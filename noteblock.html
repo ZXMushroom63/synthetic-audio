@@ -1,0 +1,38 @@
+<link rel="stylesheet" href="wrapper.css">
+<div class="noteblock">
+    <span>A</span>
+    <span>B</span>
+    <span>C</span>
+    <span>B</span>
+</div>
+<script>
+    window.addEventListener("load", () => {
+        var valid = "ABCDEFG";
+        var n = document.querySelector(".noteblock");
+        n.querySelectorAll("span").forEach(x => {
+            x.setAttribute("contentEditable", "true");
+            x.addEventListener("focus", ()=>{
+                window.getSelection().anchorOffset = 0;
+            });
+            x.addEventListener("keydown", (e) => {
+                if (e.key.length === 1) {
+                    if (valid.includes(e.key.toUpperCase())) {
+                        e.preventDefault();
+                        x.innerText = e.key.toUpperCase();
+                    } else {
+                        e.preventDefault();
+                        x.innerText = "";
+                    }
+                }
+                if (e.key === "Enter") {
+                    e.preventDefault();
+                }
+            });
+            x.addEventListener("keyup", (e) => {
+                if (x.innerText.length > 1) {
+                    x.innerText = x.innerText.slice(0, 1);
+                }
+            });
+        });
+    });
+</script>

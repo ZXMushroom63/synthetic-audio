@@ -1,0 +1,345 @@
+#track {
+    height: 60vh;
+    background-color: rgba(0, 25, 55, 0.5);
+    border-radius: 1rem;
+    border: 4px solid black;
+    width: calc(100vw - 16px);
+    overflow-x: scroll;
+    overflow-y: auto;
+}
+#track #time {
+    height: 2rem;
+    background-color: rgb(20,20,20);
+    border-bottom: 2px solid white;
+    color: white;
+    width: 100%;
+    overflow-x: hidden;
+    overflow-y: hidden;
+}
+html,body {
+    margin: 0;
+    padding: 0;
+    background-color: rgb(0,0,0);
+    overflow-x: hidden;
+    overflow-y: hidden;
+}
+h4 {
+    font-family: sans-serif;
+    color: white;
+}
+.timeMarker {
+    display: inline-block;
+    height: 2rem;
+    margin: 0;
+    padding: 0;
+    position: relative;
+    font-family: sans-serif;
+    line-height: 2rem;
+    width: 0rem;
+    text-align: right;
+    cursor: pointer;
+    user-select: none;
+}
+#tray {
+    bottom: 0;
+    width: 100vw;
+    border-top: 2px solid white;
+    min-height: 10vh;
+    padding: 4px;
+}
+table.main {
+    height: 100vh;
+    position: fixed;
+    width: 100vw;
+    top: 0;
+    left: 0;
+}
+tr {
+    width: 100vw;
+}
+h4 {
+    padding: 0;
+    margin: 0;
+}
+.trayElem {
+    height: 1rem;
+    line-height: 1rem;
+    min-width: 1rem;
+    margin-right: 4px;
+    color: white;
+    font-family: sans-serif;
+    padding: 0px 5px;
+    border-radius: 2px;
+    border: 1px solid transparent;
+    cursor: default;
+    transition: 0.3s;
+    white-space: nowrap;
+    background-color: rgba(125,125,255,0.3);
+}
+.trayElem:hover {
+    border: 1px solid white;
+}
+.trayElem input {
+    background: transparent;
+    border: 0;
+    color: white;
+    height: 1rem;
+    line-height: 1rem;
+    text-align: right;
+    width: 6rem;
+}
+.trayElem input:focus {
+    outline: 0;
+}
+.beatMarker {
+    pointer-events: none;
+    position: relative;
+    display: inline-block;
+    margin: 0;
+    padding: 0;
+    height: calc(600vh - 2rem - 4px);
+    text-align: center;
+    width: 0px;
+}
+.beatMarker::after {
+    pointer-events: none;
+    display: inline-block;
+    margin: 0;
+    padding: 0;
+    content: "_";
+    color: transparent;
+    height: calc(600vh - 2rem - 4px);
+    background-color: rgba(255,255,255,0.25);
+    width: 2px;
+}
+.loop {
+    position: relative;
+    width: 0;
+    text-align: left;
+    margin: 0;
+    padding: 0;
+    height: 0;
+    left: 0%;
+}
+.loop.deactivated .loopInternal {
+    pointer-events: none;
+    user-select: none;
+    opacity: 0.15;
+}
+.loopInternal {
+    user-select: none;
+    overflow-x: auto;
+    overflow-y: hidden;
+    min-width: 0.2rem;
+    line-height: 0rem;
+    height: 3rem;
+    color: white;
+    font-family: sans-serif;
+    border: 1px solid rgba(199, 199, 255, 0.5);
+    border-radius: 0.5rem;
+    transition: border 0.3s;
+    background-blend-mode: color;
+}
+.loop.active .loopInternal {
+    outline: 2px solid rgba(255,255,255,0.75);
+}
+.loopInternal.selected {
+    outline: 2px solid rgba(0,255,255,0.75);
+}
+.loopInternal:hover {
+    border: 1px solid rgb(199, 199, 255);
+}
+.loopInternal span.name {
+    display: block;
+    margin-left: calc(4px + 0.5rem);
+    border-radius: 2px;
+    text-shadow: 0px 0px 1px rgba(0,0,0,0.5);
+    margin-top: 8px;
+    z-index: 2;
+    font-size: 0.5rem;
+}
+.loopInternal .handle {
+    position: absolute;
+    display: block;
+    top: 0;
+    height: 3rem;
+    width: 0.5rem;
+    color: transparent;
+    transition: border 0.3s;
+    background-color: rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(255,255,255,0.5);
+}
+.loopInternal span.handleLeft {
+    left: 0;
+    z-index: 3;
+    border-radius: 0.5rem 0px 0px 0.5rem;
+}
+.loopInternal span.handleRight {
+    z-index: 3;
+    border-radius: 0rem 0.5rem 0.5rem 0rem;
+}
+.loopInternal .handle:hover {
+    border: 1px solid white;
+}
+.loopOptionsMenu {
+    position: absolute;
+    width: 20rem;
+    overflow-x: hidden;
+    overflow-y: auto;
+    min-height: 6rem;
+    top: 0rem;
+    border: 1px solid rgba(255,255,255,0.5);
+    display: none;
+    z-index: 444444;
+    background-color: rgba(0, 0, 0, 0.5);
+    border-radius: 0.5rem;
+}
+.loopInternal.selected .loopOptionsMenu {
+    display: block;
+}
+.loopOptionsMenu input, .loopOptionsMenu select {
+    background-color: transparent;
+    border: 0;
+    color: white;
+    background-color: rgba(125, 125, 255, 0.3);
+    padding: 2px;
+    border-radius: 3px;
+    width: 4rem;
+}
+.loopOptionsMenu input.modifyable, .loopOptionsMenu select.modifyable {
+    background-color: rgba(255, 0, 255, 0.3);
+}
+.loopOptionsMenu select option {
+    color: black;
+}
+.loopOptionsMenu input:focus, .loopOptionsMenu select:focus {
+    outline: 0;
+}
+.loopOptionsMenu button {
+    margin-top: 6px;
+    background-color: rgba(125, 125, 255, 0.3);
+    border: 1px solid white;
+    border-radius: 3px;
+    color: white;
+}
+#addstuff {
+    text-align: right;
+    position: fixed;
+    z-index: 2;
+    top: 0;
+    right: 0;
+    width: 20rem;
+    background-color: rgba(0,0,0,0.5);
+    border-left: 1px solid white;
+    border-bottom: 1px solid white;
+    overflow-y: auto;
+    overflow-x: hidden;
+    max-height: 100vh;
+    border-radius: 0rem 0rem 0rem 0.4rem;
+}
+#addstuff details summary {
+    user-select: none;
+    cursor: pointer;
+}
+#addstuff summary {
+    list-style-type: "+ ";
+}
+#addstuff details[open]>summary {
+    list-style-type: "- ";
+}
+#addstuff h4 {
+    text-decoration: underline;
+}
+#addstuff * {
+    font-family: sans-serif;
+    color: white
+}
+#addstuff>details>div span {
+    display: block;
+}
+#addstuff>details>div span a {
+    color: lightblue;
+    text-decoration: underline;
+    cursor: pointer;
+    user-select: none;
+    transition: color 0.3s;
+}
+#addstuff>details>div span a:hover {
+    color: white;
+}
+#loopsample, #loopmeta {
+    display: none;
+}
+#loopSelector, #renderProgress {
+    color: white;
+    font-family: sans-serif;
+}
+.timePosMarker {
+    position: relative;
+    display: inline-block;
+    margin: 0;
+    user-select: none;
+    padding: 0;
+    pointer-events: none;
+    height: calc(600vh - 2rem - 4px);
+    text-align: center;
+    width: 0px;
+    z-index: 4;
+}
+.timePosMarker::after {
+    display: inline-block;
+    margin: 0;
+    padding: 0;
+    content: "|";
+    user-select: none;
+    pointer-events: none;
+    color: transparent;
+    height: calc(600vh - 2rem - 4px);
+    width: 3px;
+    background-color: rgba(255,255,255,1);
+    z-index: 6000;
+}
+.timePosMarker::before {
+    pointer-events: all;
+    display: inline-block;
+    -webkit-user-drag: none;
+    position: absolute;
+    user-select: none;
+    margin: 0;
+    padding: 0;
+    content: "_";
+    width: 14px;
+    color: transparent;
+    top: 0px;
+    left: -7px;
+    height: 14px;
+    background-color: white;
+    border: 2px solid rgba(0,0,0,0.1);
+    z-index: 7000;
+    cursor: grab;
+    border-radius: 5px;
+}
+.timePosMarker.grabbing::before {
+    cursor: grabbing;
+}
+.noteblock {
+    background-color: white;
+    padding: 2rem;
+}
+.noteblock span {
+    width: 0.75rem;
+    text-align: center;
+    display: inline-block;
+    font-family: sans-serif;
+    color: black;
+    background-color: rgba(0, 125, 255, 0.3);
+    padding: 1rem;
+    margin-right: 0.5rem;
+    border-radius: 0.6rem;
+}
+.selectbox {
+    position: fixed;
+    z-index: 999999999999999999;
+    border: 1px solid rgba(0, 125, 255, 0.6);
+    background-color: rgba(0, 125, 255, 0.4);
+}

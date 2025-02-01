@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Soundplate</title>
+    <link rel="stylesheet" href="wrapper.css">
+</head>
+<body>
+    <script src="fsaver.js"></script>
+    <script src="lamejs.min.js"></script>
+
+    <script src="gui.js"></script>
+    <script src="module.js"></script>
+    <script src="vizualiser.js"></script>
+    <table class="main">
+        <tr>
+            <td>
+                <h4>
+                    <canvas width="150" height="75" style="border: 1px solid white;"></canvas>
+                    <button id="renderBtn" disabled onclick="if(this.disabled){return};render()">Render Audio</button>
+                    <audio id="renderOut" controls></audio>
+                    <div style="display: inline-block;">
+                        <span>Playback Rate: </span><br>
+                        <input id="playbackRateSlider" type="range" min="0.075" step="0.01" max="1" value="1" oninput="document.querySelector('#renderOut').playbackRate = parseFloat(this.value)">
+                    </div>
+                </h4>
+                <div id="loopSelector">
+                    <label>Select loop folder: </label><input type="file" multiple>
+                </div>
+                <div id="renderProgress">
+                    (no render task currently active)
+                </div>
+                <div id="controlsAndStuff">
+                    <button onclick="saveAs(new Blob([JSON.stringify(serialise())], {type: 'text/json'}), 'mysong.sm')">
+                        Save
+                    </button>
+                    <button onclick="load()">
+                        Load
+                    </button>
+                    <button onclick="deserialise('{}')">
+                        Clear
+                    </button>
+                    <button onclick="viewKeybinds()">
+                        View Keybinds
+                    </button>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <div id="track">
+                    <div id="trackInternal">
+                        <div id="time">
+                        </div>
+                        <span class="timePosMarker" style="left: 0%;"></span>
+                    </div>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td style="align-content: flex-end;">
+                <div id="tray">
+                    <span class="trayElem">
+                        Editor Layer: <input step="1" min="-10" max="10" type="number" id="editorlayer" value="0">
+                    </span>
+                    <span class="trayElem">
+                        BPM: <input step="1" min="20" max="480" type="number" id="bpm" value="240">
+                    </span>
+                    <span class="trayElem">
+                        Loop Interval: <input step="1" min="0.1" max="16" type="number" id="loopi" value="0.001">
+                    </span>
+                    <span class="trayElem">
+                        Duration: <input step="1" min="1" max="360" type="number" id="duration" value="10">s
+                    </span>
+                    <span class="trayElem">
+                        Stereo: <input checked type="checkbox" id="stereobox">
+                    </span>
+                    <span class="trayElem">
+                        Normalised: <input checked type="checkbox" id="normalisebox">
+                    </span>
+                </div>
+            </td>
+        </tr>
+    </table>
+    <div id="addstuff">
+        <h4>Add Tracks</h4>
+        <details>
+            <summary>Loops</summary>
+            <div id="addloops">
+            </div>
+        </details>
+        <details>
+            <summary>Filters</summary>
+            <div id="addfilters">
+            </div>
+        </details>
+        <details>
+            <summary>Primitives</summary>
+            <div id="addprims">
+            </div>
+        </details>
+    </div>
+    <audio id="loopsample"></audio>
+    <audio id="loopmeta"></audio>
+</body>
+</html>
