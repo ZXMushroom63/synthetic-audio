@@ -30,7 +30,7 @@ window.addEventListener("load", () => {
         const freq = (maxIndex * nyquist) / freqDataArray.length;
         return freq.toFixed(2); // return frequency in Hz
     }
-
+    var logoImage = document.querySelector("#logo");
     function draw() {
         requestAnimationFrame(draw);
 
@@ -38,9 +38,12 @@ window.addEventListener("load", () => {
 
         canvasCtx.fillStyle = 'rgb(0, 0, 0)';
         canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
+        canvasCtx.drawImage(logoImage, 0, 15, 150, 45);
+        canvasCtx.fillStyle = 'rgba(0, 0, 0, 0.9)';
+        canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
 
         canvasCtx.lineWidth = 1.5;
-        canvasCtx.strokeStyle = 'rgb(0, 255, 0)';
+        canvasCtx.strokeStyle = 'rgb(255, 255, 255)';
 
         canvasCtx.beginPath();
 
@@ -67,9 +70,9 @@ window.addEventListener("load", () => {
         const mostCommonFrequency = getMostCommonFrequency();
 
         canvasCtx.lineWidth = 1;
-        canvasCtx.strokeStyle = 'rgb(0, 255, 0)';
+        canvasCtx.strokeStyle = 'rgb(255, 255, 255)';
         canvasCtx.font = "10px sans-serif";
-        canvasCtx.strokeText("Soundplate", 0, 10);
+        canvasCtx.strokeText("SYNTHETIC", 0, 10);
         canvasCtx.strokeText(`${mostCommonFrequency} Hz`, 0, 20);
     }
 

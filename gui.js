@@ -401,10 +401,13 @@ window.addEventListener("beforeunload", () => {
 });
 function viewKeybinds() {
     var div = document.createElement("div");
-    div.innerText = 
+    div.innerHTML = 
 `
 (click to close)
 
+******************
+*      KEYS      *
+******************
 CTRL + (any number) = Go to that layer
 Spacebar =  Pause/Play playback
 CTRL + Scroll on timeline = Shrink/expand timeline
@@ -416,8 +419,21 @@ CTRL + V = Paste selected/hovered loop(s)
 CTRL + X = Cut selected/hovered loop(s)
 TAB = Focus next input (in edit panel)
 CTRL + SPACE = Go to ALL layer (layer 10)
-`;
-div.style = "position: absolute; z-index: 99999; top: 0; left: 0; right: 0; bottom: 0; background-color: black; color: white; font-family: sans-serif; overflow-x: hidden; overflow-y: auto;";
+
+
+*******************
+* INPUT SHORTCUTS *
+*******************
+If an input box is purple, that means you can write inline scripts inside it.
+For a simple linear interpolation, try inputting:   #0~24
+
+For writing an arbitrary script, do: #(()=>{/*/code/*/ return 1;})()
+These scripts have access to the following variables:
+x - The percentage through the node
+rt - The total runtime of the node
+i - The index of the current sample
+`.replaceAll(" ", "&nbsp;").replaceAll("\n", "\<br\>");
+div.style = "font-family: monospace; position: absolute; z-index: 99999; top: 0; left: 0; right: 0; bottom: 0; background-color: black; color: white; overflow-x: hidden; overflow-y: auto;";
 div.addEventListener("click", ()=>{
     div.remove();
 });
