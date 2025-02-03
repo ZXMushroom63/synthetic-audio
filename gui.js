@@ -51,6 +51,7 @@ function pickupLoop(loop, natural = false) {
     if (loop.classList.contains("deactivated")) {
         return;
     }
+    markLoopDirty(loop, true);
     loop.classList.add("active");
     var px = mouse.x;
     var py = mouse.y;
@@ -93,6 +94,12 @@ function pickupLoop(loop, natural = false) {
     var originalBB = loop.querySelector(".loopInternal").getBoundingClientRect();
     document.addEventListener("mousemove", mouseMove);
     document.addEventListener("mouseup", mouseUp);
+}
+function markLoopDirty(loop, wasMoved) {
+    loop.setAttribute("data-dirty", "yes");
+    if (wasMoved) {
+        loop.setAttribute("data-wasMovedSinceRender", "yes");
+    }
 }
 function hydrateBeatMarkers() {
     var track = document.querySelector("#trackInternal");
@@ -163,6 +170,7 @@ function hydrate() {
 function addBlock(type, start, duration, title, layer = 0, data = {}, editorValue = Math.min(gui.layer, 9)) {
     var definition = window.filters[type];
     function resizeBlock(e) {
+        markLoopDirty(loop, true);
         if (parseInt(loop.getAttribute("data-editlayer")) !== gui.layer) {
             return;
         }
@@ -216,6 +224,7 @@ function addBlock(type, start, duration, title, layer = 0, data = {}, editorValu
         }
     }
     const loop = document.createElement("div");
+    markLoopDirty(loop);
     loop.setAttribute("data-type", type);
     loop.setAttribute("data-start", start);
     loop.setAttribute("data-duration", duration);
@@ -255,6 +264,7 @@ function addBlock(type, start, duration, title, layer = 0, data = {}, editorValu
                 if (definition.updateMiddleware) {
                     definition.updateMiddleware(loop);
                 }
+                markLoopDirty(loop);
             });
             s.addEventListener("focus", () => {
                 loop["conf"][key] = s.value;
@@ -282,6 +292,7 @@ function addBlock(type, start, duration, title, layer = 0, data = {}, editorValu
                 if (definition.updateMiddleware) {
                     definition.updateMiddleware(loop);
                 }
+                markLoopDirty(loop);
             });
             optionsMenu.appendChild(input);
         }
@@ -368,6 +379,7 @@ function addBlock(type, start, duration, title, layer = 0, data = {}, editorValu
         var originalBB = internal.getBoundingClientRect();
         loop.classList.add("active");
         // (a.left - b.left) / b.width
+        markLoopDirty(loop, true);
         document.onmousemove = function (j) {
             var pos = Math.max(0, ((originalBB.left - trackBB.left - (e.clientX - j.clientX)) / trackBB.width) * 100);
             var bpmInterval = 60 / bpm;
@@ -638,7 +650,7 @@ function init() {
             if (!document.querySelector(".loop.active")) {
                 var x = document.elementsFromPoint(mouse.x, mouse.y).find(x => !x.classList.contains("deactivated"));
                 if (x && x.closest(".loop")) {
-                    var y = deserialiseNode(structuredClone(serialiseNode(x.closest(".loop"))));
+                    var y = deserialiseNode(structuredClone(serialiseNode(x.closest(".loop"))), true);
                     hydrateZoom();
                     pickupLoop(y);
                 }
@@ -648,7 +660,7 @@ function init() {
                 dropHandlers = [];
                 var dupedLoops = [];
                 targets.forEach(target => {
-                    var loop = deserialiseNode(structuredClone(serialiseNode(target)));
+                    var loop = deserialiseNode(structuredClone(serialiseNode(target)), true);
                     dupedLoops.push(loop);
                 });
                 hydrateZoom();
@@ -714,7 +726,7 @@ function init() {
                     });
                     var pastedLoops = [];
                     data.forEach(target => {
-                        pastedLoops.push(deserialiseNode(target));
+                        pastedLoops.push(deserialiseNode(target, true));
                     });
                     hydrateZoom();
                     if (!e.shiftKey) {

@@ -243,27 +243,37 @@ function convertToMp3Blob(float32Arrays, channels, sampleRate, bRate) {
 
 var filters = {};
 var decodedPcmCache = {};
-function serialise() {
+function serialise(forRender) {
     var hNodes = document.querySelectorAll(".loop");
     var x = Array.prototype.flatMap.apply(hNodes, [(node => {
-        return serialiseNode(node);
+        return serialiseNode(node, forRender);
     })]);
     var out = { nodes: x, duration: audio.duration, bpm: bpm, zoom: zoom, loopInterval: loopi, stereo: audio.stereo, sampleRate: audio.samplerate, normalise: audio.normalise };
     return out;
 }
-function serialiseNode(node) {
+function serialiseNode(node, forRender) {
     var out = {};
     out.conf = node.conf;
     out.start = parseFloat(node.getAttribute("data-start")) || 0;
     out.duration = parseFloat(node.getAttribute("data-duration")) || 0;
+    out.end = out.start + out.duration;
     out.layer = parseFloat(node.getAttribute("data-layer")) || 0;
     out.file = node.getAttribute("data-file") || "";
     out.type = node.getAttribute("data-type");
     out.editorLayer = Math.min(parseInt(node.getAttribute("data-editlayer")), 9);
+    if (forRender) {
+        out.dirty = node.hasAttribute("data-dirty");
+        out.wasMovedSinceRender = node.hasAttribute("data-wasMovedSinceRender");
+        out.ref = node;
+    }
     return out;
 }
-function deserialiseNode(serNode) {
-    return addBlock(serNode.type, serNode.start, serNode.duration, serNode.file, serNode.layer, serNode.conf, serNode.editorLayer || 0);
+function deserialiseNode(serNode, markDirty) {
+    var x = addBlock(serNode.type, serNode.start, serNode.duration, serNode.file, serNode.layer, serNode.conf, serNode.editorLayer || 0);
+    if (markDirty) {
+        markLoopDirty(x);
+    }
+    return x;
 }
 function deserialise(serialisedStr) {
     if (!serialisedStr) {
@@ -287,11 +297,17 @@ function deserialise(serialisedStr) {
     document.querySelector("#loopi").value = ser.loopInterval;
     document.querySelector("#stereobox").checked = ser.stereo;
     document.querySelector("#normalisebox").checked = ser.normalise;
+    gui.layer = ser.editorLayer;
+    bpm = ser.bpm;
+    loopi = ser.loopInterval
+    audio.duration = ser.duration;
     audio.normalise = ser.normalise;
+    audio.stereo = ser.stereo;
     zoom = ser.zoom || 100;
     ser.nodes.forEach((node) => {
         deserialiseNode(node);
     });
+    proceduralAssets = new Map();
     hydrate();
 }
 function addBlockType(id, data) {
@@ -362,6 +378,7 @@ function constructAbstractLayerMapsForLevel(nodes, usedLayers, editorOnly) {
     return abstractLayerMaps;
 }
 function constructRenderDataArray(data) {
+    data.nodes.sort((a, b)=>a.layer - b.layer);
     var usedEditorLayers = [...new Set(data.nodes.flatMap(x => { return x.editorLayer }))].sort((a, b) => { return a - b });
     var renderDataArray = [];
     usedEditorLayers.forEach(editorLayer => {
@@ -371,16 +388,68 @@ function constructRenderDataArray(data) {
         var usedLayers = [...new Set(nodesForLevel.flatMap(x => { return x.layer }).sort((a, b) => { return a - b }))];
         renderDataArray.push(constructAbstractLayerMapsForLevel(nodesForLevel, usedLayers, editorLayer < 0));
     });
+    var assetMap = {};
+    renderDataArray.forEach(editorLayer => {
+        var dirtyNodes = editorLayer.flat().filter(x=>x.dirty);
+        dirtyNodes.forEach(x => {
+            if (x.type === "p_writeasset") {
+                assetMap[x.conf.Asset] = true;
+            }
+            if (x.wasMovedSinceRender) {
+                dirtyNodes.push({
+                    type: "ghost",
+                    start: x.ref.startOld,
+                    end: x.ref.endOld,
+                    layer: x.ref.layerOld,
+                });
+            }
+        });
+        dirtyNodes.push({
+            start: -1,
+            end: -2,
+            layer: 9999
+        });
+        for (let layer = 0; layer < editorLayer.length; layer++) {
+            const nodes = editorLayer[layer];
+            nodes.forEach(x=>{
+                if (x.dirty) {
+                    if (x.type === "p_writeasset") {
+                        assetMap[x.conf.Asset] = true;
+                    }
+                    return;
+                }
+                if (x.type === "p_readasset") {
+                    debugger;
+                }
+                for (let i = 0; i < dirtyNodes.length; i++) {
+                    const dirtyNode = dirtyNodes[i];
+                    if (
+                        (!dirtyNodes.includes(x)) &&
+                        (((x.start >= dirtyNode.start && 
+                        x.start <= dirtyNode.end) ||
+                        (x.end >= dirtyNode.start && 
+                        x.end <= dirtyNode.end) && (x.layer >= dirtyNode.layer)) || (x.type === "p_readasset" && assetMap[x.conf.Asset]))
+                    ) {
+                        x.dirty = true;
+                        dirtyNodes.push(x);
+                        if (x.type === "p_writeasset") {
+                            assetMap[x.conf.Asset] = true;
+                        }
+                        break;
+                    }
+                }
+            });
+        }
+    });
     return renderDataArray;
 }
 async function render() {
-    proceduralAssets = new Map();
     if (document.querySelector("#renderOut").src) {
         URL.revokeObjectURL(document.querySelector("#renderOut").src);
     }
     var output = [];
     hydrate();
-    var data = serialise();
+    var data = serialise(true);
     var channels = data.stereo ? 2 : 1;
 
     var ax = new OfflineAudioContext(channels, audio.length, audio.samplerate);
@@ -390,33 +459,59 @@ async function render() {
 
     var renderDataArray = constructRenderDataArray(data);
     document.querySelector("#renderProgress").innerText = "Processing layers...";
-    for (let c = 0; c < channels; c++) {
-        var channelPcms = [];
-        for (let q = 0; q < renderDataArray.length; q++) {
-            var initialPcm = new Float32Array(audio.length).fill(0);
-            const abstractLayerMaps = renderDataArray[q];
-            for (let l = 0; l < abstractLayerMaps.length; l++) {
-                const layer = abstractLayerMaps[l];
-                for (let n = 0; n < layer.length; n++) {
-                    const node = layer[n];
-                    var newPcm = await filters[node.type].functor.apply(node, [initialPcm.slice(Math.floor(node.start * audio.samplerate), Math.floor((node.start + node.duration) * audio.samplerate)), c, data]);
-                    initialPcm.set(newPcm, Math.floor(node.start * audio.samplerate));
-                    await wait(0.05);
+    var success = true;
+    var proccessedNodeCount = 0;
+    try {
+        for (let c = 0; c < channels; c++) {
+            var channelPcms = [];
+            for (let q = 0; q < renderDataArray.length; q++) {
+                var initialPcm = new Float32Array(audio.length).fill(0);
+                const abstractLayerMaps = renderDataArray[q];
+                for (let l = 0; l < abstractLayerMaps.length; l++) {
+                    const layer = abstractLayerMaps[l];
+                    for (let n = 0; n < layer.length; n++) {
+                        const node = layer[n];
+                        var newPcm;
+                        
+                        if (node.dirty || (!node.ref.cache)) {
+                            node.dirty = false;
+                            node.ref.removeAttribute("data-dirty");
+                            node.ref.removeAttribute("data-wasMovedSinceLastRender");
+                            node.ref.cache = [null, null];
+                            node.ref.startOld = node.start;
+                            node.ref.layerOld = node.layer;
+                            node.ref.endOld = node.end;
+                            proccessedNodeCount++;
+                        }
+
+                        if (!node.ref.cache[c]) {
+                            newPcm = await filters[node.type].functor.apply(node, [initialPcm.slice(Math.floor(node.start * audio.samplerate), Math.floor((node.start + node.duration) * audio.samplerate)), c, data]);
+                            node.ref.cache[c] = newPcm;
+                        } else {
+                            newPcm = node.ref.cache[c];
+                        }
+                        
+                        initialPcm.set(newPcm, Math.floor(node.start * audio.samplerate));
+                        await wait(1/240);
+                    }
+                }
+                if (!abstractLayerMaps.editorOnly) {
+                    channelPcms.push(initialPcm);
                 }
             }
-            if (!abstractLayerMaps.editorOnly) {
-                channelPcms.push(initialPcm);
-            }
+            output.push(sumFloat32ArraysNormalised(channelPcms));
         }
-        output.push(sumFloat32ArraysNormalised(channelPcms));
+        var blob = convertToMp3Blob(output, channels, audio.samplerate, audio.bitrate);
+    } catch (error) {
+        console.error(error);
+        success = false;
     }
-    var blob = convertToMp3Blob(output, channels, audio.samplerate, audio.bitrate);
-    document.querySelector("#renderProgress").innerText = "Render successful!";
-    document.querySelector("#renderOut").src = URL.createObjectURL(blob);
+    document.querySelector("#renderProgress").innerText = success?"Render successful! ("+proccessedNodeCount+")":"Render failed.";
+    if (success) {
+        document.querySelector("#renderOut").src = URL.createObjectURL(blob);
+    }
 
     document.querySelector("#renderBtn").removeAttribute("disabled");
-
-    //proceduralAssets = new Map();
 }
 function applySoundbiteToPcm(reverse, looping, currentData, inPcm, duration, speed, volume) {
     if (typeof speed !== "function") {
@@ -466,7 +561,6 @@ function applySoundbiteToPcmSidechain(reverse, looping, currentData, inPcm, dura
         const sum = pcmData.reduce((acc, x) => acc + Math.abs(x));
         LOOKUPTABLE[i] = (sum / PCMBINSIZE) * 2;
     });
-    console.log(LOOKUPTABLE);
     if (looping) {
         var interval = Math.floor(currentData.length * speed(currentData.length - 1, inPcm));
         for (let i = 0; i < inPcm.length; i++) {
@@ -570,6 +664,36 @@ addBlockType("bitcrunch", {
         return inPcm;
     }
 });
+addBlockType("quantise", {
+    color: "rgba(0,255,0,0.3)",
+    title: "Quantise",
+    configs: {
+        "Snapping": [0.25, "number", 1],
+    },
+    functor: function (inPcm, channel, data) {
+        var snapping = _(this.conf.Snapping);
+        inPcm.forEach((x, i) => {
+            var sign = Math.sign(x);
+            var lvl = snapping(i, inPcm) || 0.01;
+            inPcm[x] = Math.floor(Math.abs(x) / lvl) * lvl * sign;
+        });
+        return inPcm;
+    }
+});
+addBlockType("repeat", {
+    color: "rgba(0,255,0,0.3)",
+    title: "Repeat",
+    configs: {
+        "RepeatDuration": [0.2, "number"],
+    },
+    functor: function (inPcm, channel, data) {
+        var repeatAmount = inPcm.subarray(0, Math.floor(this.conf.RepeatDuration * audio.samplerate));
+        inPcm.forEach((x, i) => {
+            inPcm[i] = repeatAmount[i % repeatAmount.length];
+        });
+        return inPcm;
+    }
+});
 addBlockType("sidechannel", {
     color: "rgba(0,255,0,0.3)",
     title: "Sidechannel",
@@ -617,6 +741,15 @@ addBlockType("reverb", {
     },
     functor: async function (inPcm, channel, data) {
         return await applyReverbOffline(inPcm, audio.samplerate, this.conf.ReverbTime, this.conf.DecayRate);
+    }
+});
+addBlockType("reverse", {
+    color: "rgba(0,255,0,0.3)",
+    title: "Reverse",
+    configs: {
+    },
+    functor: async function (inPcm, channel, data) {
+        return inPcm.reverse();
     }
 });
 addBlockType("resample", {
@@ -909,6 +1042,9 @@ addBlockType("p_waveform_plus", {
         "Exponent": [1, "number", 1],
         "Amplitude": [1, "number", 1],
         "Decay": [0, "number", 1],
+        "Harmonics": [false, "checkbox"],
+        "HarmonicCount": [2, "number"],
+        "HarmonicRatio": [0.5, "number"],
         "Multiply": [false, "checkbox"],
         "Sidechain": [false, "checkbox"],
         "SidechainPower": [2, "number"],
@@ -936,6 +1072,16 @@ addBlockType("p_waveform_plus", {
         var fdecay = _(this.conf.FrequencyDecay);
         var exp = _(this.conf.Exponent);
         var amp = _(this.conf.Amplitude);
+
+        var totalNormalisedVolume = 0;
+        if (this.conf.Harmonics) {
+            for (let h = 0; h < this.conf.HarmonicCount; h++) {
+                totalNormalisedVolume += Math.pow(this.conf.HarmonicRatio, h);
+            }
+        } else {
+            totalNormalisedVolume = 1;
+        }
+
         inPcm.forEach((x, i) => {
             var denominator = Math.max(...keys.flatMap((k) => { return underscores[k](i, inPcm) })) || 1;
             var total = 0;
@@ -949,12 +1095,16 @@ addBlockType("p_waveform_plus", {
             f *= Math.exp(-fdecay(i, inPcm) * t);
             var y = 0;
 
-            y += waveforms.sin(t * f) * values.Sine;
-            y += waveforms.square(t * f) * values.Square;
-            y += waveforms.sawtooth(t * f) * values.Sawtooth;
-            y += waveforms.triangle(t * f) * values.Triangle;
+            for (let h = 0; h < (this.conf.Harmonics ? this.conf.HarmonicCount : 1); h++) {
+                var harmonicVolumeRatio = Math.pow(this.conf.HarmonicRatio, h);
+                y += waveforms.sin(t * f * (h+1)) * values.Sine * harmonicVolumeRatio;
+                y += waveforms.square(t * f * (h+1)) * values.Square * harmonicVolumeRatio;
+                y += waveforms.sawtooth(t * f * (h+1)) * values.Sawtooth * harmonicVolumeRatio;
+                y += waveforms.triangle(t * f * (h+1)) * values.Triangle * harmonicVolumeRatio;
+                y /= total;
+            }
 
-            y /= total;
+            y /= totalNormalisedVolume;
 
             y = (Math.pow(Math.abs(y), exp(i, inPcm)) * Math.sign(y)) * amp(i, inPcm);
 
