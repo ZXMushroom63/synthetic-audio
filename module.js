@@ -418,9 +418,6 @@ function constructRenderDataArray(data) {
                     }
                     return;
                 }
-                if (x.type === "p_readasset") {
-                    debugger;
-                }
                 for (let i = 0; i < dirtyNodes.length; i++) {
                     const dirtyNode = dirtyNodes[i];
                     if (
@@ -675,7 +672,7 @@ addBlockType("quantise", {
         inPcm.forEach((x, i) => {
             var sign = Math.sign(x);
             var lvl = snapping(i, inPcm) || 0.01;
-            inPcm[x] = Math.floor(Math.abs(x) / lvl) * lvl * sign;
+            inPcm[i] = Math.ceil(Math.abs(x) / lvl) * lvl * sign;
         });
         return inPcm;
     }
