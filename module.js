@@ -1,3 +1,27 @@
+function noteToFrequency(note, octave, accidental = '') {
+    const A4 = 440;
+    const notes = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+    const flats = {
+        'Db': 'C#',
+        'Eb': 'D#',
+        'Gb': 'F#',
+        'Ab': 'G#',
+        'Bb': 'A#'
+    };
+
+    if (accidental === 'b' && flats.hasOwnProperty(note.toUpperCase() + accidental)) {
+        note = flats[note.toUpperCase() + accidental][0];
+        accidental = '#';
+    }
+    let index = notes.indexOf(note.toUpperCase() + accidental);
+    if (index === -1) {
+        console.log("Invalid note or accidental.");
+        return 440;
+    }
+    const halfSteps = (octave - 4) * 12 + index - notes.indexOf('A');
+    const frequency = A4 * Math.pow(2, halfSteps / 12);
+    return frequency;
+}
 var proceduralAssets = new Map();
 const waveforms = {
     tau: 6.28318530718,
@@ -15,7 +39,40 @@ const waveforms = {
         return 2 * Math.abs(2 * (t % 1) - 1) - 1;
     }
 }
+const VALID_NOTES = ["A", "B", "C", "D", "E", "F", "G"];
+const VALID_DESCRIPTORS = ["#", "b"];
 function _(val) {
+    if (typeof val === "string" && val.includes(":")) {
+        var arr = val.split(":");
+        var noteArray = (arr.length % 2) ? arr.filter((x, i) => i % 2) : arr.filter((x, i) => i % 2 && (i !== arr.length - 1));
+        noteArray = noteArray.map(note => {
+            if (!((note.length > 0) && (note.length <= 3))) {
+                return note;
+            }
+            if (!VALID_NOTES.includes(note[0].toUpperCase())) {
+                return;
+            }
+            switch (note.length) {
+                case 1:
+                    return noteToFrequency(note, 4, "");
+                case 2:
+                    if (VALID_DESCRIPTORS.includes(note[1])) {
+                        return noteToFrequency(note[0], 4, note[1]);
+                    } else {
+                        return noteToFrequency(note[0], parseInt(note[1]), "");
+                    }
+                case 3:
+                    return noteToFrequency(note[0], parseInt(note[2]), note[1]);
+            }
+        });
+        val = arr.map((x, i) => {
+            if (i % 2) {
+                return noteArray[Math.floor(i / 2)];
+            } else {
+                return x;
+            }
+        }).join("");
+    }
     if (typeof val === "string" && val.startsWith("#")) {
         if (val.split("~").length === 2) {
             var v = val.replace("#", "").split("~").flatMap(x => parseFloat(x) || 0);
@@ -263,6 +320,7 @@ function serialiseNode(node, forRender) {
     out.editorLayer = Math.min(parseInt(node.getAttribute("data-editlayer")), 9);
     if (forRender) {
         out.dirty = node.hasAttribute("data-dirty");
+        out.deleted = node.hasAttribute("data-deleted");
         out.wasMovedSinceRender = node.hasAttribute("data-wasMovedSinceRender");
         out.ref = node;
     }
@@ -378,19 +436,19 @@ function constructAbstractLayerMapsForLevel(nodes, usedLayers, editorOnly) {
     return abstractLayerMaps;
 }
 function constructRenderDataArray(data) {
-    data.nodes.sort((a, b)=>a.layer - b.layer);
+    data.nodes.sort((a, b) => a.layer - b.layer);
     var usedEditorLayers = [...new Set(data.nodes.flatMap(x => { return x.editorLayer }))].sort((a, b) => { return a - b });
     var renderDataArray = [];
     usedEditorLayers.forEach(editorLayer => {
         var nodesForLevel = data.nodes.filter(x => {
-            return x.editorLayer === editorLayer;
+            return (x.editorLayer === editorLayer);
         });
         var usedLayers = [...new Set(nodesForLevel.flatMap(x => { return x.layer }).sort((a, b) => { return a - b }))];
         renderDataArray.push(constructAbstractLayerMapsForLevel(nodesForLevel, usedLayers, editorLayer < 0));
     });
     var assetMap = {};
     renderDataArray.forEach(editorLayer => {
-        var dirtyNodes = editorLayer.flat().filter(x=>x.dirty);
+        var dirtyNodes = editorLayer.flat().filter(x => x.dirty);
         dirtyNodes.forEach(x => {
             if (x.type === "p_writeasset") {
                 assetMap[x.conf.Asset] = true;
@@ -411,7 +469,7 @@ function constructRenderDataArray(data) {
         });
         for (let layer = 0; layer < editorLayer.length; layer++) {
             const nodes = editorLayer[layer];
-            nodes.forEach(x=>{
+            nodes.forEach(x => {
                 if (x.dirty) {
                     if (x.type === "p_writeasset") {
                         assetMap[x.conf.Asset] = true;
@@ -422,10 +480,10 @@ function constructRenderDataArray(data) {
                     const dirtyNode = dirtyNodes[i];
                     if (
                         (!dirtyNodes.includes(x)) &&
-                        (((x.start >= dirtyNode.start && 
-                        x.start <= dirtyNode.end) ||
-                        (x.end >= dirtyNode.start && 
-                        x.end <= dirtyNode.end) && (x.layer >= dirtyNode.layer)) || (x.type === "p_readasset" && assetMap[x.conf.Asset]))
+                        (((x.start >= dirtyNode.start &&
+                            x.start <= dirtyNode.end) ||
+                            (x.end >= dirtyNode.start &&
+                                x.end <= dirtyNode.end) && (x.layer >= dirtyNode.layer)) || (x.type === "p_readasset" && assetMap[x.conf.Asset]))
                     ) {
                         x.dirty = true;
                         dirtyNodes.push(x);
@@ -468,8 +526,13 @@ async function render() {
                     const layer = abstractLayerMaps[l];
                     for (let n = 0; n < layer.length; n++) {
                         const node = layer[n];
+
+                        if (node.deleted) {
+                            continue;
+                        }
+
                         var newPcm;
-                        
+
                         if (node.dirty || (!node.ref.cache)) {
                             node.dirty = false;
                             node.ref.removeAttribute("data-dirty");
@@ -487,9 +550,9 @@ async function render() {
                         } else {
                             newPcm = node.ref.cache[c];
                         }
-                        
+
                         initialPcm.set(newPcm, Math.floor(node.start * audio.samplerate));
-                        await wait(1/240);
+                        await wait(1 / 240);
                     }
                 }
                 if (!abstractLayerMaps.editorOnly) {
@@ -503,10 +566,12 @@ async function render() {
         console.error(error);
         success = false;
     }
-    document.querySelector("#renderProgress").innerText = success?"Render successful! ("+proccessedNodeCount+")":"Render failed.";
+    document.querySelector("#renderProgress").innerText = success ? "Render successful! (" + proccessedNodeCount + ")" : "Render failed.";
     if (success) {
         document.querySelector("#renderOut").src = URL.createObjectURL(blob);
     }
+
+    document.querySelectorAll(".loop[data-deleted]").forEach(x => x.remove());
 
     document.querySelector("#renderBtn").removeAttribute("disabled");
 }
@@ -562,7 +627,7 @@ function applySoundbiteToPcmSidechain(reverse, looping, currentData, inPcm, dura
         var interval = Math.floor(currentData.length * speed(currentData.length - 1, inPcm));
         for (let i = 0; i < inPcm.length; i++) {
             var idx = Math.floor(i * speed(i, inPcm)) % interval;
-            var sidechainCoefficient = Math.pow(1 - Math.max(Math.min(1, LOOKUPTABLE[Math.floor(idx/PCMBINSIZE)]), 0), Math.abs(sideChain)) || 0;
+            var sidechainCoefficient = Math.pow(1 - Math.max(Math.min(1, LOOKUPTABLE[Math.floor(idx / PCMBINSIZE)]), 0), Math.abs(sideChain)) || 0;
             var y = (currentData[idx] || 0) * volume;
             if (sideChain < 0) {
                 y *= sidechainCoefficient;
@@ -574,7 +639,7 @@ function applySoundbiteToPcmSidechain(reverse, looping, currentData, inPcm, dura
     } else {
         for (let i = 0; i < inPcm.length; i++) {
             var idx = Math.floor(i * speed(i, inPcm));
-            var sidechainCoefficient = Math.pow(1 - Math.max(Math.min(1, LOOKUPTABLE[Math.floor(idx/PCMBINSIZE)]), 0), Math.abs(sideChain)) || 0;
+            var sidechainCoefficient = Math.pow(1 - Math.max(Math.min(1, LOOKUPTABLE[Math.floor(idx / PCMBINSIZE)]), 0), Math.abs(sideChain)) || 0;
             var y = (currentData[idx] || 0) * volume;
             if (sideChain < 0) {
                 y *= sidechainCoefficient;
@@ -1094,10 +1159,10 @@ addBlockType("p_waveform_plus", {
 
             for (let h = 0; h < (this.conf.Harmonics ? this.conf.HarmonicCount : 1); h++) {
                 var harmonicVolumeRatio = Math.pow(this.conf.HarmonicRatio, h);
-                y += waveforms.sin(t * f * (h+1)) * values.Sine * harmonicVolumeRatio;
-                y += waveforms.square(t * f * (h+1)) * values.Square * harmonicVolumeRatio;
-                y += waveforms.sawtooth(t * f * (h+1)) * values.Sawtooth * harmonicVolumeRatio;
-                y += waveforms.triangle(t * f * (h+1)) * values.Triangle * harmonicVolumeRatio;
+                y += waveforms.sin(t * f * (h + 1)) * values.Sine * harmonicVolumeRatio;
+                y += waveforms.square(t * f * (h + 1)) * values.Square * harmonicVolumeRatio;
+                y += waveforms.sawtooth(t * f * (h + 1)) * values.Sawtooth * harmonicVolumeRatio;
+                y += waveforms.triangle(t * f * (h + 1)) * values.Triangle * harmonicVolumeRatio;
                 y /= total;
             }
 
@@ -1155,7 +1220,7 @@ addBlockType("p_readasset", {
         } else {
             applySoundbiteToPcm(this.conf.Reverse, this.conf.Looping, currentData, inPcm, duration, this.conf.Speed, this.conf.Volume);
         }
-        
+
         return inPcm;
     }
 });

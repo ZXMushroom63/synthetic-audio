@@ -26,6 +26,9 @@ var loopMap = {
 
 };
 var loopDurationMap = {};
+function deleteLoop(loop) {
+    loop.setAttribute("data-deleted", "yes"); markLoopDirty(loop, true);
+}
 function getDurationOfLoop(audioFile) {
     return new Promise((res, rej) => {
         var audioElement = document.querySelector("#loopmeta");
@@ -300,7 +303,7 @@ function addBlock(type, start, duration, title, layer = 0, data = {}, editorValu
     });
     var del = document.createElement("button");
     del.innerText = "Delete";
-    del.onclick = () => { loop.remove() };
+    del.onclick = () => { deleteLoop(loop); };
     optionsMenu.appendChild(del);
 
     if (definition.customGuiButtons) {
@@ -313,7 +316,7 @@ function addBlock(type, start, duration, title, layer = 0, data = {}, editorValu
             optionsMenu.appendChild(btn);
         });
     }
-    
+
     optionsMenu.loadValues = () => {
         optionKeys.forEach(key => {
             var input = optionsMenu.querySelector(`[data-key=${key}]`);
@@ -351,7 +354,7 @@ function addBlock(type, start, duration, title, layer = 0, data = {}, editorValu
             return;
         }
         if (e.button === 0 && (keymap["Backspace"] || keymap["Delete"])) {
-            loop.remove();
+            deleteLoop(loop);
             return;
         }
         if (e.button !== 2) {
@@ -413,8 +416,8 @@ window.addEventListener("beforeunload", () => {
 });
 function viewKeybinds() {
     var div = document.createElement("div");
-    div.innerHTML = 
-`
+    div.innerHTML =
+        `
 (click to close)
 
 ******************
@@ -422,6 +425,7 @@ function viewKeybinds() {
 ******************
 CTRL + (any number) = Go to that layer
 Spacebar =  Pause/Play playback
+SHIFT + LEFT = Playback to second 0
 CTRL + Scroll on timeline = Shrink/expand timeline
 DELETE/BACKSPACE = Delete selected loops
 DELETE/BACKSPACE + Click = Delete loop
@@ -444,12 +448,17 @@ These scripts have access to the following variables:
 x - The percentage through the node
 rt - The total runtime of the node
 i - The index of the current sample
+
+In purple input boxes, you can also use autocomplete for notes.
+:a:  =  :a4:  =  440
+:g#3:  =  207
+
 `.replaceAll(" ", "&nbsp;").replaceAll("\n", "\<br\>");
-div.style = "font-family: monospace; position: absolute; z-index: 99999; top: 0; left: 0; right: 0; bottom: 0; background-color: black; color: white; overflow-x: hidden; overflow-y: auto;";
-div.addEventListener("click", ()=>{
-    div.remove();
-});
-document.body.appendChild(div);
+    div.style = "font-family: monospace; position: absolute; z-index: 99999; top: 0; left: 0; right: 0; bottom: 0; background-color: black; color: white; overflow-x: hidden; overflow-y: auto;";
+    div.addEventListener("click", () => {
+        div.remove();
+    });
+    document.body.appendChild(div);
 }
 function init() {
     deserialise(localStorage.getItem("save"));
@@ -457,7 +466,7 @@ function init() {
         gui.layer = parseInt(document.querySelector("#editorlayer").value);
         hydrateZoom();
     });
-    window.addEventListener("keydown", (e)=>{
+    window.addEventListener("keydown", (e) => {
         if (e.ctrlKey && Number.isFinite(parseFloat(e.key.toLowerCase())) && document.activeElement === document.body) {
             document.querySelector("#editorlayer").value = gui.layer = parseFloat(e.key.toLowerCase());
             hydrateZoom();
@@ -492,6 +501,14 @@ function init() {
             } else {
                 document.querySelector("#renderOut").pause();
             }
+            return;
+        }
+        keymap[e.key] = true;
+    });
+    window.addEventListener("keydown", (e) => {
+        if (e.key === "ArrowLeft" && e.target && e.target.tagName === "BODY" && e.shiftKey) {
+            e.preventDefault();
+            document.querySelector("#renderOut").currentTime = 0;
             return;
         }
         keymap[e.key] = true;
@@ -751,7 +768,7 @@ function init() {
     window.addEventListener("keydown", (e) => {
         if (["backspace", "delete"].includes(e.key.toLowerCase())) {
             var targets = document.querySelectorAll(".loop.active");
-            targets.forEach(t => { t.remove() });
+            targets.forEach(t => { deleteLoop(t); });
         }
     });
     document.querySelector("#trackInternal").addEventListener("mousedown", (e) => {
