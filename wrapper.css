@@ -338,7 +338,7 @@ h4 {
     border-radius: 0.6rem;
 }
 .selectbox {
-    position: fixed;
+    position: absolute;
     z-index: 999999999999999999;
     border: 1px solid rgba(0, 125, 255, 0.6);
     background-color: rgba(0, 125, 255, 0.4);

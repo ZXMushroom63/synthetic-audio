@@ -8,6 +8,7 @@ function intersect(rect1, rect2) {
     );
 }
 var gui = {
+    LOD: 1,
     intervals: 1,
     marker: 0,
     layer: 0
@@ -50,6 +51,21 @@ var loopObjURL = null;
 var mouse = {};
 var keymap = {};
 var zoom = 200;
+function updateLOD() {
+    gui.LOD = 1;
+    if (audio.duration < 479) {
+        gui.LOD = 8;
+    }
+    if (audio.duration < 239) {
+        gui.LOD = 4;
+    }
+    if (audio.duration < 119) {
+        gui.LOD = 2;
+    }
+    if (audio.duration < 59) {
+        gui.LOD = 1;
+    }
+}
 function pickupLoop(loop, natural = false) {
     if (loop.classList.contains("deactivated")) {
         return;
@@ -105,15 +121,18 @@ function markLoopDirty(loop, wasMoved) {
     }
 }
 function hydrateBeatMarkers() {
+    updateLOD();
     var track = document.querySelector("#trackInternal");
     document.querySelectorAll(".beatMarker").forEach(x => { x.remove() });
     bpm = parseInt(document.querySelector("#bpm").value);
     loopi = parseFloat(document.querySelector("#loopi").value);
-    var beatCount = Math.floor(audio.duration / 60 * bpm);
+    var trueBPM = bpm;
+    trueBPM = bpm / gui.LOD;
+    var beatCount = Math.floor(audio.duration / 60 * trueBPM);
     for (let i = 0; i < beatCount; i++) {
         const marker = document.createElement("span");
         marker.classList.add("beatMarker");
-        marker.style.left = `calc(${((i * (60 / bpm)) / audio.duration * 100)}% - 4px)`;
+        marker.style.left = `calc(${((i * (60 / trueBPM)) / audio.duration * 100)}% - 4px)`;
         track.appendChild(marker);
     }
 }
@@ -150,11 +169,12 @@ function hydrateEditorLayer() {
     });
 }
 function hydrate() {
+    updateLOD();
     audio.duration = parseFloat(document.querySelector("#duration").value);
     audio.length = audio.duration * audio.samplerate;
     var timeRibbon = document.querySelector("#time");
     timeRibbon.innerHTML = "";
-    for (let time = 0; time <= audio.duration; time += gui.intervals) {
+    for (let time = 0; time <= audio.duration; time += (gui.intervals * gui.LOD)) {
         const marker = document.createElement("span");
         marker.classList.add("timeMarker");
         marker.innerText = time + "s";
@@ -303,7 +323,7 @@ function addBlock(type, start, duration, title, layer = 0, data = {}, editorValu
     });
     var del = document.createElement("button");
     del.innerText = "Delete";
-    del.onclick = () => { deleteLoop(loop); };
+    del.onclick = () => { pushState(); deleteLoop(loop); };
     optionsMenu.appendChild(del);
 
     if (definition.customGuiButtons) {
@@ -354,12 +374,14 @@ function addBlock(type, start, duration, title, layer = 0, data = {}, editorValu
             return;
         }
         if (e.button === 0 && (keymap["Backspace"] || keymap["Delete"])) {
+            pushState();
             deleteLoop(loop);
             return;
         }
         if (e.button !== 2) {
             return;
         }
+        pushState();
         e.preventDefault();
         e.stopImmediatePropagation();
         e.stopPropagation();
@@ -459,6 +481,14 @@ In purple input boxes, you can also use autocomplete for notes.
         div.remove();
     });
     document.body.appendChild(div);
+}
+const MAXIMUM_REVERT_COUNT = 2;
+const backups = [];
+function pushState() {
+    backups.unshift(serialise());
+    if (backups.length > MAXIMUM_REVERT_COUNT) {
+        backups.pop();
+    }
 }
 function init() {
     deserialise(localStorage.getItem("save"));
@@ -722,6 +752,13 @@ function init() {
         }
     });
     window.addEventListener("keydown", (e) => {
+        if (e.ctrlKey && e.key === "z" && e.target.tagName === "BODY") {
+            if (backups[0]) {
+                deserialise(backups.shift());
+            }
+        }
+    });
+    window.addEventListener("keydown", (e) => {
         if (e.ctrlKey && e.key.toLowerCase() === "v") {
             if (document.activeElement !== document.body) {
                 return;
@@ -771,6 +808,11 @@ function init() {
             targets.forEach(t => { deleteLoop(t); });
         }
     });
+    document.querySelector("#track").addEventListener("scroll", ()=>{
+        if (document.querySelector(".selectbox")) {
+            window.onmousemove(window.lastScrollEvent);
+        }
+    });
     document.querySelector("#trackInternal").addEventListener("mousedown", (e) => {
         if (e.button !== 2) {
             return;
@@ -778,6 +820,9 @@ function init() {
         e.preventDefault();
         e.stopImmediatePropagation();
         e.stopPropagation();
+        var track = document.querySelector("#track");
+        var initialScrollLeft = track.scrollLeft;
+        var initialScrollTop = track.scrollTop;
         var a = { x: e.clientX, y: e.clientY };
         var b = { x: e.clientX, y: e.clientY };
         var selectBox = document.createElement("div");
@@ -787,20 +832,23 @@ function init() {
         selectBox.style.left = a.x + "px";
         selectBox.style.bottom = (window.innerHeight - b.y) + "px";
         selectBox.style.right = (window.innerWidth - b.x) + "px";
-        document.body.appendChild(selectBox);
+        document.querySelector("#trackInternal").appendChild(selectBox);
         window.onmousemove = function (e) {
+            window.lastScrollEvent = e;
             e.preventDefault();
             e.stopImmediatePropagation();
             e.stopPropagation();
+            var scrollDx = track.scrollLeft - initialScrollLeft; 
+            var scrollDy = track.scrollTop - initialScrollTop;
             b.x = e.clientX;
             b.y = e.clientY;
             var pos1 = {
-                x: Math.min(a.x, b.x),
-                y: Math.min(a.y, b.y)
+                x: Math.min(a.x - scrollDx, b.x),
+                y: Math.min(a.y - scrollDy, b.y)
             }
             var pos2 = {
-                x: Math.max(a.x, b.x),
-                y: Math.max(a.y, b.y)
+                x: Math.max(a.x - scrollDx, b.x),
+                y: Math.max(a.y - scrollDy, b.y)
             }
             selectBox.style.top = pos1.y + "px";
             selectBox.style.left = pos1.x + "px";
@@ -808,19 +856,22 @@ function init() {
             selectBox.style.right = (window.innerWidth - pos2.x) + "px";
         }
         window.onmouseup = function (e) {
+            pushState();
             e.preventDefault();
             e.stopImmediatePropagation();
             e.stopPropagation();
             selectBox.remove();
             window.onmousemove = null;
             window.onmouseup = null;
+            var scrollDx = track.scrollLeft - initialScrollLeft; 
+            var scrollDy = track.scrollTop - initialScrollTop; 
             var pos1 = {
-                x: Math.min(a.x, b.x),
-                y: Math.min(a.y, b.y)
+                x: Math.min(a.x - scrollDx, b.x),
+                y: Math.min(a.y - scrollDy, b.y)
             }
             var pos2 = {
-                x: Math.max(a.x, b.x),
-                y: Math.max(a.y, b.y)
+                x: Math.max(a.x - scrollDx, b.x),
+                y: Math.max(a.y - scrollDy, b.y)
             }
             var rect = new DOMRect(pos1.x, pos1.y, pos2.x - pos1.x, pos2.y - pos1.y);
             document.querySelectorAll(".loopInternal").forEach(x => {

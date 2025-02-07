@@ -1103,6 +1103,7 @@ addBlockType("p_waveform_plus", {
         "Triangle": [0, "number", 1],
         "Exponent": [1, "number", 1],
         "Amplitude": [1, "number", 1],
+        "AmplitudeSmoothTime": [0.01, "number"],
         "Decay": [0, "number", 1],
         "Harmonics": [false, "checkbox"],
         "HarmonicCount": [2, "number"],
@@ -1144,6 +1145,9 @@ addBlockType("p_waveform_plus", {
             totalNormalisedVolume = 1;
         }
 
+        const AmpSmoothingStart = Math.floor(audio.samplerate * this.conf.AmplitudeSmoothTime);
+        const AmpSmoothingEnd = inPcm.length - AmpSmoothingStart;
+
         inPcm.forEach((x, i) => {
             var denominator = Math.max(...keys.flatMap((k) => { return underscores[k](i, inPcm) })) || 1;
             var total = 0;
@@ -1171,6 +1175,13 @@ addBlockType("p_waveform_plus", {
             y = (Math.pow(Math.abs(y), exp(i, inPcm)) * Math.sign(y)) * amp(i, inPcm);
 
             y *= Math.exp(-decay(i, inPcm) * t);
+
+            if (i < AmpSmoothingStart) {
+                y *= i / AmpSmoothingStart;
+            }
+            if (i > AmpSmoothingEnd) {
+                y *= 1 - ((i - AmpSmoothingEnd) / AmpSmoothingStart);
+            }
             if (this.conf.Multiply) {
                 inPcm[i] *= (y + 1) / 2;
             } else {
@@ -1241,16 +1252,27 @@ addBlockType("p_writeasset", {
     }
 });
 function load() {
+    pushState();
     var x = document.createElement("input");
     x.type = "file";
-    x.accept = ".sm";
+    x.accept = ".sm,.mid";
     x.oninput = () => {
         if (x.files[0]) {
             var fr = new FileReader();
+            var isMidi = false;
             fr.onload = () => {
-                deserialise(fr.result);
+                if (isMidi) {
+                    openMidi(fr.result);
+                } else {
+                    deserialise(fr.result);
+                }
             };
-            fr.readAsText(x.files[0]);
+            if (x.files[0].name.endsWith(".mid")) {
+                isMidi = true;
+                fr.readAsArrayBuffer(x.files[0]);
+            } else {
+                fr.readAsText(x.files[0]);
+            }
         }
     };
     x.click();
