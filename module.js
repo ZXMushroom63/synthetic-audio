@@ -627,7 +627,7 @@ function applySoundbiteToPcmSidechain(reverse, looping, currentData, inPcm, dura
         var interval = Math.floor(currentData.length * speed(currentData.length - 1, inPcm));
         for (let i = 0; i < inPcm.length; i++) {
             var idx = Math.floor(i * speed(i, inPcm)) % interval;
-            var sidechainCoefficient = Math.pow(1 - Math.max(Math.min(1, LOOKUPTABLE[Math.floor(idx / PCMBINSIZE)]), 0), Math.abs(sideChain)) || 0;
+            var sidechainCoefficient = Math.pow(1 - Math.max(Math.min(1, LOOKUPTABLE[Math.floor(idx / PCMBINSIZE)] || 0), 0), Math.abs(sideChain)) || 0;
             var y = (currentData[idx] || 0) * volume;
             if (sideChain < 0) {
                 y *= sidechainCoefficient;
@@ -747,12 +747,19 @@ addBlockType("repeat", {
     title: "Repeat",
     configs: {
         "RepeatDuration": [0.2, "number"],
+        "FromEnd": [false, "checkbox"],
     },
     functor: function (inPcm, channel, data) {
+        if (this.conf.FromEnd) {
+            inPcm.reverse();
+        }
         var repeatAmount = inPcm.subarray(0, Math.floor(this.conf.RepeatDuration * audio.samplerate));
         inPcm.forEach((x, i) => {
             inPcm[i] = repeatAmount[i % repeatAmount.length];
         });
+        if (this.conf.FromEnd) {
+            inPcm.reverse();
+        }
         return inPcm;
     }
 });
@@ -1101,9 +1108,10 @@ addBlockType("p_waveform_plus", {
         "Square": [0, "number", 1],
         "Sawtooth": [0, "number", 1],
         "Triangle": [0, "number", 1],
+        "Period": [1.0, "number", 1],
         "Exponent": [1, "number", 1],
         "Amplitude": [1, "number", 1],
-        "AmplitudeSmoothTime": [0.01, "number"],
+        "AmplitudeSmoothTime": [0.0, "number"],
         "Decay": [0, "number", 1],
         "Harmonics": [false, "checkbox"],
         "HarmonicCount": [2, "number"],
@@ -1135,6 +1143,7 @@ addBlockType("p_waveform_plus", {
         var fdecay = _(this.conf.FrequencyDecay);
         var exp = _(this.conf.Exponent);
         var amp = _(this.conf.Amplitude);
+        var period = _(this.conf.Period);
 
         var totalNormalisedVolume = 0;
         if (this.conf.Harmonics) {
@@ -1157,16 +1166,18 @@ addBlockType("p_waveform_plus", {
                 return [[k, x]];
             }));
             var t = i / audio.samplerate;
+            
             var f = freq(i, inPcm);
             f *= Math.exp(-fdecay(i, inPcm) * t);
+            var waveformTime = (t * f) % period(i, inPcm);
             var y = 0;
 
             for (let h = 0; h < (this.conf.Harmonics ? this.conf.HarmonicCount : 1); h++) {
                 var harmonicVolumeRatio = Math.pow(this.conf.HarmonicRatio, h);
-                y += waveforms.sin(t * f * (h + 1)) * values.Sine * harmonicVolumeRatio;
-                y += waveforms.square(t * f * (h + 1)) * values.Square * harmonicVolumeRatio;
-                y += waveforms.sawtooth(t * f * (h + 1)) * values.Sawtooth * harmonicVolumeRatio;
-                y += waveforms.triangle(t * f * (h + 1)) * values.Triangle * harmonicVolumeRatio;
+                y += waveforms.sin(waveformTime * (h + 1)) * values.Sine * harmonicVolumeRatio;
+                y += waveforms.square(waveformTime * (h + 1)) * values.Square * harmonicVolumeRatio;
+                y += waveforms.sawtooth(waveformTime * (h + 1)) * values.Sawtooth * harmonicVolumeRatio;
+                y += waveforms.triangle(waveformTime * (h + 1)) * values.Triangle * harmonicVolumeRatio;
                 y /= total;
             }
 

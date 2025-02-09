@@ -6,5 +6,6 @@ window.addEventListener("keydown", (e) => {
         const nearest = A4 * Math.pow(twelfth_root_of_2, n);
         e.target.value = nearest.toFixed("1");
         e.preventDefault();
+        e.target.dispatchEvent(new Event('input', { bubbles: true }));
     }
 });
