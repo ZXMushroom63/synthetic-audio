@@ -281,7 +281,11 @@ function addBlock(type, start, duration, title, layer = 0, data = {}, editorValu
             var s = document.createElement("select");
             s.setAttribute("data-key", key);
             var proxy = definition.selectMiddleware || (x => x);
-            s.innerHTML = proxy(value[1]).flatMap((a) => { return `<option${a === value[0] ? " selected" : ""}>${a}</option>` }).join("");
+            var opts = proxy(value[1]);
+            if (!opts.includes(value[0])) {
+                opts.push(value[0]);
+            }
+            s.innerHTML = opts.flatMap((a) => { return `<option${a === value[0] ? " selected" : ""}>${a}</option>` }).join("");
             s.addEventListener("input", () => {
                 loop["conf"][key] = s.value;
                 if (definition.updateMiddleware) {
