@@ -918,6 +918,44 @@ addBlockType("peakclip", {
         return inPcm;
     }
 });
+addBlockType("compressor", {
+    color: "rgba(0,255,0,0.3)",
+    title: "Compressor",
+    configs: {
+        "Threshold": [0.5, "number", 1],
+        "Ratio": [0.5, "number", 1]
+    },
+    functor: function (inPcm, channel, data) {
+        var threshold = _(this.conf.Threshold);
+        var ratio = _(this.conf.Ratio);
+        inPcm.forEach((x, i) => {
+            var abs = Math.abs(x);
+            var thr = threshold(i, inPcm);
+            if (abs > thr) {
+                var sign = Math.sign(x);
+                inPcm[i] -= (abs - thr) * ratio(i, inPcm) * sign;
+            }
+        });
+        return inPcm;
+    }
+});
+addBlockType("speed", {
+    color: "rgba(0,255,0,0.3)",
+    title: "Speed Change",
+    configs: {
+        "Speed": [1, "number", 1],
+    },
+    functor: function (inPcm, channel, data) {
+        var samplePosition = 0;
+        var speed = _(this.conf.Speed);
+        var out = new Float32Array(inPcm.length).fill(0);
+        out.forEach((x, i)=>{
+            out[i] = inPcm[Math.floor(samplePosition)];
+            samplePosition += speed(i, inPcm);
+        });
+        return out;
+    }
+});
 addBlockType("gate", {
     color: "rgba(0,255,0,0.3)",
     title: "Stereo Gate",
