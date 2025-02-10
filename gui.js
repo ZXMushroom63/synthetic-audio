@@ -577,7 +577,7 @@ function init() {
         var fileList = [...fileInput.files];
         if (fileList.length > 0) {
             document.querySelector("#loopSelector").remove();
-            Object.keys(filters).forEach(k => {
+            Object.keys(filters).sort().forEach(k => {
                 if (k === "audio") {
                     return;
                 }
@@ -682,6 +682,10 @@ function init() {
             window.onmouseup = () => { };
             hydrateTimePosMarker();
         }
+    });
+    document.querySelector("#renderOut").addEventListener("focus", () => {
+        document.querySelector("#renderOut").blur();
+        document.body.focus();
     });
     document.querySelector("#renderOut").addEventListener("timeupdate", () => {
         gui.marker = document.querySelector("#renderOut").currentTime;
