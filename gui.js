@@ -845,6 +845,7 @@ function init() {
         selectBox.style.bottom = (window.innerHeight - b.y) + "px";
         selectBox.style.right = (window.innerWidth - b.x) + "px";
         document.querySelector("#trackInternal").appendChild(selectBox);
+        window.oncontextmenu = (e)=>{e.preventDefault()};
         window.onmousemove = function (e) {
             window.lastScrollEvent = e;
             e.preventDefault();
@@ -873,6 +874,7 @@ function init() {
             e.stopImmediatePropagation();
             e.stopPropagation();
             selectBox.remove();
+            setTimeout(()=>{window.oncontextmenu = null;}, 1/60);
             window.onmousemove = null;
             window.onmouseup = null;
             var scrollDx = track.scrollLeft - initialScrollLeft; 
