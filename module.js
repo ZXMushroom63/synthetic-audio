@@ -211,8 +211,8 @@ async function applyBandpassFilter(pcmData, sampleRate, lowCutoff, highCutoff) {
     // Create a bandpass filter
     const bandpassFilter = offlineContext.createBiquadFilter();
     bandpassFilter.type = 'bandpass';
-    bandpassFilter.frequency.value = (lowCutoff + highCutoff) / 2;
-    bandpassFilter.Q.value = (highCutoff - lowCutoff) / bandpassFilter.frequency.value;
+    bandpassFilter.frequency.value = Math.sqrt(lowCutoff * highCutoff);
+    bandpassFilter.Q.value = bandpassFilter.frequency.value / (highCutoff - lowCutoff);
 
     // Connect the nodes
     source.connect(bandpassFilter);
@@ -472,6 +472,7 @@ function constructRenderDataArray(data) {
             nodes.forEach(x => {
                 if (x.dirty) {
                     if (x.type === "p_writeasset") {
+                        //console.log("Dirty asset found: ", x.conf.Asset);
                         assetMap[x.conf.Asset] = true;
                     }
                     return;
@@ -480,14 +481,22 @@ function constructRenderDataArray(data) {
                     const dirtyNode = dirtyNodes[i];
                     if (
                         (!dirtyNodes.includes(x)) &&
-                        (((x.start >= dirtyNode.start &&
-                            x.start <= dirtyNode.end) ||
+                        (((
+                            (x.start >= dirtyNode.start &&
+                                x.start <= dirtyNode.end) ||
+
                             (x.end >= dirtyNode.start &&
-                                x.end <= dirtyNode.end) && (x.layer >= dirtyNode.layer)) || (x.type === "p_readasset" && assetMap[x.conf.Asset]))
+                                x.end <= dirtyNode.end) ||
+
+                            (x.end >= dirtyNode.start &&
+                                x.start <= dirtyNode.end)
+
+                        ) && (x.layer >= dirtyNode.layer)) || (x.type === "p_readasset" && assetMap[x.conf.Asset]))
                     ) {
                         x.dirty = true;
                         dirtyNodes.push(x);
                         if (x.type === "p_writeasset") {
+                            //console.log("Dirty asset found: ", x.conf.Asset);
                             assetMap[x.conf.Asset] = true;
                         }
                         break;
@@ -1166,7 +1175,7 @@ addBlockType("p_waveform_plus", {
                 return [[k, x]];
             }));
             var t = i / audio.samplerate;
-            
+
             var f = freq(i, inPcm);
             f *= Math.exp(-fdecay(i, inPcm) * t);
             var waveformTime = (t * f) % period(i, inPcm);
@@ -1227,6 +1236,7 @@ addBlockType("p_readasset", {
             document.querySelectorAll(".loop[data-type=p_writeasset]"),
             [(node) => node.conf.Asset]
         ))];
+        console.log(assetNames);
         return ["(none)", ...assetNames];
     },
     updateMiddleware: (loop) => {
