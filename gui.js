@@ -468,6 +468,8 @@ CTRL + SPACE = Go to ALL layer (layer 10)
 *******************
 If an input box is purple, that means you can write inline scripts inside it.
 For a simple linear interpolation, try inputting:   #0~24
+For a exponential interpolation (squared), try inputting:   #0~24@2
+ |- (spaces are allowed between the numbers)
 
 For writing an arbitrary script, do: #(()=>{/*/code/*/ return 1;})()
 These scripts have access to the following variables:
@@ -478,6 +480,8 @@ i - The index of the current sample
 In purple input boxes, you can also use autocomplete for notes.
 :a:  =  :a4:  =  440
 :g#3:  =  207
+
+In any numberical input box, pressing 'b' on your keyboard will round the frequency into the nearest note.
 
 `.replaceAll(" ", "&nbsp;").replaceAll("\n", "\<br\>");
     div.style = "font-family: monospace; position: absolute; z-index: 99999; top: 0; left: 0; right: 0; bottom: 0; background-color: black; color: white; overflow-x: hidden; overflow-y: auto;";

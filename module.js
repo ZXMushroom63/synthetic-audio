@@ -75,9 +75,22 @@ function _(val) {
     }
     if (typeof val === "string" && val.startsWith("#")) {
         if (val.split("~").length === 2) {
-            var v = val.replace("#", "").split("~").flatMap(x => parseFloat(x) || 0);
+            var exponent = 1;
+            var v = val.replace("#", "").split("~").flatMap((x, i) => {
+                if (i === 0) {
+                    return parseFloat(x) || 0;
+                }
+                
+                var split = x.split("@");
+                if (split.length === 2) {
+                    exponent = parseFloat(split[1]) || 1;
+                    return parseFloat(split[0]) || 0;
+                } else {
+                    return parseFloat(x) || 0;
+                }
+            });
             return (x, pcm) => {
-                return lerp(v[0], v[1], x / pcm.length);
+                return lerp(v[0], v[1], Math.pow(x / pcm.length, exponent));
             }
         }
         var fn = new Function(["x", "rt", "i"], val.replace("#", "return "));
