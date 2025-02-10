@@ -748,6 +748,25 @@ addBlockType("bitcrunch", {
         return inPcm;
     }
 });
+addBlockType("comb", {
+    color: "rgba(0,255,0,0.3)",
+    title: "Comb Filter",
+    configs: {
+        "Iterations": [1, "number"],
+        "Delay": [0.01, "number"],
+    },
+    functor: function (inPcm, channel, data) {
+        var delay = _(this.conf.Delay);
+        var out = (new Float32Array(inPcm.length)).fill(0);
+        out.forEach((x, i)=>{
+            var delayImpl = delay(i, out) * audio.samplerate;
+            for (let j = 0; j < (this.conf.Iterations + 1); j++) {
+                out[i] += inPcm[Math.floor(delayImpl * j) + i] || 0;
+            }
+        });
+        return out;
+    }
+});
 addBlockType("quantise", {
     color: "rgba(0,255,0,0.3)",
     title: "Quantise",
@@ -950,7 +969,7 @@ addBlockType("speed", {
         var speed = _(this.conf.Speed);
         var out = new Float32Array(inPcm.length).fill(0);
         out.forEach((x, i)=>{
-            out[i] = inPcm[Math.floor(samplePosition)];
+            out[i] = inPcm[Math.floor(samplePosition)] || 0;
             samplePosition += speed(i, inPcm);
         });
         return out;
