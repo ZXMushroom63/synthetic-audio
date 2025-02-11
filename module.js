@@ -1384,8 +1384,7 @@ addBlockType("p_writeasset", {
     },
     functor: function (inPcm, channel, data) {
         proceduralAssets.set(this.conf.Asset, inPcm);
-        inPcm.fill(0);
-        return inPcm;
+        return new Float32Array(inPcm.length);
     }
 });
 function load() {
