@@ -1351,7 +1351,6 @@ addBlockType("p_readasset", {
             document.querySelectorAll(".loop[data-type=p_writeasset]"),
             [(node) => node.conf.Asset]
         ))];
-        console.log(assetNames);
         return ["(none)", ...assetNames];
     },
     updateMiddleware: (loop) => {
