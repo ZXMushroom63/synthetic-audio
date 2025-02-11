@@ -8,6 +8,7 @@ function intersect(rect1, rect2) {
     );
 }
 var gui = {
+    noLOD: true,
     LOD: 1,
     intervals: 1,
     marker: 0,
@@ -52,6 +53,10 @@ var mouse = {};
 var keymap = {};
 var zoom = 200;
 function updateLOD() {
+    if (gui.noLOD) {
+        gui.LOD = 1;
+        return;
+    }
     gui.LOD = 1;
     if (audio.duration < 479) {
         gui.LOD = 8;
@@ -127,7 +132,7 @@ function hydrateBeatMarkers() {
     bpm = parseInt(document.querySelector("#bpm").value);
     loopi = parseFloat(document.querySelector("#loopi").value);
     var trueBPM = bpm;
-    trueBPM = bpm / gui.LOD;
+    trueBPM = 480 / gui.LOD;
     var beatCount = Math.floor(audio.duration / 60 * trueBPM);
     for (let i = 0; i < beatCount; i++) {
         const marker = document.createElement("span");
@@ -694,6 +699,14 @@ function init() {
         } else {
             audio.normalise = false;
         }
+    });
+    document.querySelector("#nolod").addEventListener("input", () => {
+        if (document.querySelector("#nolod").checked) {
+            gui.noLOD = true;
+        } else {
+            gui.noLOD = false;
+        }
+        hydrateBeatMarkers();
     });
     document.querySelector(".timePosMarker").addEventListener("mousedown", () => {
         var bba = document.querySelector("#trackInternal").getBoundingClientRect();
