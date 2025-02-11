@@ -795,7 +795,7 @@ addBlockType("repeat", {
     color: "rgba(0,255,0,0.3)",
     title: "Repeat",
     configs: {
-        "RepeatDuration": [0.2, "number"],
+        "RepeatDuration": [0.1, "number"],
         "FromEnd": [false, "checkbox"],
     },
     functor: function (inPcm, channel, data) {
@@ -1255,8 +1255,8 @@ addBlockType("p_waveform_plus", {
 
         var totalNormalisedVolume = 0;
         if (this.conf.Harmonics) {
-            for (let h = 0; h < this.conf.HarmonicCount; h++) {
-                totalNormalisedVolume += Math.pow(this.conf.HarmonicRatio, h);
+            for (let h = 0; h < this.conf.HarmonicsCount; h++) {
+                totalNormalisedVolume += Math.pow(this.conf.HarmonicsRatio, h);
             }
         } else {
             totalNormalisedVolume = 1;
@@ -1279,9 +1279,8 @@ addBlockType("p_waveform_plus", {
             f *= Math.exp(-fdecay(i, inPcm) * t);
             var waveformTime = (t * f) % period(i, inPcm);
             var y = 0;
-
-            for (let h = 0; h < (this.conf.Harmonics ? this.conf.HarmonicCount + 1 : 1); h++) {
-                var harmonicVolumeRatio = Math.pow(this.conf.HarmonicRatio, h);
+            for (let h = 0; h < (this.conf.Harmonics ? this.conf.HarmonicsCount + 1 : 1); h++) {
+                var harmonicVolumeRatio = Math.pow(this.conf.HarmonicsRatio, h);
                 var coefficient = 1;
                 if (this.conf.Harmonics) {
                     if (this.conf.HarmonicsUseSemitones) {
@@ -1290,6 +1289,7 @@ addBlockType("p_waveform_plus", {
                         coefficient = h + 1;
                     }
                 }
+                
                 y += waveforms.sin(waveformTime * coefficient) * values.Sine * harmonicVolumeRatio;
                 y += waveforms.square(waveformTime * coefficient) * values.Square * harmonicVolumeRatio;
                 y += waveforms.sawtooth(waveformTime * coefficient) * values.Sawtooth * harmonicVolumeRatio;
@@ -1311,9 +1311,10 @@ addBlockType("p_waveform_plus", {
             }
             if (this.conf.Multiply) {
                 if (this.conf.Absolute) {
-                    y = Math.abs(y);
+                    inPcm[i] *= Math.abs(y);
+                } else {
+                    inPcm[i] *= (y + 1) / 2;
                 }
-                inPcm[i] *= (y + 1) / 2;
             } else {
                 if (this.conf.Sidechain) {
                     var sidechainCoefficient = Math.pow(1 - Math.max(Math.min(1, amp(i, inPcm) * Math.exp(-decay(i, inPcm) * t)), 0), Math.abs(this.conf.SidechainPower));
@@ -1324,7 +1325,7 @@ addBlockType("p_waveform_plus", {
                     }
                 }
                 if (this.conf.Absolute) {
-                    inPcm[i] += 2 * (Math.abs(y) - 0.5);
+                    inPcm[i] += 2 * (Math.abs(y) - 0.25);
                 } else {
                     inPcm[i] += y;
                 }
@@ -1383,6 +1384,7 @@ addBlockType("p_writeasset", {
     },
     functor: function (inPcm, channel, data) {
         proceduralAssets.set(this.conf.Asset, inPcm);
+        inPcm.fill(0);
         return inPcm;
     }
 });
