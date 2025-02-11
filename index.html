@@ -5,7 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SYNTHETIC</title>
     <link rel="stylesheet" href="wrapper.css">
-    <link rel="icon" type="image/x-icon" href="logo_small.png">
+    <link rel="icon" type="image/x-icon" href="public/logo_small.png">
+    <link rel="manifest" href="manifest.json" />
 </head>
 <body>
     <script src="fsaver.js"></script>
@@ -21,7 +22,7 @@
         <tr>
             <td>
                 <h4>
-                    <img id="logo" style="display:none;" src="logo.png" height="75">
+                    <img id="logo" style="display:none;" src="public/logo.png" height="75">
                     <canvas width="150" height="75" style="border: 1px solid white;"></canvas>
                     <button id="renderBtn" disabled onclick="if(this.disabled){return};render()">Render Audio</button>
                     <audio id="renderOut" controls></audio>
