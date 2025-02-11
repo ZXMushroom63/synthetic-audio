@@ -346,3 +346,19 @@ h4 {
 .loop[data-deleted=yes] {
     display: none;
 }
+.loop details {
+    margin-top: 1.15rem;
+    margin-bottom: 0.5rem;
+    padding-left: 0.5rem;
+    border-left: 2px solid white;
+}
+.loop details * {
+    transform: translateY(-0.33rem);
+}
+.loop summary {
+    text-decoration: underline;
+    cursor: pointer;
+}
+.loop details:first(label) {
+    margin-top: 1rem;
+}

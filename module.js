@@ -1201,14 +1201,31 @@ addBlockType("p_waveform_plus", {
         "AmplitudeSmoothTime": [0.0, "number"],
         "Decay": [0, "number", 1],
         "Harmonics": [false, "checkbox"],
-        "HarmonicCount": [2, "number"],
-        "HarmonicRatio": [0.5, "number"],
+        "HarmonicsCount": [2, "number"],
+        "HarmonicsRatio": [0.5, "number"],
         "HarmonicsUseSemitones": [false, "checkbox"],
         "HarmonicsSemitoneOffset": [7, "checkbox", 1],
         "Absolute": [false, "checkbox"],
         "Multiply": [false, "checkbox"],
         "Sidechain": [false, "checkbox"],
         "SidechainPower": [2, "number"],
+    },
+    dropdowns: {
+        "Waveform": [
+            "Sine",
+            "Square",
+            "Sawtooth",
+            "Triangle",
+            "Period",
+            "Exponent"
+        ],
+        "Harmonics": [
+            "Harmonics",
+            "HarmonicsCount",
+            "HarmonicsRatio",
+            "HarmonicsUseSemitones",
+            "HarmonicsSemitoneOffset",
+        ]
     },
     customGuiButtons: {
         "Preview": function () {

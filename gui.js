@@ -263,9 +263,35 @@ function addBlock(type, start, duration, title, layer = 0, data = {}, editorValu
     const optionsMenu = document.createElement("div");
     optionsMenu.classList.add("loopOptionsMenu");
     loop["conf"] = data;
+    var dropdowns = definition.dropdowns || {};
+    var dropdownsMap = Object.fromEntries(Object.keys(dropdowns).map(x => {
+        var detail = document.createElement("details");
+        detail.open = true;
+        var summary = document.createElement("summary");
+        summary.innerText = x;
+        detail.appendChild(summary);
+        detail._appended = false;
+        return [x, detail];
+    }));
+    function getDropdown(prop) {
+        var dKeys = Object.keys(dropdowns);
+        for (let i = 0; i < dKeys.length; i++) {
+            if (dropdowns[dKeys[i]].includes(prop)) {
+                if (!dropdownsMap[dKeys[i]]._appended) {
+                    optionsMenu.appendChild(dropdownsMap[dKeys[i]]);
+                    optionsMenu.appendChild(document.createElement("br"));
+                    dropdownsMap[dKeys[i]]._appended = true;
+                }
+                return dropdownsMap[dKeys[i]];
+            }
+        }
+        return null;
+    }
     var optionKeys = Object.keys(definition.configs);
     optionKeys.forEach(key => {
         var value = structuredClone(definition.configs[key]);
+        var dropdown = getDropdown(key);
+        var target = dropdown || optionsMenu;
         if (loop["conf"][key] === undefined) {
             loop["conf"][key] = value[0];
         } else if (loop["conf"][key] === null) {
@@ -275,7 +301,7 @@ function addBlock(type, start, duration, title, layer = 0, data = {}, editorValu
         }
         var label = document.createElement("label");
         label.innerText = key + ": ";
-        optionsMenu.appendChild(label);
+        target.appendChild(label);
 
         if (Array.isArray(value[1])) {
             var s = document.createElement("select");
@@ -297,7 +323,7 @@ function addBlock(type, start, duration, title, layer = 0, data = {}, editorValu
                 loop["conf"][key] = s.value;
                 s.innerHTML = proxy(value[1]).flatMap((a) => { return `<option${a === value[0] ? " selected" : ""}>${a}</option>` }).join("");
             });
-            optionsMenu.appendChild(s);
+            target.appendChild(s);
         } else {
             var input = document.createElement("input");
             input.type = value[1];
@@ -321,9 +347,9 @@ function addBlock(type, start, duration, title, layer = 0, data = {}, editorValu
                 }
                 markLoopDirty(loop);
             });
-            optionsMenu.appendChild(input);
+            target.appendChild(input);
         }
-        optionsMenu.appendChild(document.createElement("br"));
+        target.appendChild(document.createElement("br"));
     });
     var del = document.createElement("button");
     del.innerText = "Delete";
@@ -820,7 +846,7 @@ function init() {
             targets.forEach(t => { deleteLoop(t); });
         }
     });
-    document.querySelector("#track").addEventListener("scroll", ()=>{
+    document.querySelector("#track").addEventListener("scroll", () => {
         if (document.querySelector(".selectbox")) {
             window.onmousemove(window.lastScrollEvent);
         }
@@ -845,13 +871,13 @@ function init() {
         selectBox.style.bottom = (window.innerHeight - b.y) + "px";
         selectBox.style.right = (window.innerWidth - b.x) + "px";
         document.querySelector("#trackInternal").appendChild(selectBox);
-        window.oncontextmenu = (e)=>{e.preventDefault()};
+        window.oncontextmenu = (e) => { e.preventDefault() };
         window.onmousemove = function (e) {
             window.lastScrollEvent = e;
             e.preventDefault();
             e.stopImmediatePropagation();
             e.stopPropagation();
-            var scrollDx = track.scrollLeft - initialScrollLeft; 
+            var scrollDx = track.scrollLeft - initialScrollLeft;
             var scrollDy = track.scrollTop - initialScrollTop;
             b.x = e.clientX;
             b.y = e.clientY;
@@ -874,11 +900,11 @@ function init() {
             e.stopImmediatePropagation();
             e.stopPropagation();
             selectBox.remove();
-            setTimeout(()=>{window.oncontextmenu = null;}, 1/60);
+            setTimeout(() => { window.oncontextmenu = null; }, 1 / 60);
             window.onmousemove = null;
             window.onmouseup = null;
-            var scrollDx = track.scrollLeft - initialScrollLeft; 
-            var scrollDy = track.scrollTop - initialScrollTop; 
+            var scrollDx = track.scrollLeft - initialScrollLeft;
+            var scrollDy = track.scrollTop - initialScrollTop;
             var pos1 = {
                 x: Math.min(a.x - scrollDx, b.x),
                 y: Math.min(a.y - scrollDy, b.y)
