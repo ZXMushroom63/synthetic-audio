@@ -80,7 +80,7 @@ function _(val) {
                 if (i === 0) {
                     return parseFloat(x) || 0;
                 }
-                
+
                 var split = x.split("@");
                 if (split.length === 2) {
                     exponent = parseFloat(split[1]) || 1;
@@ -105,6 +105,10 @@ function _(val) {
     } else {
         return () => val;
     }
+}
+function getSemitoneCoefficient(semitones) {
+    const twelfthRootOf2 = Math.pow(2, 1 / 12);
+    return Math.pow(twelfthRootOf2, semitones);
 }
 function getAudioParamsForChannel(x, y, earDistance, angle, behindFactor, channel, speedOfSound) {
     var angleRadians = angle * (Math.PI / 180); // Convert degrees to radians
@@ -628,7 +632,7 @@ function applySoundbiteToPcm(reverse, looping, currentData, inPcm, duration, spe
         }
     }
 }
-function applySoundbiteToPcmSidechain(reverse, looping, currentData, inPcm, duration, speed, volume, sideChain) {
+function applySoundbiteToPcmSidechain(reverse, looping, currentData, inPcm, duration, speed, volume, sideChain, silent) {
     if (typeof speed !== "function") {
         var oldSpeed = speed;
         speed = () => { return oldSpeed };
@@ -656,7 +660,9 @@ function applySoundbiteToPcmSidechain(reverse, looping, currentData, inPcm, dura
             } else {
                 inPcm[i] *= sidechainCoefficient;
             }
-            inPcm[i] += y;
+            if (!silent) {
+                inPcm[i] += y;
+            }
         }
     } else {
         for (let i = 0; i < inPcm.length; i++) {
@@ -668,7 +674,9 @@ function applySoundbiteToPcmSidechain(reverse, looping, currentData, inPcm, dura
             } else {
                 inPcm[i] *= sidechainCoefficient;
             }
-            inPcm[i] += y;
+            if (!silent) {
+                inPcm[i] += y;
+            }
         }
     }
 }
@@ -758,7 +766,7 @@ addBlockType("comb", {
     functor: function (inPcm, channel, data) {
         var delay = _(this.conf.Delay);
         var out = (new Float32Array(inPcm.length)).fill(0);
-        out.forEach((x, i)=>{
+        out.forEach((x, i) => {
             var delayImpl = delay(i, out) * audio.samplerate;
             for (let j = 0; j < (this.conf.Iterations + 1); j++) {
                 out[i] += inPcm[Math.floor(delayImpl * j) + i] || 0;
@@ -968,7 +976,7 @@ addBlockType("speed", {
         var samplePosition = 0;
         var speed = _(this.conf.Speed);
         var out = new Float32Array(inPcm.length).fill(0);
-        out.forEach((x, i)=>{
+        out.forEach((x, i) => {
             out[i] = inPcm[Math.floor(samplePosition)] || 0;
             samplePosition += speed(i, inPcm);
         });
@@ -1195,6 +1203,9 @@ addBlockType("p_waveform_plus", {
         "Harmonics": [false, "checkbox"],
         "HarmonicCount": [2, "number"],
         "HarmonicRatio": [0.5, "number"],
+        "HarmonicsUseSemitones": [false, "checkbox"],
+        "HarmonicsSemitoneOffset": [7, "checkbox", 1],
+        "Absolute": [false, "checkbox"],
         "Multiply": [false, "checkbox"],
         "Sidechain": [false, "checkbox"],
         "SidechainPower": [2, "number"],
@@ -1223,6 +1234,7 @@ addBlockType("p_waveform_plus", {
         var exp = _(this.conf.Exponent);
         var amp = _(this.conf.Amplitude);
         var period = _(this.conf.Period);
+        var semitones = _(this.conf.HarmonicsSemitoneOffset);
 
         var totalNormalisedVolume = 0;
         if (this.conf.Harmonics) {
@@ -1251,12 +1263,20 @@ addBlockType("p_waveform_plus", {
             var waveformTime = (t * f) % period(i, inPcm);
             var y = 0;
 
-            for (let h = 0; h < (this.conf.Harmonics ? this.conf.HarmonicCount : 1); h++) {
+            for (let h = 0; h < (this.conf.Harmonics ? this.conf.HarmonicCount + 1 : 1); h++) {
                 var harmonicVolumeRatio = Math.pow(this.conf.HarmonicRatio, h);
-                y += waveforms.sin(waveformTime * (h + 1)) * values.Sine * harmonicVolumeRatio;
-                y += waveforms.square(waveformTime * (h + 1)) * values.Square * harmonicVolumeRatio;
-                y += waveforms.sawtooth(waveformTime * (h + 1)) * values.Sawtooth * harmonicVolumeRatio;
-                y += waveforms.triangle(waveformTime * (h + 1)) * values.Triangle * harmonicVolumeRatio;
+                var coefficient = 1;
+                if (this.conf.Harmonics) {
+                    if (this.conf.HarmonicsUseSemitones) {
+                        coefficient = getSemitoneCoefficient(Math.round(h * semitones(i, inPcm)));
+                    } else {
+                        coefficient = h + 1;
+                    }
+                }
+                y += waveforms.sin(waveformTime * coefficient) * values.Sine * harmonicVolumeRatio;
+                y += waveforms.square(waveformTime * coefficient) * values.Square * harmonicVolumeRatio;
+                y += waveforms.sawtooth(waveformTime * coefficient) * values.Sawtooth * harmonicVolumeRatio;
+                y += waveforms.triangle(waveformTime * coefficient) * values.Triangle * harmonicVolumeRatio;
                 y /= total;
             }
 
@@ -1273,6 +1293,9 @@ addBlockType("p_waveform_plus", {
                 y *= 1 - ((i - AmpSmoothingEnd) / AmpSmoothingStart);
             }
             if (this.conf.Multiply) {
+                if (this.conf.Absolute) {
+                    y = Math.abs(y);
+                }
                 inPcm[i] *= (y + 1) / 2;
             } else {
                 if (this.conf.Sidechain) {
@@ -1283,7 +1306,11 @@ addBlockType("p_waveform_plus", {
                         inPcm[i] *= sidechainCoefficient;
                     }
                 }
-                inPcm[i] += y;
+                if (this.conf.Absolute) {
+                    inPcm[i] += 2 * (Math.abs(y) - 0.5);
+                } else {
+                    inPcm[i] += y;
+                }
             }
         });
         return inPcm;
@@ -1300,6 +1327,7 @@ addBlockType("p_readasset", {
         "Speed": [1, "number"],
         "Sidechain": [false, "checkbox"],
         "SidechainPower": [2, "number"],
+        "Silent": [false, "checkbox"],
     },
     selectMiddleware: (options) => {
         var assetNames = [...new Set(Array.prototype.flatMap.apply(
@@ -1318,7 +1346,7 @@ addBlockType("p_readasset", {
         var currentData = proceduralAssets.has(this.conf.Asset) ? proceduralAssets.get(this.conf.Asset) : [];
         var duration = Math.floor(Math.round((((currentData.length / audio.samplerate) || 0) + 0.0) / data.loopInterval) * data.loopInterval * audio.samplerate);
         if (this.conf.Sidechain) {
-            applySoundbiteToPcmSidechain(this.conf.Reverse, this.conf.Looping, currentData, inPcm, duration, this.conf.Speed, this.conf.Volume, this.conf.SidechainPower);
+            applySoundbiteToPcmSidechain(this.conf.Reverse, this.conf.Looping, currentData, inPcm, duration, this.conf.Speed, this.conf.Volume, this.conf.SidechainPower, this.conf.Silent);
         } else {
             applySoundbiteToPcm(this.conf.Reverse, this.conf.Looping, currentData, inPcm, duration, this.conf.Speed, this.conf.Volume);
         }
