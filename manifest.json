@@ -18,7 +18,7 @@
             "sizes": "360x360"
         }
     ],
-    "start_url": "/",
+    "start_url": "/synthetic-audio",
     "display": "standalone",
     "display_override": "standalone"
 }
