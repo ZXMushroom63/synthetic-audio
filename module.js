@@ -508,7 +508,7 @@ function constructRenderDataArray(data) {
                             (x.end >= dirtyNode.start &&
                                 x.start <= dirtyNode.end)
 
-                        ) && (x.layer >= dirtyNode.layer)) || (x.type === "p_readasset" && assetMap[x.conf.Asset]))
+                        ) && (x.layer > dirtyNode.layer)) || (x.type === "p_readasset" && assetMap[x.conf.Asset]))
                     ) {
                         x.dirty = true;
                         dirtyNodes.push(x);
