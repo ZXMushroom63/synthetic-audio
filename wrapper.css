@@ -49,7 +49,6 @@ h4 {
     padding: 4px;
     overflow-x: auto;
     overflow-y: hidden;
-    white-space: nowrap;
 }
 table.main {
     height: 100vh;
