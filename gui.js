@@ -772,7 +772,7 @@ function init() {
         if (!canDuplicateKeybind) {
             return;
         }
-        if (e.shiftKey && e.key.toLowerCase() === "d" && e.target.tagName !== "INPUT" && !e.target.contentEditable) {
+        if (e.shiftKey && (e.key.toLowerCase() === "d") && (e.target.tagName !== "INPUT") && (e.target.contentEditable != "true")) {
             canDuplicateKeybind = false;
             if (!document.querySelector(".loop.active")) {
                 var x = document.elementsFromPoint(mouse.x, mouse.y).find(x => !x.classList.contains("deactivated"));
@@ -826,7 +826,7 @@ function init() {
             var text = "sp_loopdata::" + JSON.stringify(dupedLoops);
             navigator.clipboard.writeText(text);
             if (e.key.toLowerCase() === "x") {
-                targets.forEach(x => { x.remove() });
+                targets.forEach(x => { deleteLoop(x) });
             }
         }
     });

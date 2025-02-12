@@ -562,7 +562,7 @@ async function render() {
                         if (node.dirty || (!node.ref.cache)) {
                             node.dirty = false;
                             node.ref.removeAttribute("data-dirty");
-                            node.ref.removeAttribute("data-wasMovedSinceLastRender");
+                            node.ref.removeAttribute("data-wasMovedSinceRender");
                             node.ref.cache = [null, null];
                             node.ref.startOld = node.start;
                             node.ref.layerOld = node.layer;
