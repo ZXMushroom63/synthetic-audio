@@ -74,6 +74,7 @@ function updateLOD() {
 function minimisePosition(loopArr) {
     var smallestLayer = 9999999;
     var smallestStartTime = 9999999;
+    var trackBB = document.querySelector("#trackInternal").getBoundingClientRect();
     loopArr.forEach(loop => {
         smallestLayer = Math.min(loop.layer, smallestLayer);
         smallestStartTime = Math.min(loop.start, smallestStartTime);
@@ -81,6 +82,16 @@ function minimisePosition(loopArr) {
     loopArr.forEach(loop => {
         loop.layer -= smallestLayer;
         loop.start -= smallestStartTime;
+    });
+    var offsetX = mouse.x - trackBB.left;
+    var offsetY = mouse.y - trackBB.top;
+    var posOffset = Math.max(0, (offsetX / trackBB.width) * 100);
+    posOffset = posOffset / 100 * audio.duration;
+    var layerOffset = Math.max(0, ((offsetY) / (16 * 3)) * 1);
+    layerOffset = Math.round(layerOffset - 0.5);
+    loopArr.forEach(loop => {
+        loop.layer += layerOffset;
+        loop.start += posOffset;
     });
 }
 function pickupLoop(loop, natural = false) {
@@ -776,10 +787,11 @@ function init() {
     });
     var canDuplicateKeybind = true;
     window.addEventListener("keydown", (e) => {
-        if (!canDuplicateKeybind) {
-            return;
-        }
-        if (e.shiftKey && (e.key.toLowerCase() === "d") && (e.target.tagName !== "INPUT") && (e.target.contentEditable === "true")) {
+        debugger;
+        if (e.shiftKey && (e.key.toLowerCase() === "d") && (e.target.tagName !== "INPUT") && (e.target.contentEditable !== "true")) {
+            if (!canDuplicateKeybind) {
+                return;
+            }
             canDuplicateKeybind = false;
             if (!document.querySelector(".loop.active")) {
                 var x = document.elementsFromPoint(mouse.x, mouse.y).find(x => !x.classList.contains("deactivated"));
