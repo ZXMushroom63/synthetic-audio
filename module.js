@@ -1201,6 +1201,7 @@ addBlockType("p_waveform_plus", {
         "AmplitudeSmoothTime": [0.0, "number"],
         "Decay": [0, "number", 1],
         "Harmonics": [false, "checkbox"],
+        "HarmonicsStrum": [0, "number"],
         "HarmonicsCount": [2, "number"],
         "HarmonicsRatio": [0.5, "number"],
         "HarmonicsUseSemitones": [false, "checkbox"],
@@ -1221,6 +1222,7 @@ addBlockType("p_waveform_plus", {
         ],
         "Harmonics": [
             "Harmonics",
+            "HarmonicsStrum",
             "HarmonicsCount",
             "HarmonicsRatio",
             "HarmonicsUseSemitones",
@@ -1277,9 +1279,13 @@ addBlockType("p_waveform_plus", {
 
             var f = freq(i, inPcm);
             f *= Math.exp(-fdecay(i, inPcm) * t);
-            var waveformTime = (t * f) % period(i, inPcm);
             var y = 0;
             for (let h = 0; h < (this.conf.Harmonics ? this.conf.HarmonicsCount + 1 : 1); h++) {
+                if (t < (h * this.conf.HarmonicsStrum)) {
+                    continue;
+                }
+                var waveformTime = (f * t) % period(i, inPcm);
+
                 var harmonicVolumeRatio = Math.pow(this.conf.HarmonicsRatio, h);
                 var coefficient = 1;
                 if (this.conf.Harmonics) {

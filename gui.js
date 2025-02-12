@@ -767,8 +767,13 @@ function init() {
         document.querySelector("#renderOut").currentTime = gui.marker;
         hydrateTimePosMarker();
     });
+    var canDuplicateKeybind = true;
     window.addEventListener("keydown", (e) => {
-        if (e.shiftKey && e.key.toLowerCase() === "d") {
+        if (!canDuplicateKeybind) {
+            return;
+        }
+        if (e.shiftKey && e.key.toLowerCase() === "d" && e.target.tagName !== "INPUT" && !e.target.contentEditable) {
+            canDuplicateKeybind = false;
             if (!document.querySelector(".loop.active")) {
                 var x = document.elementsFromPoint(mouse.x, mouse.y).find(x => !x.classList.contains("deactivated"));
                 if (x && x.closest(".loop")) {
@@ -790,6 +795,11 @@ function init() {
                     pickupLoop(loop, true);
                 });
             }
+        }
+    });
+    window.addEventListener("keyup", (e) => {
+        if (e.key.toLowerCase() === "d") {
+            canDuplicateKeybind = true;
         }
     });
     window.addEventListener("keydown", (e) => {
