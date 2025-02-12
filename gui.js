@@ -132,7 +132,7 @@ function hydrateBeatMarkers() {
     bpm = parseInt(document.querySelector("#bpm").value);
     loopi = parseFloat(document.querySelector("#loopi").value);
     var trueBPM = bpm;
-    trueBPM = 480 / gui.LOD;
+    trueBPM = trueBPM / gui.LOD;
     var beatCount = Math.floor(audio.duration / 60 * trueBPM);
     for (let i = 0; i < beatCount; i++) {
         const marker = document.createElement("span");
@@ -271,7 +271,7 @@ function addBlock(type, start, duration, title, layer = 0, data = {}, editorValu
     var dropdowns = definition.dropdowns || {};
     var dropdownsMap = Object.fromEntries(Object.keys(dropdowns).map(x => {
         var detail = document.createElement("details");
-        detail.open = true;
+        detail.open = false;
         var summary = document.createElement("summary");
         summary.innerText = x;
         detail.appendChild(summary);
@@ -478,6 +478,30 @@ function viewKeybinds() {
 (click to close)
 
 ******************
+*    STARTING    *
+******************
+To start the program select any audio assets you want to use in the 'Select loops folder: ' input box.
+If you don't have any audio files, just select any file at all.
+
+Once the program has started, you can LOAD projects using the 'Load' button. Supported formats are:
+  -  .sm (SYNTHETIC music file)
+  -  .mid (midi file)
+
+You can add nodes (tracks, loops, assets and filters) using the 'Add Tracks' menu in the top right.
+  |- Click to expand or shrink categories.
+
+You can move tracks using the LEFT MOUSE BUTTON.
+Dragging the handles on the left and right of nodes allows you to change the duration.
+Right click on a node to edit it's properties.
+
+Nodes are applied in order from top to bottom.
+
+You can use different editor layers for different components of a song.
+
+Negative layers to not output any sound into the mixer.
+  |- They are useful for making procedural assets (using the save asset and play asset nodes)
+
+******************
 *      KEYS      *
 ******************
 CTRL + (any number) = Go to that layer
@@ -491,7 +515,7 @@ CTRL + C = Copy selected/hovered loop(s)
 CTRL + V = Paste selected/hovered loop(s)
 CTRL + X = Cut selected/hovered loop(s)
 TAB = Focus next input (in edit panel)
-CTRL + SPACE = Go to ALL layer (layer 10)
+CTRL + SPACE = Go to ALL layer (layer 10, readonly)
 
 
 *******************
@@ -500,7 +524,7 @@ CTRL + SPACE = Go to ALL layer (layer 10)
 If an input box is purple, that means you can write inline scripts inside it.
 For a simple linear interpolation, try inputting:   #0~24
 For a exponential interpolation (squared), try inputting:   #0~24@2
- |- (spaces are allowed between the numbers)
+  |- (spaces are allowed between the numbers)
 
 For writing an arbitrary script, do: #(()=>{/*/code/*/ return 1;})()
 These scripts have access to the following variables:
