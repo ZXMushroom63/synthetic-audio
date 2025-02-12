@@ -51,5 +51,6 @@ self.addEventListener('message', event => {
                 })
             );
         });
+        console.log("Cleared cache!");
     }
 });
