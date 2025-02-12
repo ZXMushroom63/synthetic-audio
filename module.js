@@ -1401,7 +1401,6 @@ addBlockType("p_writeasset", {
     }
 });
 function load() {
-    pushState();
     var x = document.createElement("input");
     x.type = "file";
     x.accept = ".sm,.mid";
