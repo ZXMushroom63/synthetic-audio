@@ -372,6 +372,7 @@ function deserialise(serialisedStr) {
     document.querySelector("#loopi").value = ser.loopInterval;
     document.querySelector("#stereobox").checked = ser.stereo;
     document.querySelector("#normalisebox").checked = ser.normalise;
+    document.querySelector("#renderOut").currentTime = 0;
     gui.layer = ser.editorLayer;
     bpm = ser.bpm;
     loopi = ser.loopInterval

@@ -71,6 +71,18 @@ function updateLOD() {
         gui.LOD = 1;
     }
 }
+function minimisePosition(loopArr) {
+    var smallestLayer = 9999999;
+    var smallestStartTime = 9999999;
+    loopArr.forEach(loop => {
+        smallestLayer = Math.min(loop.layer, smallestLayer);
+        smallestStartTime = Math.min(loop.start, smallestStartTime);
+    });
+    loopArr.forEach(loop => {
+        loop.layer -= smallestLayer;
+        loop.start -= smallestStartTime;
+    });
+}
 function pickupLoop(loop, natural = false) {
     if (loop.classList.contains("deactivated")) {
         return;
@@ -358,7 +370,7 @@ function addBlock(type, start, duration, title, layer = 0, data = {}, editorValu
     });
     var del = document.createElement("button");
     del.innerText = "Delete";
-    del.onclick = () => { pushState(); deleteLoop(loop); };
+    del.onclick = () => { deleteLoop(loop); };
     optionsMenu.appendChild(del);
 
     if (definition.customGuiButtons) {
@@ -409,14 +421,12 @@ function addBlock(type, start, duration, title, layer = 0, data = {}, editorValu
             return;
         }
         if (e.button === 0 && (keymap["Backspace"] || keymap["Delete"])) {
-            pushState();
             deleteLoop(loop);
             return;
         }
         if (e.button !== 2) {
             return;
         }
-        pushState();
         e.preventDefault();
         e.stopImmediatePropagation();
         e.stopPropagation();
@@ -545,14 +555,6 @@ In any numberical input box, pressing 'b' on your keyboard will round the freque
     });
     document.body.appendChild(div);
 }
-const MAXIMUM_REVERT_COUNT = 2;
-const backups = [];
-function pushState() {
-    backups.unshift(serialise());
-    if (backups.length > MAXIMUM_REVERT_COUNT) {
-        backups.pop();
-    }
-}
 function init() {
     deserialise(localStorage.getItem("save"));
     document.querySelector("#editorlayer").addEventListener("input", () => {
@@ -605,6 +607,11 @@ function init() {
             return;
         }
         keymap[e.key] = true;
+    });
+    window.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") {
+            document.querySelectorAll(".loopInternal.selected").forEach(a => { a.classList.remove("selected") });
+        }
     });
     window.addEventListener("keyup", (e) => {
         keymap[e.key] = false;
@@ -772,7 +779,7 @@ function init() {
         if (!canDuplicateKeybind) {
             return;
         }
-        if (e.shiftKey && (e.key.toLowerCase() === "d") && (e.target.tagName !== "INPUT") && (e.target.contentEditable != "true")) {
+        if (e.shiftKey && (e.key.toLowerCase() === "d") && (e.target.tagName !== "INPUT") && (e.target.contentEditable === "true")) {
             canDuplicateKeybind = false;
             if (!document.querySelector(".loop.active")) {
                 var x = document.elementsFromPoint(mouse.x, mouse.y).find(x => !x.classList.contains("deactivated"));
@@ -803,8 +810,8 @@ function init() {
         }
     });
     window.addEventListener("keydown", (e) => {
-        if (e.ctrlKey && (e.key.toLowerCase() === "c" || e.key.toLowerCase() === "x")) {
-            if (document.activeElement !== document.body) {
+        if (e.ctrlKey && ((e.key.toLowerCase() === "c") || (e.key.toLowerCase() === "x"))) {
+            if ((e.target.tagName === "INPUT") || (e.target.contentEditable === "true")) {
                 return;
             }
             e.preventDefault();
@@ -837,13 +844,6 @@ function init() {
         }
     });
     window.addEventListener("keydown", (e) => {
-        if (e.ctrlKey && e.key === "z" && e.target.tagName === "BODY") {
-            if (backups[0]) {
-                deserialise(backups.shift());
-            }
-        }
-    });
-    window.addEventListener("keydown", (e) => {
         if (e.ctrlKey && e.key.toLowerCase() === "v") {
             if (document.activeElement !== document.body) {
                 return;
@@ -863,6 +863,7 @@ function init() {
                     data.forEach(entry => {
                         entry.editorLayer = Math.min(gui.layer, 9);
                     });
+                    minimisePosition(data);
                     var pastedLoops = [];
                     data.forEach(target => {
                         pastedLoops.push(deserialiseNode(target, true));
@@ -942,7 +943,6 @@ function init() {
             selectBox.style.right = (window.innerWidth - pos2.x) + "px";
         }
         window.onmouseup = function (e) {
-            pushState();
             e.preventDefault();
             e.stopImmediatePropagation();
             e.stopPropagation();
