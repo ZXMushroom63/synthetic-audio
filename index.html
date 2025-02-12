@@ -9,6 +9,7 @@
     <link rel="manifest" href="manifest.json" />
 </head>
 <body>
+    <script src="sw_loader.js"></script>
     <script src="fsaver.js"></script>
     <script src="lamejs.min.js"></script>
     <script src="midi_lib.js"></script>
@@ -49,6 +50,9 @@
                     </button>
                     <button onclick="viewKeybinds()">
                         Help
+                    </button>
+                    <button onclick="updateApp()">
+                        Update App
                     </button>
                 </div>
             </td>
