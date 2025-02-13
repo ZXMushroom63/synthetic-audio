@@ -370,6 +370,7 @@ button {
     margin-left: 8px;
     cursor: pointer;
     transition: 0.2s;
+    white-space: normal;
 }
 #track, button {
     background: linear-gradient(140deg, rgba(255, 0, 0, 0.15) 0%, rgba(255, 255, 255, 0.0) 34%, rgba(0, 255, 187, 0.15) 100%);
@@ -420,6 +421,6 @@ button:hover {
 #controlsAndStuff button {
     transform: translateY(-8px);
 }
- * {
+* {
     white-space: nowrap;
 }
