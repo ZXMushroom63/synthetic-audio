@@ -74,29 +74,7 @@ function updateLOD() {
         gui.LOD = 1;
     }
 }
-function minimisePosition(loopArr) {
-    var smallestLayer = 9999999;
-    var smallestStartTime = 9999999;
-    var trackBB = document.querySelector("#trackInternal").getBoundingClientRect();
-    loopArr.forEach(loop => {
-        smallestLayer = Math.min(loop.layer, smallestLayer);
-        smallestStartTime = Math.min(loop.start, smallestStartTime);
-    });
-    loopArr.forEach(loop => {
-        loop.layer -= smallestLayer;
-        loop.start -= smallestStartTime;
-    });
-    var offsetX = mouse.x - trackBB.left;
-    var offsetY = mouse.y - trackBB.top;
-    var posOffset = Math.max(0, (offsetX / trackBB.width) * 100);
-    posOffset = posOffset / 100 * audio.duration;
-    var layerOffset = Math.max(0, ((offsetY) / (16 * 3)) * 1);
-    layerOffset = Math.round(layerOffset - 0.5);
-    loopArr.forEach(loop => {
-        loop.layer += layerOffset;
-        loop.start += posOffset;
-    });
-}
+
 function pickupLoop(loop, natural = false) {
     if (loop.classList.contains("deactivated")) {
         return;
@@ -488,7 +466,7 @@ function addBlock(type, start, duration, title, layer = 0, data = {}, editorValu
     return loop;
 }
 function init() {
-    deserialise(localStorage.getItem("save"));
+    deserialise(localStorage.getItem("synthetic/save"));
     customEvent("init");
     document.querySelector("#editorlayer").addEventListener("input", () => {
         gui.layer = parseInt(document.querySelector("#editorlayer").value);

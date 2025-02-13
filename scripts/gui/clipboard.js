@@ -1,3 +1,26 @@
+function minimisePosition(loopArr) {
+    var smallestLayer = 9999999;
+    var smallestStartTime = 9999999;
+    var trackBB = document.querySelector("#trackInternal").getBoundingClientRect();
+    loopArr.forEach(loop => {
+        smallestLayer = Math.min(loop.layer, smallestLayer);
+        smallestStartTime = Math.min(loop.start, smallestStartTime);
+    });
+    loopArr.forEach(loop => {
+        loop.layer -= smallestLayer;
+        loop.start -= smallestStartTime;
+    });
+    var offsetX = mouse.x - trackBB.left;
+    var offsetY = mouse.y - trackBB.top;
+    var posOffset = Math.max(0, (offsetX / trackBB.width) * 100);
+    posOffset = posOffset / 100 * audio.duration;
+    var layerOffset = Math.max(0, ((offsetY) / (16 * 3)) * 1);
+    layerOffset = Math.round(layerOffset - 0.5);
+    loopArr.forEach(loop => {
+        loop.layer += layerOffset;
+        loop.start += posOffset;
+    });
+}
 window.addEventListener("init", ()=>{
     window.addEventListener("keydown", (e) => {
         if (e.ctrlKey && ((e.key.toLowerCase() === "c") || (e.key.toLowerCase() === "x"))) {
