@@ -1,3 +1,6 @@
+function customEvent(ev, data = {}) {
+    window.dispatchEvent(new CustomEvent(ev, data));
+}
 var dropHandlers = [];
 function intersect(rect1, rect2) {
     return (
@@ -184,9 +187,6 @@ function hydrateZoom() {
     });
     hydrateEditorLayer();
 }
-function hydrateTimePosMarker() {
-    document.querySelector(".timePosMarker").style.left = gui.marker / audio.duration * 100 + "%";
-}
 function hydrateEditorLayer() {
     document.querySelectorAll(".loop").forEach(elem => {
         if ((parseInt(elem.getAttribute("data-editlayer")) === gui.layer) || (gui.layer === 10)) {
@@ -210,11 +210,10 @@ function hydrate() {
         marker.addEventListener("click", () => {
             gui.marker = time;
             document.querySelector("#renderOut").currentTime = gui.marker;
-            hydrateTimePosMarker();
         });
         timeRibbon.appendChild(marker);
     }
-    hydrateTimePosMarker();
+    customEvent("hydrate");
     hydrateBeatMarkers();
     hydrateZoom();
 }
@@ -459,7 +458,6 @@ function addBlock(type, start, duration, title, layer = 0, data = {}, editorValu
         var trackBB = document.querySelector("#trackInternal").getBoundingClientRect();
         var originalBB = internal.getBoundingClientRect();
         loop.classList.add("active");
-        // (a.left - b.left) / b.width
         markLoopDirty(loop, true);
         document.onmousemove = function (j) {
             var pos = Math.max(0, ((originalBB.left - trackBB.left - (e.clientX - j.clientX)) / trackBB.width) * 100);
@@ -489,85 +487,9 @@ function addBlock(type, start, duration, title, layer = 0, data = {}, editorValu
 
     return loop;
 }
-window.addEventListener("beforeunload", () => {
-    localStorage.setItem("save", JSON.stringify(serialise()));
-});
-function viewKeybinds() {
-    var div = document.createElement("div");
-    div.innerHTML =
-        `
-(click to close)
-
-******************
-*    STARTING    *
-******************
-To start the program select any audio assets you want to use in the 'Select loops folder: ' input box.
-If you don't have any audio files, just select any file at all.
-
-Once the program has started, you can LOAD projects using the 'Load' button. Supported formats are:
-  -  .sm (SYNTHETIC music file)
-  -  .mid (midi file)
-
-You can add nodes (tracks, loops, assets and filters) using the 'Add Tracks' menu in the top right.
-  |- Click to expand or shrink categories.
-
-You can move tracks using the LEFT MOUSE BUTTON.
-Dragging the handles on the left and right of nodes allows you to change the duration.
-Right click on a node to edit it's properties.
-
-Nodes are applied in order from top to bottom.
-
-You can use different editor layers for different components of a song.
-
-Negative layers to not output any sound into the mixer.
-  |- They are useful for making procedural assets (using the save asset and play asset nodes)
-
-******************
-*      KEYS      *
-******************
-CTRL + (any number) = Go to that layer
-Spacebar =  Pause/Play playback
-SHIFT + LEFT = Playback to second 0
-CTRL + Scroll on timeline = Shrink/expand timeline
-DELETE/BACKSPACE = Delete selected loops
-DELETE/BACKSPACE + Click = Delete loop
-SHIFT + D = Duplicate selected/hovered loop(s)
-CTRL + C = Copy selected/hovered loop(s)
-CTRL + V = Paste selected/hovered loop(s)
-CTRL + X = Cut selected/hovered loop(s)
-TAB = Focus next input (in edit panel)
-CTRL + SPACE = Go to ALL layer (layer 10, readonly)
-
-
-*******************
-* INPUT SHORTCUTS *
-*******************
-If an input box is purple, that means you can write inline scripts inside it.
-For a simple linear interpolation, try inputting:   #0~24
-For a exponential interpolation (squared), try inputting:   #0~24@2
-  |- (spaces are allowed between the numbers)
-
-For writing an arbitrary script, do: #(()=>{/*/code/*/ return 1;})()
-These scripts have access to the following variables:
-x - The percentage through the node
-rt - The total runtime of the node
-i - The index of the current sample
-
-In purple input boxes, you can also use autocomplete for notes.
-:a:  =  :a4:  =  440
-:g#3:  =  207
-
-In any numberical input box, pressing 'b' on your keyboard will round the frequency into the nearest note.
-
-`.replaceAll(" ", "&nbsp;").replaceAll("\n", "\<br\>");
-    div.style = "font-family: monospace; position: absolute; z-index: 99999; top: 0; left: 0; right: 0; bottom: 0; background-color: black; color: white; overflow-x: hidden; overflow-y: auto;";
-    div.addEventListener("click", () => {
-        div.remove();
-    });
-    document.body.appendChild(div);
-}
 function init() {
     deserialise(localStorage.getItem("save"));
+    customEvent("init");
     document.querySelector("#editorlayer").addEventListener("input", () => {
         gui.layer = parseInt(document.querySelector("#editorlayer").value);
         hydrateZoom();
@@ -642,92 +564,6 @@ function init() {
             URL.revokeObjectURL(loopObjURL);
         }
     }));
-    document.querySelector("#loopSelector input").addEventListener("input", async () => {
-        var loopsDiv = document.querySelector("#addloops");
-        var filtersDiv = document.querySelector("#addfilters");
-        var primsDiv = document.querySelector("#addprims");
-        var fileInput = document.querySelector("#loopSelector input");
-        var fileList = [...fileInput.files];
-        if (fileList.length > 0) {
-            document.querySelector("#loopSelector").remove();
-            Object.keys(filters).sort().forEach(k => {
-                if (k === "audio") {
-                    return;
-                }
-                var span = document.createElement("span");
-                span.innerText = filters[k].title;
-                span.innerHTML += "&nbsp;";
-                var y = document.createElement("a");
-                y.innerText = "[Add]";
-                y.addEventListener("click", () => {
-                    const loop = addBlock(k, 0, 1, filters[k].title, 0, {});
-                    hydrate();
-                    pickupLoop(loop);
-                });
-                span.appendChild(y);
-                if (k.startsWith("p_")) {
-                    primsDiv.appendChild(span);
-                } else {
-                    filtersDiv.appendChild(span);
-                }
-            });
-            for (let a = 0; a < fileList.length; a++) {
-                const file = fileList[a];
-                loopMap[file.name] = file;
-            }
-            for (let a = 0; a < fileList.length; a++) {
-                const file = fileList[a];
-                loopDurationMap[file.name] = await getDurationOfLoop(file);
-                if (a % 50 === 0) {
-                    document.querySelector("#renderProgress").innerText = "Processing audio... (" + (a / fileList.length * 100).toFixed(1) + "%)";
-                    hydrateZoom();
-                }
-            }
-            Array.prototype.sort.apply(fileList, [((a, b) => {
-                return loopDurationMap[a.name] - loopDurationMap[b.name];
-            })]);
-            for (let i = 0; i < fileList.length; i++) {
-                const file = fileList[i];
-                var dur = loopDurationMap[file.name];
-                var span = document.createElement("span");
-                if (file.name.length > 15) {
-                    span.innerText = file.name.substring(0, 14) + "…";
-                } else {
-                    span.innerText = file.name;
-                }
-                span.innerText += ` (${dur.toFixed(1)}s)`
-                span.innerHTML += "&nbsp;";
-                var x = document.createElement("a");
-                x.innerText = "[Play]";
-                x.addEventListener("click", () => {
-                    if (document.querySelector("audio#loopsample").src) {
-                        URL.revokeObjectURL(document.querySelector("audio#loopsample").src);
-                    }
-                    if (loopObjURL) {
-                        URL.revokeObjectURL(loopObjURL);
-                    }
-                    document.querySelector("audio#loopsample").src = loopObjURL = URL.createObjectURL(file);
-                    document.querySelector("audio#loopsample").currentTime = 0;
-                    document.querySelector("audio#loopsample").play();
-                });
-                span.appendChild(x);
-                span.append(" ");
-                var y = document.createElement("a");
-                y.innerText = "[Add]";
-                y.addEventListener("click", () => {
-                    const loop = addBlock("audio", 0, 1, file.name, 0, {});
-                    hydrate();
-                    pickupLoop(loop);
-                });
-                span.appendChild(y);
-                loopsDiv.appendChild(span);
-                loopMap[file.name] = file;
-            }
-        }
-        hydrateZoom();
-        document.querySelector("#renderProgress").innerText = "(no render task currently active)";
-        document.querySelector("#renderBtn").removeAttribute("disabled");
-    });
     document.querySelector("#stereobox").addEventListener("input", () => {
         if (document.querySelector("#stereobox").checked) {
             audio.stereo = true;
@@ -750,145 +586,7 @@ function init() {
         }
         hydrateBeatMarkers();
     });
-    document.querySelector(".timePosMarker").addEventListener("mousedown", () => {
-        var bba = document.querySelector("#trackInternal").getBoundingClientRect();
-        var bbb = document.querySelector(".timePosMarker").getBoundingClientRect();
-        window.onmousemove = (e) => {
-            document.querySelector(".timePosMarker").style.left = ((e.clientX - bba.left) / bba.width) * 100 + "%";
-            gui.marker = ((e.clientX - bba.left) / bba.width) * audio.duration;
-            document.querySelector("#renderOut").currentTime = gui.marker;
-        }
-        window.onmouseup = () => {
-            window.onmousemove = () => { };
-            window.onmouseup = () => { };
-            hydrateTimePosMarker();
-        }
-    });
-    document.querySelector("#renderOut").addEventListener("focus", () => {
-        document.querySelector("#renderOut").blur();
-        document.body.focus();
-    });
-    document.querySelector("#renderOut").addEventListener("timeupdate", () => {
-        gui.marker = document.querySelector("#renderOut").currentTime;
-        hydrateTimePosMarker();
-    });
-    document.querySelector("#renderOut").addEventListener("seeking", () => {
-        gui.marker = document.querySelector("#renderOut").currentTime;
-        hydrateTimePosMarker();
-    });
-    document.querySelector("#renderOut").addEventListener("loadedmetadata", () => {
-        document.querySelector('#renderOut').playbackRate = parseFloat(document.querySelector('#playbackRateSlider').value) || 0
-        document.querySelector("#renderOut").currentTime = gui.marker;
-        hydrateTimePosMarker();
-    });
-    document.querySelector("#renderOut").addEventListener("loadstart", () => {
-        document.querySelector("#renderOut").currentTime = gui.marker;
-        hydrateTimePosMarker();
-    });
-    var canDuplicateKeybind = true;
-    window.addEventListener("keydown", (e) => {
-        debugger;
-        if (e.shiftKey && (e.key.toLowerCase() === "d") && (e.target.tagName !== "INPUT") && (e.target.contentEditable !== "true")) {
-            if (!canDuplicateKeybind) {
-                return;
-            }
-            canDuplicateKeybind = false;
-            if (!document.querySelector(".loop.active")) {
-                var x = document.elementsFromPoint(mouse.x, mouse.y).find(x => !x.classList.contains("deactivated"));
-                if (x && x.closest(".loop")) {
-                    var y = deserialiseNode(structuredClone(serialiseNode(x.closest(".loop"))), true);
-                    hydrateZoom();
-                    pickupLoop(y);
-                }
-            } else {
-                var targets = document.querySelectorAll(".loop.active");
-                dropHandlers.forEach(fn => { fn(true) });
-                dropHandlers = [];
-                var dupedLoops = [];
-                targets.forEach(target => {
-                    var loop = deserialiseNode(structuredClone(serialiseNode(target)), true);
-                    dupedLoops.push(loop);
-                });
-                hydrateZoom();
-                dupedLoops.forEach(loop => {
-                    pickupLoop(loop, true);
-                });
-            }
-        }
-    });
-    window.addEventListener("keyup", (e) => {
-        if (e.key.toLowerCase() === "d") {
-            canDuplicateKeybind = true;
-        }
-    });
-    window.addEventListener("keydown", (e) => {
-        if (e.ctrlKey && ((e.key.toLowerCase() === "c") || (e.key.toLowerCase() === "x"))) {
-            if ((e.target.tagName === "INPUT") || (e.target.contentEditable === "true")) {
-                return;
-            }
-            e.preventDefault();
-            var targets = [];
-            if (!document.querySelector(".loop.active")) {
-                var targetNode = document.elementsFromPoint(mouse.x, mouse.y).find(x => !x.classList.contains("deactivated") && x.classList.contains("loopInternal"));
-                if (targetNode) {
-                    targets = [targetNode.parentElement]
-                } else {
-                    targets = [];
-                }
-            } else {
-                targets = document.querySelectorAll(".loop.active");
-            }
-            var dupedLoops = [];
-            targets.forEach(target => {
-                dupedLoops.push(serialiseNode(target));
-            });
-            var text = "sp_loopdata::" + JSON.stringify(dupedLoops);
-            navigator.clipboard.writeText(text);
-            if (e.key.toLowerCase() === "x") {
-                targets.forEach(x => { deleteLoop(x) });
-            }
-        }
-    });
-    window.addEventListener("keydown", (e) => {
-        if (e.ctrlKey && e.key.toLowerCase() === "g") {
-            e.preventDefault();
-            document.querySelector(".timePosMarker").dispatchEvent(new Event('mousedown'));
-        }
-    });
-    window.addEventListener("keydown", (e) => {
-        if (e.ctrlKey && e.key.toLowerCase() === "v") {
-            if (document.activeElement !== document.body) {
-                return;
-            }
-            e.preventDefault();
-            dropHandlers.forEach(fn => { fn(true) });
-            dropHandlers = [];
-            console.log("requesting clipboard");
-            navigator.clipboard
-                .readText()
-                .then((clipText) => {
-                    console.log("recieved clipboard: " + clipText)
-                    if (!clipText.startsWith("sp_loopdata::")) {
-                        return;
-                    }
-                    var data = JSON.parse(clipText.replace("sp_loopdata::", ""));
-                    data.forEach(entry => {
-                        entry.editorLayer = Math.min(gui.layer, 9);
-                    });
-                    minimisePosition(data);
-                    var pastedLoops = [];
-                    data.forEach(target => {
-                        pastedLoops.push(deserialiseNode(target, true));
-                    });
-                    hydrateZoom();
-                    if (!e.shiftKey) {
-                        pastedLoops.forEach(loop => {
-                            pickupLoop(loop, true);
-                        });
-                    }
-                });
-        }
-    });
+    
     window.addEventListener("keydown", (e) => {
         if (e.ctrlKey && e.key.toLowerCase() === "a") {
             if (document.activeElement !== document.body) {
@@ -906,81 +604,5 @@ function init() {
             targets.forEach(t => { deleteLoop(t); });
         }
     });
-    document.querySelector("#track").addEventListener("scroll", () => {
-        if (document.querySelector(".selectbox")) {
-            window.onmousemove(window.lastScrollEvent);
-        }
-    });
-    document.querySelector("#trackInternal").addEventListener("mousedown", (e) => {
-        if (e.button !== 2) {
-            return;
-        }
-        e.preventDefault();
-        e.stopImmediatePropagation();
-        e.stopPropagation();
-        var track = document.querySelector("#track");
-        var initialScrollLeft = track.scrollLeft;
-        var initialScrollTop = track.scrollTop;
-        var a = { x: e.clientX, y: e.clientY };
-        var b = { x: e.clientX, y: e.clientY };
-        var selectBox = document.createElement("div");
-        selectBox.classList.add("selectbox");
-        selectBox.style.color = "red";
-        selectBox.style.top = a.y + "px";
-        selectBox.style.left = a.x + "px";
-        selectBox.style.bottom = (window.innerHeight - b.y) + "px";
-        selectBox.style.right = (window.innerWidth - b.x) + "px";
-        document.querySelector("#trackInternal").appendChild(selectBox);
-        window.oncontextmenu = (e) => { e.preventDefault() };
-        window.onmousemove = function (e) {
-            window.lastScrollEvent = e;
-            e.preventDefault();
-            e.stopImmediatePropagation();
-            e.stopPropagation();
-            var scrollDx = track.scrollLeft - initialScrollLeft;
-            var scrollDy = track.scrollTop - initialScrollTop;
-            b.x = e.clientX;
-            b.y = e.clientY;
-            var pos1 = {
-                x: Math.min(a.x - scrollDx, b.x),
-                y: Math.min(a.y - scrollDy, b.y)
-            }
-            var pos2 = {
-                x: Math.max(a.x - scrollDx, b.x),
-                y: Math.max(a.y - scrollDy, b.y)
-            }
-            selectBox.style.top = pos1.y + "px";
-            selectBox.style.left = pos1.x + "px";
-            selectBox.style.bottom = (window.innerHeight - pos2.y) + "px";
-            selectBox.style.right = (window.innerWidth - pos2.x) + "px";
-        }
-        window.onmouseup = function (e) {
-            e.preventDefault();
-            e.stopImmediatePropagation();
-            e.stopPropagation();
-            selectBox.remove();
-            setTimeout(() => { window.oncontextmenu = null; }, 1 / 60);
-            window.onmousemove = null;
-            window.onmouseup = null;
-            var scrollDx = track.scrollLeft - initialScrollLeft;
-            var scrollDy = track.scrollTop - initialScrollTop;
-            var pos1 = {
-                x: Math.min(a.x - scrollDx, b.x),
-                y: Math.min(a.y - scrollDy, b.y)
-            }
-            var pos2 = {
-                x: Math.max(a.x - scrollDx, b.x),
-                y: Math.max(a.y - scrollDy, b.y)
-            }
-            var rect = new DOMRect(pos1.x, pos1.y, pos2.x - pos1.x, pos2.y - pos1.y);
-            document.querySelectorAll(".loopInternal").forEach(x => {
-                var rect2 = x.getBoundingClientRect();
-                if (intersect(rect, rect2)) {
-                    pickupLoop(x.parentElement, mouse.x, mouse.y);
-                }
-            });
-        }
-    });
-    document.querySelector("#trackInternal").addEventListener("contextmenu", (e) => { e.preventDefault() });
 }
 addEventListener("load", init);

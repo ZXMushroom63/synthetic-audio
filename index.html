@@ -17,7 +17,13 @@
     <script src="lib/filesaver.min.js"></script>
     <script src="lib/midi_lib.js"></script>
 
-    <script src="scripts/gui.js"></script>
+    <script src="scripts/gui/loop_select.js"></script>
+    <script src="scripts/gui/timePosMarker.js"></script>
+    <script src="scripts/gui/selectbox.js"></script>
+    <script src="scripts/gui/duplicate.js"></script>
+    <script src="scripts/gui/clipboard.js"></script>
+    <script src="scripts/gui/help.js"></script>
+    <script src="scripts/gui/gui.js"></script>
     <script src="scripts/module.js"></script>
     <script src="scripts/vizualiser.js"></script>
     <script src="scripts/quantiseToNote.js"></script>
@@ -51,7 +57,7 @@
                     <button onclick="deserialise('{}')">
                         Clear
                     </button>
-                    <button onclick="viewKeybinds()">
+                    <button onclick="viewHelp()">
                         Help
                     </button>
                     <button onclick="updateApp()">

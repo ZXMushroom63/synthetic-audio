@@ -1406,6 +1406,7 @@ function load() {
     x.accept = ".sm,.mid";
     x.oninput = () => {
         if (x.files[0]) {
+            document.querySelector("title").innerText = x.files[0].name;
             var fr = new FileReader();
             var isMidi = false;
             fr.onload = () => {
@@ -1425,3 +1426,6 @@ function load() {
     };
     x.click();
 }
+window.addEventListener("beforeunload", () => {
+    localStorage.setItem("save", JSON.stringify(serialise()));
+});
