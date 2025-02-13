@@ -6,7 +6,6 @@
     width: calc(100vw - 16px);
     overflow-x: scroll;
     overflow-y: auto;
-    resize: vertical;
 }
 #track #time {
     height: 2rem;
