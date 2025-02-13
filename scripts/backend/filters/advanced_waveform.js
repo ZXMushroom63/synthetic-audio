@@ -22,7 +22,7 @@ addBlockType("p_waveform_plus", {
         "HarmonicsSemitoneOffset": [7, "checkbox", 1],
         "Unison": [false, "checkbox"],
         "uVoices": [4, "number"],
-        "uAmplitudeRatio": [4, "number"],
+        "uAmplitudeRatio": [0.5, "number"],
         "uDetuneHz": [0, "number", 1],
         "uPan": [0.0, "number", 1],
         "Absolute": [false, "checkbox"],
@@ -139,12 +139,12 @@ addBlockType("p_waveform_plus", {
                 if (t < (h * this.conf.HarmonicsStrum * this.conf.Harmonics)) {
                     continue;
                 }
-                var freq = f;
+                var harmonicFrequency = f;
                 var volumeRatio = 1;
                 var coefficient = 1;
                 if (this.conf.Unison) {
                     var detunePosition = (h + 0.5) - (waveCount / 2);
-                    freq += detuneHz * Math.trunc(detunePosition);
+                    harmonicFrequency += detuneHz * Math.trunc(detunePosition);
                     volumeRatio = Math.abs(detunePosition);
                     if ((waveCount % 2) === 0) {
                         volumeRatio -= 0.5;
@@ -158,7 +158,7 @@ addBlockType("p_waveform_plus", {
                         volumeRatio *= right;
                     }
                 }
-                var waveformTime = (freq * t) % thePeriod;
+                var waveformTime = (harmonicFrequency * t) % thePeriod;
 
                 if (this.conf.Harmonics) {
                     volumeRatio = Math.pow(this.conf.HarmonicsRatio, h);
