@@ -1,3 +1,13 @@
+var timers = {};
+function startTiming(name) {
+    timers[name] = performance.now();
+}
+function stopTiming(name) {
+    var dt = performance.now() - timers[name];
+    console.log(`${name} took ${(dt).toFixed(1)} ms.`);
+    delete timers[name];
+    return dt;
+}
 function noteToFrequency(note, octave, accidental = '') {
     const A4 = 440;
     const notes = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
@@ -145,6 +155,7 @@ function float32ToInt16(float32Array) {
 }
 
 function convertToMp3Blob(float32Arrays, channels, sampleRate, bRate) {
+    startTiming("encode");
     let mp3Encoder = new lamejs.Mp3Encoder(channels, sampleRate, bRate);
     let samples = float32Arrays.flatMap(float32ToInt16);
     let mp3Data = [];
@@ -164,6 +175,7 @@ function convertToMp3Blob(float32Arrays, channels, sampleRate, bRate) {
     }
 
     let blob = new Blob(mp3Data, { type: 'audio/mp3' });
+    stopTiming("encode");
     return blob;
 }
 
@@ -316,6 +328,7 @@ async function render() {
     }
     var output = [];
     hydrate();
+    startTiming("render");
     var data = serialise(true);
     var channels = data.stereo ? 2 : 1;
 
@@ -373,8 +386,10 @@ async function render() {
             }
             output.push(sumFloat32ArraysNormalised(channelPcms));
         }
+        stopTiming("render");
         var blob = convertToMp3Blob(output, channels, audio.samplerate, audio.bitrate);
     } catch (error) {
+        stopTiming("render");
         console.error(error);
         success = false;
     }
