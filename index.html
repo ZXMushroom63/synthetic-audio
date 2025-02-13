@@ -9,16 +9,19 @@
     <link rel="manifest" href="manifest.json" />
 </head>
 <body>
-    <script src="sw_loader.js"></script>
-    <script src="fsaver.js"></script>
-    <script src="lamejs.min.js"></script>
-    <script src="midi_lib.js"></script>
+    <!-- CACHE SERVICE WORKER -->
+    <script src="scripts/sw/sw_loader.js"></script>
 
-    <script src="gui.js"></script>
-    <script src="module.js"></script>
-    <script src="vizualiser.js"></script>
-    <script src="quantiseToNote.js"></script>
-    <script src="importMidi.js"></script>
+    <!-- LIBRARIES -->
+    <script src="lib/lamejs.min.js"></script>
+    <script src="lib/filesaver.min.js"></script>
+    <script src="lib/midi_lib.js"></script>
+
+    <script src="scripts/gui.js"></script>
+    <script src="scripts/module.js"></script>
+    <script src="scripts/vizualiser.js"></script>
+    <script src="scripts/quantiseToNote.js"></script>
+    <script src="scripts/importMidi.js"></script>
     <table class="main">
         <tr>
             <td style="height: 10rem;">
