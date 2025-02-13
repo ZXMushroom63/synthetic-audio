@@ -27,6 +27,7 @@
     <script src="scripts/gui/help.js"></script>
     <script src="scripts/gui/quantiseToNote.js"></script>
     <script src="scripts/gui/vizualiser.js"></script>
+    <script src="scripts/gui/sample_rate_chooser.js"></script>
 
     <!-- GUI CORE -->
     <script src="scripts/gui/gui.js"></script>
@@ -55,7 +56,7 @@
             <td style="height: 10rem;">
                 <h4>
                     <img id="logo" style="display:none;" src="public/logo.png" height="75">
-                    <canvas width="150" height="75" style="border: 1px solid white;"></canvas>
+                    <canvas width="150" height="75" style="border: 1px solid white; image-rendering: pixelated;"></canvas>
                     <button id="renderBtn" disabled onclick="if(this.disabled){return};render()">Render Audio</button>
                     <audio id="renderOut" controls></audio>
                     <div style="display: inline-block;">
@@ -120,6 +121,15 @@
                     </span>
                     <span class="trayElem">
                         Normalised: <input checked type="checkbox" id="normalisebox">
+                    </span>
+                    <span class="trayElem">
+                        Quality: <select id="samplerate">
+                            <option value="8000">Trash (8k)</option>
+                            <option value="16000">Low (16k)</option>
+                            <option value="24000" selected>Medium (24k)</option>
+                            <option value="48000">High (48k)</option>
+                            <option value="88200">Extreme (88.2k)</option>
+                        </select>
                     </span>
                     <span class="trayElem">
                         NoLOD: <input checked type="checkbox" id="nolod">

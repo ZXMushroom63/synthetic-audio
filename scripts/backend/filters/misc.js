@@ -47,14 +47,15 @@ addBlockType("bitcrunch", {
         "Level": [1, "number", 1],
     },
     functor: function (inPcm, channel, data) {
+        var sampleRateAnchor = audio.samplerate / 24000;
         var level = _(this.conf.Level);
-        var x = Math.max(0, Math.round(level(0, 0, 0)));
+        var x = Math.max(0, Math.roundsampleRateAnchor * (level(0, 0, 0)));
         for (let i = 0; i < inPcm.length; i += x + 1) {
             var original = inPcm[i];
             for (let j = 0; j < x; j++) {
                 inPcm[i + j + 1] = original;
             }
-            x = Math.max(0, Math.round(level(i, inPcm)))
+            x = Math.max(0, Math.round(sampleRateAnchor * level(i, inPcm)))
         }
         return inPcm;
     }
@@ -259,7 +260,8 @@ addBlockType("smooth", {
         "Iterations": [1, "number"]
     },
     functor: function (inPcm, channel, data) {
-        var x = Math.max(0, Math.round(this.conf.Iterations));
+        var sampleRateAnchor = audio.samplerate / 24000;
+        var x = Math.max(0, Math.round(this.conf.Iterations * sampleRateAnchor));
         if (x === 0) {
             return inPcm;
         }

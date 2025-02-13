@@ -31,9 +31,10 @@ window.addEventListener("load", () => {
         return freq.toFixed(2); // return frequency in Hz
     }
     var logoImage = document.querySelector("#logo");
+    canvasCtx.drawImage(logoImage, 0, 15, 150, 45);
+    var keepDrawing = true;
+    var started = false;
     function draw() {
-        requestAnimationFrame(draw);
-
         analyser.getByteTimeDomainData(dataArray);
 
         canvasCtx.fillStyle = 'rgb(0, 0, 0)';
@@ -74,11 +75,35 @@ window.addEventListener("load", () => {
         canvasCtx.font = "10px sans-serif";
         canvasCtx.strokeText("SYNTHETIC", 0, 10);
         canvasCtx.strokeText(`${mostCommonFrequency} Hz`, 0, 20);
+
+        if (keepDrawing) {
+            requestAnimationFrame(draw);
+        }
     }
 
     audio.addEventListener('play', () => {
-        audioCtx.resume().then(() => {
+        if (!keepDrawing) {
+            keepDrawing = true;
             draw();
-        });
+        }
+        if (!started) {
+            audioCtx.resume().then(() => {
+                draw();
+            });
+        }
+    });
+    function stopViz() {
+        keepDrawing = false;
+    }
+    audio.addEventListener('pause', () => {
+        stopViz();
+    });
+    audio.addEventListener('ended', () => {
+        stopViz();
+        setTimeout(() => {
+            canvasCtx.fillStyle = 'rgb(0, 0, 0)';
+            canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
+            canvasCtx.drawImage(logoImage, 0, 15, 150, 45);
+        }, 150);
     });
 });

@@ -59,6 +59,7 @@ function deserialise(serialisedStr) {
     document.querySelector("#loopi").value = ser.loopInterval;
     document.querySelector("#stereobox").checked = ser.stereo;
     document.querySelector("#normalisebox").checked = ser.normalise;
+    document.querySelector("#samplerate").value = ser.sampleRate;
     document.querySelector("#renderOut").currentTime = 0;
     gui.layer = ser.editorLayer;
     bpm = ser.bpm;
@@ -66,6 +67,12 @@ function deserialise(serialisedStr) {
     audio.duration = ser.duration;
     audio.normalise = ser.normalise;
     audio.stereo = ser.stereo;
+
+    if (audio.samplerate !== ser.sampleRate) {
+        decodedPcmCache = {};
+    }
+
+    audio.samplerate = ser.sampleRate;
     zoom = ser.zoom || 100;
     ser.nodes.forEach((node) => {
         deserialiseNode(node);

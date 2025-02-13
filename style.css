@@ -201,7 +201,7 @@ h4 {
 .loopInternal.selected .loopOptionsMenu {
     display: block;
 }
-.loopOptionsMenu input, .loopOptionsMenu select {
+.loopOptionsMenu input, select {
     background-color: transparent;
     border: 0;
     color: white;
@@ -210,13 +210,13 @@ h4 {
     border-radius: 3px;
     width: 4rem;
 }
-.loopOptionsMenu input.modifyable, .loopOptionsMenu select.modifyable {
+.loopOptionsMenu input.modifyable, select.modifyable {
     background-color: rgba(255, 0, 255, 0.3);
 }
 .loopOptionsMenu select option {
     color: black;
 }
-.loopOptionsMenu input:focus, .loopOptionsMenu select:focus {
+.loopOptionsMenu input:focus, select:focus {
     outline: 0;
 }
 .loopOptionsMenu button {
@@ -376,6 +376,7 @@ button {
     background: linear-gradient(140deg, rgba(255, 0, 0, 0.15) 0%, rgba(255, 255, 255, 0.0) 34%, rgba(0, 255, 187, 0.15) 100%);
 }
 button:disabled {
+    cursor: not-allowed;
     background: black;
     text-decoration: none;
     color: rgb(200,200,200);
@@ -418,4 +419,8 @@ button:hover {
 }
 * {
     white-space: nowrap;
+}
+select option {
+    color: white !important;
+    background: black;
 }
