@@ -43,10 +43,11 @@ h4 {
     bottom: 0;
     width: 100vw;
     border-top: 2px solid white;
-    min-height: 3rem;
+    height: 3rem;
     padding: 4px;
-    overflow-x: auto;
-    overflow-y: hidden;
+    overflow-x: hidden;
+    overflow-y: auto;
+    white-space: normal;
 }
 table.main {
     height: 100vh;
@@ -395,7 +396,6 @@ button:hover {
     font-family: sans-serif;
     border: 1px solid white;
     padding: 8px 16px;
-    transform: translateY(2px);
     display:  inline-block;
     position: relative;
     border-radius: 0.2rem;
@@ -404,7 +404,6 @@ button:hover {
     user-select: none;
 }
 .tab.selected {
-    transform: translateY(-8px);
     background-color: rgba(125, 125, 255, 0.3);
     text-decoration: underline;
     cursor: default;
@@ -415,7 +414,7 @@ button:hover {
 #controlsAndStuff {
     max-width: 100vw;
     overflow-x: visible;
-    overflow-y: visible;
+    overflow-y: auto;
 }
 * {
     white-space: nowrap;
