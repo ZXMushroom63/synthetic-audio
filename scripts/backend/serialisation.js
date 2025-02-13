@@ -1,12 +1,15 @@
 function serialise(forRender) {
     var hNodes = document.querySelectorAll(".loop");
-    var x = Array.prototype.flatMap.apply(Array.prototype.filter.apply(hNodes,
-        [
-            (node) => {
-                return !node.hasAttribute("data-deleted");
-            }
-        ]
-    ), [(node => {
+    if (!forRender) {
+        hNodes = Array.prototype.filter.apply(hNodes,
+            [
+                (node) => {
+                    return !node.hasAttribute("data-deleted");
+                }
+            ]
+        )
+    }
+    var x = Array.prototype.flatMap.apply(hNodes, [(node => {
         return serialiseNode(node, forRender);
     })]);
     var out = { nodes: x, duration: audio.duration, bpm: bpm, zoom: zoom, loopInterval: loopi, stereo: audio.stereo, sampleRate: audio.samplerate, normalise: audio.normalise };
