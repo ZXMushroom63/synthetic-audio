@@ -385,3 +385,41 @@ button:hover {
 .loop button {
     margin-bottom: 0.25rem;
 }
+#controlsAndStuff ins {
+    margin-right: 6rem;
+}
+.tab {
+    color: white;
+    font-family: sans-serif;
+    border-top: 1px solid white;
+    border-left: 1px solid white;
+    border-right: 1px solid white;
+    padding: 8px 16px;
+    transform: translateY(10px);
+    display:  inline-block;
+    position: relative;
+    border-radius: 0.2rem 0.2rem 0rem 0rem;
+    transition: 0.2s transform;
+    cursor: pointer;
+    user-select: none;
+}
+.tab.selected {
+    transform: translateY(1px);
+    background-color: rgba(125, 125, 255, 0.3);
+    cursor: default;
+}
+.tabHidden {
+    display: none;
+}
+#controlsAndStuff {
+    max-width: 100vw;
+    overflow-x: auto;
+    overflow-y: hidden;
+    transform: translateY(8px);
+}
+#controlsAndStuff button {
+    transform: translateY(-8px);
+}
+ * {
+    white-space: nowrap;
+}

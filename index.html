@@ -18,6 +18,7 @@
     <script src="lib/midi_lib.js"></script>
 
     <!-- GUI MODULES -->
+    <script src="scripts/gui/tabs.js"></script>
     <script src="scripts/gui/loop_select.js"></script>
     <script src="scripts/gui/timePosMarker.js"></script>
     <script src="scripts/gui/selectbox.js"></script>
@@ -84,6 +85,7 @@
                     <button onclick="updateApp()">
                         Update App
                     </button>
+                    <ins></ins>
                 </div>
             </td>
         </tr>
@@ -99,7 +101,7 @@
             </td>
         </tr>
         <tr>
-            <td style="align-content: flex-end;">
+            <td style="align-content: flex-end; white-space: nowrap; overflow-x: auto;">
                 <div id="tray">
                     <span class="trayElem">
                         Editor Layer: <input step="1" min="-10" max="10" type="number" id="editorlayer" value="0">
