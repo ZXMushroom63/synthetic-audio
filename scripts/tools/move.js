@@ -1,4 +1,4 @@
 addEventListener("init", ()=>{
-    registerTool("Move", (node)=>{pickupLoop(node, true)}, true);
-    registerTool("Delete", (node)=>{deleteLoop(node)});
+    registerTool("Move", (node)=>{if (!node) {return}; pickupLoop(node, true)}, true);
+    registerTool("Delete", (node)=>{if (!node) {return}; deleteLoop(node)});
 });

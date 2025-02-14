@@ -1,6 +1,7 @@
 
 var ACTIVE_TOOL = null;
 var ACTIVE_TOOL_FN = null;
+var TOOL_ACTIVE = false;
 addEventListener("init", ()=>{
     var toolboxExpander = document.querySelector("#toolboxExpander");
     var toolbox = document.querySelector(".toolbox");
@@ -19,12 +20,22 @@ addEventListener("init", ()=>{
             toolboxExpander.click();
         }
     });
+
+    querySelector("#toolboxRunButton").addEventListener("click", ()=>{
+        if (!TOOL_ACTIVE) {
+            return;
+        }
+        ACTIVE_TOOL_FN(null);
+    });
 });
 function registerTool(name, fn, selected = false) {
     var tool = document.createElement("div");
     tool.innerText = name;
     tool.classList.add("tool");
     tool.addEventListener("click", ()=>{
+        if (TOOL_ACTIVE) {
+            return;
+        }
         document.querySelectorAll(".tool.selected").forEach(x => x.classList.remove("selected"));
         tool.classList.add("selected");
         ACTIVE_TOOL = name.toUpperCase().trim().replaceAll(" ", "_");
