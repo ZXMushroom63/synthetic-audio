@@ -23,7 +23,9 @@ addBlockType("p_tts", {
         loop.querySelector(".loopInternal [data-key=Voice]").style.width = "9rem";
     },
     functor: function (inPcm, channel, data) {
-        if (loc)
+        if (!location.origin.startsWith("http")) {
+            return inPcm;
+        }
         return new Promise((res, rej) => {
             let ttsRecorder = new SpeechSynthesisRecorder({
                 text: this.conf.Text,
