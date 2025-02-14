@@ -13,6 +13,7 @@ function serialise(forRender) {
         return serialiseNode(node, forRender);
     })]);
     var out = { nodes: x, duration: audio.duration, bpm: bpm, zoom: zoom, loopInterval: loopi, stereo: audio.stereo, sampleRate: audio.samplerate, normalise: audio.normalise };
+    customEvent("serialise", {data: out});
     return out;
 }
 function serialiseNode(node, forRender) {
@@ -31,6 +32,7 @@ function serialiseNode(node, forRender) {
         out.wasMovedSinceRender = node.hasAttribute("data-wasMovedSinceRender");
         out.ref = node;
     }
+    customEvent("serialisenode", {node: node, data: out});
     return out;
 }
 function deserialiseNode(serNode, markDirty) {
@@ -38,6 +40,7 @@ function deserialiseNode(serNode, markDirty) {
     if (markDirty) {
         markLoopDirty(x);
     }
+    customEvent("deserialisenode", {node: x, data: serNode});
     return x;
 }
 function deserialise(serialisedStr) {
@@ -81,6 +84,7 @@ function deserialise(serialisedStr) {
         deserialiseNode(node);
     });
     proceduralAssets = new Map();
+    customEvent("deserialise", {data: ser});
     hydrate();
 }
 function load() {
