@@ -1,4 +1,12 @@
-window.addEventListener("init", () => {
+function intersect(rect1, rect2) {
+    return (
+        rect1.left < rect2.right &&
+        rect1.right > rect2.left &&
+        rect1.top < rect2.bottom &&
+        rect1.bottom > rect2.top
+    );
+}
+addEventListener("init", () => {
     document.querySelector("#track").addEventListener("scroll", () => {
         if (document.querySelector(".selectbox")) {
             window.onmousemove(window.lastScrollEvent);
@@ -69,7 +77,7 @@ window.addEventListener("init", () => {
             document.querySelectorAll(".loopInternal").forEach(x => {
                 var rect2 = x.getBoundingClientRect();
                 if (intersect(rect, rect2)) {
-                    pickupLoop(x.parentElement, mouse.x, mouse.y);
+                    ACTIVE_TOOL_FN(x.parentElement);
                 }
             });
         }

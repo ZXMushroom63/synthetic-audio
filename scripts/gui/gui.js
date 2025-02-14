@@ -2,14 +2,7 @@ function customEvent(ev, data = {}) {
     window.dispatchEvent(new CustomEvent(ev, data));
 }
 var dropHandlers = [];
-function intersect(rect1, rect2) {
-    return (
-        rect1.left < rect2.right &&
-        rect1.right > rect2.left &&
-        rect1.top < rect2.bottom &&
-        rect1.bottom > rect2.top
-    );
-}
+
 var gui = {
     noLOD: true,
     LOD: 1,
@@ -75,54 +68,6 @@ function updateLOD() {
     }
 }
 
-function pickupLoop(loop, natural = false) {
-    if (loop.classList.contains("deactivated")) {
-        return;
-    }
-    markLoopDirty(loop, true);
-    loop.classList.add("active");
-    var px = mouse.x;
-    var py = mouse.y;
-    function mouseMove(j) {
-        var pos = 0;
-        if (natural) {
-            pos = Math.max(0, ((originalBB.left - trackBB.left - (px - j.clientX)) / trackBB.width) * 100);
-        } else {
-            pos = Math.max(0, ((originalBB.left - trackBB.left - (((originalBB.left + originalBB.right) / 2) - j.clientX)) / trackBB.width) * 100);
-        }
-        var bpmInterval = 60 / bpm;
-        if (keymap["Shift"]) {
-            bpmInterval = 0.001;
-        }
-        pos = (Math.round(pos / 100 * audio.duration / bpmInterval) * bpmInterval) / audio.duration * 100;
-        loop.style.left = pos + "%";
-        pos = Math.round(pos / 100 * audio.duration / bpmInterval) * bpmInterval;
-        loop.setAttribute("data-start", pos);
-        var layer = 0;
-        if (natural) {
-            layer = Math.max(0, ((originalBB.top - trackBB.top - (py - j.clientY)) / (16 * 3)) * 1);
-        } else {
-            layer = Math.max(0, ((originalBB.top - trackBB.top - (((originalBB.top + originalBB.bottom) / 2) - j.clientY)) / (16 * 3)) * 1);
-        }
-        layer = Math.round(layer - 0.5);
-        loop.style.top = layer * 3 + "rem";
-        loop.setAttribute("data-layer", layer);
-    }
-    function mouseUp(fake) {
-        if (!fake) {
-            dropHandlers.splice(dropHandlers.indexOf(mouseUp), 1);
-        }
-        loop.classList.remove("active");
-        hydrateZoom();
-        document.removeEventListener("mouseup", mouseUp);
-        document.removeEventListener("mousemove", mouseMove);
-    }
-    dropHandlers.push(mouseUp);
-    var trackBB = document.querySelector("#trackInternal").getBoundingClientRect();
-    var originalBB = loop.querySelector(".loopInternal").getBoundingClientRect();
-    document.addEventListener("mousemove", mouseMove);
-    document.addEventListener("mouseup", mouseUp);
-}
 function markLoopDirty(loop, wasMoved) {
     loop.setAttribute("data-dirty", "yes");
     if (wasMoved) {
@@ -436,43 +381,55 @@ function addBlock(type, start, duration, title, layer = 0, data = {}, editorValu
         var trackBB = document.querySelector("#trackInternal").getBoundingClientRect();
         var originalBB = internal.getBoundingClientRect();
         loop.classList.add("active");
-        markLoopDirty(loop, true);
-        document.onmousemove = function (j) {
-            var pos = Math.max(0, ((originalBB.left - trackBB.left - (e.clientX - j.clientX)) / trackBB.width) * 100);
-            var bpmInterval = 60 / bpm;
-            if (keymap["Shift"]) {
-                bpmInterval = 0.001;
+        if (ACTIVE_TOOL === "MOVE") {
+            markLoopDirty(loop, true);
+            document.onmousemove = function (j) {
+                var pos = Math.max(0, ((originalBB.left - trackBB.left - (e.clientX - j.clientX)) / trackBB.width) * 100);
+                var bpmInterval = 60 / bpm;
+                if (keymap["Shift"]) {
+                    bpmInterval = 0.001;
+                }
+                pos = (Math.round(pos / 100 * audio.duration / bpmInterval) * bpmInterval) / audio.duration * 100;
+                loop.style.left = pos + "%";
+                pos = Math.round(pos / 100 * audio.duration / bpmInterval) * bpmInterval;
+                loop.setAttribute("data-start", pos);
+                var layer = Math.max(0, ((originalBB.top - trackBB.top - (e.clientY - j.clientY)) / (16 * 3)) * 1);
+                layer = Math.round(layer - 0.5);
+                loop.style.top = layer * 3 + "rem";
+                loop.setAttribute("data-layer", layer);
             }
-            pos = (Math.round(pos / 100 * audio.duration / bpmInterval) * bpmInterval) / audio.duration * 100;
-            loop.style.left = pos + "%";
-            pos = Math.round(pos / 100 * audio.duration / bpmInterval) * bpmInterval;
-            loop.setAttribute("data-start", pos);
-            var layer = Math.max(0, ((originalBB.top - trackBB.top - (e.clientY - j.clientY)) / (16 * 3)) * 1);
-            layer = Math.round(layer - 0.5);
-            loop.style.top = layer * 3 + "rem";
-            loop.setAttribute("data-layer", layer);
+        } else {
+            ACTIVE_TOOL_FN(loop);
         }
         document.onmouseup = function (q) {
             loop.classList.remove("active");
             document.onmousemove = null;
+            document.onmouseup = null;
             hydrateZoom();
         }
     });
 
     loop.appendChild(internal);
 
+    if (definition.initMiddleware) {
+        definition.initMiddleware(loop);
+    }
+
     document.querySelector("#time").after(loop);
 
     return loop;
 }
-function init() {
+function loadAutosave() {
     deserialise(localStorage.getItem("synthetic/save"));
+}
+function init() {
+    loadAutosave()
     customEvent("init");
     document.querySelector("#editorlayer").addEventListener("input", () => {
         gui.layer = parseInt(document.querySelector("#editorlayer").value);
         hydrateZoom();
     });
-    window.addEventListener("keydown", (e) => {
+    addEventListener("keydown", (e) => {
         if (e.ctrlKey && Number.isFinite(parseFloat(e.key.toLowerCase())) && document.activeElement === document.body) {
             document.querySelector("#editorlayer").value = gui.layer = parseFloat(e.key.toLowerCase());
             hydrateZoom();
@@ -495,11 +452,11 @@ function init() {
     document.querySelector("#duration").addEventListener("input", () => {
         hydrate();
     });
-    window.addEventListener("mousemove", (e) => {
+    addEventListener("mousemove", (e) => {
         mouse.x = e.x;
         mouse.y = e.y;
     });
-    window.addEventListener("keydown", (e) => {
+    addEventListener("keydown", (e) => {
         if (e.key.toLowerCase() === " " && e.target && e.target.tagName === "BODY") {
             e.preventDefault();
             if (document.querySelector("#renderOut").paused) {
@@ -511,7 +468,7 @@ function init() {
         }
         keymap[e.key] = true;
     });
-    window.addEventListener("keydown", (e) => {
+    addEventListener("keydown", (e) => {
         if (e.key === "ArrowLeft" && e.target && e.target.tagName === "BODY" && e.shiftKey) {
             e.preventDefault();
             document.querySelector("#renderOut").currentTime = 0;
@@ -519,15 +476,16 @@ function init() {
         }
         keymap[e.key] = true;
     });
-    window.addEventListener("keydown", (e) => {
+    addEventListener("keydown", (e) => {
         if (e.key === "Escape") {
+            dropHandlers.forEach(x => x(false, true));
             document.querySelectorAll(".loopInternal.selected").forEach(a => { a.classList.remove("selected") });
         }
     });
-    window.addEventListener("keyup", (e) => {
+    addEventListener("keyup", (e) => {
         keymap[e.key] = false;
     });
-    window.addEventListener("wheel", (e) => {
+    addEventListener("wheel", (e) => {
         if (keymap["Control"]) {
             e.preventDefault();
             e.stopImmediatePropagation();
@@ -564,8 +522,8 @@ function init() {
         }
         hydrateBeatMarkers();
     });
-    
-    window.addEventListener("keydown", (e) => {
+
+    addEventListener("keydown", (e) => {
         if (e.ctrlKey && e.key.toLowerCase() === "a") {
             if (document.activeElement !== document.body) {
                 return;
@@ -576,7 +534,8 @@ function init() {
             });
         }
     });
-    window.addEventListener("keydown", (e) => {
+
+    addEventListener("keydown", (e) => {
         if (["backspace", "delete"].includes(e.key.toLowerCase())) {
             var targets = document.querySelectorAll(".loop.active");
             targets.forEach(t => { deleteLoop(t); });

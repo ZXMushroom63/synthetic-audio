@@ -1,4 +1,4 @@
-window.addEventListener("init", ()=>{
+addEventListener("init", ()=>{
     function registerTab(tabName, element, selected) {
         var tab = document.createElement("span");
         tab.innerText = tabName;

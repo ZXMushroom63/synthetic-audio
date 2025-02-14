@@ -1,4 +1,4 @@
-window.addEventListener("keydown", (e) => {
+addEventListener("keydown", (e) => {
     if ((e.key === "b") && (e.target.tagName === "INPUT") && parseInt(e.target.value)) {
         const A4 = 440;
         const twelfth_root_of_2 = Math.pow(2, 1/12);

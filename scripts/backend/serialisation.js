@@ -113,6 +113,9 @@ function load() {
     };
     x.click();
 }
-window.addEventListener("beforeunload", () => {
+function writeAutosave() {
     localStorage.setItem("synthetic/save", JSON.stringify(serialise()));
+}
+addEventListener("beforeunload", () => {
+    writeAutosave();
 });

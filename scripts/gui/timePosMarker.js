@@ -1,8 +1,8 @@
 function hydrateTimePosMarker() {
     document.querySelector(".timePosMarker").style.left = gui.marker / audio.duration * 100 + "%";
 }
-window.addEventListener("hydrate", hydrateTimePosMarker);
-window.addEventListener("init", () => {
+addEventListener("hydrate", hydrateTimePosMarker);
+addEventListener("init", () => {
     document.querySelector(".timePosMarker").addEventListener("mousedown", () => {
         var bba = document.querySelector("#trackInternal").getBoundingClientRect();
         window.onmousemove = (e) => {
@@ -37,7 +37,7 @@ window.addEventListener("init", () => {
         document.querySelector("#renderOut").currentTime = gui.marker;
         hydrateTimePosMarker();
     });
-    window.addEventListener("keydown", (e) => {
+    addEventListener("keydown", (e) => {
         if (e.ctrlKey && e.key.toLowerCase() === "g") {
             e.preventDefault();
             document.querySelector(".timePosMarker").dispatchEvent(new Event('mousedown'));

@@ -1,4 +1,4 @@
-window.addEventListener("init", () => {
+addEventListener("init", () => {
     document.querySelector("#loopSelector input").addEventListener("input", async () => {
         var loopsDiv = document.querySelector("#addloops");
         var filtersDiv = document.querySelector("#addfilters");

@@ -14,11 +14,13 @@
 
     <!-- LIBRARIES -->
     <script src="lib/lamejs.min.js"></script>
+    <script src="lib/SpeechSynthesisRecorder.js"></script>
     <script src="lib/filesaver.min.js"></script>
     <script src="lib/midi_lib.js"></script>
 
     <!-- GUI MODULES -->
     <script src="scripts/gui/tabs.js"></script>
+    <script src="scripts/gui/pickupLoop.js"></script>
     <script src="scripts/gui/loop_select.js"></script>
     <script src="scripts/gui/timePosMarker.js"></script>
     <script src="scripts/gui/selectbox.js"></script>
@@ -28,6 +30,10 @@
     <script src="scripts/gui/quantiseToNote.js"></script>
     <script src="scripts/gui/vizualiser.js"></script>
     <script src="scripts/gui/sample_rate_chooser.js"></script>
+    <script src="scripts/gui/toolbox.js"></script>
+
+    <!-- TOOLS -->
+    <script src="scripts/tools/move.js"></script>
 
     <!-- GUI CORE -->
     <script src="scripts/gui/gui.js"></script>
@@ -50,7 +56,13 @@
     <script src="scripts/backend/filters/waveform.js"></script>
     <script src="scripts/backend/filters/advanced_waveform.js"></script>
     <script src="scripts/backend/filters/procedural_asset.js"></script>
-
+    <script src="scripts/backend/filters/tts.js"></script>
+    <div class="toolbox">
+        <button>Run</button><br>
+        <span id="toolboxExpander">
+            >
+        </span>
+    </div>
     <table class="main">
         <tr>
             <td style="height: 10rem;">
@@ -85,6 +97,12 @@
                     </button>
                     <button onclick="updateApp()">
                         Update App
+                    </button>
+                    <button onclick="writeAutosave()">
+                        Backup
+                    </button>
+                    <button onclick="loadAutosave()">
+                        Revert
                     </button>
                     <ins></ins>
                 </div>

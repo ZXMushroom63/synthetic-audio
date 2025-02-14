@@ -368,13 +368,13 @@ button {
     text-decoration: underline;
     margin-top: 8px;
     padding: 8px 16px;
-    margin-left: 8px;
+    margin-left: 5px;
     cursor: pointer;
     transition: 0.2s;
     white-space: normal;
 }
 #track, button {
-    background: linear-gradient(140deg, rgba(255, 0, 0, 0.15) 0%, rgba(255, 255, 255, 0.0) 34%, rgba(0, 255, 187, 0.15) 100%);
+    background: linear-gradient(140deg, rgba(255, 0, 0, 0.3) 0%, rgba(255, 255, 255, 0.0) 34%, rgba(0, 255, 187, 0.2) 100%);
 }
 button:disabled {
     cursor: not-allowed;
@@ -422,4 +422,61 @@ button:hover {
 select option {
     color: white !important;
     background: black;
+}
+.toolbox {
+    position: fixed;
+    left: 0px;
+    top: 0px;
+    bottom: 0px;
+    height: 100vh;
+    z-index: 988;
+    width: calc(4rem + 4px);
+    pointer-events: none;
+    align-content: center;
+    background-color: rgba(0, 0, 0, 0.5);
+    transform: translateX(calc(-4rem - 4px));
+}
+#toolboxExpander {
+    background-color: rgb(60,60,60);
+    color: white;
+    display: inline-block;
+    width: 1rem;
+    height: 2rem;
+    font-family: sans-serif;
+    opacity: 0.8;
+    border-radius: 0.2rem;
+    cursor: pointer;
+    user-select: none;
+    align-content: center;
+    top: calc(50% - 1rem);
+    position: absolute;
+    text-align: center;
+    transform: translateX(calc(4rem + 4px));
+}
+.toolbox * {
+    pointer-events: all;
+}
+.toolbox div.tool {
+    width: 4rem;
+    height: 4rem;
+    color: white;
+    background-color: rgba(0, 125, 255, 0.1);
+    border-radius: 0.5rem;
+    text-align: center;
+    align-content: center;
+    cursor: pointer;
+    font-family: sans-serif;
+    margin-top: 0.25rem;
+    margin-bottom: 0.25rem;
+    user-select: none;
+    border: 2px solid white;
+}
+.toolbox div.tool.selected {
+    background-color: rgba(0, 125, 255, 0.3);
+    border: 2px solid white;
+}
+.toolbox.open {
+    transform: translateX(0);
+    pointer-events: all;
+    border-right: 1px solid white;
 }

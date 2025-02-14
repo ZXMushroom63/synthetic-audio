@@ -1,6 +1,6 @@
-window.addEventListener("init", ()=>{
+addEventListener("init", ()=>{
     var canDuplicateKeybind = true;
-    window.addEventListener("keydown", (e) => {
+    addEventListener("keydown", (e) => {
         if (e.shiftKey && (e.key.toLowerCase() === "d") && (e.target.tagName !== "INPUT") && (e.target.contentEditable !== "true")) {
             if (!canDuplicateKeybind) {
                 return;
@@ -29,7 +29,7 @@ window.addEventListener("init", ()=>{
             }
         }
     });
-    window.addEventListener("keyup", (e) => {
+    addEventListener("keyup", (e) => {
         if (e.key.toLowerCase() === "d") {
             canDuplicateKeybind = true;
         }

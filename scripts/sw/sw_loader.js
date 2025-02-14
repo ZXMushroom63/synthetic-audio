@@ -1,6 +1,6 @@
 globalThis.sw = null;
 if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
+    addEventListener('load', () => {
         navigator.serviceWorker.register('/scripts/sw/sw_loader.js').then(registration => {
             globalThis.sw = registration;
             console.log('ServiceWorker registration successful with scope: ', registration.scope);

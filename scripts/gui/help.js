@@ -4,6 +4,7 @@ function viewHelp() {
         `
 (click to close)
 
+
 ******************
 *    STARTING    *
 ******************
@@ -28,6 +29,8 @@ You can use different editor layers for different components of a song.
 Negative layers to not output any sound into the mixer.
   |- They are useful for making procedural assets (using the save asset and play asset nodes)
 
+
+
 ******************
 *      KEYS      *
 ******************
@@ -43,6 +46,8 @@ CTRL + V = Paste selected/hovered loop(s)
 CTRL + X = Cut selected/hovered loop(s)
 TAB = Focus next input (in edit panel)
 CTRL + SPACE = Go to ALL layer (layer 10, readonly)
+N = Open toolbox panel
+
 
 
 *******************

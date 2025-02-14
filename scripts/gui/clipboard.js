@@ -21,8 +21,8 @@ function minimisePosition(loopArr) {
         loop.start += posOffset;
     });
 }
-window.addEventListener("init", ()=>{
-    window.addEventListener("keydown", (e) => {
+addEventListener("init", ()=>{
+    addEventListener("keydown", (e) => {
         if (e.ctrlKey && ((e.key.toLowerCase() === "c") || (e.key.toLowerCase() === "x"))) {
             if ((e.target.tagName === "INPUT") || (e.target.contentEditable === "true")) {
                 return;
@@ -50,7 +50,7 @@ window.addEventListener("init", ()=>{
             }
         }
     });
-    window.addEventListener("keydown", (e) => {
+    addEventListener("keydown", (e) => {
         if (e.ctrlKey && e.key.toLowerCase() === "v") {
             if (document.activeElement !== document.body) {
                 return;

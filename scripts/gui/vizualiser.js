@@ -1,4 +1,4 @@
-window.addEventListener("load", () => {
+addEventListener("load", () => {
     const audio = document.querySelector('#renderOut');
     const canvas = document.querySelector('canvas');
     const canvasCtx = canvas.getContext('2d');
