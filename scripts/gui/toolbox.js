@@ -21,7 +21,7 @@ addEventListener("init", ()=>{
         }
     });
 
-    querySelector("#toolboxRunButton").addEventListener("click", ()=>{
+    document.querySelector("#toolboxRunButton").addEventListener("click", ()=>{
         if (!TOOL_ACTIVE) {
             return;
         }
