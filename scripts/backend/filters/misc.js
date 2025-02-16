@@ -148,7 +148,7 @@ addBlockType("noise", {
         "Seed": [1, "number", 1]
     },
     functor: function (inPcm, channel, data) {
-        Math.newRandom(0);
+        Math.newRandom(this.conf.Seed);
         var n = _(this.conf.Volume);
         inPcm.forEach((x, i) => {
             inPcm[i] += (Math.random() - 0.5) * n(i, inPcm) * 2;
