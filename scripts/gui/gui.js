@@ -2,7 +2,11 @@ function customEvent(ev, data = {}) {
     window.dispatchEvent(new CustomEvent(ev, {detail: data}));
 }
 var dropHandlers = [];
-
+function resetDrophandlers(cancel) {
+    while (dropHandlers.length > 0) {
+        dropHandlers[0](null, cancel);
+    }
+}
 var gui = {
     noLOD: true,
     LOD: 1,
@@ -379,7 +383,7 @@ function init() {
     });
     addEventListener("keydown", (e) => {
         if (e.key === "Escape") {
-            dropHandlers.forEach(x => x(false, true));
+            resetDrophandlers(true);
             document.querySelectorAll(".loopInternal.selected").forEach(a => { a.classList.remove("selected") });
         }
     });

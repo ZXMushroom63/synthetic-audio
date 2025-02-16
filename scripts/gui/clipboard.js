@@ -56,8 +56,7 @@ addEventListener("init", ()=>{
                 return;
             }
             e.preventDefault();
-            dropHandlers.forEach(fn => { fn(true) });
-            dropHandlers = [];
+            resetDrophandlers(false);
             console.log("requesting clipboard");
             navigator.clipboard
                 .readText()

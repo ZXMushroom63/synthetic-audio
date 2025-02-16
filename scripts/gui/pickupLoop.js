@@ -33,11 +33,12 @@ function pickupLoop(loop, natural = false) {
         loop.style.top = layer * 3 + "rem";
         loop.setAttribute("data-new-layer", layer);
     }
-    function mouseUp(fake, cancel) {
-        if (!fake) {
-            dropHandlers.splice(dropHandlers.indexOf(mouseUp), 1);
-        }
+    function mouseUp(unused, cancel) {
+        dropHandlers.splice(dropHandlers.indexOf(mouseUp), 1);
         if (!cancel) {
+            if (!loop.getAttribute("data-new-start")) {
+                debugger;
+            }
             loop.setAttribute("data-layer", loop.getAttribute("data-new-layer"));
             loop.setAttribute("data-start", loop.getAttribute("data-new-start"));
         }

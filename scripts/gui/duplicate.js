@@ -15,8 +15,7 @@ addEventListener("init", ()=>{
                 }
             } else {
                 var targets = findLoops(".loop.active:not([data-deleted])");
-                dropHandlers.forEach(fn => { fn(true) });
-                dropHandlers = [];
+                resetDrophandlers(false);
                 var dupedLoops = [];
                 targets.forEach(target => {
                     var loop = deserialiseNode(structuredClone(serialiseNode(target)), true);
