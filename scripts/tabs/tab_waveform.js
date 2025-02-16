@@ -2,6 +2,7 @@ var custom_waveforms = {
     X: {
         samples: (new Float32Array(600)).fill(0),
         calculated: (new Float32Array(600)).fill(0),
+        midpoint: 0,
         modifiers: []
     }
 };
@@ -117,11 +118,26 @@ addEventListener("init", () => {
     freq.classList.add("inputStyles");
     freq.style.marginLeft = "0.75rem";
     freq.type = "number";
-    freq.value = 440;
-    freq.addEventListener("input", ()=>{
+    freq.value = 100;
+    freq.addEventListener("input", () => {
         changeFrequency(freq.value);
     });
     oscillatorControls.appendChild(freq);
+
+    var volumeLabel = document.createElement("span");
+    volumeLabel.innerText = "Volume:";
+    volumeLabel.style.marginLeft = "1.5rem";
+    oscillatorControls.appendChild(volumeLabel);
+
+    const vol = document.createElement("input");
+    vol.classList.add("inputStyles");
+    vol.style.marginLeft = "0.75rem";
+    vol.type = "number";
+    vol.value = 0.1;
+    vol.addEventListener("input", () => {
+        changeVolume(vol.value);
+    });
+    oscillatorControls.appendChild(vol);
 
     var oscillating = false;
 
@@ -129,7 +145,7 @@ addEventListener("init", () => {
     oscBtn.style.marginLeft = "3rem";
     oscBtn.innerText = "Start";
     oscBtn.classList.add("smallBtn");
-    oscBtn.addEventListener("click", ()=>{
+    oscBtn.addEventListener("click", () => {
         if (oscillating) {
             oscBtn.innerText = "Start";
             oscillating = false;
@@ -148,12 +164,15 @@ addEventListener("init", () => {
     var audioContext = new AudioContext();
     var audioBuffer = audioContext.createBuffer(1, 600, 48000);
     var audioBufferData = audioBuffer.getChannelData(0);
+    var gainNode = audioContext.createGain();
     var source;
     function createSource() {
         source = audioContext.createBufferSource();
         source.buffer = audioBuffer;
         source.loop = true;
         source.connect(audioContext.destination);
+        source.connect(gainNode);
+        gainNode.connect(audioContext.destination);
     }
     function startOscillator() {
         createSource();
@@ -167,10 +186,16 @@ addEventListener("init", () => {
     }
     function changeFrequency(newFrequency) {
         if (source) {
-            source.playbackRate.value = 600/48000*newFrequency;
+            source.playbackRate.value = 600 / 48000 * newFrequency;
         }
     }
-    
+    function changeVolume(vol) {
+        if (source) {
+            gainNode.gain.value = lerp(-1, 1, vol);
+        }
+    }
+    changeVolume(0.1);
+
 
 
     const right = document.createElement("td");
@@ -231,6 +256,16 @@ addEventListener("init", () => {
         ctx.lineTo(1280, 720 / 2);
         ctx.stroke();
 
+        ctx.strokeStyle = "orange";
+        ctx.lineWidth = 1;
+
+        ctx.moveTo(0, 720 * (target.midpoint + 1 / 2));
+
+        ctx.beginPath();
+        ctx.moveTo(0, 720 * (target.midpoint + 1 / 2));
+        ctx.lineTo(1280, 720 * (target.midpoint + 1 / 2));
+        ctx.stroke();
+
         ctx.strokeStyle = "cyan";
         ctx.lineWidth = 1;
 
@@ -264,6 +299,7 @@ addEventListener("init", () => {
         t.calculated = await applyModifierStack(structuredClone(t.samples), t.modifiers);
         t.calculated[0] = 0;
         t.calculated[t.calculated.length - 1] = [0];
+        t.midpoint = t.calculated.reduce((p, a) => p + a) / t.calculated.length / 2;
         audioBufferData.set(t.calculated);
         t.dirty = true;
     }
