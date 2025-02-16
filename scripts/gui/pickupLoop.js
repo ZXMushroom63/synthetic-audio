@@ -4,6 +4,8 @@ function pickupLoop(loop, natural = false) {
     }
     markLoopDirty(loop, true);
     loop.classList.add("active");
+    loop.setAttribute("data-new-layer", loop.getAttribute("data-layer"));
+    loop.setAttribute("data-new-start", loop.getAttribute("data-start"));
     var px = mouse.x;
     var py = mouse.y;
     function mouseMove(j) {
