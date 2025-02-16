@@ -389,6 +389,7 @@ async function render() {
             }
             output.push(sumFloat32ArraysNormalised(channelPcms));
         }
+        customEvent("render");
         stopTiming("render");
         var blob = convertToMp3Blob(output, channels, audio.samplerate, audio.bitrate);
     } catch (error) {

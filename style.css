@@ -375,6 +375,12 @@ button {
     transition: 0.2s;
     white-space: normal;
 }
+.smallBtn {
+    font-size: 0.5rem;
+    padding: 4px 8px;
+    margin-left: 3px;
+    margin-top: 3px;
+}
 #track, button, .themeGradient {
     background: linear-gradient(140deg, rgba(255, 0, 0, 0.3) 0%, rgba(255, 255, 255, 0.0) 34%, rgba(0, 255, 187, 0.2) 100%);
 }

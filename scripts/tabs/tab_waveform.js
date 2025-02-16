@@ -23,7 +23,7 @@ addEventListener("init", () => {
     left.style.width = "20vw";
     left.style.overflowX = "hidden";
     left.style.overflowY = "auto";
-    left.style.alignContent = "baseline";
+    left.style.alignContent = "start";
     left.style.borderRight = "1px solid white";
     left.style.textAlign = "left";
     UI.appendChild(left);
@@ -104,12 +104,23 @@ addEventListener("init", () => {
     right.style.width = "20vw";
     right.style.alignContent = "baseline";
     right.style.textAlign = "left";
+    right.style.whiteSpace = "break-spaces";
     UI.appendChild(right);
 
-    var supportedFilters = ["smooth", "noise", "comb", "compressor", "bitcrunch", "quantise"];
-    supportedFilters.forEach(filter => {
+    var supportedFilters = {
+        "smooth": "Smooth",
+        "noise": "Noise",
+        "comb": "Comb",
+        "compressor": "Cmprssr",
+        "bitcrunch": "Bcrunch",
+        "quantise": "Quant",
+        "normalise": "Norm",
+        "power": "Exp",
+    };
+    Object.keys(supportedFilters).forEach(filter => {
         const addMod = document.createElement("button");
-        addMod.innerText = filters[filter].title;
+        addMod.classList.add("smallBtn");
+        addMod.innerText = supportedFilters[filter];
         addMod.addEventListener("click", () => {
             if (!target) {
                 return;
@@ -121,6 +132,8 @@ addEventListener("init", () => {
                 type: filter
             });
             drawModifierStack();
+            loadModifiersToTarget();
+            drawWaveform();
         });
         right.appendChild(addMod);
     });
@@ -167,6 +180,7 @@ addEventListener("init", () => {
         t.calculated = await applyModifierStack(structuredClone(t.samples), t.modifiers);
         t.calculated[0] = 0;
         t.calculated[t.calculated.length - 1] = [0];
+        t.dirty = true;
     }
 
     function drawModifierStack() {
@@ -268,15 +282,19 @@ addEventListener("init", () => {
         custom_waveforms = e.detail.data.waveforms || {};
         for (let id in custom_waveforms) {
             custom_waveforms[id].samples = new Float32Array(custom_waveforms[id].samples);
+            custom_waveforms[id].dirty = true;
             calculateWaveform(custom_waveforms[id]);
         }
     });
 
     addEventListener('serialise', (e) => {
         var out = structuredClone(custom_waveforms);
+
         for (let id in out) {
             out[id].samples = [...custom_waveforms[id].samples];
+            delete out[id].dirty;
         }
+        
         e.detail.data.waveforms = out;
     });
 
@@ -284,6 +302,18 @@ addEventListener("init", () => {
         if (e.detail.loop.isWaveformLoop) {
             loadModifiersToTarget();
             drawWaveform();
+        }
+    });
+
+    addEventListener("preserialisenode", (e) => {
+        if ((e.detail.node.getAttribute("data-type") === "p_waveform_plus") && e.detail.node.conf.UseCustomWaveform && (custom_waveforms[e.detail.node.conf.WaveformAsset].dirty)) {
+            markLoopDirty(e.detail.node);
+        }
+    });
+
+    addEventListener("render", (e) => {
+        for (let id in custom_waveforms) {
+            custom_waveforms[id].dirty = false;
         }
     });
 

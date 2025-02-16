@@ -17,6 +17,7 @@ function serialise(forRender) {
     return out;
 }
 function serialiseNode(node, forRender) {
+    customEvent("preserialisenode", {node: node});
     var out = {};
     out.conf = node.conf;
     out.start = parseFloat(node.getAttribute("data-start")) || 0;
