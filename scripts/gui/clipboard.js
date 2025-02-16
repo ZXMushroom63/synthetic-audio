@@ -23,7 +23,7 @@ function minimisePosition(loopArr) {
 }
 addEventListener("init", ()=>{
     addEventListener("keydown", (e) => {
-        if (e.ctrlKey && ((e.key.toLowerCase() === "c") || (e.key.toLowerCase() === "x"))) {
+        if (e.ctrlKey && ((e.key.toLowerCase() === "c") || (e.key.toLowerCase() === "x")) && (CURRENT_TAB === "TIMELINE")) {
             if ((e.target.tagName === "INPUT") || (e.target.contentEditable === "true")) {
                 return;
             }
@@ -51,7 +51,7 @@ addEventListener("init", ()=>{
         }
     });
     addEventListener("keydown", (e) => {
-        if (e.ctrlKey && e.key.toLowerCase() === "v") {
+        if (e.ctrlKey && e.key.toLowerCase() === "v" && (CURRENT_TAB === "TIMELINE")) {
             if (document.activeElement !== document.body) {
                 return;
             }

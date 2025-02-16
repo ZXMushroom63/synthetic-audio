@@ -46,7 +46,7 @@ function createOptionsMenu(loop, data, definition) {
             var s = document.createElement("select");
             s.setAttribute("data-key", key);
             var proxy = definition.selectMiddleware || (x => x);
-            var opts = proxy(value[1]);
+            var opts = proxy(key);
             if (!opts.includes(value[0])) {
                 opts.push(value[0]);
             }
@@ -60,7 +60,7 @@ function createOptionsMenu(loop, data, definition) {
             });
             s.addEventListener("focus", () => {
                 loop["conf"][key] = s.value;
-                s.innerHTML = proxy(value[1]).flatMap((a) => { return `<option${a === value[0] ? " selected" : ""}>${a}</option>` }).join("");
+                s.innerHTML = proxy(key).flatMap((a) => { return `<option${a === value[0] ? " selected" : ""}>${a}</option>` }).join("");
             });
             target.appendChild(s);
         } else {

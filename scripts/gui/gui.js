@@ -1,5 +1,5 @@
 function customEvent(ev, data = {}) {
-    window.dispatchEvent(new CustomEvent(ev, data));
+    window.dispatchEvent(new CustomEvent(ev, {detail: data}));
 }
 var dropHandlers = [];
 
@@ -26,9 +26,11 @@ var loopMap = {
 var loopDurationMap = {};
 function deleteLoop(loop) {
     if (loop.forceDelete) {
-        return loop.remove();
+        loop.remove();
     }
-    loop.setAttribute("data-deleted", "yes"); markLoopDirty(loop, true);
+    loop.setAttribute("data-deleted", "yes");
+    markLoopDirty(loop, true);
+    customEvent("loopdeleted", {loop: loop});
 }
 function getDurationOfLoop(audioFile) {
     return new Promise((res, rej) => {
@@ -76,6 +78,7 @@ function markLoopDirty(loop, wasMoved) {
     if (wasMoved) {
         loop.setAttribute("data-wasMovedSinceRender", "yes");
     }
+    customEvent("loopchanged", {loop: loop});
 }
 function hydrateBeatMarkers() {
     updateLOD();
@@ -264,7 +267,7 @@ function addBlock(type, start, duration, title, layer = 0, data = {}, editorValu
         if (e.button !== 0) {
             return;
         }
-        var trackBB = document.querySelector("#trackInternal").getBoundingClientRect();
+        var trackBB = loop.referenceBB || document.querySelector("#trackInternal").getBoundingClientRect();
         var originalBB = internal.getBoundingClientRect();
         loop.classList.add("active");
         if (ACTIVE_TOOL === "MOVE") {
@@ -275,14 +278,19 @@ function addBlock(type, start, duration, title, layer = 0, data = {}, editorValu
                 if (keymap["Shift"]) {
                     bpmInterval = 0.001;
                 }
-                pos = (Math.round(pos / 100 * audio.duration / bpmInterval) * bpmInterval) / audio.duration * 100;
-                loop.style.left = pos + "%";
-                pos = Math.round(pos / 100 * audio.duration / bpmInterval) * bpmInterval;
-                loop.setAttribute("data-start", pos);
-                var layer = Math.max(0, ((originalBB.top - trackBB.top - (e.clientY - j.clientY)) / (16 * 3)) * 1);
-                layer = Math.round(layer - 0.5);
-                loop.style.top = layer * 3 + "rem";
-                loop.setAttribute("data-layer", layer);
+                if (!loop.horizontalBlocked) {
+                    pos = (Math.round(pos / 100 * audio.duration / bpmInterval) * bpmInterval) / audio.duration * 100;
+                    loop.style.left = pos + "%";
+                    pos = Math.round(pos / 100 * audio.duration / bpmInterval) * bpmInterval;
+                    loop.setAttribute("data-start", pos);
+                }
+                if (!loop.verticalBlocked) {
+                    var layer = Math.max(0, ((originalBB.top - trackBB.top - (e.clientY - j.clientY)) / (16 * 3)) * 1);
+                    layer = Math.round(layer - 0.5);
+                    loop.style.top = layer * 3 + "rem";
+                    loop.setAttribute("data-layer", layer);
+                }
+                customEvent("loopmoved", {loop: loop});
             }
         } else {
             ACTIVE_TOOL_FN(loop);
@@ -316,7 +324,6 @@ function loadAutosave() {
     deserialise(localStorage.getItem("synthetic/save"));
 }
 function init() {
-    loadAutosave()
     customEvent("init");
     document.querySelector("#editorlayer").addEventListener("input", () => {
         gui.layer = parseInt(document.querySelector("#editorlayer").value);
@@ -434,5 +441,7 @@ function init() {
             targets.forEach(t => { deleteLoop(t); });
         }
     });
+
+    loadAutosave();
 }
 addEventListener("load", init);

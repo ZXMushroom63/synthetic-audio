@@ -1,10 +1,13 @@
 #track {
-    height: calc(100vh - 15rem);
     min-height: 16rem;
     border-radius: 0.5rem;
-    width: calc(100vw - 16px);
     overflow-x: scroll;
     overflow-y: auto;
+}
+#tabContent>div, #tabContent>table {
+    width: 100vw;
+    height: calc(100vh - 15rem);
+    border-collapse: collapse;
 }
 #track #time {
     height: 2rem;
@@ -365,7 +368,6 @@ button {
     background-color: black;
     border-radius: 4px;
     text-rendering: optimizeLegibility;
-    text-decoration: underline;
     margin-top: 8px;
     padding: 8px 16px;
     margin-left: 5px;
@@ -373,7 +375,7 @@ button {
     transition: 0.2s;
     white-space: normal;
 }
-#track, button {
+#track, button, .themeGradient {
     background: linear-gradient(140deg, rgba(255, 0, 0, 0.3) 0%, rgba(255, 255, 255, 0.0) 34%, rgba(0, 255, 187, 0.2) 100%);
 }
 button:disabled {

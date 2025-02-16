@@ -1,12 +1,12 @@
 addEventListener("init", ()=>{
     var canDuplicateKeybind = true;
     addEventListener("keydown", (e) => {
-        if (e.shiftKey && (e.key.toLowerCase() === "d") && (e.target.tagName !== "INPUT") && (e.target.contentEditable !== "true")) {
+        if (e.shiftKey && (e.key.toLowerCase() === "d") && (e.target.tagName !== "INPUT") && (e.target.contentEditable !== "true") && (CURRENT_TAB === "TIMELINE")) {
             if (!canDuplicateKeybind) {
                 return;
             }
             canDuplicateKeybind = false;
-            if (!document.querySelector(".loop.active")) {
+            if (!findLoops(".loop.active")[0]) {
                 var x = document.elementsFromPoint(mouse.x, mouse.y).find(x => !x.classList.contains("deactivated"));
                 if (x && x.closest(".loop")) {
                     var y = deserialiseNode(structuredClone(serialiseNode(x.closest(".loop"))), true);
@@ -14,7 +14,7 @@ addEventListener("init", ()=>{
                     pickupLoop(y);
                 }
             } else {
-                var targets = document.querySelectorAll(".loop.active");
+                var targets = findLoops(".loop.active");
                 dropHandlers.forEach(fn => { fn(true) });
                 dropHandlers = [];
                 var dupedLoops = [];

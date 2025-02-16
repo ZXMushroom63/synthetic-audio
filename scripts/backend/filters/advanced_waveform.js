@@ -11,6 +11,8 @@ addBlockType("p_waveform_plus", {
         "Triangle": [0, "number", 1],
         "Period": [1.0, "number", 1],
         "Exponent": [1, "number", 1],
+        "UseCustomWaveform": [false, "checkbox"],
+        "WaveformAsset": ["(none)", ["(none)"]],
         "Amplitude": [1, "number", 1],
         "AmplitudeSmoothTime": [0.0, "number"],
         "Decay": [0, "number", 1],
@@ -39,6 +41,10 @@ addBlockType("p_waveform_plus", {
             "Period",
             "Exponent"
         ],
+        "Custom Waveforms": [
+            "UseCustomWaveform",
+            "WaveformAsset"
+        ],
         "Harmonics": [
             "Harmonics",
             "HarmonicsStrum",
@@ -54,6 +60,9 @@ addBlockType("p_waveform_plus", {
             "uDetuneHz",
             "uPan"
         ]
+    },
+    selectMiddleware: () => {
+        return ["(none)", ...Object.keys(custom_waveforms)];
     },
     customGuiButtons: {
         "Preview": function () {
@@ -85,6 +94,8 @@ addBlockType("p_waveform_plus", {
         var exp = _(this.conf.Exponent);
         var amp = _(this.conf.Amplitude);
         var period = _(this.conf.Period);
+
+        var customWaveform = custom_waveforms[this.conf.WaveformAsset]?.calculated;
 
         var semitones = _(this.conf.HarmonicsSemitoneOffset);
 
@@ -169,10 +180,17 @@ addBlockType("p_waveform_plus", {
                     }
                 }
 
-                y += waveforms.sin(waveformTime * coefficient) * values.Sine * volumeRatio;
-                y += waveforms.square(waveformTime * coefficient) * values.Square * volumeRatio;
-                y += waveforms.sawtooth(waveformTime * coefficient) * values.Sawtooth * volumeRatio;
-                y += waveforms.triangle(waveformTime * coefficient) * values.Triangle * volumeRatio;
+                if (this.conf.UseCustomWaveform) {
+                    if (customWaveform) {
+                        y += customWaveform[Math.floor(waveformTime * coefficient * 600) % 600] * volumeRatio;
+                    }
+                } else {
+                    y += waveforms.sin(waveformTime * coefficient) * values.Sine * volumeRatio;
+                    y += waveforms.square(waveformTime * coefficient) * values.Square * volumeRatio;
+                    y += waveforms.sawtooth(waveformTime * coefficient) * values.Sawtooth * volumeRatio;
+                    y += waveforms.triangle(waveformTime * coefficient) * values.Triangle * volumeRatio;
+                }
+                
                 y /= total;
             }
 

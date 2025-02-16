@@ -11,7 +11,7 @@ addBlockType("p_readasset", {
         "SidechainPower": [2, "number"],
         "Silent": [false, "checkbox"],
     },
-    selectMiddleware: (options) => {
+    selectMiddleware: () => {
         var assetNames = [...new Set(Array.prototype.flatMap.apply(
             findLoops(".loop[data-type=p_writeasset]"),
             [(node) => node.conf.Asset]
