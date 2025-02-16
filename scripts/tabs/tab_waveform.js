@@ -32,7 +32,7 @@ addEventListener("init", () => {
         }
         var smp = new Float32Array(600).fill(0);
         smp.forEach((x, i)=>{
-            smp[i] = waveforms.sine(i / 600);
+            smp[i] = waveforms.sin(i / 600);
         });
         custom_waveforms[newWaveformName] = {
             samples: smp,
