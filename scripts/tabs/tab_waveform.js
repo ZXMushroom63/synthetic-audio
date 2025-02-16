@@ -26,6 +26,7 @@ addEventListener("init", () => {
     left.style.alignContent = "start";
     left.style.borderRight = "1px solid white";
     left.style.textAlign = "left";
+    left.style.display = "block";
     UI.appendChild(left);
 
     const makeNewWaveform = document.createElement("button");
@@ -91,7 +92,7 @@ addEventListener("init", () => {
             drawWaveform();
         }
     });
-    window.addEventListener("mouseup", (e) => {
+    addEventListener("mouseup", (e) => {
         if (e.button === 0) {
             prevIdx = -1;
             prevValue = -1;
@@ -100,9 +101,81 @@ addEventListener("init", () => {
     });
     middle.appendChild(panel);
 
+    const oscillatorControls = document.createElement("div");
+    oscillatorControls.style.width = "80%";
+    oscillatorControls.style.display = "inline-block";
+    oscillatorControls.style.height = "2rem";
+    oscillatorControls.style.background = "rgba(0,0,0,0.7)";
+    oscillatorControls.style.borderRadius = "0.35rem";
+    oscillatorControls.style.lineHeight = "1.9rem";
+    oscillatorControls.style.color = "white";
+    oscillatorControls.style.fontFamily = "sans-serif";
+
+    oscillatorControls.innerText = "Frequency:";
+
+    const freq = document.createElement("input");
+    freq.classList.add("inputStyles");
+    freq.style.marginLeft = "0.75rem";
+    freq.type = "number";
+    freq.value = 440;
+    freq.addEventListener("input", ()=>{
+        changeFrequency(freq.value);
+    });
+    oscillatorControls.appendChild(freq);
+
+    var oscillating = false;
+
+    const oscBtn = document.createElement("button");
+    oscBtn.style.marginLeft = "3rem";
+    oscBtn.innerText = "Start";
+    oscBtn.classList.add("smallBtn");
+    oscBtn.addEventListener("click", ()=>{
+        if (oscillating) {
+            oscBtn.innerText = "Start";
+            oscillating = false;
+            stopOscillator();
+        } else {
+            oscBtn.innerText = "Stop";
+            oscillating = true;
+            startOscillator();
+        }
+    })
+    oscillatorControls.appendChild(oscBtn);
+
+    middle.appendChild(document.createElement("br"));
+    middle.appendChild(oscillatorControls);
+
+    var audioContext = new AudioContext();
+    var audioBuffer = audioContext.createBuffer(1, 600, 48000);
+    var audioBufferData = audioBuffer.getChannelData(0);
+    var source;
+    function createSource() {
+        source = audioContext.createBufferSource();
+        source.buffer = audioBuffer;
+        source.loop = true;
+        source.connect(audioContext.destination);
+    }
+    function startOscillator() {
+        createSource();
+        changeFrequency(freq.value);
+        source.start();
+    }
+    function stopOscillator() {
+        if (source) {
+            source.stop();
+        }
+    }
+    function changeFrequency(newFrequency) {
+        if (source) {
+            source.playbackRate.value = 600/48000*newFrequency;
+        }
+    }
+    
+
+
     const right = document.createElement("td");
     right.style.width = "20vw";
-    right.style.alignContent = "baseline";
+    right.style.alignContent = "start";
     right.style.textAlign = "left";
     right.style.whiteSpace = "break-spaces";
     UI.appendChild(right);
@@ -158,6 +231,18 @@ addEventListener("init", () => {
         ctx.lineTo(1280, 720 / 2);
         ctx.stroke();
 
+        ctx.strokeStyle = "cyan";
+        ctx.lineWidth = 1;
+
+        ctx.moveTo(0, 720 / 2);
+
+        ctx.beginPath();
+        for (let i = 0; i < target.samples.length; i++) {
+            ctx.lineTo(i / 600 * 1280, 720 * (target.samples[i] + 1) / 2);
+        }
+
+        ctx.stroke();
+
         ctx.strokeStyle = "lime";
         ctx.lineWidth = 2;
 
@@ -179,6 +264,7 @@ addEventListener("init", () => {
         t.calculated = await applyModifierStack(structuredClone(t.samples), t.modifiers);
         t.calculated[0] = 0;
         t.calculated[t.calculated.length - 1] = [0];
+        audioBufferData.set(t.calculated);
         t.dirty = true;
     }
 
@@ -293,7 +379,7 @@ addEventListener("init", () => {
             out[id].samples = [...custom_waveforms[id].samples];
             delete out[id].dirty;
         }
-        
+
         e.detail.data.waveforms = out;
     });
 
