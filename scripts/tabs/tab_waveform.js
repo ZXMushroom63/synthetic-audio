@@ -398,6 +398,7 @@ addEventListener("init", () => {
 
     addEventListener('deserialise', (e) => {
         custom_waveforms = e.detail.data.waveforms || {};
+        target = null;
         for (let id in custom_waveforms) {
             custom_waveforms[id].samples = new Float32Array(custom_waveforms[id].samples);
             custom_waveforms[id].dirty = true;
