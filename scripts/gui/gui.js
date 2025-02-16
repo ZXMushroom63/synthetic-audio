@@ -29,6 +29,7 @@ function deleteLoop(loop) {
         loop.remove();
     }
     loop.setAttribute("data-deleted", "yes");
+    loop.classList.remove("active");
     markLoopDirty(loop, true);
     customEvent("loopdeleted", {loop: loop});
 }

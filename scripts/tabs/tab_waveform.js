@@ -223,7 +223,7 @@ addEventListener("init", () => {
                 return;
             }
             target.modifiers.push({
-                file: filters[filter].title + " as modifier",
+                file: filters[filter].title + " (as modifier)",
                 layer: 0,
                 conf: {},
                 type: filter

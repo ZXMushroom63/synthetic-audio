@@ -29,7 +29,7 @@ addEventListener("init", ()=>{
             }
             e.preventDefault();
             var targets = [];
-            if (!document.querySelector(".loop.active")) {
+            if (!findLoops(".loop.active:not([data-deleted])")[0]) {
                 var targetNode = document.elementsFromPoint(mouse.x, mouse.y).find(x => !x.classList.contains("deactivated") && x.classList.contains("loopInternal"));
                 if (targetNode) {
                     targets = [targetNode.parentElement]
@@ -37,7 +37,7 @@ addEventListener("init", ()=>{
                     targets = [];
                 }
             } else {
-                targets = document.querySelectorAll(".loop.active");
+                targets = findLoops(".loop.active:not([data-deleted])");
             }
             var dupedLoops = [];
             targets.forEach(target => {

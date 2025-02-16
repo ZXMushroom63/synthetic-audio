@@ -6,7 +6,7 @@ addEventListener("init", ()=>{
                 return;
             }
             canDuplicateKeybind = false;
-            if (!findLoops(".loop.active")[0]) {
+            if (!findLoops(".loop.active:not([data-deleted])")[0]) {
                 var x = document.elementsFromPoint(mouse.x, mouse.y).find(x => !x.classList.contains("deactivated"));
                 if (x && x.closest(".loop")) {
                     var y = deserialiseNode(structuredClone(serialiseNode(x.closest(".loop"))), true);
@@ -14,7 +14,7 @@ addEventListener("init", ()=>{
                     pickupLoop(y);
                 }
             } else {
-                var targets = findLoops(".loop.active");
+                var targets = findLoops(".loop.active:not([data-deleted])");
                 dropHandlers.forEach(fn => { fn(true) });
                 dropHandlers = [];
                 var dupedLoops = [];
