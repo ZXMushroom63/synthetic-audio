@@ -13,7 +13,7 @@ addBlockType("p_readasset", {
     },
     selectMiddleware: (options) => {
         var assetNames = [...new Set(Array.prototype.flatMap.apply(
-            document.querySelectorAll(".loop[data-type=p_writeasset]"),
+            findLoops(".loop[data-type=p_writeasset]"),
             [(node) => node.conf.Asset]
         ))];
         return ["(none)", ...assetNames];

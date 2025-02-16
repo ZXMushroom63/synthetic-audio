@@ -1,5 +1,5 @@
 function serialise(forRender) {
-    var hNodes = document.querySelectorAll(".loop");
+    var hNodes = findLoops(".loop");
     if (!forRender) {
         hNodes = Array.prototype.filter.apply(hNodes,
             [
@@ -48,7 +48,7 @@ function deserialise(serialisedStr) {
         return hydrate();
     }
     var ser = JSON.parse(serialisedStr);
-    document.querySelectorAll(".loop").forEach(x => { x.remove() });
+    findLoops(".loop").forEach(x => { x.remove() });
     ser.nodes ||= [];
     ser.duration ||= 10;
     ser.zoom ||= 100;

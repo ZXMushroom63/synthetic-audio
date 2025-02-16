@@ -4,7 +4,7 @@ addEventListener("init", ()=>{
             audio.samplerate = parseInt(e.target.value);
             decodedPcmCache = {};
             proceduralAssets.clear();
-            document.querySelectorAll(".loop").forEach(x => x.setAttribute("data-dirty", "yes"));
+            findLoops(".loop").forEach(x => x.setAttribute("data-dirty", "yes"));
         }
     });
 });

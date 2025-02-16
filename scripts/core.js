@@ -8,6 +8,9 @@ function stopTiming(name) {
     delete timers[name];
     return dt;
 }
+function findLoops(selector) {
+    return Array.prototype.filter.apply(document.querySelectorAll(selector), [(x)=>!x._ignore]);
+}
 function noteToFrequency(note, octave, accidental = '') {
     const A4 = 440;
     const notes = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
@@ -398,7 +401,8 @@ async function render() {
         document.querySelector("#renderOut").src = URL.createObjectURL(blob);
     }
 
-    document.querySelectorAll(".loop[data-deleted]").forEach(x => x.remove());
+    
+    findLoops(".loop[data-deleted]").forEach(x => x.remove());
 
     document.querySelector("#renderBtn").removeAttribute("disabled");
 }
