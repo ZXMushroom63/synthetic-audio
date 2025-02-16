@@ -110,7 +110,6 @@ addEventListener("init", () => {
     var supportedFilters = {
         "smooth": "Smooth",
         "noise": "Noise",
-        "comb": "Comb",
         "compressor": "Cmprssr",
         "bitcrunch": "Bcrunch",
         "quantise": "Quant",

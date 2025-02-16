@@ -19,6 +19,7 @@ async function applyReverbOffline(pcmData, sampleRate, reverbTime = 2.0, decayRa
 
     // Fill the impulse buffer with a decay function
     for (let i = 0; i < impulseData.length; i++) {
+        Math.newRandom(0);
         impulseData[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / impulseData.length, decayRate);
     }
 
