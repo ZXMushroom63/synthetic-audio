@@ -1,11 +1,4 @@
-var custom_waveforms = {
-    X: {
-        samples: (new Float32Array(600)).fill(0),
-        calculated: (new Float32Array(600)).fill(0),
-        midpoint: 0,
-        modifiers: []
-    }
-};
+var custom_waveforms = {};
 //"X": {
 //    samples: [0,0,0,...] (len=600)
 //    modifiers: [
@@ -37,8 +30,12 @@ addEventListener("init", () => {
         if (custom_waveforms[newWaveformName]) {
             return;
         }
+        var smp = new Float32Array(600).fill(0);
+        smp.forEach((x, i)=>{
+            smp[i] = waveforms.sine(i / 600);
+        });
         custom_waveforms[newWaveformName] = {
-            samples: new Float32Array(600).fill(0),
+            samples: smp,
             modifiers: []
         };
         hydrateWaveformTab();
