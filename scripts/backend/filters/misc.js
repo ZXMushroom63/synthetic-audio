@@ -267,10 +267,14 @@ addBlockType("smooth", {
         if (x === 0) {
             return inPcm;
         }
-        for (let i = 0; i < x; i++) {
-            inPcm.forEach((x, i) => {
-                inPcm[i] = (inPcm[i] + (inPcm[i + 1] || 0)) / 2;
-            });
+        for (let iter = 0; iter < x; iter++) {
+            let tempPcm = new Float32Array(inPcm.length);
+            for (let i = 0; i < inPcm.length; i++) {
+                let prevSample = inPcm[i - 1] || inPcm[i];
+                let nextSample = inPcm[i + 1] || inPcm[i];
+                tempPcm[i] = (prevSample + inPcm[i] + nextSample) / 3;
+            }
+            inPcm.set(tempPcm);
         }
         return inPcm;
     }
