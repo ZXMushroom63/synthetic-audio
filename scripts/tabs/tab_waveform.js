@@ -152,8 +152,34 @@ addEventListener("init", () => {
             oscillating = true;
             startOscillator();
         }
-    })
+    });
     oscillatorControls.appendChild(oscBtn);
+    oscillatorControls.appendChild(document.createElement("br"));
+    var referenceLabel = document.createElement("span");
+    referenceLabel.innerText = "Image Reference:";
+    oscillatorControls.appendChild(referenceLabel);
+
+
+    var imageSrc = null;
+    var referenceImage = new Image();
+    const referenceUpload = document.createElement("input");
+    referenceUpload.style.marginLeft = "3rem";
+    referenceUpload.type = "file";
+    referenceUpload.accept = "image/*";
+    referenceUpload.addEventListener("input", () => {
+        if (imageSrc) {
+            URL.revokeObjectURL(imageSrc);
+            imageSrc = null;
+        }
+        if (referenceUpload.files[0]) {
+            imageSrc = URL.createObjectURL(referenceUpload.files[0]);
+        }
+        referenceImage.src = imageSrc;
+    });
+    referenceImage.addEventListener("load", ()=>{
+        drawWaveform();
+    });
+    oscillatorControls.appendChild(referenceUpload);
 
     middle.appendChild(document.createElement("br"));
     middle.appendChild(oscillatorControls);
@@ -243,6 +269,13 @@ addEventListener("init", () => {
         calculating = true;
         await calculateWaveform(target);
         ctx.clearRect(0, 0, 1280, 720);
+
+        if (imageSrc) {
+            ctx.drawImage(referenceImage, 0, 0, 1280, 720);
+            ctx.fillStyle = "rgba(0,0,0,0.5)";
+            ctx.fillRect(0, 0, 1280, 720);
+        }
+
         ctx.strokeStyle = "white";
         ctx.lineWidth = 1;
 
