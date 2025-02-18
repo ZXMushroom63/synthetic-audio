@@ -85,9 +85,9 @@ addEventListener("init", () => {
             }
             prevIdx = newIdx;
             prevValue = newValue;
-            target.samples[0] = 0;
-            target.samples[target.samples.length - 1] = 0;
+            target.samples[target.samples.length - 1] = target.samples[target.samples.length - 2];
             drawWaveform();
+            e.preventDefault();
         }
     });
     addEventListener("mouseup", (e) => {
@@ -266,7 +266,7 @@ addEventListener("init", () => {
         ctx.strokeStyle = "cyan";
         ctx.lineWidth = 1;
 
-        ctx.moveTo(0, 720 / 2);
+        ctx.moveTo(0, 720 * ((target.samples[0] + 1) / 2));
 
         ctx.beginPath();
         for (let i = 0; i < target.samples.length; i++) {
@@ -278,7 +278,7 @@ addEventListener("init", () => {
         ctx.strokeStyle = "lime";
         ctx.lineWidth = 2;
 
-        ctx.moveTo(0, 720 / 2);
+        ctx.moveTo(0, 720 * (target.calculated[0] + 1) / 2);
 
         ctx.beginPath();
         for (let i = 0; i < target.calculated.length; i++) {
@@ -294,8 +294,6 @@ addEventListener("init", () => {
             return;
         }
         t.calculated = await applyModifierStack(structuredClone(t.samples), t.modifiers);
-        t.calculated[0] = 0;
-        t.calculated[t.calculated.length - 1] = [0];
         t.midpoint = t.calculated.reduce((p, a) => p + a) / t.calculated.length / 2;
         audioBufferData.set(t.calculated);
         t.dirty = true;
