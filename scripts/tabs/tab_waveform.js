@@ -166,6 +166,14 @@ addEventListener("init", () => {
     referenceUpload.style.marginLeft = "3rem";
     referenceUpload.type = "file";
     referenceUpload.accept = "image/*";
+    referenceUpload.addEventListener("click", () => {
+        if (imageSrc) {
+            URL.revokeObjectURL(imageSrc);
+            imageSrc = null;
+        }
+        referenceImage.src = imageSrc;
+        drawWaveform();
+    });
     referenceUpload.addEventListener("input", () => {
         if (imageSrc) {
             URL.revokeObjectURL(imageSrc);
