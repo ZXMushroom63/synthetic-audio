@@ -330,6 +330,7 @@ function loadAutosave() {
 }
 function init() {
     customEvent("init");
+    document.querySelector('#renderOut').preservesPitch = false;
     document.querySelector("#editorlayer").addEventListener("input", () => {
         gui.layer = parseInt(document.querySelector("#editorlayer").value);
         hydrateZoom();
