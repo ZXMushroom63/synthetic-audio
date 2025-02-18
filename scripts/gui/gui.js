@@ -119,7 +119,6 @@ function hydrateZoom() {
         var trueWidth = trueDuration / elem.conf.Speed * (zoom / audio.duration);
         elem.querySelector(".loopInternal").style.backgroundImage = `repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.0), rgba(255, 255, 255, 0.0) ${trueWidth - 0.15}vw, rgba(255, 255, 255, 1) ${trueWidth - 0.15}vw, rgba(255, 255, 255, 1) ${trueWidth + 0.0}vw)`;
     });
-    hydrateEditorLayer();
 }
 function hydrateEditorLayer() {
     findLoops(".loop").forEach(elem => {
@@ -150,6 +149,7 @@ function hydrate() {
     customEvent("hydrate");
     hydrateBeatMarkers();
     hydrateZoom();
+    hydrateEditorLayer();
 }
 function addBlock(type, start, duration, title, layer = 0, data = {}, editorValue = Math.min(gui.layer, 9), noTimeline) {
     var definition = window.filters[type];
@@ -333,17 +333,17 @@ function init() {
     document.querySelector('#renderOut').preservesPitch = false;
     document.querySelector("#editorlayer").addEventListener("input", () => {
         gui.layer = parseInt(document.querySelector("#editorlayer").value);
-        hydrateZoom();
+        hydrateEditorLayer();
     });
     addEventListener("keydown", (e) => {
         if (e.ctrlKey && Number.isFinite(parseFloat(e.key.toLowerCase())) && document.activeElement === document.body) {
             document.querySelector("#editorlayer").value = gui.layer = parseFloat(e.key.toLowerCase());
-            hydrateZoom();
+            hydrateEditorLayer();
             e.preventDefault();
         }
         if (e.ctrlKey && e.key.toLowerCase() === " " && document.activeElement === document.body) {
             document.querySelector("#editorlayer").value = gui.layer = 10;
-            hydrateZoom();
+            hydrateEditorLayer();
             e.preventDefault();
         }
     });
