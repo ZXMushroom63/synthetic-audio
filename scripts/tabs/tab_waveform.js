@@ -414,6 +414,19 @@ addEventListener("init", () => {
             });
             item.appendChild(deleteBtn);
 
+            const duplicateBtn = document.createElement("button");
+            duplicateBtn.innerText = "📋";
+            duplicateBtn.addEventListener("click", (e) => {
+                var newId = prompt("Copy waveform to: ", id + " clone");
+                if (custom_waveforms[newId]) {
+                    return;
+                }
+                custom_waveforms[newId] = structuredClone(custom_waveforms[id]);
+                e.stopPropagation();
+                hydrateWaveformTab();
+            });
+            item.appendChild(duplicateBtn);
+
             item.addEventListener("click", () => {
                 loadModifiersToTarget();
                 target = custom_waveforms[id];
