@@ -1,6 +1,6 @@
 addEventListener("load", () => {
     const audio = document.querySelector('#renderOut');
-    const canvas = document.querySelector('canvas');
+    const canvas = document.querySelector('#viz');
     const canvasCtx = canvas.getContext('2d');
 
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -31,15 +31,16 @@ addEventListener("load", () => {
         return freq.toFixed(2); // return frequency in Hz
     }
     var logoImage = document.querySelector("#logo");
-    canvasCtx.drawImage(logoImage, 0, 15, 150, 45);
+    canvasCtx.drawImage(logoImage, 0, 40, 450, 135);
     var keepDrawing = true;
     var started = false;
+    const previousByteData = new Uint8Array(bufferLength);
     function draw() {
         analyser.getByteTimeDomainData(dataArray);
 
         canvasCtx.fillStyle = 'rgb(0, 0, 0)';
         canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
-        canvasCtx.drawImage(logoImage, 0, 15, 150, 45);
+        canvasCtx.drawImage(logoImage, 0, 40, 450, 135);
         canvasCtx.fillStyle = 'rgba(0, 0, 0, 0.9)';
         canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
 
@@ -52,7 +53,7 @@ addEventListener("load", () => {
         let x = 0;
 
         for (let i = 0; i < bufferLength; i++) {
-            const v = dataArray[i] / 128.0;
+            const v = previousByteData[i] / 128.0;
             const y = v * canvas.height / 2;
 
             if (i === 0) {
@@ -71,13 +72,14 @@ addEventListener("load", () => {
         const mostCommonFrequency = getMostCommonFrequency();
 
         canvasCtx.lineWidth = 1;
-        canvasCtx.strokeStyle = 'rgb(255, 255, 255)';
-        canvasCtx.font = "10px sans-serif";
-        canvasCtx.strokeText("SYNTHETIC", 0, 10);
-        canvasCtx.strokeText(`${mostCommonFrequency} Hz`, 0, 20);
+        canvasCtx.fillStyle = 'rgb(255, 255, 255)';
+        canvasCtx.font = "30px sans-serif";
+        canvasCtx.fillText("SYNTHETIC", 0, 30);
+        canvasCtx.fillText(`${mostCommonFrequency} Hz`, 0, 60);
 
         if (keepDrawing) {
             requestAnimationFrame(draw);
+            previousByteData.set(dataArray);
         }
     }
 
@@ -103,7 +105,7 @@ addEventListener("load", () => {
         setTimeout(() => {
             canvasCtx.fillStyle = 'rgb(0, 0, 0)';
             canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
-            canvasCtx.drawImage(logoImage, 0, 15, 150, 45);
-        }, 150);
+            canvasCtx.drawImage(logoImage, 0, 40, 450, 135);
+        }, 450);
     });
 });
