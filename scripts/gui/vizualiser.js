@@ -44,7 +44,7 @@ addEventListener("load", () => {
         canvasCtx.fillStyle = 'rgba(0, 0, 0, 0.9)';
         canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
 
-        canvasCtx.lineWidth = 1.5;
+        canvasCtx.lineWidth = 2;
         canvasCtx.strokeStyle = 'rgb(255, 255, 255)';
 
         canvasCtx.beginPath();
