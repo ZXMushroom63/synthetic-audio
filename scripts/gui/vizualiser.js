@@ -3,6 +3,15 @@ addEventListener("load", () => {
     const canvas = document.querySelector('#viz');
     const canvasCtx = canvas.getContext('2d');
 
+    canvas.addEventListener("click", ()=>{
+        canvas.requestFullscreen().then(()=>{
+            canvas.style.pointerEvents = "none";
+        });
+    });
+    canvas.addEventListener("fullscreenchange", ()=>{
+        canvas.style.pointerEvents = "all";
+    });
+
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     const analyser = audioCtx.createAnalyser();
     const source = audioCtx.createMediaElementSource(audio);
@@ -37,12 +46,10 @@ addEventListener("load", () => {
     const previousByteData = new Uint8Array(bufferLength);
     function draw() {
         analyser.getByteTimeDomainData(dataArray);
-
-        canvasCtx.fillStyle = 'rgb(0, 0, 0)';
-        canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
+        canvasCtx.clearRect(0, 0, canvas.width, canvas.height);
+        canvasCtx.globalAlpha = 0.2;
         canvasCtx.drawImage(logoImage, 0, 40, 450, 135);
-        canvasCtx.fillStyle = 'rgba(0, 0, 0, 0.9)';
-        canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
+        canvasCtx.globalAlpha = 1;
 
         canvasCtx.lineWidth = 2;
         canvasCtx.strokeStyle = 'rgb(255, 255, 255)';
@@ -103,8 +110,7 @@ addEventListener("load", () => {
     audio.addEventListener('ended', () => {
         stopViz();
         setTimeout(() => {
-            canvasCtx.fillStyle = 'rgb(0, 0, 0)';
-            canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
+            canvasCtx.clearRect(0, 0, canvas.width, canvas.height);
             canvasCtx.drawImage(logoImage, 0, 40, 450, 135);
         }, 450);
     });
