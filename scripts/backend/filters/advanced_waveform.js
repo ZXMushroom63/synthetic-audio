@@ -208,9 +208,9 @@ addBlockType("p_waveform_plus", {
             }
             if (this.conf.Multiply) {
                 if (this.conf.Absolute) {
-                    inPcm[i] *= Math.abs(y);
+                    inPcm[i] *= Math.abs(-y);
                 } else {
-                    inPcm[i] *= (y + 1) / 2;
+                    inPcm[i] *= (-y + 1) / 2;
                 }
             } else {
                 if (this.conf.Sidechain) {
