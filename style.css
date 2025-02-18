@@ -488,3 +488,9 @@ select option {
     pointer-events: all;
     border-right: 1px solid white;
 }
+#viz {
+    border: 1px solid white;
+    image-rendering: pixelated;
+    width: 150px;
+    height: 75px;
+}
