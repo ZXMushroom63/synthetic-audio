@@ -45,8 +45,23 @@ addBlockType("reverb", {
     configs: {
         "ReverbTime": [2, "number", 1],
         "DecayRate": [8, "number", 1],
+        "Volume": [0.5, "number", 1],
+        "Method": ["Overwrite", ["Additive", "Overwrite"]]
     },
     functor: async function (inPcm, channel, data) {
-        return await applyReverbOffline(inPcm, audio.samplerate, this.conf.ReverbTime, this.conf.DecayRate);
+        var volume = _(this.conf.Volume);
+        const reverb = await applyReverbOffline(inPcm, audio.samplerate, this.conf.ReverbTime, this.conf.DecayRate);
+        reverb.forEach((x, i)=>{
+            reverb[i] *= volume(i, inPcm);
+        });
+        if (this.conf.Method === "Overwrite") {
+            return reverb;
+        }
+
+        //Additive mixing
+        inPcm.forEach((x, i)=>{
+            inPcm[i] += reverb[i];
+        });
+        return inPcm;
     }
 });
