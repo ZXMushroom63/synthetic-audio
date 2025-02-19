@@ -81,6 +81,7 @@ addEventListener("init", () => {
                     selectedLoops.push(x.parentElement);
                 }
             });
+            selectedLoops = selectedLoops.filter(x => !x.classList.contains("deactivated"));
             ACTIVE_TOOL_FN(selectedLoops);
         }
     });
