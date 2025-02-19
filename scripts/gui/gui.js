@@ -122,7 +122,7 @@ function hydrateZoom() {
 }
 function hydrateEditorLayer() {
     findLoops(".loop").forEach(elem => {
-        if ((parseInt(elem.getAttribute("data-editlayer")) === gui.layer) || (gui.layer === 10)) {
+        if (elem.noEditorLayer || (parseInt(elem.getAttribute("data-editlayer")) === gui.layer) || (gui.layer === 10)) {
             elem.classList.remove("deactivated");
         } else {
             elem.classList.add("deactivated");
@@ -155,7 +155,7 @@ function addBlock(type, start, duration, title, layer = 0, data = {}, editorValu
     var definition = window.filters[type];
     function resizeBlock(e) {
         markLoopDirty(loop, true);
-        if (parseInt(loop.getAttribute("data-editlayer")) !== gui.layer) {
+        if (!loop.noEditorLayer && (parseInt(loop.getAttribute("data-editlayer")) !== gui.layer)) {
             return;
         }
         var isRight = e.target.classList.contains("handleRight");
@@ -244,7 +244,7 @@ function addBlock(type, start, duration, title, layer = 0, data = {}, editorValu
 
 
     internal.addEventListener("mousedown", (e) => {
-        if (parseInt(loop.getAttribute("data-editlayer")) !== gui.layer) {
+        if (!loop.noEditorLayer && (parseInt(loop.getAttribute("data-editlayer")) !== gui.layer)) {
             return;
         }
         if (e.button === 0 && (keymap["Backspace"] || keymap["Delete"])) {
@@ -266,7 +266,7 @@ function addBlock(type, start, duration, title, layer = 0, data = {}, editorValu
     });
     internal.addEventListener("contextmenu", (e) => { e.preventDefault() });
     internal.addEventListener("mousedown", function (e) {
-        if (parseInt(loop.getAttribute("data-editlayer")) !== gui.layer) {
+        if (!loop.noEditorLayer && (parseInt(loop.getAttribute("data-editlayer")) !== gui.layer)) {
             return;
         }
         if (e.button !== 0) {
@@ -298,7 +298,7 @@ function addBlock(type, start, duration, title, layer = 0, data = {}, editorValu
                 customEvent("loopmoved", {loop: loop});
             }
         } else {
-            ACTIVE_TOOL_FN(loop);
+            ACTIVE_TOOL_FN([loop]);
         }
         document.onmouseup = function (q) {
             loop.classList.remove("active");

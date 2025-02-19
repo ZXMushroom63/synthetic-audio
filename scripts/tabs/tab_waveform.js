@@ -357,6 +357,7 @@ addEventListener("init", () => {
             modifier.horizontalBlocked = true;
             modifier.isWaveformLoop = true;
             modifier.forceDelete = true;
+            modifier.noEditorLayer = true;
             right.appendChild(modifier);
         });
 
