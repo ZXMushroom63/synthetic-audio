@@ -274,8 +274,8 @@ function addBlock(type, start, duration, title, layer = 0, data = {}, editorValu
         }
         var trackBB = loop.referenceBB || document.querySelector("#trackInternal").getBoundingClientRect();
         var originalBB = internal.getBoundingClientRect();
-        loop.classList.add("active");
         if (ACTIVE_TOOL === "MOVE") {
+            loop.classList.add("active");
             markLoopDirty(loop, true);
             document.onmousemove = function (j) {
                 var pos = Math.max(0, ((originalBB.left - trackBB.left - (e.clientX - j.clientX)) / trackBB.width) * 100);

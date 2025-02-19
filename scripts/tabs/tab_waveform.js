@@ -27,6 +27,9 @@ addEventListener("init", () => {
     makeNewWaveform.innerText = "New";
     makeNewWaveform.addEventListener("click", (e) => {
         var newWaveformName = prompt("Waveform name: ", "new waveform 1");
+        if (!newWaveformName) {
+            return;
+        }
         if (custom_waveforms[newWaveformName]) {
             return;
         }
@@ -245,7 +248,7 @@ addEventListener("init", () => {
         "bitcrunch": "Bcrunch",
         "quantise": "Quant",
         "normalise": "Norm",
-        "power": "Exp",
+        "power": "Pwr",
     };
     Object.keys(supportedFilters).forEach(filter => {
         const addMod = document.createElement("button");
@@ -396,6 +399,9 @@ addEventListener("init", () => {
             renameBtn.innerText = "✏️";
             renameBtn.addEventListener("click", (e) => {
                 var newId = prompt("Rename to: ", id);
+                if (!newId) {
+                    return;
+                }
                 custom_waveforms[newId] = custom_waveforms[id];
                 if (newId !== id) {
                     delete custom_waveforms[id];
@@ -421,6 +427,9 @@ addEventListener("init", () => {
             duplicateBtn.innerText = "📋";
             duplicateBtn.addEventListener("click", (e) => {
                 var newId = prompt("Copy waveform to: ", id + " clone");
+                if (!newId) {
+                    return;
+                }
                 if (custom_waveforms[newId]) {
                     return;
                 }
