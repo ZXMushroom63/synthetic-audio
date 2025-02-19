@@ -9,9 +9,6 @@
     height: calc(100vh - 15rem);
     border-collapse: collapse;
 }
-td {
-    display: inline-block;
-}
 #track #time {
     height: 2rem;
     background-color: rgb(20,20,20);

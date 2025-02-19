@@ -20,7 +20,7 @@ addEventListener("init", () => {
     left.style.alignContent = "start";
     left.style.borderRight = "1px solid white";
     left.style.textAlign = "left";
-    left.style.display = "block";
+    left.style.display = "inline-block";
     UI.appendChild(left);
 
     const makeNewWaveform = document.createElement("button");
@@ -48,6 +48,8 @@ addEventListener("init", () => {
     middle.style.alignContent = "center";
     middle.style.textAlign = "center";
     middle.classList.add("themeGradient");
+    middle.style.overflowX = "hidden";
+    middle.style.overflowY = "auto";
     UI.appendChild(middle);
 
     const panel = document.createElement("canvas");
@@ -441,8 +443,8 @@ addEventListener("init", () => {
             middle.style.display = "none";
             return;
         } else {
-            right.style.display = "table-cell";
-            middle.style.display = "table-cell";
+            right.style.display = "inline-block";
+            middle.style.display = "inline-block";
         }
         drawModifierStack();
         drawWaveform();
