@@ -74,12 +74,14 @@ addEventListener("init", () => {
                 y: Math.max(a.y - scrollDy, b.y)
             }
             var rect = new DOMRect(pos1.x, pos1.y, pos2.x - pos1.x, pos2.y - pos1.y);
+            var selectedLoops = [];
             document.querySelectorAll(".loopInternal").forEach(x => {
                 var rect2 = x.getBoundingClientRect();
                 if (intersect(rect, rect2)) {
-                    ACTIVE_TOOL_FN(x.parentElement);
+                    selectedLoops.push(x.parentElement);
                 }
             });
+            ACTIVE_TOOL_FN(selectedLoops);
         }
     });
     document.querySelector("#trackInternal").addEventListener("contextmenu", (e) => { e.preventDefault() });
