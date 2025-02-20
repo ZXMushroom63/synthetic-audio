@@ -26,7 +26,7 @@ addEventListener("init", () => {
     const makeNewWaveform = document.createElement("button");
     makeNewWaveform.innerText = "New";
     makeNewWaveform.addEventListener("click", (e) => {
-        var newWaveformName = prompt("Waveform name: ", "new waveform 1");
+        var newWaveformName = cleanString(prompt("Waveform name: ", "new waveform 1"));
         if (!newWaveformName) {
             return;
         }
@@ -398,7 +398,7 @@ addEventListener("init", () => {
             const renameBtn = document.createElement("button");
             renameBtn.innerText = "✏️";
             renameBtn.addEventListener("click", (e) => {
-                var newId = prompt("Rename to: ", id);
+                var newId = cleanString(prompt("Rename to: ", id));
                 if (!newId) {
                     return;
                 }
@@ -426,7 +426,7 @@ addEventListener("init", () => {
             const duplicateBtn = document.createElement("button");
             duplicateBtn.innerText = "📋";
             duplicateBtn.addEventListener("click", (e) => {
-                var newId = prompt("Copy waveform to: ", id + " clone");
+                var newId = cleanString(prompt("Copy waveform to: ", id + " clone"));
                 if (!newId) {
                     return;
                 }
