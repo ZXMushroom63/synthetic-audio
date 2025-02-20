@@ -11,7 +11,7 @@ addBlockType("chorus", {
         const delaySamples = Math.floor((this.conf.DelayMs / 1000) * audio.samplerate);
         const modFrequency = (2 * Math.PI * this.conf.ModulationRateHz) / audio.samplerate;
         const depth = this.conf.DepthMs / 1000 * audio.samplerate;
-        console.log(delaySamples, modFrequency, depth);
+
         for (let i = 0; i < inPcm.length; i++) {
             const modulatedDelay = delaySamples + Math.sin(i * modFrequency) * depth;
             const delayIndex = i - Math.floor(modulatedDelay);
