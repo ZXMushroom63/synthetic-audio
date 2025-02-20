@@ -217,7 +217,7 @@ addBlockType("p_waveform_plus", {
                 }
             } else {
                 if (this.conf.Sidechain) {
-                    var sidechainCoefficient = Math.pow(1 - Math.max(Math.min(1, amp(i, inPcm) * Math.exp(-decay(i, inPcm) * t)), 0), Math.abs(this.conf.SidechainPower));
+                    var sidechainCoefficient = Math.pow(1 - Math.max(Math.min(1, amp(i, inPcm) * Math.exp(-decay(i, inPcm) * absoluteTime)), 0), Math.abs(this.conf.SidechainPower));
                     if (this.conf.SidechainPower < 0) {
                         y *= sidechainCoefficient;
                     } else {
