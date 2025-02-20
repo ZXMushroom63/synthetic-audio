@@ -121,7 +121,8 @@ addBlockType("p_waveform_plus", {
 
         const AmpSmoothingStart = Math.floor(audio.samplerate * this.conf.AmplitudeSmoothTime);
         const AmpSmoothingEnd = inPcm.length - AmpSmoothingStart;
-
+        var dt = Math.pow(audio.samplerate, -1);
+        var t = 0;
         inPcm.forEach((x, i) => {
             var denominator = Math.max(...keys.flatMap((k) => { return underscores[k](i, inPcm) })) || 1;
             var total = 0;
@@ -130,10 +131,10 @@ addBlockType("p_waveform_plus", {
                 total += Math.abs(x);
                 return [[k, x]];
             }));
-            var t = i / audio.samplerate;
 
             var f = freq(i, inPcm);
             f *= Math.exp(-fdecay(i, inPcm) * t);
+            t += f * dt;
             var y = 0;
             var waveCount = 1;
             if (this.conf.Harmonics) {
@@ -169,6 +170,7 @@ addBlockType("p_waveform_plus", {
                         volumeRatio *= right;
                     }
                 }
+                harmonicFrequency = harmonicFrequency / f;
                 var waveformTime = (harmonicFrequency * t) % thePeriod;
 
                 if (this.conf.Harmonics) {

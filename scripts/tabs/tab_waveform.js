@@ -491,7 +491,17 @@ addEventListener("init", () => {
     addEventListener("preserialisenode", (e) => {
         if ((e.detail.node.getAttribute("data-type") === "p_waveform_plus") && e.detail.node.conf.UseCustomWaveform && (custom_waveforms[e.detail.node.conf.WaveformAsset].dirty)) {
             markLoopDirty(e.detail.node);
+            return;
         }
+        Object.values(e.detail.node).forEach(x => {
+            if (x.split("~")[1].split("@!").length !== 2) {
+                return;
+            }
+            if (custom_waveforms[x.replace(/^[\s\S]+?@!/, "")]?.dirty) {
+                markLoopDirty(e.detail.node);
+                return;
+            }
+        });
     });
 
     addEventListener("render", (e) => {
