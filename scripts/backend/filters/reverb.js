@@ -35,8 +35,8 @@ addBlockType("reverb", {
     color: "rgba(0,255,0,0.3)",
     title: "Reverb",
     configs: {
-        "ReverbTime": [2, "number", 1],
-        "DecayRate": [8, "number", 1],
+        "ReverbTime": [2, "number"],
+        "DecayRate": [8, "number"],
         "Volume": [0.5, "number", 1],
         "Method": ["Overwrite", ["Additive", "Overwrite"]]
     },
