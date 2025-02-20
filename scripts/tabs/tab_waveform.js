@@ -493,7 +493,7 @@ addEventListener("init", () => {
             markLoopDirty(e.detail.node);
             return;
         }
-        Object.values(e.detail.node).forEach(x => {
+        Object.values(e.detail.node.conf).forEach(x => {
             if (x.split("~")[1].split("@!").length !== 2) {
                 return;
             }
