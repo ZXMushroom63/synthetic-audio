@@ -57,6 +57,8 @@ If an input box is purple, that means you can write inline scripts inside it.
 For a simple linear interpolation, try inputting:   #0~24
 For a exponential interpolation (squared), try inputting:   #0~24@2
   |- (spaces are allowed between the numbers)
+For interpolating using a custom waveform, use #100~500@!custom_waveform_name
+
 
 For writing an arbitrary script, do: #(()=>{/*/code/*/ return 1;})()
 These scripts have access to the following variables:
