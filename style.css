@@ -212,10 +212,12 @@ h4 {
     background-color: rgba(125, 125, 255, 0.3);
     padding: 2px;
     border-radius: 3px;
-    width: 4rem;
+    resize: horizontal;
+    width: 8rem;
 }
 .loopOptionsMenu input.modifyable, select.modifyable {
     background-color: rgba(255, 0, 255, 0.3);
+    width: 12rem;
 }
 .loopOptionsMenu select option {
     color: black;
@@ -487,4 +489,35 @@ select option {
     transform: translateX(0);
     pointer-events: all;
     border-right: 1px solid white;
+}
+#viz {
+    border: 1px solid white;
+    image-rendering: pixelated;
+    width: 150px;
+    height: 75px;
+    background: black;
+}
+#waveformsDropdown {
+    position: fixed;
+    z-index: 999;
+    top:  0;
+    left: 0;
+    background: rgba(0,0,0,0.8);
+    color: white;
+    max-height: 12rem;
+    overflow-y: auto;
+    max-width: 9rem;
+    overflow-x: hidden;
+    font-family: sans-serif;
+    border: 1px solid white;
+    border-radius: 0.3rem;
+}
+#waveformsDropdown li {
+    padding: 4px 12px;
+    list-style: none;
+    user-select: none;
+    cursor: pointer;
+}
+#waveformsDropdown li:hover {
+    background-color: rgba(0, 125, 255, 0.3);
 }

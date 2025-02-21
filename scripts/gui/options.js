@@ -45,7 +45,7 @@ function createOptionsMenu(loop, data, definition) {
         if (Array.isArray(value[1])) {
             var s = document.createElement("select");
             s.setAttribute("data-key", key);
-            var proxy = definition.selectMiddleware || (x => x);
+            var proxy = definition.selectMiddleware || (() => value[1]);
             var opts = proxy(key);
             if (!opts.includes(value[0])) {
                 opts.push(value[0]);

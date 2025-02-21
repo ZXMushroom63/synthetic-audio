@@ -65,15 +65,17 @@ addBlockType("comb", {
     title: "Comb Filter",
     configs: {
         "Iterations": [1, "number"],
-        "Delay": [0.01, "number"],
+        "Delay": [0.01, "number", 1],
+        "VolumeRatio": [1, "number", "1"]
     },
     functor: function (inPcm, channel, data) {
+        var volRatio = _(this.conf.VolumeRatio);
         var delay = _(this.conf.Delay);
         var out = (new Float32Array(inPcm.length)).fill(0);
         out.forEach((x, i) => {
             var delayImpl = delay(i, out) * audio.samplerate;
             for (let j = 0; j < (this.conf.Iterations + 1); j++) {
-                out[i] += inPcm[Math.floor(delayImpl * j) + i] || 0;
+                out[i] += inPcm[Math.floor(delayImpl * j) + i] * Math.pow(volRatio(i, out), j) || 0;
             }
         });
         return out;
@@ -145,10 +147,15 @@ addBlockType("noise", {
     title: "Noise",
     configs: {
         "Volume": [0.5, "number", 1],
-        "Seed": [1, "number", 1]
+        "SeedLeft": [1, "number", 1],
+        "SeedRight": [1, "number", 1]
     },
     functor: function (inPcm, channel, data) {
-        Math.newRandom(this.conf.Seed);
+        if (channel === 0) {
+            Math.newRandom(this.conf.SeedLeft);
+        } else {
+            Math.newRandom(this.conf.SeedRight);
+        }
         var n = _(this.conf.Volume);
         inPcm.forEach((x, i) => {
             inPcm[i] += (Math.random() - 0.5) * n(i, inPcm) * 2;
@@ -259,7 +266,8 @@ addBlockType("smooth", {
     color: "rgba(0,255,0,0.3)",
     title: "Smooth",
     configs: {
-        "Iterations": [1, "number"]
+        "Iterations": [1, "number"],
+        "Circular": [false, "checkbox"]
     },
     functor: function (inPcm, channel, data) {
         var sampleRateAnchor = audio.samplerate / 24000;
@@ -270,8 +278,16 @@ addBlockType("smooth", {
         for (let iter = 0; iter < x; iter++) {
             let tempPcm = new Float32Array(inPcm.length);
             for (let i = 0; i < inPcm.length; i++) {
-                let prevSample = inPcm[i - 1] || inPcm[i];
-                let nextSample = inPcm[i + 1] || inPcm[i];
+                var prevSampleIdx = i - 1;
+                var nextSampleIdx = i + 1;
+                if (prevSampleIdx === -1 && this.conf.Circular) {
+                    prevSampleIdx = inPcm.length - 1;
+                }
+                if (nextSampleIdx === inPcm.length && this.conf.Circular) {
+                    nextSampleIdx = 0;
+                }
+                var prevSample = inPcm[prevSampleIdx] || inPcm[i];
+                var nextSample = inPcm[nextSampleIdx] || inPcm[i];
                 tempPcm[i] = (prevSample + inPcm[i] + nextSample) / 3;
             }
             inPcm.set(tempPcm);
@@ -288,7 +304,7 @@ addBlockType("normalise", {
     functor: function (inPcm, channel, data) {
         var maxVolume = 0.0001;
         inPcm.forEach((x) => {
-            maxVolume = Math.max(maxVolume, x);
+            maxVolume = Math.max(maxVolume, Math.abs(x));
         });
         inPcm.forEach((x, i) => {
             inPcm[i] /= maxVolume;

@@ -119,11 +119,10 @@ function hydrateZoom() {
         var trueWidth = trueDuration / elem.conf.Speed * (zoom / audio.duration);
         elem.querySelector(".loopInternal").style.backgroundImage = `repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.0), rgba(255, 255, 255, 0.0) ${trueWidth - 0.15}vw, rgba(255, 255, 255, 1) ${trueWidth - 0.15}vw, rgba(255, 255, 255, 1) ${trueWidth + 0.0}vw)`;
     });
-    hydrateEditorLayer();
 }
 function hydrateEditorLayer() {
     findLoops(".loop").forEach(elem => {
-        if ((parseInt(elem.getAttribute("data-editlayer")) === gui.layer) || (gui.layer === 10)) {
+        if (elem.noEditorLayer || (parseInt(elem.getAttribute("data-editlayer")) === gui.layer) || (gui.layer === 10)) {
             elem.classList.remove("deactivated");
         } else {
             elem.classList.add("deactivated");
@@ -150,12 +149,13 @@ function hydrate() {
     customEvent("hydrate");
     hydrateBeatMarkers();
     hydrateZoom();
+    hydrateEditorLayer();
 }
 function addBlock(type, start, duration, title, layer = 0, data = {}, editorValue = Math.min(gui.layer, 9), noTimeline) {
     var definition = window.filters[type];
     function resizeBlock(e) {
         markLoopDirty(loop, true);
-        if (parseInt(loop.getAttribute("data-editlayer")) !== gui.layer) {
+        if (!loop.noEditorLayer && (parseInt(loop.getAttribute("data-editlayer")) !== gui.layer)) {
             return;
         }
         var isRight = e.target.classList.contains("handleRight");
@@ -244,7 +244,7 @@ function addBlock(type, start, duration, title, layer = 0, data = {}, editorValu
 
 
     internal.addEventListener("mousedown", (e) => {
-        if (parseInt(loop.getAttribute("data-editlayer")) !== gui.layer) {
+        if (!loop.noEditorLayer && (parseInt(loop.getAttribute("data-editlayer")) !== gui.layer)) {
             return;
         }
         if (e.button === 0 && (keymap["Backspace"] || keymap["Delete"])) {
@@ -266,7 +266,7 @@ function addBlock(type, start, duration, title, layer = 0, data = {}, editorValu
     });
     internal.addEventListener("contextmenu", (e) => { e.preventDefault() });
     internal.addEventListener("mousedown", function (e) {
-        if (parseInt(loop.getAttribute("data-editlayer")) !== gui.layer) {
+        if (!loop.noEditorLayer && (parseInt(loop.getAttribute("data-editlayer")) !== gui.layer)) {
             return;
         }
         if (e.button !== 0) {
@@ -274,8 +274,8 @@ function addBlock(type, start, duration, title, layer = 0, data = {}, editorValu
         }
         var trackBB = loop.referenceBB || document.querySelector("#trackInternal").getBoundingClientRect();
         var originalBB = internal.getBoundingClientRect();
-        loop.classList.add("active");
         if (ACTIVE_TOOL === "MOVE") {
+            loop.classList.add("active");
             markLoopDirty(loop, true);
             document.onmousemove = function (j) {
                 var pos = Math.max(0, ((originalBB.left - trackBB.left - (e.clientX - j.clientX)) / trackBB.width) * 100);
@@ -298,7 +298,7 @@ function addBlock(type, start, duration, title, layer = 0, data = {}, editorValu
                 customEvent("loopmoved", {loop: loop});
             }
         } else {
-            ACTIVE_TOOL_FN(loop);
+            ACTIVE_TOOL_FN([loop]);
         }
         document.onmouseup = function (q) {
             loop.classList.remove("active");
@@ -330,19 +330,20 @@ function loadAutosave() {
 }
 function init() {
     customEvent("init");
+    document.querySelector('#renderOut').preservesPitch = false;
     document.querySelector("#editorlayer").addEventListener("input", () => {
         gui.layer = parseInt(document.querySelector("#editorlayer").value);
-        hydrateZoom();
+        hydrateEditorLayer();
     });
     addEventListener("keydown", (e) => {
         if (e.ctrlKey && Number.isFinite(parseFloat(e.key.toLowerCase())) && document.activeElement === document.body) {
             document.querySelector("#editorlayer").value = gui.layer = parseFloat(e.key.toLowerCase());
-            hydrateZoom();
+            hydrateEditorLayer();
             e.preventDefault();
         }
         if (e.ctrlKey && e.key.toLowerCase() === " " && document.activeElement === document.body) {
             document.querySelector("#editorlayer").value = gui.layer = 10;
-            hydrateZoom();
+            hydrateEditorLayer();
             e.preventDefault();
         }
     });

@@ -1,3 +1,6 @@
+function cleanString(input) {
+    return input.replace(/[^\w\s]/g, '');
+}
 var timers = {};
 function startTiming(name) {
     timers[name] = performance.now();
@@ -35,75 +38,9 @@ function noteToFrequency(note, octave, accidental = '') {
     const frequency = A4 * Math.pow(2, halfSteps / 12);
     return frequency;
 }
-var proceduralAssets = new Map();
-
 const VALID_NOTES = ["A", "B", "C", "D", "E", "F", "G"];
 const VALID_DESCRIPTORS = ["#", "b"];
-function _(val) {
-    if (typeof val === "string" && val.includes(":")) {
-        var arr = val.split(":");
-        var noteArray = (arr.length % 2) ? arr.filter((x, i) => i % 2) : arr.filter((x, i) => i % 2 && (i !== arr.length - 1));
-        noteArray = noteArray.map(note => {
-            if (!((note.length > 0) && (note.length <= 3))) {
-                return note;
-            }
-            if (!VALID_NOTES.includes(note[0].toUpperCase())) {
-                return;
-            }
-            switch (note.length) {
-                case 1:
-                    return noteToFrequency(note, 4, "");
-                case 2:
-                    if (VALID_DESCRIPTORS.includes(note[1])) {
-                        return noteToFrequency(note[0], 4, note[1]);
-                    } else {
-                        return noteToFrequency(note[0], parseInt(note[1]), "");
-                    }
-                case 3:
-                    return noteToFrequency(note[0], parseInt(note[2]), note[1]);
-            }
-        });
-        val = arr.map((x, i) => {
-            if (i % 2) {
-                return noteArray[Math.floor(i / 2)];
-            } else {
-                return x;
-            }
-        }).join("");
-    }
-    if (typeof val === "string" && val.startsWith("#")) {
-        if (val.split("~").length === 2) {
-            var exponent = 1;
-            var v = val.replace("#", "").split("~").flatMap((x, i) => {
-                if (i === 0) {
-                    return parseFloat(x) || 0;
-                }
 
-                var split = x.split("@");
-                if (split.length === 2) {
-                    exponent = parseFloat(split[1]) || 1;
-                    return parseFloat(split[0]) || 0;
-                } else {
-                    return parseFloat(x) || 0;
-                }
-            });
-            return (x, pcm) => {
-                return lerp(v[0], v[1], Math.pow(x / pcm.length, exponent));
-            }
-        }
-        var fn = new Function(["x", "rt", "i"], val.replace("#", "return "));
-        try {
-            fn(0, 0, 0, 0);
-        } catch (error) {
-            return () => 0;
-        }
-        return (x, pcm) => {
-            return fn(x / pcm.length, x / audio.samplerate, x);
-        };
-    } else {
-        return () => val;
-    }
-}
 function getSemitoneCoefficient(semitones) {
     const twelfthRootOf2 = Math.pow(2, 1 / 12);
     return Math.pow(twelfthRootOf2, semitones);

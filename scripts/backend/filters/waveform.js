@@ -52,7 +52,7 @@ addBlockType("p_waveform", {
 
             y *= Math.exp(-this.conf.Decay * t);
             if (this.conf.Multiply) {
-                inPcm[i] *= (y + 1) / 2;
+                inPcm[i] *= (-y + 1) / 2;
             } else {
                 inPcm[i] += y;
             }

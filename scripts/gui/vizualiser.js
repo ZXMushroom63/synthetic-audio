@@ -1,7 +1,16 @@
 addEventListener("load", () => {
     const audio = document.querySelector('#renderOut');
-    const canvas = document.querySelector('canvas');
+    const canvas = document.querySelector('#viz');
     const canvasCtx = canvas.getContext('2d');
+
+    canvas.addEventListener("click", ()=>{
+        canvas.requestFullscreen().then(()=>{
+            canvas.style.pointerEvents = "none";
+        });
+    });
+    canvas.addEventListener("fullscreenchange", ()=>{
+        canvas.style.pointerEvents = "all";
+    });
 
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     const analyser = audioCtx.createAnalyser();
@@ -31,19 +40,18 @@ addEventListener("load", () => {
         return freq.toFixed(2); // return frequency in Hz
     }
     var logoImage = document.querySelector("#logo");
-    canvasCtx.drawImage(logoImage, 0, 15, 150, 45);
+    canvasCtx.drawImage(logoImage, 0, 40, 450, 135);
     var keepDrawing = true;
     var started = false;
+    const previousByteData = new Uint8Array(bufferLength);
     function draw() {
         analyser.getByteTimeDomainData(dataArray);
+        canvasCtx.clearRect(0, 0, canvas.width, canvas.height);
+        canvasCtx.globalAlpha = 0.2;
+        canvasCtx.drawImage(logoImage, 0, 40, 450, 135);
+        canvasCtx.globalAlpha = 1;
 
-        canvasCtx.fillStyle = 'rgb(0, 0, 0)';
-        canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
-        canvasCtx.drawImage(logoImage, 0, 15, 150, 45);
-        canvasCtx.fillStyle = 'rgba(0, 0, 0, 0.9)';
-        canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
-
-        canvasCtx.lineWidth = 1.5;
+        canvasCtx.lineWidth = 2;
         canvasCtx.strokeStyle = 'rgb(255, 255, 255)';
 
         canvasCtx.beginPath();
@@ -52,7 +60,7 @@ addEventListener("load", () => {
         let x = 0;
 
         for (let i = 0; i < bufferLength; i++) {
-            const v = dataArray[i] / 128.0;
+            const v = previousByteData[i] / 128.0;
             const y = v * canvas.height / 2;
 
             if (i === 0) {
@@ -71,13 +79,14 @@ addEventListener("load", () => {
         const mostCommonFrequency = getMostCommonFrequency();
 
         canvasCtx.lineWidth = 1;
-        canvasCtx.strokeStyle = 'rgb(255, 255, 255)';
-        canvasCtx.font = "10px sans-serif";
-        canvasCtx.strokeText("SYNTHETIC", 0, 10);
-        canvasCtx.strokeText(`${mostCommonFrequency} Hz`, 0, 20);
+        canvasCtx.fillStyle = 'rgb(255, 255, 255)';
+        canvasCtx.font = "30px sans-serif";
+        canvasCtx.fillText("SYNTHETIC", 0, 30);
+        canvasCtx.fillText(`${mostCommonFrequency} Hz`, 0, 60);
 
         if (keepDrawing) {
             requestAnimationFrame(draw);
+            previousByteData.set(dataArray);
         }
     }
 
@@ -101,9 +110,8 @@ addEventListener("load", () => {
     audio.addEventListener('ended', () => {
         stopViz();
         setTimeout(() => {
-            canvasCtx.fillStyle = 'rgb(0, 0, 0)';
-            canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
-            canvasCtx.drawImage(logoImage, 0, 15, 150, 45);
-        }, 150);
+            canvasCtx.clearRect(0, 0, canvas.width, canvas.height);
+            canvasCtx.drawImage(logoImage, 0, 40, 450, 135);
+        }, 450);
     });
 });

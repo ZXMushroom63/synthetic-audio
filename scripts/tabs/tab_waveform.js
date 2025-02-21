@@ -20,13 +20,16 @@ addEventListener("init", () => {
     left.style.alignContent = "start";
     left.style.borderRight = "1px solid white";
     left.style.textAlign = "left";
-    left.style.display = "block";
+    left.style.display = "inline-block";
     UI.appendChild(left);
 
     const makeNewWaveform = document.createElement("button");
     makeNewWaveform.innerText = "New";
     makeNewWaveform.addEventListener("click", (e) => {
-        var newWaveformName = prompt("Waveform name: ", "new waveform 1");
+        var newWaveformName = cleanString(prompt("Waveform name: ", "new waveform 1"));
+        if (!newWaveformName) {
+            return;
+        }
         if (custom_waveforms[newWaveformName]) {
             return;
         }
@@ -48,6 +51,8 @@ addEventListener("init", () => {
     middle.style.alignContent = "center";
     middle.style.textAlign = "center";
     middle.classList.add("themeGradient");
+    middle.style.overflowX = "hidden";
+    middle.style.overflowY = "auto";
     UI.appendChild(middle);
 
     const panel = document.createElement("canvas");
@@ -85,9 +90,9 @@ addEventListener("init", () => {
             }
             prevIdx = newIdx;
             prevValue = newValue;
-            target.samples[0] = 0;
-            target.samples[target.samples.length - 1] = 0;
+            target.samples[target.samples.length - 1] = target.samples[target.samples.length - 2];
             drawWaveform();
+            e.preventDefault();
         }
     });
     addEventListener("mouseup", (e) => {
@@ -102,7 +107,7 @@ addEventListener("init", () => {
     const oscillatorControls = document.createElement("div");
     oscillatorControls.style.width = "80%";
     oscillatorControls.style.display = "inline-block";
-    oscillatorControls.style.height = "2rem";
+    oscillatorControls.style.height = "4rem";
     oscillatorControls.style.background = "rgba(0,0,0,0.7)";
     oscillatorControls.style.borderRadius = "0.35rem";
     oscillatorControls.style.lineHeight = "1.9rem";
@@ -152,8 +157,42 @@ addEventListener("init", () => {
             oscillating = true;
             startOscillator();
         }
-    })
+    });
     oscillatorControls.appendChild(oscBtn);
+    oscillatorControls.appendChild(document.createElement("br"));
+    var referenceLabel = document.createElement("span");
+    referenceLabel.innerText = "Image Reference:";
+    oscillatorControls.appendChild(referenceLabel);
+
+
+    var imageSrc = null;
+    var referenceImage = new Image();
+    const referenceUpload = document.createElement("input");
+    referenceUpload.style.marginLeft = "3rem";
+    referenceUpload.type = "file";
+    referenceUpload.accept = "image/*";
+    referenceUpload.addEventListener("click", () => {
+        if (imageSrc) {
+            URL.revokeObjectURL(imageSrc);
+            imageSrc = null;
+        }
+        referenceImage.src = imageSrc;
+        drawWaveform();
+    });
+    referenceUpload.addEventListener("input", () => {
+        if (imageSrc) {
+            URL.revokeObjectURL(imageSrc);
+            imageSrc = null;
+        }
+        if (referenceUpload.files[0]) {
+            imageSrc = URL.createObjectURL(referenceUpload.files[0]);
+        }
+        referenceImage.src = imageSrc;
+    });
+    referenceImage.addEventListener("load", ()=>{
+        drawWaveform();
+    });
+    oscillatorControls.appendChild(referenceUpload);
 
     middle.appendChild(document.createElement("br"));
     middle.appendChild(oscillatorControls);
@@ -209,7 +248,7 @@ addEventListener("init", () => {
         "bitcrunch": "Bcrunch",
         "quantise": "Quant",
         "normalise": "Norm",
-        "power": "Exp",
+        "power": "Pwr",
     };
     Object.keys(supportedFilters).forEach(filter => {
         const addMod = document.createElement("button");
@@ -243,6 +282,13 @@ addEventListener("init", () => {
         calculating = true;
         await calculateWaveform(target);
         ctx.clearRect(0, 0, 1280, 720);
+
+        if (imageSrc) {
+            ctx.drawImage(referenceImage, 0, 0, 1280, 720);
+            ctx.fillStyle = "rgba(0,0,0,0.5)";
+            ctx.fillRect(0, 0, 1280, 720);
+        }
+
         ctx.strokeStyle = "white";
         ctx.lineWidth = 1;
 
@@ -266,7 +312,7 @@ addEventListener("init", () => {
         ctx.strokeStyle = "cyan";
         ctx.lineWidth = 1;
 
-        ctx.moveTo(0, 720 / 2);
+        ctx.moveTo(0, 720 * ((target.samples[0] + 1) / 2));
 
         ctx.beginPath();
         for (let i = 0; i < target.samples.length; i++) {
@@ -278,7 +324,7 @@ addEventListener("init", () => {
         ctx.strokeStyle = "lime";
         ctx.lineWidth = 2;
 
-        ctx.moveTo(0, 720 / 2);
+        ctx.moveTo(0, 720 * (target.calculated[0] + 1) / 2);
 
         ctx.beginPath();
         for (let i = 0; i < target.calculated.length; i++) {
@@ -294,8 +340,6 @@ addEventListener("init", () => {
             return;
         }
         t.calculated = await applyModifierStack(structuredClone(t.samples), t.modifiers);
-        t.calculated[0] = 0;
-        t.calculated[t.calculated.length - 1] = [0];
         t.midpoint = t.calculated.reduce((p, a) => p + a) / t.calculated.length / 2;
         audioBufferData.set(t.calculated);
         t.dirty = true;
@@ -316,6 +360,7 @@ addEventListener("init", () => {
             modifier.horizontalBlocked = true;
             modifier.isWaveformLoop = true;
             modifier.forceDelete = true;
+            modifier.noEditorLayer = true;
             right.appendChild(modifier);
         });
 
@@ -353,7 +398,10 @@ addEventListener("init", () => {
             const renameBtn = document.createElement("button");
             renameBtn.innerText = "✏️";
             renameBtn.addEventListener("click", (e) => {
-                var newId = prompt("Rename to: ", id);
+                var newId = cleanString(prompt("Rename to: ", id));
+                if (!newId) {
+                    return;
+                }
                 custom_waveforms[newId] = custom_waveforms[id];
                 if (newId !== id) {
                     delete custom_waveforms[id];
@@ -375,6 +423,22 @@ addEventListener("init", () => {
             });
             item.appendChild(deleteBtn);
 
+            const duplicateBtn = document.createElement("button");
+            duplicateBtn.innerText = "📋";
+            duplicateBtn.addEventListener("click", (e) => {
+                var newId = cleanString(prompt("Copy waveform to: ", id + " clone"));
+                if (!newId) {
+                    return;
+                }
+                if (custom_waveforms[newId]) {
+                    return;
+                }
+                custom_waveforms[newId] = structuredClone(custom_waveforms[id]);
+                e.stopPropagation();
+                hydrateWaveformTab();
+            });
+            item.appendChild(duplicateBtn);
+
             item.addEventListener("click", () => {
                 loadModifiersToTarget();
                 target = custom_waveforms[id];
@@ -389,8 +453,8 @@ addEventListener("init", () => {
             middle.style.display = "none";
             return;
         } else {
-            right.style.display = "table-cell";
-            middle.style.display = "table-cell";
+            right.style.display = "inline-block";
+            middle.style.display = "inline-block";
         }
         drawModifierStack();
         drawWaveform();
@@ -427,7 +491,20 @@ addEventListener("init", () => {
     addEventListener("preserialisenode", (e) => {
         if ((e.detail.node.getAttribute("data-type") === "p_waveform_plus") && e.detail.node.conf.UseCustomWaveform && (custom_waveforms[e.detail.node.conf.WaveformAsset].dirty)) {
             markLoopDirty(e.detail.node);
+            return;
         }
+        Object.values(e.detail.node.conf).forEach(x => {
+            if (typeof x !== "string") {
+                return;
+            }
+            if (x.split("~")[1]?.split("@!")?.length !== 2) {
+                return;
+            }
+            if (custom_waveforms[x.replace(matchWaveformPart, "").replace(matchWaveformHz, "")]?.dirty) {
+                markLoopDirty(e.detail.node);
+                return;
+            }
+        });
     });
 
     addEventListener("render", (e) => {
