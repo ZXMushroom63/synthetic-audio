@@ -14,7 +14,7 @@ addBlockType("p_waveform_plus", {
         "UseCustomWaveform": [false, "checkbox"],
         "WaveformAsset": ["(none)", ["(none)"]],
         "Amplitude": [1, "number", 1],
-        "AmplitudeSmoothTime": [0.0, "number"],
+        "AmplitudeSmoothTime": [0.006, "number"],
         "Decay": [0, "number", 1],
         "Harmonics": [false, "checkbox"],
         "HarmonicsStrum": [0, "number"],
