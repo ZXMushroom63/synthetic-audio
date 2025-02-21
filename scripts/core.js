@@ -38,8 +38,6 @@ function noteToFrequency(note, octave, accidental = '') {
     const frequency = A4 * Math.pow(2, halfSteps / 12);
     return frequency;
 }
-var proceduralAssets = new Map();
-
 const VALID_NOTES = ["A", "B", "C", "D", "E", "F", "G"];
 const VALID_DESCRIPTORS = ["#", "b"];
 

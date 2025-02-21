@@ -1,3 +1,4 @@
+const proceduralAssets = new Map();
 addBlockType("p_readasset", {
     color: "rgba(255,0,255,0.3)",
     title: "Play Asset",

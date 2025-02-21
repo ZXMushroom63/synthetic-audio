@@ -84,7 +84,7 @@ function deserialise(serialisedStr) {
     ser.nodes.forEach((node) => {
         deserialiseNode(node);
     });
-    proceduralAssets = new Map();
+    proceduralAssets.clear();
     customEvent("deserialise", {data: ser});
     hydrate();
 }
