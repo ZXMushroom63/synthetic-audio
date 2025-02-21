@@ -494,10 +494,13 @@ addEventListener("init", () => {
             return;
         }
         Object.values(e.detail.node.conf).forEach(x => {
-            if (x.split("~")[1].split("@!").length !== 2) {
+            if (typeof x !== "string") {
                 return;
             }
-            if (custom_waveforms[x.replace(/^[\s\S]+?@!/, "")]?.dirty) {
+            if (x.split("~")[1]?.split("@!")?.length !== 2) {
+                return;
+            }
+            if (custom_waveforms[x.replace(matchWaveformPart, "").replace(matchWaveformHz, "")]?.dirty) {
                 markLoopDirty(e.detail.node);
                 return;
             }

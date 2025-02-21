@@ -58,6 +58,7 @@ For a simple linear interpolation, try inputting:   #0~24
 For a exponential interpolation (squared), try inputting:   #0~24@2
   |- (spaces are allowed between the numbers)
 For interpolating using a custom waveform, use #100~500@!custom_waveform_name
+  |- You can cycle through the waveform at a frequency (eg: 2Hz) using #100~500@!custom_waveform_name!2
 
 
 For writing an arbitrary script, do: #(()=>{/*/code/*/ return 1;})()
