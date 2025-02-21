@@ -10,8 +10,8 @@ if ('serviceWorker' in navigator) {
     });
 }
 function updateApp() {
-    if (navigator?.serviceWorker?.controller) {
-        navigator.serviceWorker.controller.postMessage({cmd: "CLEARCACHE"});
+    if (sw?.active?.postMessage) {
+        sw.active.postMessage({cmd: "CLEARCACHE"});
         alert("Updating, please wait...");
         setTimeout(()=>{
             window.location.reload();
