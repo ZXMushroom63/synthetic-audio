@@ -91,6 +91,7 @@ function hydrateBeatMarkers() {
     document.querySelectorAll(".beatMarker").forEach(x => { x.remove() });
     bpm = parseInt(document.querySelector("#bpm").value);
     loopi = parseFloat(document.querySelector("#loopi").value);
+    
     var trueBPM = bpm;
     trueBPM = trueBPM / gui.LOD;
     var beatCount = Math.floor(audio.duration / 60 * trueBPM);
@@ -104,7 +105,7 @@ function hydrateBeatMarkers() {
 function hydrateZoom() {
     document.querySelector("#trackInternal").style.width = zoom + "vw";
     findLoops(".loop").forEach(elem => {
-        var trueDuration = parseFloat(loopDurationMap[elem.getAttribute("data-file")]) + 0.0 || 0;
+        var trueDuration = (parseFloat(loopDurationMap[elem.getAttribute("data-file")]) + 0.0) || (proceduralAssets.get(elem.conf.Asset)?.length / audio.samplerate) || 0;
         trueDuration = Math.round(trueDuration / loopi) * loopi;
         var duration = parseFloat(elem.getAttribute("data-duration"));
         var start = parseFloat(elem.getAttribute("data-start"));
@@ -352,6 +353,7 @@ function init() {
         hydrateZoom();
     });
     document.querySelector("#loopi").addEventListener("input", () => {
+        findLoops(".loop[data-type=audio], .loop[data-type=p_readasset]").forEach(x => x.setAttribute("data-dirty", "yes"));
         hydrateBeatMarkers();
         hydrateZoom();
     });

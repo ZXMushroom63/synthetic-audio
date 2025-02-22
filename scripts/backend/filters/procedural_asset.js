@@ -4,7 +4,7 @@ addBlockType("p_readasset", {
     title: "Play Asset",
     configs: {
         "Asset": ["(none)", ["(none)"]],
-        "StartOffset": [1, "number"],
+        "StartOffset": [0, "number"],
         "Volume": [1, "number"],
         "Looping": [true, "checkbox"],
         "Reverse": [false, "checkbox"],

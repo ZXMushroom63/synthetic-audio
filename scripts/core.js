@@ -348,7 +348,7 @@ async function render() {
 addBlockType("audio", {
     color: "rgba(0,0,255,0.3)",
     configs: {
-        "StartPosition": [1, "number"],
+        "StartOffset": [0, "number"],
         "Volume": [1, "number"],
         "Looping": [true, "checkbox"],
         "Reverse": [false, "checkbox"],
@@ -357,7 +357,7 @@ addBlockType("audio", {
     functor: function (inPcm, channel, data) {
         var currentData = decodedPcmCache[this.file] ? decodedPcmCache[this.file].getChannelData(channel) : [];
         var duration = Math.floor(Math.round(((loopDurationMap[this.file] || 0) + 0.0) / data.loopInterval) * data.loopInterval * audio.samplerate);
-        applySoundbiteToPcm(this.conf.Reverse, this.conf.Looping, currentData, inPcm, duration, _(this.conf.Speed), this.conf.Volume, this.conf.StartPosition);
+        applySoundbiteToPcm(this.conf.Reverse, this.conf.Looping, currentData, inPcm, duration, _(this.conf.Speed), this.conf.Volume, this.conf.StartOffset);
         return inPcm;
     }
 });
