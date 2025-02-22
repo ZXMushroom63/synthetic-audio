@@ -1,4 +1,5 @@
-function applySoundbiteToPcm(reverse, looping, currentData, inPcm, duration, speed, volume) {
+function applySoundbiteToPcm(reverse, looping, currentData, inPcm, duration, speed, volume, offset) {
+    var offsetValue = Math.floor(offset * audio.samplerate);
     if (typeof speed !== "function") {
         var oldSpeed = speed;
         speed = () => { return oldSpeed };
@@ -6,30 +7,31 @@ function applySoundbiteToPcm(reverse, looping, currentData, inPcm, duration, spe
     if (reverse) {
         if (looping) {
             for (let i = 0; i < inPcm.length; i++) {
-                var idx = Math.floor(i * speed(i, inPcm));
+                var idx = Math.floor(i * speed(i, inPcm)) + offsetValue;
                 inPcm[i] += (currentData[duration - (idx % duration)] || 0) * volume;
             }
         } else {
             for (let i = 0; i < inPcm.length; i++) {
-                var idx = inPcm.length - Math.floor(i * speed(i, inPcm));
+                var idx = inPcm.length - (Math.floor(i * speed(i, inPcm)) + offsetValue);
                 inPcm[i] += (currentData[idx] || 0) * volume;
             }
         }
     } else {
         if (looping) {
             for (let i = 0; i < inPcm.length; i++) {
-                var idx = Math.floor(i * speed(i, inPcm));
+                var idx = Math.floor(i * speed(i, inPcm)) + offsetValue;
                 inPcm[i] += (currentData[idx % duration] || 0) * volume;
             }
         } else {
             for (let i = 0; i < inPcm.length; i++) {
-                var idx = Math.floor(i * speed(i, inPcm));
+                var idx = Math.floor(i * speed(i, inPcm)) + offsetValue;
                 inPcm[i] += (currentData[idx] || 0) * volume;
             }
         }
     }
 }
-function applySoundbiteToPcmSidechain(reverse, looping, currentData, inPcm, duration, speed, volume, sideChain, silent) {
+function applySoundbiteToPcmSidechain(reverse, looping, currentData, inPcm, duration, speed, volume, offset, sideChain, silent) {
+    var offsetValue = Math.floor(offset * audio.samplerate);
     if (typeof speed !== "function") {
         var oldSpeed = speed;
         speed = () => { return oldSpeed };
@@ -49,7 +51,7 @@ function applySoundbiteToPcmSidechain(reverse, looping, currentData, inPcm, dura
     if (looping) {
         var interval = Math.floor(currentData.length * speed(currentData.length - 1, inPcm));
         for (let i = 0; i < inPcm.length; i++) {
-            var idx = Math.floor(i * speed(i, inPcm)) % interval;
+            var idx = (Math.floor(i * speed(i, inPcm)) + offsetValue) % interval;
             var sidechainCoefficient = Math.pow(1 - Math.max(Math.min(1, LOOKUPTABLE[Math.floor(idx / PCMBINSIZE)] || 0), 0), Math.abs(sideChain)) || 0;
             var y = (currentData[idx] || 0) * volume;
             if (sideChain < 0) {
@@ -63,7 +65,7 @@ function applySoundbiteToPcmSidechain(reverse, looping, currentData, inPcm, dura
         }
     } else {
         for (let i = 0; i < inPcm.length; i++) {
-            var idx = Math.floor(i * speed(i, inPcm));
+            var idx = Math.floor(i * speed(i, inPcm)) + offsetValue;
             var sidechainCoefficient = Math.pow(1 - Math.max(Math.min(1, LOOKUPTABLE[Math.floor(idx / PCMBINSIZE)]), 0), Math.abs(sideChain)) || 0;
             var y = (currentData[idx] || 0) * volume;
             if (sideChain < 0) {

@@ -4,6 +4,7 @@ addBlockType("p_readasset", {
     title: "Play Asset",
     configs: {
         "Asset": ["(none)", ["(none)"]],
+        "StartOffset": [1, "number"],
         "Volume": [1, "number"],
         "Looping": [true, "checkbox"],
         "Reverse": [false, "checkbox"],
@@ -28,9 +29,9 @@ addBlockType("p_readasset", {
         var currentData = proceduralAssets.has(this.conf.Asset) ? proceduralAssets.get(this.conf.Asset) : [];
         var duration = Math.floor(Math.round((((currentData.length / audio.samplerate) || 0) + 0.0) / data.loopInterval) * data.loopInterval * audio.samplerate);
         if (this.conf.Sidechain) {
-            applySoundbiteToPcmSidechain(this.conf.Reverse, this.conf.Looping, currentData, inPcm, duration, this.conf.Speed, this.conf.Volume, this.conf.SidechainPower, this.conf.Silent);
+            applySoundbiteToPcmSidechain(this.conf.Reverse, this.conf.Looping, currentData, inPcm, duration, this.conf.Speed, this.conf.Volume, this.conf.StartOffset, this.conf.SidechainPower, this.conf.Silent);
         } else {
-            applySoundbiteToPcm(this.conf.Reverse, this.conf.Looping, currentData, inPcm, duration, this.conf.Speed, this.conf.Volume);
+            applySoundbiteToPcm(this.conf.Reverse, this.conf.Looping, currentData, inPcm, duration, this.conf.Speed, this.conf.Volume, this.conf.StartOffset);
         }
 
         return inPcm;
