@@ -521,3 +521,7 @@ select option {
 #waveformsDropdown li:hover {
     background-color: rgba(0, 125, 255, 0.3);
 }
+[data-dirty] span.name {
+    text-decoration: underline;
+    text-decoration-color: orange;
+}
