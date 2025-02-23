@@ -489,7 +489,7 @@ addEventListener("init", () => {
     });
 
     addEventListener("preserialisenode", (e) => {
-        if ((e.detail.node.getAttribute("data-type") === "p_waveform_plus") && e.detail.node.conf.UseCustomWaveform && (custom_waveforms[e.detail.node.conf.WaveformAsset].dirty)) {
+        if ((e.detail.node.getAttribute("data-type") === "p_waveform_plus") && e.detail.node.conf.UseCustomWaveform && (custom_waveforms[e.detail.node.conf.WaveformAsset]?.dirty)) {
             markLoopDirty(e.detail.node);
             return;
         }
