@@ -205,7 +205,7 @@ h4 {
 .loopInternal.selected .loopOptionsMenu {
     display: block;
 }
-.loopOptionsMenu input, select, .inputStyles {
+.loopOptionsMenu input:not([type=checkbox]), select, .inputStyles {
     background-color: transparent;
     border: 0;
     color: white;

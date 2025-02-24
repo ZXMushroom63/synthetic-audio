@@ -34,7 +34,7 @@ addEventListener("init", () => {
             return;
         }
         var smp = new Float32Array(600).fill(0);
-        smp.forEach((x, i)=>{
+        smp.forEach((x, i) => {
             smp[i] = waveforms.sin(i / 600);
         });
         custom_waveforms[newWaveformName] = {
@@ -189,7 +189,7 @@ addEventListener("init", () => {
         }
         referenceImage.src = imageSrc;
     });
-    referenceImage.addEventListener("load", ()=>{
+    referenceImage.addEventListener("load", () => {
         drawWaveform();
     });
     oscillatorControls.appendChild(referenceUpload);
@@ -244,11 +244,13 @@ addEventListener("init", () => {
     var supportedFilters = {
         "smooth": "Smooth",
         "noise": "Noise",
-        "compressor": "Cmprssr",
+        "compressor": "Comb",
         "bitcrunch": "Bcrunch",
         "quantise": "Quant",
         "normalise": "Norm",
         "power": "Pwr",
+        "p_sinewave": "∿",
+        "p_value": "𝑥",
     };
     Object.keys(supportedFilters).forEach(filter => {
         const addMod = document.createElement("button");
@@ -261,7 +263,10 @@ addEventListener("init", () => {
             target.modifiers.push({
                 file: filters[filter].title + " (as modifier)",
                 layer: 0,
-                conf: {},
+                conf: {
+                    CustomWaveformModifier: true,
+                    Frequency: 1
+                },
                 type: filter
             });
             drawModifierStack();
@@ -270,6 +275,21 @@ addEventListener("init", () => {
         });
         right.appendChild(addMod);
     });
+
+    const applyMods = document.createElement("button");
+    applyMods.classList.add("smallBtn");
+    applyMods.innerText = "APPLY";
+    applyMods.addEventListener("click", () => {
+        if (!target) {
+            return;
+        }
+        target.modifiers = [];
+        target.samples = target.calculated;
+        drawModifierStack();
+        loadModifiersToTarget();
+        drawWaveform();
+    });
+    right.appendChild(applyMods);
 
     var calculating = false;
     async function drawWaveform() {
@@ -340,6 +360,9 @@ addEventListener("init", () => {
             return;
         }
         t.calculated = await applyModifierStack(structuredClone(t.samples), t.modifiers);
+        t.calculated.forEach((x, i) => {
+            t.calculated[i] = Math.max(-1, Math.min(1, x));
+        });
         t.midpoint = t.calculated.reduce((p, a) => p + a) / t.calculated.length / 2;
         audioBufferData.set(t.calculated);
         t.dirty = true;
