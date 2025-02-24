@@ -66,3 +66,26 @@ addBlockType("stereopositioner", {
         return outPcm;
     }
 });
+
+addBlockType("gate", {
+    color: "rgba(0,255,0,0.3)",
+    title: "Stereo Gate",
+    configs: {
+        "Left": [1, "number", 1],
+        "Right": [1, "number", 1],
+    },
+    functor: function (inPcm, channel, data) {
+        var p_l = _(this.conf.Left);
+        var p_r = _(this.conf.Right);
+        inPcm.forEach((x, i) => {
+            if (channel === 0) {
+                var left = p_l(i, inPcm);
+                inPcm[i] = left * x;
+            } else {
+                var right = p_r(i, inPcm);
+                inPcm[i] = right * x;
+            }
+        });
+        return inPcm;
+    }
+});
