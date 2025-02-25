@@ -72,6 +72,11 @@ In purple input boxes, you can also use autocomplete for notes.
 :g#3:  =  207
 
 In any numberical input box, pressing 'b' on your keyboard will round the frequency into the nearest note.
+'o' will shift the frequency up 1 semitone,
+'u' will shift down 1 semitone.
+
+';' will turn a frequency into a note representation (440 -> :a4:)
+''' evaluates any inline script at 0% (:a4: -> 440, #0.5~1 -> 0.5)
 
 `.replaceAll(" ", "&nbsp;").replaceAll("\n", "\<br\>");
     div.style = "font-family: monospace; position: absolute; z-index: 99999; top: 0; left: 0; right: 0; bottom: 0; background-color: black; color: white; overflow-x: hidden; overflow-y: auto;";
