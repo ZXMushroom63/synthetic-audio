@@ -352,6 +352,8 @@ async function render() {
     findLoops(".loop[data-deleted]").forEach(x => x.remove());
 
     document.querySelector("#renderBtn").removeAttribute("disabled");
+
+    hydrateZoom();
 }
 
 addBlockType("audio", {

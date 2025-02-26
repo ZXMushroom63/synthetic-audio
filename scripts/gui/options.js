@@ -56,6 +56,7 @@ function createOptionsMenu(loop, data, definition) {
                 if (definition.updateMiddleware) {
                     definition.updateMiddleware(loop);
                 }
+                hydrateLoopPosition(loop);
                 markLoopDirty(loop);
             });
             s.addEventListener("focus", () => {
@@ -84,6 +85,7 @@ function createOptionsMenu(loop, data, definition) {
                 if (definition.updateMiddleware) {
                     definition.updateMiddleware(loop);
                 }
+                hydrateLoopPosition(loop);
                 markLoopDirty(loop);
             });
             target.appendChild(input);

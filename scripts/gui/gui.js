@@ -1,5 +1,5 @@
 function customEvent(ev, data = {}) {
-    window.dispatchEvent(new CustomEvent(ev, {detail: data}));
+    window.dispatchEvent(new CustomEvent(ev, { detail: data }));
 }
 var dropHandlers = [];
 function resetDrophandlers(cancel) {
@@ -35,7 +35,7 @@ function deleteLoop(loop) {
     loop.setAttribute("data-deleted", "yes");
     loop.classList.remove("active");
     markLoopDirty(loop, true);
-    customEvent("loopdeleted", {loop: loop});
+    customEvent("loopdeleted", { loop: loop });
 }
 function getDurationOfLoop(audioFile) {
     return new Promise((res, rej) => {
@@ -83,7 +83,7 @@ function markLoopDirty(loop, wasMoved) {
     if (wasMoved) {
         loop.setAttribute("data-wasMovedSinceRender", "yes");
     }
-    customEvent("loopchanged", {loop: loop});
+    customEvent("loopchanged", { loop: loop });
 }
 function hydrateBeatMarkers() {
     updateLOD();
@@ -91,7 +91,7 @@ function hydrateBeatMarkers() {
     document.querySelectorAll(".beatMarker").forEach(x => { x.remove() });
     bpm = parseInt(document.querySelector("#bpm").value);
     loopi = parseFloat(document.querySelector("#loopi").value);
-    
+
     var trueBPM = bpm;
     trueBPM = trueBPM / gui.LOD;
     var beatCount = Math.floor(audio.duration / 60 * trueBPM);
@@ -102,23 +102,32 @@ function hydrateBeatMarkers() {
         track.appendChild(marker);
     }
 }
+function hydrateLoopPosition(elem) {
+    if (elem.updateSuppression) {
+        return;
+    }
+    var trueDuration = (parseFloat(loopDurationMap[elem.getAttribute("data-file")]) + 0.0) || (proceduralAssets.get(elem.conf.Asset)?.length / audio.samplerate) || 0;
+    trueDuration = (Math.round(trueDuration / loopi) * loopi) / (elem.conf.Speed || 1);
+    var duration = parseFloat(elem.getAttribute("data-duration"));
+    var start = parseFloat(elem.getAttribute("data-start"));
+    elem.style.left = (start / audio.duration * 100) + "%";
+    elem.style.top = (parseFloat(elem.getAttribute("data-layer")) * 3) + "rem";
+    var zoomConstant = zoom / audio.duration;
+    var internalWidth = (duration * zoomConstant) + "vw";
+    var loopInternal = elem.querySelector(".loopInternal");
+    loopInternal.style.width = internalWidth;
+    loopInternal.querySelector(".handleRight").style.right = "calc(-" + internalWidth + " - 1.5px)";
+    if (!trueDuration) {
+        return;
+    }
+    var trueWidth = trueDuration * zoomConstant;
+    loopInternal.style.backgroundImage = `repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.0), rgba(255, 255, 255, 0.0) ${trueWidth - 0.15}vw, rgba(255, 255, 255, 1) ${trueWidth - 0.15}vw, rgba(255, 255, 255, 1) ${trueWidth + 0.0}vw)`;
+    loopInternal.style.backgroundPositionX = `-${(elem.conf.StartOffset || 0) * zoomConstant}vw`;
+}
 function hydrateZoom() {
     document.querySelector("#trackInternal").style.width = zoom + "vw";
     findLoops(".loop").forEach(elem => {
-        var trueDuration = (parseFloat(loopDurationMap[elem.getAttribute("data-file")]) + 0.0) || (proceduralAssets.get(elem.conf.Asset)?.length / audio.samplerate) || 0;
-        trueDuration = Math.round(trueDuration / loopi) * loopi;
-        var duration = parseFloat(elem.getAttribute("data-duration"));
-        var start = parseFloat(elem.getAttribute("data-start"));
-        elem.style.left = (start / audio.duration * 100) + "%";
-        elem.style.top = (parseFloat(elem.getAttribute("data-layer")) * 3) + "rem";
-        var internalWidth = (duration * (zoom / audio.duration)) + "vw";
-        elem.querySelector(".loopInternal").style.width = internalWidth;
-        elem.querySelector(".loopInternal").querySelector(".handleRight").style.right = "calc(-" + internalWidth + " - 1.5px)";
-        if (!trueDuration) {
-            return;
-        }
-        var trueWidth = trueDuration / elem.conf.Speed * (zoom / audio.duration);
-        elem.querySelector(".loopInternal").style.backgroundImage = `repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.0), rgba(255, 255, 255, 0.0) ${trueWidth - 0.15}vw, rgba(255, 255, 255, 1) ${trueWidth - 0.15}vw, rgba(255, 255, 255, 1) ${trueWidth + 0.0}vw)`;
+        hydrateLoopPosition(elem);
     });
 }
 function hydrateEditorLayer() {
@@ -296,7 +305,7 @@ function addBlock(type, start, duration, title, layer = 0, data = {}, editorValu
                     loop.style.top = layer * 3 + "rem";
                     loop.setAttribute("data-layer", layer);
                 }
-                customEvent("loopmoved", {loop: loop});
+                customEvent("loopmoved", { loop: loop });
             }
         } else {
             ACTIVE_TOOL_FN([loop]);

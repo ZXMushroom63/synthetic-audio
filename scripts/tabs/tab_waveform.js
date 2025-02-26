@@ -384,6 +384,7 @@ addEventListener("init", () => {
             modifier.isWaveformLoop = true;
             modifier.forceDelete = true;
             modifier.noEditorLayer = true;
+            modifier.updateSuppression = true;
             right.appendChild(modifier);
         });
 

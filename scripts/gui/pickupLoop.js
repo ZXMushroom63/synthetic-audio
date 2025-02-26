@@ -45,7 +45,7 @@ function pickupLoop(loop, natural = false) {
         loop.removeAttribute("data-new-layer");
         loop.removeAttribute("data-new-start");
         loop.classList.remove("active");
-        hydrateZoom();
+        hydrateLoopPosition(loop);
         document.removeEventListener("mouseup", mouseUp);
         document.removeEventListener("mousemove", mouseMove);
     }
