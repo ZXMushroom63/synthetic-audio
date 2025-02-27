@@ -48,10 +48,14 @@ function applySoundbiteToPcmSidechain(reverse, looping, currentData, inPcm, dura
         const sum = pcmData.reduce((acc, x) => acc + Math.abs(x));
         LOOKUPTABLE[i] = (sum / PCMBINSIZE) * 2;
     });
+    const LOOKUPTABLE_PERSAMPLE = new Float32Array(currentData.length);
+    LOOKUPTABLE_PERSAMPLE.forEach((x, i)=>{
+        LOOKUPTABLE_PERSAMPLE[i] = lerp(LOOKUPTABLE[Math.floor(i / PCMBINSIZE)] || 0, LOOKUPTABLE[Math.ceil(i / PCMBINSIZE)] || 0, (i % PCMBINSIZE) / PCMBINSIZE);
+    });
     if (looping) {
         for (let i = 0; i < inPcm.length; i++) {
             var idx = (Math.floor(i * speed(i, inPcm)) + offsetValue) % duration;
-            var sidechainCoefficient = Math.pow(1 - Math.max(Math.min(1, LOOKUPTABLE[Math.floor(idx / PCMBINSIZE)] || 0), 0), Math.abs(sideChain)) || 0;
+            var sidechainCoefficient = Math.pow(1 - Math.max(Math.min(1, LOOKUPTABLE_PERSAMPLE[idx] || 0), 0), Math.abs(sideChain)) || 0;
             var y = (currentData[idx] || 0) * volume;
             if (sideChain < 0) {
                 y *= sidechainCoefficient;
@@ -65,7 +69,7 @@ function applySoundbiteToPcmSidechain(reverse, looping, currentData, inPcm, dura
     } else {
         for (let i = 0; i < inPcm.length; i++) {
             var idx = Math.floor(i * speed(i, inPcm)) + offsetValue;
-            var sidechainCoefficient = Math.pow(1 - Math.max(Math.min(1, LOOKUPTABLE[Math.floor(idx / PCMBINSIZE)]), 0), Math.abs(sideChain)) || 0;
+            var sidechainCoefficient = Math.pow(1 - Math.max(Math.min(1, LOOKUPTABLE_PERSAMPLE[idx]), 0), Math.abs(sideChain)) || 0;
             var y = (currentData[idx] || 0) * volume;
             if (sideChain < 0) {
                 y *= sidechainCoefficient;
