@@ -12,7 +12,8 @@ var gui = {
     LOD: 1,
     intervals: 1,
     marker: 0,
-    layer: 0
+    layer: 0,
+    noWvLOD: false
 }
 var bpm = 240;
 var loopi = 0.001;
@@ -118,9 +119,9 @@ function hydrateLoopPosition(elem) {
     var loopInternal = elem.querySelector(".loopInternal");
     loopInternal.style.width = internalWidth;
     var bg = loopInternal.querySelector(".backgroundSvg");
-    if (bg && (nInternalWidth > 30)) {
+    if (bg && (nInternalWidth > (9.9 * (!gui.noWvLOD)))) {
         bg.style.width = internalWidth;
-        bg.querySelector("path").style.strokeWidth = innerWidth / (nInternalWidth) * 0.01 + "px";
+        bg.querySelector("path").style.strokeWidth = innerWidth / (nInternalWidth) * 0.0025 + "px";
         bg.style.display = "block";
     } else {
         bg.style.display = "none";
@@ -212,6 +213,7 @@ function addBlock(type, start, duration, title, layer = 0, data = {}, editorValu
                 newDuration = endPos - originalStart;
                 var internalWidth = newDuration * (zoom / audio.duration);
                 internal.style.width = internalWidth + "vw";
+                backgroundSvg.style.width = internalWidth + "vw";
                 handleRight.style.right = `calc(-${internalWidth}vw - 1.5px)`;
                 loop.setAttribute("data-duration", newDuration);
             }
@@ -229,6 +231,7 @@ function addBlock(type, start, duration, title, layer = 0, data = {}, editorValu
                 var newDuration = ((originalStart - pos) * 1) + originalDuration;
                 var internalWidth = newDuration * (zoom / audio.duration);
                 internal.style.width = internalWidth + "vw";
+                backgroundSvg.style.width = internalWidth + "vw";
                 handleRight.style.right = `calc(-${internalWidth}vw - 1.5px)`;
                 loop.setAttribute("data-duration", newDuration);
             }
@@ -236,7 +239,7 @@ function addBlock(type, start, duration, title, layer = 0, data = {}, editorValu
         document.onmouseup = function (q) {
             loop.classList.remove("active");
             document.onmousemove = null;
-            hydrateZoom();
+            hydrateLoopPosition(loop);
         }
     }
     const loop = document.createElement("div");
@@ -441,7 +444,7 @@ function init() {
             e.preventDefault();
             e.stopImmediatePropagation();
             e.stopPropagation();
-            zoom += e.deltaY;
+            zoom += e.deltaY * (keymap["Shift"] ? 0.05 : 1);
             zoom = Math.max(100, zoom);
             hydrateZoom();
         }
@@ -472,6 +475,14 @@ function init() {
             gui.noLOD = false;
         }
         hydrateBeatMarkers();
+    });
+    document.querySelector("#forceWv").addEventListener("input", () => {
+        if (document.querySelector("#forceWv").checked) {
+            gui.noWvLOD = true;
+        } else {
+            gui.noWvLOD = false;
+        }
+        hydrateZoom();
     });
 
     addEventListener("keydown", (e) => {

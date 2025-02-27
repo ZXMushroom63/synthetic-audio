@@ -45,7 +45,7 @@ function frequencyToNote(frequency) {
     const semitoneRatio = Math.pow(2, 1 / 12);
     let noteNumber = 12 * (Math.log(frequency / A4) / Math.log(2)) + 57;
     let noteIndex = Math.round(noteNumber) % 12;
-    let octave = Math.floor(noteNumber / 12);
+    let octave = Math.floor(Math.round(noteNumber) / 12);
 
     return notes[noteIndex] + octave;
 }

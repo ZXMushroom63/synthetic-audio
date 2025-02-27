@@ -134,7 +134,7 @@ h4 {
 }
 .loopInternal {
     user-select: none;
-    overflow-x: auto;
+    overflow-x: hidden;
     overflow-y: hidden;
     min-width: 0.2rem;
     line-height: 0rem;
@@ -530,4 +530,7 @@ select option {
     top: 0;
     left: 0;
     height: 3rem;
+}
+.loop.deactivated .backgroundSvg {
+    display: none !important;
 }
