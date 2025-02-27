@@ -30,7 +30,9 @@ addEventListener("init", ()=>{
 });
 function registerTool(name, fn, selected = false) {
     var tool = document.createElement("div");
+    var namespacedId = name.toUpperCase().trim().replaceAll(" ", "_");
     tool.innerText = name;
+    tool.setAttribute("data-tool", namespacedId);
     tool.classList.add("tool");
     tool.addEventListener("click", ()=>{
         if (TOOL_ACTIVE) {
@@ -38,11 +40,14 @@ function registerTool(name, fn, selected = false) {
         }
         document.querySelectorAll(".tool.selected").forEach(x => x.classList.remove("selected"));
         tool.classList.add("selected");
-        ACTIVE_TOOL = name.toUpperCase().trim().replaceAll(" ", "_");
+        ACTIVE_TOOL = namespacedId;
         ACTIVE_TOOL_FN = fn;
     });
     document.querySelector(".toolbox").appendChild(tool);
     if (selected) {
         tool.click();
     }
+}
+function activateTool(namespacedId) {
+    document.querySelector(`.tool[data-tool="${namespacedId}"]`).click();
 }

@@ -18,8 +18,9 @@ addEventListener("init", () => {
                 var y = document.createElement("a");
                 y.innerText = "[Add]";
                 y.addEventListener("click", () => {
+                    activateTool("MOVE");
                     const loop = addBlock(k, 0, 1, filters[k].title, 0, {});
-                    hydrate();
+                    hydrateLoopPosition(loop);
                     pickupLoop(loop);
                 });
                 span.appendChild(y);
@@ -73,8 +74,9 @@ addEventListener("init", () => {
                 var y = document.createElement("a");
                 y.innerText = "[Add]";
                 y.addEventListener("click", () => {
+                    activateTool("MOVE");
                     const loop = addBlock("audio", 0, 1, file.name, 0, {});
-                    hydrate();
+                    hydrateLoopPosition(loop);
                     pickupLoop(loop);
                 });
                 span.appendChild(y);
