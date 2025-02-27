@@ -244,7 +244,7 @@ addEventListener("init", () => {
     var supportedFilters = {
         "smooth": "Smooth",
         "noise": "Noise",
-        "compressor": "Comb",
+        "compressor": "Comp",
         "bitcrunch": "Bcrunch",
         "quantise": "Quant",
         "normalise": "Norm",
