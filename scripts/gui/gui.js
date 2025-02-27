@@ -113,9 +113,18 @@ function hydrateLoopPosition(elem) {
     elem.style.left = (start / audio.duration * 100) + "%";
     elem.style.top = (parseFloat(elem.getAttribute("data-layer")) * 3) + "rem";
     var zoomConstant = zoom / audio.duration;
-    var internalWidth = (duration * zoomConstant) + "vw";
+    var nInternalWidth = (duration * zoomConstant);
+    var internalWidth = nInternalWidth + "vw";
     var loopInternal = elem.querySelector(".loopInternal");
     loopInternal.style.width = internalWidth;
+    var bg = loopInternal.querySelector(".backgroundSvg");
+    if (bg && (nInternalWidth > 30)) {
+        bg.style.width = internalWidth;
+        bg.querySelector("path").style.strokeWidth = innerWidth / (nInternalWidth) * 0.01 + "px";
+        bg.style.display = "block";
+    } else {
+        bg.style.display = "none";
+    }
     loopInternal.querySelector(".handleRight").style.right = "calc(-" + internalWidth + " - 1.5px)";
     if (!trueDuration) {
         return;
@@ -129,6 +138,19 @@ function hydrateZoom() {
     findLoops(".loop").forEach(elem => {
         hydrateLoopPosition(elem);
     });
+}
+function hydrateLoopBackground(elem) {
+    var line = elem.querySelector(".backgroundSvg path");
+    var d = "M 0 50 ";
+    var downsample = 256;
+    elem.cache[0].forEach((v, i) => {
+        if (i % downsample === 0) {
+            var x = Math.round(i / elem.cache[0].length * 100 * 100) / 100; 
+            var y = (v + 1)/2 * 100;
+            d += "L " + x.toFixed(2) + " " + y.toFixed(1) + " ";
+        }
+    });
+    line.setAttributeNS(null, "d", d);
 }
 function hydrateEditorLayer() {
     findLoops(".loop").forEach(elem => {
@@ -317,6 +339,18 @@ function addBlock(type, start, duration, title, layer = 0, data = {}, editorValu
             hydrateZoom();
         }
     });
+
+    const backgroundSvg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    backgroundSvg.classList.add("backgroundSvg");
+    backgroundSvg.setAttributeNS(null, "viewBox", "0 0 100 100");
+    backgroundSvg.setAttributeNS(null, "preserveAspectRatio", "none");
+    const backgroundLine = document.createElementNS("http://www.w3.org/2000/svg", "path");
+    backgroundLine.setAttributeNS(null, "d", "");
+    backgroundLine.setAttributeNS(null, "stroke", "white");
+    backgroundLine.setAttributeNS(null, "fill", "none");
+    backgroundLine.style.strokeWidth = "0.1px";
+    backgroundSvg.appendChild(backgroundLine);
+    internal.appendChild(backgroundSvg);
 
     loop.appendChild(internal);
 

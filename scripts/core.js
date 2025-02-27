@@ -321,6 +321,9 @@ async function render() {
                         if (!node.ref.cache[c]) {
                             newPcm = await filters[node.type].functor.apply(node, [initialPcm.slice(Math.floor(node.start * audio.samplerate), Math.floor((node.start + node.duration) * audio.samplerate)), c, data]);
                             node.ref.cache[c] = newPcm;
+                            if (c === 0) {
+                                hydrateLoopBackground(node.ref);
+                            }
                         } else {
                             newPcm = node.ref.cache[c];
                         }

@@ -525,3 +525,9 @@ select option {
     text-decoration: underline;
     text-decoration-color: orange;
 }
+.backgroundSvg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 3rem;
+}
