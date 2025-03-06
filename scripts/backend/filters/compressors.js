@@ -17,15 +17,18 @@ addBlockType("compressor", {
     title: "Compressor",
     configs: {
         "Threshold": [0.5, "number", 1],
-        "Ratio": [0.5, "number", 1]
+        "Ratio": [0.5, "number", 1],
+        "DelayMs": [0, "number", 1]
     },
     functor: function (inPcm, channel, data) {
         var threshold = _(this.conf.Threshold);
         var ratio = _(this.conf.Ratio);
+        var delay = _(this.conf.DelayMs);
         inPcm.forEach((x, i) => {
-            var abs = Math.abs(x);
+            var del = Math.floor((delay(i, inPcm) * 1000) / audio.samplerate);
             var thr = threshold(i, inPcm);
-            if (abs > thr) {
+            if (Math.abs(inPcm[i - del] || 0) > thr) {
+                var abs = Math.abs(x);
                 var sign = Math.sign(x);
                 inPcm[i] -= (abs - thr) * ratio(i, inPcm) * sign;
             }
