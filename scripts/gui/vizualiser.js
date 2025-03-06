@@ -25,8 +25,6 @@ addEventListener("load", () => {
     const freqDataArray = new Uint8Array(analyser.frequencyBinCount);
 
     function getMostCommonFrequency() {
-        analyser.getByteFrequencyData(freqDataArray);
-
         let maxIndex = 0;
         for (let i = 1; i < freqDataArray.length; i++) {
             if (freqDataArray[i] > freqDataArray[maxIndex]) {
@@ -34,10 +32,9 @@ addEventListener("load", () => {
             }
         }
 
-        // Convert index to frequency
         const nyquist = audioCtx.sampleRate / 2;
         const freq = (maxIndex * nyquist) / freqDataArray.length;
-        return freq.toFixed(2); // return frequency in Hz
+        return freq.toFixed(2);
     }
     var logoImage = document.querySelector("#logo");
     canvasCtx.drawImage(logoImage, 0, 40, 450, 135);
@@ -46,6 +43,7 @@ addEventListener("load", () => {
     const previousByteData = new Uint8Array(bufferLength);
     function draw() {
         analyser.getByteTimeDomainData(dataArray);
+        analyser.getByteFrequencyData(freqDataArray);
         canvasCtx.clearRect(0, 0, canvas.width, canvas.height);
         canvasCtx.globalAlpha = 0.2;
         canvasCtx.drawImage(logoImage, 0, 40, 450, 135);
