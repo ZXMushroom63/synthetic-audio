@@ -3,12 +3,19 @@ addEventListener("load", () => {
     const canvas = document.querySelector('#viz');
     const canvasCtx = canvas.getContext('2d');
 
-    canvas.addEventListener("click", ()=>{
-        canvas.requestFullscreen().then(()=>{
+    canvas.addEventListener("click", () => {
+        canvas.requestFullscreen().then(() => {
             canvas.style.pointerEvents = "none";
         });
     });
-    canvas.addEventListener("fullscreenchange", ()=>{
+    canvas.addEventListener("contextmenu", (e) => {
+        eqMode = !eqMode;
+        if (!keepDrawing) {
+            draw();
+        }
+        e.preventDefault();
+    });
+    canvas.addEventListener("fullscreenchange", () => {
         canvas.style.pointerEvents = "all";
     });
 
@@ -26,29 +33,24 @@ addEventListener("load", () => {
 
     function getMostCommonFrequency() {
         let maxIndex = 0;
-        for (let i = 1; i < freqDataArray.length; i++) {
-            if (freqDataArray[i] > freqDataArray[maxIndex]) {
+        for (let i = 1; i < previousFFTData.length; i++) {
+            if (previousFFTData[i] > previousFFTData[maxIndex]) {
                 maxIndex = i;
             }
         }
 
         const nyquist = audioCtx.sampleRate / 2;
-        const freq = (maxIndex * nyquist) / freqDataArray.length;
+        const freq = (maxIndex * nyquist) / previousFFTData.length;
         return freq.toFixed(2);
     }
     var logoImage = document.querySelector("#logo");
     canvasCtx.drawImage(logoImage, 0, 40, 450, 135);
     var keepDrawing = true;
     var started = false;
+    var eqMode = false;
     const previousByteData = new Uint8Array(bufferLength);
-    function draw() {
-        analyser.getByteTimeDomainData(dataArray);
-        analyser.getByteFrequencyData(freqDataArray);
-        canvasCtx.clearRect(0, 0, canvas.width, canvas.height);
-        canvasCtx.globalAlpha = 0.2;
-        canvasCtx.drawImage(logoImage, 0, 40, 450, 135);
-        canvasCtx.globalAlpha = 1;
-
+    const previousFFTData = new Uint8Array(analyser.frequencyBinCount);
+    function drawWaveform() {
         canvasCtx.lineWidth = 2;
         canvasCtx.strokeStyle = 'rgb(255, 255, 255)';
 
@@ -72,6 +74,55 @@ addEventListener("load", () => {
 
         canvasCtx.lineTo(canvas.width, canvas.height / 2);
         canvasCtx.stroke();
+    }
+    function drawEq() {
+        const shelves = [
+            [20, 60, "red"],   // sub
+            [61, 250, "yellow"],  // bass
+            [251, 500, "lime"], // low-mid
+            [501, 2000, "green"], // midrange
+            [2001, 4000, "white"], // high-mid
+            [4001, 6000, "magenta"], // presence
+            [6001, 16000, "cyan"] // brilliance
+        ];
+
+        const shelfWidth = canvas.width / shelves.length;
+        for (let i = 0; i < shelves.length; i++) {
+            const [minFreq, maxFreq] = shelves[i];
+
+            let sum = 0;
+            let count = 0;
+
+            for (let j = 0; j < previousFFTData.length; j++) {
+                const nyquist = audioCtx.sampleRate / 2;
+                const freq = (j * nyquist) / previousFFTData.length;
+                if (freq >= minFreq && freq <= maxFreq) {
+                    sum += previousFFTData[j];
+                    count++;
+                }
+            }
+
+            const average = sum / count;
+            const barHeight = average / 256 * canvas.height;
+
+            canvasCtx.fillStyle = shelves[i][2];
+            canvasCtx.fillRect(i * shelfWidth, canvas.height - barHeight, shelfWidth - 1, barHeight);
+        }
+    }
+
+    function draw() {
+        analyser.getByteTimeDomainData(dataArray);
+        analyser.getByteFrequencyData(freqDataArray);
+        canvasCtx.clearRect(0, 0, canvas.width, canvas.height);
+        canvasCtx.globalAlpha = 0.2;
+        canvasCtx.drawImage(logoImage, 0, 40, 450, 135);
+        canvasCtx.globalAlpha = 1;
+
+        if (eqMode) {
+            drawEq();
+        } else {
+            drawWaveform();
+        }
 
         // Display the most common frequency
         const mostCommonFrequency = getMostCommonFrequency();
@@ -85,6 +136,7 @@ addEventListener("load", () => {
         if (keepDrawing) {
             requestAnimationFrame(draw);
             previousByteData.set(dataArray);
+            previousFFTData.set(freqDataArray);
         }
     }
 

@@ -47,6 +47,7 @@ CTRL + X = Cut selected/hovered loop(s)
 TAB = Focus next input (in edit panel)
 CTRL + SPACE = Go to ALL layer (layer 10, readonly)
 N = Open toolbox panel
+RMB on the visualiser to switch between waveform <-> EQ
 
 
 
