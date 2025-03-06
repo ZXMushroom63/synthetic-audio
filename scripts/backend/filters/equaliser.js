@@ -1,5 +1,5 @@
 async function applyEQFilter(pcmData, sampleRate, shelfValues) {
-    var volOld = pcmData.reduce((acc, v)=>acc + Math.abs(v)) / pcmData.length;
+    //var volOld = pcmData.reduce((acc, v)=>acc + Math.abs(v)) / pcmData.length;
 
     var pcmValues = new Float32Array(pcmData.length);
     for (let i = 0; i < shelfValues.length; i++) {
@@ -10,8 +10,10 @@ async function applyEQFilter(pcmData, sampleRate, shelfValues) {
         });
     }
 
-    var volNew = pcmValues.reduce((acc, v)=>acc + Math.abs(v)) / pcmValues.length;
-    var volumeRatio = volNew / volOld;
+    //var volNew = pcmValues.reduce((acc, v)=>acc + Math.abs(v)) / pcmValues.length;
+    //var volumeRatio = volNew / volOld;
+
+    var volumeRatio = 1.5;
 
     pcmValues.forEach((x, i)=>{
         pcmValues[i] /= volumeRatio;
