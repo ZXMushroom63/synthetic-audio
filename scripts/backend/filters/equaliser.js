@@ -1,10 +1,10 @@
-async function applyEQFilter(pcmData, sampleRate, shelfValues) {
+async function applyEQFilter(pcmData, sampleRate, shelfValues, falloff) {
     //var volOld = pcmData.reduce((acc, v)=>acc + Math.abs(v)) / pcmData.length;
 
     var pcmValues = new Float32Array(pcmData.length);
     for (let i = 0; i < shelfValues.length; i++) {
         const shelf = shelfValues[i];
-        var pcm = await applyBandpassFilter(pcmData, sampleRate, ()=>shelf[0], ()=>shelf[1]);
+        var pcm = await applyBandpassFilter(pcmData, sampleRate, ()=>shelf[0], ()=>shelf[1], falloff);
         pcmValues.forEach((x, j)=>{
             pcmValues[j] += pcm[j] * shelf[2](j, pcmData);
         });
@@ -32,6 +32,7 @@ addBlockType("eq", {
         "HighMidrange": [1, "number", 1],
         "Presence": [1, "number", 1],
         "Brilliance": [1, "number", 1],
+        "ShelfFalloff": [2, "number", 1]
     },
     functor: async function (inPcm, channel, data) {
         return await applyEQFilter(inPcm, audio.samplerate, [
@@ -42,6 +43,6 @@ addBlockType("eq", {
             [2001, 4000, _(this.conf.HighMidrange)], // high-mid
             [4001, 6000, _(this.conf.Presence)], // presence
             [6001, 16000, _(this.conf.Brilliance)] // brilliance
-        ]);
+        ], _(this.conf.ShelfFalloff));
     }
 });
