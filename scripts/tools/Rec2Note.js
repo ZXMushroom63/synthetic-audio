@@ -2,8 +2,13 @@ async function fileToNotes(file) {
     const notes = [];
 
     const arrayBuffer = await file.arrayBuffer();
-    const audioContext = new OfflineAudioContext(1, arrayBuffer.byteLength, 44100);
-    const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+    const audioBuffer = await new Promise((resolve, reject) => {
+        const tempContext = new AudioContext({
+            sampleRate: 44100
+        });
+        tempContext.decodeAudioData(arrayBuffer, resolve, reject);
+    });
+    const audioContext = new OfflineAudioContext(1, audioBuffer.length, 44100);
 
     for (let i = 0; i < audioBuffer.numberOfChannels; i++) {
         const channelData = audioBuffer.getChannelData(i);
@@ -13,15 +18,15 @@ async function fileToNotes(file) {
         });
     }
 
-    const amplitudeThreshold = 0.33;
-    const volumeThreshold = 20 * Math.log10(amplitudeThreshold)
-
-    const frequencyData = new Float32Array(analyser.frequencyBinCount);
+    const entryThreshold = -48;
+    const exitThreshold = -58;
 
     const sampleRate = audioContext.sampleRate;
-    const fftSize = 2048;
+    const fftSize = 4096;
     const analyser = audioContext.createAnalyser();
     analyser.fftSize = fftSize;
+
+    const frequencyData = new Float32Array(analyser.frequencyBinCount);
 
     const source = audioContext.createBufferSource();
     source.buffer = audioBuffer;
@@ -29,28 +34,30 @@ async function fileToNotes(file) {
     const scriptProcessor = audioContext.createScriptProcessor(256, 1, 1);
 
     const unclosedNotes = {};
-
+    var elavation = 0;
+    
     scriptProcessor.onaudioprocess = function (audioProcessingEvent) {
+        const time = audioContext.currentTime;
         analyser.getFloatFrequencyData(frequencyData);
-
         for (let i = 0; i < frequencyData.length; i++) {
-            if (frequencyData[i] > volumeThreshold) {
-                const time = audioContext.currentTime;
-                const frequency = i * (sampleRate / fftSize);
-                if (!unclosedNotes[frequency]) {
-                    unclosedNotes[frequency] = {
+            const frequency = i * (sampleRate / fftSize);
+            const note = frequencyToNote(frequency);
+            if (frequencyData[i] > entryThreshold) {
+                if (!unclosedNotes[note]) {
+                    unclosedNotes[note] = {
                         frequency: frequency,
-                        startTime: time
+                        startTime: time,
+                        rawVol: frequencyData[i],
+                        index: i,
+                        elavation: elavation
                     };
+                    elavation++;
                 }
-            }
-        }
-
-        for (const [frequency, note] of Object.entries(unclosedNotes)) {
-            if (frequencyData[frequency] <= volumeThreshold) {
-                note.endTime = audioContext.currentTime;
-                notes.push(note);
-                delete unclosedNotes[frequency];
+            } else if (unclosedNotes[note] && frequencyData[i] < exitThreshold) {
+                unclosedNotes[note].endTime = audioContext.currentTime;
+                notes.push(unclosedNotes[note]);
+                delete unclosedNotes[note];
+                elavation--;
             }
         }
     }
@@ -64,25 +71,23 @@ async function fileToNotes(file) {
     await audioContext.startRendering();
 
     var interval = 1 / (bpm / 60);
-
-    notes = notes.map((note)=>{
-        var note = frequencyToNote(note.frequency);
+    return notes.map((note)=>{
+        var f = frequencyToNote(note.frequency);
         var start = Math.round(note.startTime / interval) * interval;
-        var end = Math.round(note.endTime / interval) * interval;
+        var end = Math.floor(note.endTime / interval) * interval;
 
         return {
-            note: note,
+            note: f,
             start: start,
             end: end,
-            duration: end - start
+            duration: end - start,
+            rawVol: note.rawVol,
+            elavation: note.elavation,
+            index: note.index
         }
-    });
-
-    notes = notes.filter((note) => {
+    }).filter((note) => {
         return note.duration >= interval;
     });
-
-    return notes;
 }
 addEventListener("init", () => {
     registerTool("🎤︎2♪", (nodes) => {
@@ -102,6 +107,17 @@ addEventListener("init", () => {
             };
             const notes = await fileToNotes(picker.files[0]);
             console.log(notes);
+            deleteLoop(templateNode);
+            var startOffset = parseFloat(templateNode.getAttribute("data-start"));
+            var layerOffset = parseInt(templateNode.getAttribute("data-layer"));
+            notes.forEach((x, i)=>{
+                var conf = structuredClone(templateNode.conf);
+                conf.Frequency = ":" + x.note + ":";
+                var noteBlock = addBlock(nodeType, startOffset + x.start, x.duration, "Rec2Note Import", layerOffset + x.elavation, conf, gui.layer, false);
+                hydrateLoopPosition(noteBlock);
+                //pickupLoop(noteBlock, true);
+                activateTool("MOVE");
+            });
         });
         picker.click();
     });
