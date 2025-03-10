@@ -9,7 +9,7 @@ addBlockType("value_gate", {
         var threshold = _(this.conf.Threshold);
         var volume = _(this.conf.Volume);
         inPcm.forEach((x, i) => {
-            if (Math.abs(x) > threshold(i, inPcm)) {
+            if (Math.abs(x) < threshold(i, inPcm)) {
                 inPcm[i] = x * volume(i, inPcm);
             }
         });
