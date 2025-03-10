@@ -42,6 +42,7 @@ addBlockType("p_writeasset", {
     title: "Save Asset",
     configs: {
         "Asset": ["My Asset", "text"],
+        "Transparent": [false, "checkbox"]
     },
     updateMiddleware: (loop) => {
         var newTitle = "Save Asset - " + loop.conf.Asset;
@@ -50,6 +51,10 @@ addBlockType("p_writeasset", {
     },
     functor: function (inPcm, channel, data) {
         proceduralAssets.set(this.conf.Asset, inPcm);
-        return new Float32Array(inPcm.length);
+        var out = new Float32Array(inPcm.length);
+        if (this.conf.Transparent) {
+            out.set(inPcm);
+        }
+        return out;
     }
 });
