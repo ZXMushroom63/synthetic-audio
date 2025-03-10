@@ -4,6 +4,7 @@ addBlockType("p_waveform_plus", {
     title: "Advanced Synth",
     configs: {
         "Frequency": [100, "number", 1],
+        "SemitonesOffset": [0, "number", 1],
         "FrequencyDecay": [0, "number", 1],
         "Sine": [1, "number", 1],
         "Square": [0, "number", 1],
@@ -89,6 +90,7 @@ addBlockType("p_waveform_plus", {
             underscores[k] = _(this.conf[k]);
         });
         var freq = _(this.conf.Frequency);
+        var freqsemioffset = _(this.conf.SemitonesOffset);
         var decay = _(this.conf.Decay);
         var fdecay = _(this.conf.FrequencyDecay);
         var exp = _(this.conf.Exponent);
@@ -133,7 +135,7 @@ addBlockType("p_waveform_plus", {
                 return [[k, x]];
             }));
 
-            var f = freq(i, inPcm);
+            var f = freq(i, inPcm) * Math.pow(2, freqsemioffset(i, inPcm) / 12);
             f *= Math.exp(-fdecay(i, inPcm) * absoluteTime);
             t += f * dt;
             var y = 0;
