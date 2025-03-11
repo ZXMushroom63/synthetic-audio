@@ -7,7 +7,12 @@ addEventListener("init", () => {
         var fileList = [...fileInput.files];
         if (fileList.length > 0) {
             document.querySelector("#loopSelector").remove();
-            Object.keys(filters).sort().forEach(k => {
+            Object.entries(filters)
+            .map(x=>{
+                var ret = Object(x[1].title);
+                ret._key = x[0];
+                return ret
+            }).sort().map(x=>x._key).forEach(k => {
                 if (k === "audio") {
                     return;
                 }
