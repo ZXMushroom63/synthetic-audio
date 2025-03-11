@@ -54,4 +54,10 @@ function pickupLoop(loop, natural = false) {
     var originalBB = loop.querySelector(".loopInternal").getBoundingClientRect();
     document.addEventListener("mousemove", mouseMove);
     document.addEventListener("mouseup", mouseUp);
+    if (!natural) {
+        mouseMove({
+            clientX: mouse.x,
+            clientY: mouse.y
+        });
+    }
 }

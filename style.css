@@ -244,7 +244,8 @@ h4 {
     border-bottom: 1px solid white;
     overflow-y: auto;
     overflow-x: hidden;
-    max-height: 100vh;
+    max-height: 80vh;
+    padding: 0.5rem;
     border-radius: 0rem 0rem 0rem 0.4rem;
 }
 #addstuff details summary {
@@ -533,4 +534,48 @@ select option {
 }
 .loop.deactivated .backgroundSvg {
     display: none !important;
+}
+#addNodeDropdown {
+    position: fixed;
+    z-index: 999;
+    width: 25vw;
+    height: 40vh;
+    left: calc(50vw - 12.5vw);
+    top: calc(50vh - 20vh);
+    background-color: rgba(0, 0, 0, 0.8);
+    border: 1.5px solid white;
+    border-radius: 0.5rem;
+    overflow: hidden;
+}
+#addNodeDropdown input {
+    width: 25vw;
+    outline: 0;
+    background-color: rgba(0, 125, 255, 0.05);
+    color: white;
+    border: 0;
+    border-bottom: 1.5px solid white;
+    padding: 0.2rem;
+}
+#addNodeDropdown input::placeholder {
+    color: lightgrey;
+}
+#addNodeDropdown ul {
+    font-family: sans-serif;
+    color: white;
+    padding: 0;
+    margin: 0;
+    padding-top: 0.5rem;
+    height: calc(40vh - 1.5rem - 1rem);
+    padding-bottom: 1.5rem;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+#addNodeDropdown li {
+    padding: 4px 12px;
+    list-style: none;
+    user-select: none;
+    cursor: pointer;
+}
+#addNodeDropdown li:hover {
+    background-color: rgba(0, 125, 255, 0.3);
 }
