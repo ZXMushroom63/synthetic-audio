@@ -3,16 +3,18 @@ addBlockType("p_value", {
     title: "Value",
     configs: {
         "Value": [0, "number", 1],
+        "Volume": [1, "number", 1],
         "Additive": [false, "checkbox"]
     },
     functor: function (inPcm, channel, data) {
         var val = _(this.conf.Value);
+        var vol = _(this.conf.Volume);
         inPcm.forEach((x, i) => {
             var value = parseFloat(val(i, inPcm));
             if (this.conf.Additive) {
-                inPcm[i] += value;
+                inPcm[i] += value * vol(i, inPcm);
             } else {
-                inPcm[i] = value;
+                inPcm[i] = value * vol(i, inPcm);
             }
         });
         return inPcm;
