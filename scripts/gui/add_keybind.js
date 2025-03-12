@@ -3,12 +3,7 @@ addNodeDropdown.id = "addNodeDropdown";
 addNodeDropdown.style.display = "none";
 addNodeDropdown.innerHTML = `
 <input type="search" placeholder="Search for node types...">
-<ul>
-<li>test elems</li>
-<li>test elems</li>
-<li>test elems</li>
-<li>test elems</li>
-</ul>
+<ul></ul>
 `;
 document.body.appendChild(addNodeDropdown);
 function calcOptions(search) {
