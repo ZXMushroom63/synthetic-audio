@@ -4,7 +4,7 @@ addBlockType("comb", {
     configs: {
         "Iterations": [1, "number"],
         "Delay": [0.01, "number", 1],
-        "VolumeRatio": [1, "number", "1"]
+        "VolumeRatio": [1, "number", 1]
     },
     functor: function (inPcm, channel, data) {
         var volRatio = _(this.conf.VolumeRatio);
