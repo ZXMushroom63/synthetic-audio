@@ -130,9 +130,12 @@ function convertToMp3Blob(float32Arrays, channels, sampleRate, bRate) {
 
 var filters = {};
 var decodedPcmCache = {};
-
+const assetUserTypes = [];
 
 function addBlockType(id, data) {
+    if (data.assetUser) {
+        assetUserTypes.push(id);
+    }
     filters[id] = data;
 }
 function wait(s) {
@@ -255,7 +258,7 @@ function constructRenderDataArray(data) {
                             (x.end >= dirtyNode.start &&
                                 x.start <= dirtyNode.end)
 
-                        ) && (x.layer > dirtyNode.layer)) || (x.type === "p_readasset" && assetMap[x.conf.Asset]))
+                        ) && (x.layer > dirtyNode.layer)) || (assetUserTypes.includes(x.type) && assetMap[x.conf.Asset]))
                     ) {
                         x.dirty = true;
                         dirtyNodes.push(x);
