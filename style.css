@@ -4,31 +4,39 @@
     overflow-x: scroll;
     overflow-y: auto;
 }
-#tabContent>div, #tabContent>table, #tabContent>table>tr>td {
+
+#tabContent>div,
+#tabContent>table,
+#tabContent>table>tr>td {
     width: 100vw;
     height: calc(100vh - 15rem);
     border-collapse: collapse;
 }
+
 #track #time {
     height: 2rem;
-    background-color: rgb(20,20,20);
+    background-color: rgb(20, 20, 20);
     border-bottom: 2px solid white;
     color: white;
     width: 100%;
     overflow-x: hidden;
     overflow-y: hidden;
 }
-html,body {
+
+html,
+body {
     margin: 0;
     padding: 0;
-    background-color: rgb(0,0,0);
+    background-color: rgb(0, 0, 0);
     overflow-x: hidden;
     overflow-y: hidden;
 }
+
 h4 {
     font-family: sans-serif;
     color: white;
 }
+
 .timeMarker {
     display: inline-block;
     height: 2rem;
@@ -42,6 +50,7 @@ h4 {
     cursor: pointer;
     user-select: none;
 }
+
 #tray {
     bottom: 0;
     width: 100vw;
@@ -52,6 +61,7 @@ h4 {
     overflow-y: auto;
     white-space: normal;
 }
+
 table.main {
     height: 100vh;
     position: fixed;
@@ -60,13 +70,16 @@ table.main {
     border-collapse: collapse;
     left: 0;
 }
+
 tr {
     width: 100vw;
 }
+
 h4 {
     padding: 0;
     margin: 0;
 }
+
 .trayElem {
     height: 1rem;
     line-height: 1rem;
@@ -80,11 +93,13 @@ h4 {
     cursor: default;
     transition: 0.3s;
     white-space: nowrap;
-    background-color: rgba(125,125,255,0.3);
+    background-color: rgba(125, 125, 255, 0.3);
 }
+
 .trayElem:hover {
     border: 1px solid white;
 }
+
 .trayElem input {
     background: transparent;
     border: 0;
@@ -94,9 +109,11 @@ h4 {
     text-align: right;
     width: 6rem;
 }
+
 .trayElem input:focus {
     outline: 0;
 }
+
 .beatMarker {
     pointer-events: none;
     position: relative;
@@ -107,6 +124,7 @@ h4 {
     text-align: center;
     width: 0px;
 }
+
 .beatMarker::after {
     pointer-events: none;
     display: inline-block;
@@ -115,9 +133,10 @@ h4 {
     content: "_";
     color: transparent;
     height: calc(600vh - 2rem - 4px);
-    background-color: rgba(255,255,255,0.25);
+    background-color: rgba(255, 255, 255, 0.25);
     width: 2px;
 }
+
 .loop {
     position: relative;
     width: 0;
@@ -127,11 +146,13 @@ h4 {
     height: 0;
     left: 0%;
 }
+
 .loop.deactivated .loopInternal {
     pointer-events: none;
     user-select: none;
     opacity: 0.15;
 }
+
 .loopInternal {
     user-select: none;
     overflow-x: hidden;
@@ -146,24 +167,29 @@ h4 {
     transition: border 0.3s;
     background-blend-mode: color;
 }
+
 .loop.active .loopInternal {
-    outline: 2px solid rgba(255,255,255,0.75);
+    outline: 2px solid rgba(255, 255, 255, 0.75);
 }
+
 .loopInternal.selected {
-    outline: 2px solid rgba(0,255,255,0.75);
+    outline: 2px solid rgba(0, 255, 255, 0.75);
 }
+
 .loopInternal:hover {
     border: 1px solid rgb(199, 199, 255);
 }
+
 .loopInternal span.name {
     display: block;
     margin-left: calc(4px + 0.5rem);
     border-radius: 2px;
-    text-shadow: 0px 0px 1px rgba(0,0,0,0.5);
+    text-shadow: 0px 0px 1px rgba(0, 0, 0, 0.5);
     margin-top: 8px;
     z-index: 2;
     font-size: 0.5rem;
 }
+
 .loopInternal .handle {
     position: absolute;
     display: block;
@@ -173,20 +199,24 @@ h4 {
     color: transparent;
     transition: border 0.3s;
     background-color: rgba(0, 0, 0, 0.5);
-    border: 1px solid rgba(255,255,255,0.5);
+    border: 1px solid rgba(255, 255, 255, 0.5);
 }
+
 .loopInternal span.handleLeft {
     left: 0;
     z-index: 3;
     border-radius: 0.5rem 0px 0px 0.5rem;
 }
+
 .loopInternal span.handleRight {
     z-index: 3;
     border-radius: 0rem 0.5rem 0.5rem 0rem;
 }
+
 .loopInternal .handle:hover {
     border: 1px solid white;
 }
+
 .loopOptionsMenu {
     padding-left: 1rem;
     padding-top: 1rem;
@@ -196,16 +226,20 @@ h4 {
     overflow-y: auto;
     min-height: 6rem;
     top: 0rem;
-    border: 1px solid rgba(255,255,255,0.5);
+    border: 1px solid rgba(255, 255, 255, 0.5);
     display: none;
     z-index: 444444;
     background-color: rgba(0, 0, 0, 0.8);
     border-radius: 0.5rem;
 }
+
 .loopInternal.selected .loopOptionsMenu {
     display: block;
 }
-.loopOptionsMenu input:not([type=checkbox]), select, .inputStyles {
+
+.loopOptionsMenu input:not([type=checkbox]),
+select,
+.inputStyles {
     background-color: transparent;
     border: 0;
     color: white;
@@ -215,16 +249,22 @@ h4 {
     resize: horizontal;
     width: 8rem;
 }
-.loopOptionsMenu input.modifyable, select.modifyable {
+
+.loopOptionsMenu input.modifyable,
+select.modifyable {
     background-color: rgba(255, 0, 255, 0.3);
     width: 12rem;
 }
+
 .loopOptionsMenu select option {
     color: black;
 }
-.loopOptionsMenu input:focus, select:focus {
+
+.loopOptionsMenu input:focus,
+select:focus {
     outline: 0;
 }
+
 .loopOptionsMenu button {
     margin-top: 6px;
     background-color: rgba(125, 125, 255, 0.3);
@@ -232,6 +272,7 @@ h4 {
     border-radius: 3px;
     color: white;
 }
+
 #addstuff {
     text-align: right;
     position: fixed;
@@ -239,7 +280,7 @@ h4 {
     top: 0;
     right: 0;
     width: 20rem;
-    background-color: rgba(0,0,0,0.5);
+    background-color: rgba(0, 0, 0, 0.5);
     border-left: 1px solid white;
     border-bottom: 1px solid white;
     overflow-y: auto;
@@ -248,26 +289,33 @@ h4 {
     padding: 0.5rem;
     border-radius: 0rem 0rem 0rem 0.4rem;
 }
+
 #addstuff details summary {
     user-select: none;
     cursor: pointer;
 }
+
 #addstuff summary {
     list-style-type: "+ ";
 }
+
 #addstuff details[open]>summary {
     list-style-type: "- ";
 }
+
 #addstuff h4 {
     text-decoration: underline;
 }
+
 #addstuff * {
     font-family: sans-serif;
     color: white
 }
+
 #addstuff>details>div span {
     display: block;
 }
+
 #addstuff>details>div span a {
     color: lightblue;
     text-decoration: underline;
@@ -275,16 +323,22 @@ h4 {
     user-select: none;
     transition: color 0.3s;
 }
+
 #addstuff>details>div span a:hover {
     color: white;
 }
-#loopsample, #loopmeta {
+
+#loopsample,
+#loopmeta {
     display: none;
 }
-#loopSelector, #renderProgress {
+
+#loopSelector,
+#renderProgress {
     color: white;
     font-family: sans-serif;
 }
+
 .timePosMarker {
     position: relative;
     display: inline-block;
@@ -297,6 +351,7 @@ h4 {
     width: 0px;
     z-index: 4;
 }
+
 .timePosMarker::after {
     display: inline-block;
     margin: 0;
@@ -307,9 +362,10 @@ h4 {
     color: transparent;
     height: calc(600vh - 2rem - 4px);
     width: 3px;
-    background-color: rgba(255,255,255,1);
+    background-color: rgba(255, 255, 255, 1);
     z-index: 6000;
 }
+
 .timePosMarker::before {
     pointer-events: all;
     display: inline-block;
@@ -325,46 +381,54 @@ h4 {
     left: -7px;
     height: 14px;
     background-color: white;
-    border: 2px solid rgba(0,0,0,0.1);
+    border: 2px solid rgba(0, 0, 0, 0.1);
     z-index: 7000;
     cursor: grab;
     border-radius: 5px;
 }
+
 .timePosMarker.grabbing::before {
     cursor: grabbing;
 }
+
 .selectbox {
     position: absolute;
     z-index: 999999999999999999;
     border: 1px solid rgba(0, 125, 255, 0.6);
     background-color: rgba(0, 125, 255, 0.4);
 }
+
 .loop[data-deleted=yes] {
     display: none;
 }
+
 .loop details {
     margin-top: 1.75rem;
     margin-bottom: 0.25rem;
     border-left: 2px solid white;
 }
+
 .loop details summary {
     transform: translateY(-0.75rem);
     text-decoration: underline;
     cursor: pointer;
 }
+
 .loop details:first(label) {
     margin-top: 1rem;
 }
+
 #renderBtn {
     display: inline-block;
     height: 75px;
-    width:  75px;
+    width: 75px;
     vertical-align: text-bottom;
     transform: translateY(-0.25rem);
     border: 1px solid white;
     margin-top: 0px;
     margin-left: 0px;
 }
+
 button {
     border: 1px solid white;
     color: white;
@@ -378,62 +442,77 @@ button {
     transition: 0.2s;
     white-space: normal;
 }
+
 .smallBtn {
     font-size: 0.5rem;
     padding: 4px 8px;
     margin-left: 3px;
     margin-top: 3px;
 }
-#track, button, .themeGradient {
+
+#track,
+button,
+.themeGradient {
     background: linear-gradient(140deg, rgba(255, 0, 0, 0.3) 0%, rgba(255, 255, 255, 0.0) 34%, rgba(0, 255, 187, 0.2) 100%);
 }
+
 button:disabled {
     cursor: not-allowed;
     background: black;
     text-decoration: none;
-    color: rgb(200,200,200);
+    color: rgb(200, 200, 200);
 }
+
 button:hover {
     scale: 1.02;
 }
+
 .loop button {
     margin-bottom: 0.25rem;
 }
+
 #controlsAndStuff ins {
     margin-right: 6rem;
 }
+
 .tab {
     color: white;
     font-family: sans-serif;
     border: 1px solid white;
     padding: 8px 16px;
-    display:  inline-block;
+    display: inline-block;
     position: relative;
     border-radius: 0.2rem;
     transition: 0.2s transform;
     cursor: pointer;
     user-select: none;
 }
+
 .tab.selected {
     background-color: rgba(125, 125, 255, 0.3);
     text-decoration: underline;
     cursor: default;
 }
+
 .tabHidden {
     display: none;
 }
+
 #controlsAndStuff {
     max-width: 100vw;
     overflow-x: visible;
     overflow-y: auto;
 }
+
 * {
     white-space: nowrap;
 }
+
 select option {
     color: white !important;
     background: black;
 }
+
 .toolbox {
     position: fixed;
     left: 0px;
@@ -447,8 +526,9 @@ select option {
     background-color: rgba(0, 0, 0, 0.5);
     transform: translateX(calc(-4rem - 4px));
 }
+
 #toolboxExpander {
-    background-color: rgb(60,60,60);
+    background-color: rgb(60, 60, 60);
     color: white;
     display: inline-block;
     width: 1rem;
@@ -464,9 +544,11 @@ select option {
     text-align: center;
     transform: translateX(calc(4rem + 4px));
 }
+
 .toolbox * {
     pointer-events: all;
 }
+
 .toolbox div.tool {
     width: 4rem;
     height: 4rem;
@@ -482,15 +564,18 @@ select option {
     user-select: none;
     border: 2px solid white;
 }
+
 .toolbox div.tool.selected {
     background-color: rgba(0, 125, 255, 0.3);
     border: 2px solid white;
 }
+
 .toolbox.open {
     transform: translateX(0);
     pointer-events: all;
     border-right: 1px solid white;
 }
+
 #viz {
     border: 1px solid white;
     image-rendering: pixelated;
@@ -498,12 +583,13 @@ select option {
     height: 75px;
     background: black;
 }
+
 #waveformsDropdown {
     position: fixed;
     z-index: 999;
-    top:  0;
+    top: 0;
     left: 0;
-    background: rgba(0,0,0,0.8);
+    background: rgba(0, 0, 0, 0.8);
     color: white;
     max-height: 12rem;
     overflow-y: auto;
@@ -513,28 +599,34 @@ select option {
     border: 1px solid white;
     border-radius: 0.3rem;
 }
+
 #waveformsDropdown li {
     padding: 4px 12px;
     list-style: none;
     user-select: none;
     cursor: pointer;
 }
+
 #waveformsDropdown li:hover {
     background-color: rgba(0, 125, 255, 0.3);
 }
+
 [data-dirty] span.name {
     text-decoration: underline;
     text-decoration-color: orange;
 }
+
 .backgroundSvg {
     position: absolute;
     top: 0;
     left: 0;
     height: 3rem;
 }
+
 .loop.deactivated .backgroundSvg {
     display: none !important;
 }
+
 #addNodeDropdown {
     position: fixed;
     z-index: 999;
@@ -547,6 +639,7 @@ select option {
     border-radius: 0.5rem;
     overflow: hidden;
 }
+
 #addNodeDropdown input {
     width: 25vw;
     outline: 0;
@@ -556,9 +649,11 @@ select option {
     border-bottom: 1.5px solid white;
     padding: 0.2rem;
 }
+
 #addNodeDropdown input::placeholder {
     color: lightgrey;
 }
+
 #addNodeDropdown ul {
     font-family: sans-serif;
     color: white;
@@ -570,12 +665,18 @@ select option {
     overflow-y: auto;
     overflow-x: hidden;
 }
+
 #addNodeDropdown li {
     padding: 4px 12px;
     list-style: none;
     user-select: none;
     cursor: pointer;
 }
+
 #addNodeDropdown li:hover {
     background-color: rgba(0, 125, 255, 0.3);
+}
+
+input[type="number"]::-webkit-inner-spin-button {
+    cursor: pointer;
 }
