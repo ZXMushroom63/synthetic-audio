@@ -28,6 +28,7 @@ addBlockType("p_waveform_plus", {
         "uAmplitudeRatio": [0.5, "number"],
         "uDetuneHz": [0, "number", 1],
         "uPan": [0.0, "number", 1],
+        "uPhase": [0.0, "number", 1],
         "Absolute": [false, "checkbox"],
         "Multiply": [false, "checkbox"],
         "Sidechain": [false, "checkbox"],
@@ -59,7 +60,8 @@ addBlockType("p_waveform_plus", {
             "uVoices",
             "uAmplitudeRatio",
             "uDetuneHz",
-            "uPan"
+            "uPan",
+            "uPhase"
         ]
     },
     selectMiddleware: () => {
@@ -103,6 +105,7 @@ addBlockType("p_waveform_plus", {
 
         var uDetuneHz = _(this.conf.uDetuneHz);
         var uPan = _(this.conf.uPan);
+        var uPhase = _(this.conf.uPhase);
 
         var totalNormalisedVolume = 0;
         if (this.conf.Harmonics) {
@@ -147,6 +150,7 @@ addBlockType("p_waveform_plus", {
                 waveCount = this.conf.uVoices;
             }
             var detuneHz = uDetuneHz(i, inPcm);
+            var uPhaseAmount = uPhase(i, inPcm);
             var panAmount = uPan(i, inPcm) / this.conf.uVoices;
             var thePeriod = period(i, inPcm);
             var semiOffset = semitones(i, inPcm);
@@ -156,10 +160,11 @@ addBlockType("p_waveform_plus", {
                 }
                 var harmonicFrequency = f;
                 var volumeRatio = 1;
-                var coefficient = 1;
+                var wavePhaseOffset = 0;
                 if (this.conf.Unison) {
                     var detunePosition = (h + 0.5) - (waveCount / 2);
                     harmonicFrequency += detuneHz * Math.trunc(detunePosition);
+                    wavePhaseOffset = uPhaseAmount * h;
                     volumeRatio = Math.abs(detunePosition);
                     if ((waveCount % 2) === 0) {
                         volumeRatio -= 0.5;
@@ -179,21 +184,21 @@ addBlockType("p_waveform_plus", {
                 if (this.conf.Harmonics) {
                     volumeRatio = Math.pow(this.conf.HarmonicsRatio, h);
                     if (this.conf.HarmonicsUseSemitones) {
-                        coefficient = getSemitoneCoefficient(Math.round(h * semiOffset));
+                        waveformTime *= getSemitoneCoefficient(Math.round(h * semiOffset));
                     } else {
-                        coefficient = h + 1;
+                        waveformTime *= h + 1;
                     }
                 }
 
                 if (this.conf.UseCustomWaveform) {
                     if (customWaveform) {
-                        y += customWaveform[Math.floor(waveformTime * coefficient * 600) % 600] * volumeRatio;
+                        y += customWaveform[Math.floor((waveformTime + wavePhaseOffset) * 600) % 600] * volumeRatio;
                     }
                 } else {
-                    y += waveforms.sin(waveformTime * coefficient) * values.Sine * volumeRatio;
-                    y += waveforms.square(waveformTime * coefficient) * values.Square * volumeRatio;
-                    y += waveforms.sawtooth(waveformTime * coefficient) * values.Sawtooth * volumeRatio;
-                    y += waveforms.triangle(waveformTime * coefficient) * values.Triangle * volumeRatio;
+                    y += waveforms.sin(waveformTime + wavePhaseOffset) * values.Sine * volumeRatio;
+                    y += waveforms.square(waveformTime + wavePhaseOffset) * values.Square * volumeRatio;
+                    y += waveforms.sawtooth(waveformTime + wavePhaseOffset) * values.Sawtooth * volumeRatio;
+                    y += waveforms.triangle(waveformTime + wavePhaseOffset) * values.Triangle * volumeRatio;
                 }
                 
                 y /= total;
@@ -205,12 +210,17 @@ addBlockType("p_waveform_plus", {
 
             y *= Math.exp(-decay(i, inPcm) * absoluteTime);
 
+            var ampSmoothingFactor = 1;
+
             if (i < AmpSmoothingStart) {
-                y *= i / AmpSmoothingStart;
+                ampSmoothingFactor = i / AmpSmoothingStart;
             }
+
             if (i > AmpSmoothingEnd) {
-                y *= 1 - ((i - AmpSmoothingEnd) / AmpSmoothingStart);
+                ampSmoothingFactor = 1 - ((i - AmpSmoothingEnd) / AmpSmoothingStart);
             }
+
+            y *= ampSmoothingFactor;
             if (this.conf.Multiply) {
                 if (this.conf.Absolute) {
                     inPcm[i] *= Math.abs(-y);
@@ -219,7 +229,7 @@ addBlockType("p_waveform_plus", {
                 }
             } else {
                 if (this.conf.Sidechain) {
-                    var sidechainCoefficient = Math.pow(1 - Math.max(Math.min(1, amp(i, inPcm) * Math.exp(-decay(i, inPcm) * absoluteTime)), 0), Math.abs(this.conf.SidechainPower));
+                    var sidechainCoefficient = Math.pow(1 - Math.max(Math.min(1, amp(i, inPcm) * ampSmoothingFactor * Math.exp(-decay(i, inPcm) * absoluteTime)), 0), Math.abs(this.conf.SidechainPower));
                     if (this.conf.SidechainPower < 0) {
                         y *= sidechainCoefficient;
                     } else {
