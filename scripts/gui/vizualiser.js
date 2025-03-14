@@ -33,14 +33,14 @@ addEventListener("load", () => {
 
     function getMostCommonFrequency() {
         let maxIndex = 0;
-        for (let i = 1; i < previousFFTData.length; i++) {
-            if (previousFFTData[i] > previousFFTData[maxIndex]) {
+        for (let i = 1; i < previousFFTData[0].length; i++) {
+            if (previousFFTData[0][i] > previousFFTData[0][maxIndex]) {
                 maxIndex = i;
             }
         }
 
         const nyquist = audioCtx.sampleRate / 2;
-        const freq = (maxIndex * nyquist) / previousFFTData.length;
+        const freq = (maxIndex * nyquist) / previousFFTData[0].length;
         return freq.toFixed(2);
     }
     var logoImage = document.querySelector("#logo");
@@ -48,8 +48,8 @@ addEventListener("load", () => {
     var keepDrawing = true;
     var started = false;
     var eqMode = false;
-    const previousByteData = new Uint8Array(bufferLength);
-    const previousFFTData = new Uint8Array(analyser.frequencyBinCount);
+    const previousByteData = [];
+    const previousFFTData = [];
     function drawWaveform() {
         canvasCtx.lineWidth = 2;
         canvasCtx.strokeStyle = 'rgb(255, 255, 255)';
@@ -60,7 +60,7 @@ addEventListener("load", () => {
         let x = 0;
 
         for (let i = 0; i < bufferLength; i++) {
-            const v = previousByteData[i] / 128.0;
+            const v = previousByteData[0][i] / 128.0;
             const y = v * canvas.height / 2;
 
             if (i === 0) {
@@ -93,11 +93,11 @@ addEventListener("load", () => {
             let sum = 0;
             let count = 0;
 
-            for (let j = 0; j < previousFFTData.length; j++) {
+            for (let j = 0; j < previousFFTData[0].length; j++) {
                 const nyquist = audioCtx.sampleRate / 2;
-                const freq = (j * nyquist) / previousFFTData.length;
+                const freq = (j * nyquist) / previousFFTData[0].length;
                 if (freq >= minFreq && freq <= maxFreq) {
-                    sum += previousFFTData[j];
+                    sum += previousFFTData[0][j];
                     count++;
                 }
             }
@@ -109,10 +109,19 @@ addEventListener("load", () => {
             canvasCtx.fillRect(i * shelfWidth, canvas.height - barHeight, shelfWidth - 1, barHeight);
         }
     }
-
+    const dataHistrogramSize = 3;
     function draw() {
+        if (!keepDrawing) {
+            return;
+        }
         analyser.getByteTimeDomainData(dataArray);
         analyser.getByteFrequencyData(freqDataArray);
+        previousByteData.push(structuredClone(dataArray));
+        previousFFTData.push(structuredClone(freqDataArray));
+        if (previousByteData.length > dataHistrogramSize) {
+            previousByteData.shift();
+            previousFFTData.shift();
+        }
         canvasCtx.clearRect(0, 0, canvas.width, canvas.height);
         canvasCtx.globalAlpha = 0.2;
         canvasCtx.drawImage(logoImage, 0, 40, 450, 135);
@@ -135,8 +144,6 @@ addEventListener("load", () => {
 
         if (keepDrawing) {
             requestAnimationFrame(draw);
-            previousByteData.set(dataArray);
-            previousFFTData.set(freqDataArray);
         }
     }
 
