@@ -129,7 +129,6 @@ addBlockType("p_waveform_plus", {
         } else {
             totalNormalisedVolume = 1;
         }
-        console.log(totalNormalisedVolume);
 
         const AmpSmoothingStart = Math.floor(audio.samplerate * this.conf.AmplitudeSmoothTime);
         const AmpSmoothingEnd = inPcm.length - AmpSmoothingStart;
@@ -187,13 +186,6 @@ addBlockType("p_waveform_plus", {
                         volumeRatio *= left;
                     } else {
                         volumeRatio *= right;
-                    }
-                    if (i === 0) {
-                        console.log("H-index", h);
-                        console.log("Detune pos", detunePosition);
-                        console.log("Harmonic freq", harmonicFrequency);
-                        console.log("volume ratio", volumeRatio);
-                        console.log("___")
                     }
                 }
                 harmonicFrequency = harmonicFrequency / f;
