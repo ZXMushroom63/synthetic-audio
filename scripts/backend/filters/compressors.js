@@ -1,6 +1,6 @@
 addBlockType("peakclip", {
     color: "rgba(0,255,0,0.3)",
-    title: "Peak Clipper",
+    title: "Distortion / Clipper",
     configs: {
         "Cap": [0.75, "number", 1]
     },
