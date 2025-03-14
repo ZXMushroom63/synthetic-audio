@@ -26,6 +26,7 @@ addBlockType("p_waveform_plus", {
         "Unison": [false, "checkbox"],
         "uVoices": [4, "number"],
         "uAmplitudeRatio": [0.5, "number"],
+        "uAmplitudeConstant": [false, "checkbox"],
         "uDetuneHz": [0, "number", 1],
         "uPan": [0.0, "number", 1],
         "uPhase": [0.0, "number", 1],
@@ -59,6 +60,7 @@ addBlockType("p_waveform_plus", {
             "Unison",
             "uVoices",
             "uAmplitudeRatio",
+            "uAmplitudeConstant",
             "uDetuneHz",
             "uPan",
             "uPhase"
@@ -114,7 +116,11 @@ addBlockType("p_waveform_plus", {
             }
         } else if (this.conf.Unison) {
             for (let h = 0; h < this.conf.uVoices / 2; h++) {
-                totalNormalisedVolume += Math.pow(this.conf.uAmplitudeRatio, h);
+                if (this.conf.uAmplitudeConstant) {
+                    totalNormalisedVolume += (h === 0 || Math.abs(h) === 0.5) ? 1 : this.conf.uAmplitudeRatio;
+                } else {
+                    totalNormalisedVolume += Math.pow(this.conf.uAmplitudeRatio, h);
+                }
             }
             totalNormalisedVolume *= 2;
             if (this.conf.uVoices % 2) {
@@ -123,6 +129,7 @@ addBlockType("p_waveform_plus", {
         } else {
             totalNormalisedVolume = 1;
         }
+        console.log(totalNormalisedVolume);
 
         const AmpSmoothingStart = Math.floor(audio.samplerate * this.conf.AmplitudeSmoothTime);
         const AmpSmoothingEnd = inPcm.length - AmpSmoothingStart;
@@ -165,8 +172,12 @@ addBlockType("p_waveform_plus", {
                     var detunePosition = (h + 0.5) - (waveCount / 2);
                     harmonicFrequency += detuneHz * Math.trunc(detunePosition);
                     wavePhaseOffset = uPhaseAmount * h;
-                    volumeRatio = Math.abs(detunePosition);
-                    if ((waveCount % 2) === 0) {
+                    if (this.conf.uAmplitudeConstant) {
+                        volumeRatio = Math.trunc(detunePosition) === 0 ? 1 : this.conf.uAmplitudeRatio;
+                    } else {
+                        volumeRatio = Math.pow(this.conf.uAmplitudeRatio, Math.abs(Math.trunc(detunePosition)))
+                    }
+                    if ((waveCount % 2) === 0 && !this.conf.uAmplitudeConstant) {
                         volumeRatio -= 0.5;
                     }
                     var panValue = panAmount * Math.trunc(detunePosition);
@@ -176,6 +187,13 @@ addBlockType("p_waveform_plus", {
                         volumeRatio *= left;
                     } else {
                         volumeRatio *= right;
+                    }
+                    if (i === 0) {
+                        console.log("H-index", h);
+                        console.log("Detune pos", detunePosition);
+                        console.log("Harmonic freq", harmonicFrequency);
+                        console.log("volume ratio", volumeRatio);
+                        console.log("___")
                     }
                 }
                 harmonicFrequency = harmonicFrequency / f;
