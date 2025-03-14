@@ -109,6 +109,9 @@ addEventListener("load", () => {
             canvasCtx.fillRect(i * shelfWidth, canvas.height - barHeight, shelfWidth - 1, barHeight);
         }
     }
+    function calculateVolume() {
+        return previousByteData[0].reduce((acc, v)=>acc + Math.abs(v / 128 - 1)) / previousByteData[0].length * 2;
+    }
     const dataHistrogramSize = 3;
     function draw() {
         if (keepDrawing) { //if not true, visualiser if being redrawn while paused.
@@ -121,8 +124,9 @@ addEventListener("load", () => {
                 previousFFTData.shift();
             }
         }
+        const currentVolume = calculateVolume();
         canvasCtx.clearRect(0, 0, canvas.width, canvas.height);
-        canvasCtx.globalAlpha = 0.2;
+        canvasCtx.globalAlpha = lerp(0.2, 0.5, currentVolume);
         canvasCtx.drawImage(logoImage, 0, 40, 450, 135);
         canvasCtx.globalAlpha = 1;
 
