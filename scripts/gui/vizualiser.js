@@ -111,9 +111,6 @@ addEventListener("load", () => {
     }
     const dataHistrogramSize = 3;
     function draw() {
-        if (!keepDrawing) {
-            return;
-        }
         analyser.getByteTimeDomainData(dataArray);
         analyser.getByteFrequencyData(freqDataArray);
         previousByteData.push(structuredClone(dataArray));
