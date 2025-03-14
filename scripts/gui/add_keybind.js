@@ -12,7 +12,7 @@ function calcOptions(search) {
             var ret = Object(x[1].title);
             ret._key = x;
             return ret
-        }).sort().map(x => x._key)
+        }).sort().sort((a, b)=>{return (b.toLowerCase() === search) - (a.toLowerCase() === search)}).map(x => x._key)
         .map(x => [x[0], x[1].title])
         .concat(Object.keys(loopMap).sort().map(y => ["audio", y]))
         .filter(x => x[1].toLowerCase().includes(search) || x[0].toLowerCase().includes(search));
