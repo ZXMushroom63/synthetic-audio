@@ -111,13 +111,15 @@ addEventListener("load", () => {
     }
     const dataHistrogramSize = 3;
     function draw() {
-        analyser.getByteTimeDomainData(dataArray);
-        analyser.getByteFrequencyData(freqDataArray);
-        previousByteData.push(structuredClone(dataArray));
-        previousFFTData.push(structuredClone(freqDataArray));
-        if (previousByteData.length > dataHistrogramSize) {
-            previousByteData.shift();
-            previousFFTData.shift();
+        if (keepDrawing) { //if not true, visualiser if being redrawn while paused.
+            analyser.getByteTimeDomainData(dataArray);
+            analyser.getByteFrequencyData(freqDataArray);
+            previousByteData.push(structuredClone(dataArray));
+            previousFFTData.push(structuredClone(freqDataArray));
+            if (previousByteData.length > dataHistrogramSize) {
+                previousByteData.shift();
+                previousFFTData.shift();
+            }
         }
         canvasCtx.clearRect(0, 0, canvas.width, canvas.height);
         canvasCtx.globalAlpha = 0.2;
