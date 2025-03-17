@@ -27,7 +27,7 @@ addBlockType("p_readasset", {
         loop.querySelector(".loopInternal .name").innerText = newTitle;
     },
     functor: function (inPcm, channel, data) {
-        var currentData = proceduralAssets.has(this.conf.Asset) ? proceduralAssets.get(this.conf.Asset) : [];
+        var currentData = proceduralAssets.has(this.conf.Asset) ? proceduralAssets.get(this.conf.Asset)[channel] : [];
         var duration = Math.floor(Math.round((((currentData.length / audio.samplerate) || 0) + 0.0) / data.loopInterval) * data.loopInterval * audio.samplerate);
         if (this.conf.Sidechain) {
             applySoundbiteToPcmSidechain(this.conf.Reverse, this.conf.Looping, currentData, inPcm, duration, this.conf.Speed, this.conf.Volume, this.conf.StartOffset, this.conf.SidechainPower, this.conf.Silent);
@@ -51,7 +51,12 @@ addBlockType("p_writeasset", {
         loop.querySelector(".loopInternal .name").innerText = newTitle;
     },
     functor: function (inPcm, channel, data) {
-        proceduralAssets.set(this.conf.Asset, inPcm);
+        if (channel === 0) {
+            proceduralAssets.set(this.conf.Asset, [inPcm, null]);
+        } else {
+            proceduralAssets.get(this.conf.Asset)[channel] = inPcm;
+        }
+        
         var out = new Float32Array(inPcm.length);
         if (this.conf.Transparent) {
             out.set(inPcm);
