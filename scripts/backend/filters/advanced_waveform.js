@@ -202,7 +202,7 @@ addBlockType("p_waveform_plus", {
 
                 if (this.conf.UseCustomWaveform) {
                     if (customWaveform) {
-                        y += customWaveform[Math.floor((waveformTime + wavePhaseOffset) * 600) % 600] * volumeRatio;
+                        y += -1*customWaveform[Math.floor((waveformTime + wavePhaseOffset) * 600) % 600] * volumeRatio;
                     }
                 } else {
                     y += waveforms.sin(waveformTime + wavePhaseOffset) * values.Sine * volumeRatio;
