@@ -78,14 +78,14 @@ addEventListener("init", () => {
         if (isDrawing && target) {
             var newIdx = Math.floor(e.offsetX * (600 / aabb.width));
             var newValue = e.offsetY * (2 / aabb.height) - 1;
-            target.samples[newIdx] = newValue;
+            target.samples[newIdx] = -newValue;
             if (prevIdx !== -1) {
                 var startIdx = Math.min(prevIdx, newIdx);
                 var endIdx = Math.max(newIdx, prevIdx);
                 var startValue = startIdx === prevIdx ? prevValue : newValue;
                 var endValue = startIdx === prevIdx ? prevValue : newValue;
                 for (let i = startIdx; i < endIdx; i++) {
-                    target.samples[i] = lerp(startValue, endValue, (i - startIdx) / (endIdx - startIdx + 1));
+                    target.samples[i] = -lerp(startValue, endValue, (i - startIdx) / (endIdx - startIdx + 1));
                 }
             }
             prevIdx = newIdx;
@@ -243,14 +243,15 @@ addEventListener("init", () => {
 
     var supportedFilters = {
         "smooth": "Smooth",
-        "noise": "Noise",
-        "compressor": "Comp",
-        "bitcrunch": "Bcrunch",
+        "noise": "Rnd",
+        "compressor": "Cmp",
+        "bitcrunch": "Bcr",
         "quantise": "Quant",
         "normalise": "Norm",
         "power": "Pwr",
         "p_sinewave": "∿",
         "p_value": "𝑥",
+        "adsr": "ADSR",
     };
     Object.keys(supportedFilters).forEach(filter => {
         const addMod = document.createElement("button");
@@ -332,11 +333,11 @@ addEventListener("init", () => {
         ctx.strokeStyle = "cyan";
         ctx.lineWidth = 1;
 
-        ctx.moveTo(0, 720 * ((target.samples[0] + 1) / 2));
+        ctx.moveTo(0, 720 * ((-target.samples[0] + 1) / 2));
 
         ctx.beginPath();
         for (let i = 0; i < target.samples.length; i++) {
-            ctx.lineTo(i / 600 * 1280, 720 * (target.samples[i] + 1) / 2);
+            ctx.lineTo(i / 600 * 1280, 720 * (-target.samples[i] + 1) / 2);
         }
 
         ctx.stroke();
@@ -344,11 +345,11 @@ addEventListener("init", () => {
         ctx.strokeStyle = "lime";
         ctx.lineWidth = 2;
 
-        ctx.moveTo(0, 720 * (target.calculated[0] + 1) / 2);
+        ctx.moveTo(0, 720 * (-target.calculated[0] + 1) / 2);
 
         ctx.beginPath();
         for (let i = 0; i < target.calculated.length; i++) {
-            ctx.lineTo(i / 600 * 1280, 720 * (target.calculated[i] + 1) / 2);
+            ctx.lineTo(i / 600 * 1280, 720 * (-target.calculated[i] + 1) / 2);
         }
 
         ctx.stroke();
