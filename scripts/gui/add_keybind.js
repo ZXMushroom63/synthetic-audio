@@ -8,6 +8,7 @@ addNodeDropdown.innerHTML = `
 document.body.appendChild(addNodeDropdown);
 function calcOptions(search) {
     var opts = Object.entries(filters)
+        .filter(x => !x[1].hidden)
         .filter(x => x[0] !== "audio").map(x => {
             var ret = Object(x[1].title);
             ret._key = x;

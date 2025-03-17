@@ -8,6 +8,7 @@ addEventListener("init", () => {
         if (fileList.length > 0) {
             document.querySelector("#loopSelector").remove();
             Object.entries(filters)
+            .filter(x => !x[1].hidden)
             .map(x=>{
                 var ret = Object(x[1].title);
                 ret._key = x[0];
