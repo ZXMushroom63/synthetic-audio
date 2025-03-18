@@ -49,6 +49,7 @@ addBlockType("reverb", {
         reverb.forEach((x, i)=>{
             reverb[i] *= volume(i, inPcm);
         });
+        
         if (this.conf.Method === "Overwrite") {
             return reverb;
         }
