@@ -14,6 +14,7 @@
 
     <!-- LIBRARIES -->
     <script src="lib/lamejs.min.js"></script>
+    <script src="lib/wav-encoder.js"></script>
     <script src="lib/filesaver.min.js"></script>
     <script src="lib/midi_lib.js"></script>
     <script src="lib/seeded_random.js"></script>
@@ -31,6 +32,7 @@
     <script src="scripts/gui/quantiseToNote.js"></script>
     <script src="scripts/gui/vizualiser.js"></script>
     <script src="scripts/gui/sample_rate_chooser.js"></script>
+    <script src="scripts/gui/encode_format.js"></script>
     <script src="scripts/gui/options.js"></script>
     <script src="scripts/gui/toolbox.js"></script>
     <script src="scripts/gui/add_keybind.js"></script>
@@ -195,6 +197,12 @@
                     </span>
                     <span class="trayElem">
                         ForceWaveform: <input type="checkbox" id="forceWv">
+                    </span>
+                    <span class="trayElem">
+                        Format: <select id="encformat">
+                            <option value="mp3">.mp3 (slow, small)</option>
+                            <option value="wav" selected>.wav (fast, larger)</option>
+                        </select>
                     </span>
                 </div>
             </td>

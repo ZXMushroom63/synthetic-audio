@@ -24,6 +24,7 @@ var audio = {
     length: 240000,
     stereo: false,
     normalise: true,
+    format: "wav"
 }
 var loopMap = {
 

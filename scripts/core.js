@@ -102,9 +102,7 @@ function float32ToInt16(float32Array) {
     }
     return int16Array;
 }
-
 function convertToMp3Blob(float32Arrays, channels, sampleRate, bRate) {
-    startTiming("encode");
     let mp3Encoder = new lamejs.Mp3Encoder(channels, sampleRate, bRate);
     let samples = float32Arrays.flatMap(float32ToInt16);
     let mp3Data = [];
@@ -124,6 +122,23 @@ function convertToMp3Blob(float32Arrays, channels, sampleRate, bRate) {
     }
 
     let blob = new Blob(mp3Data, { type: 'audio/mp3' });
+    return blob;
+}
+function contertToWavData(float32Arrays, channels, sampleRate, bRate) {
+    const audioInterface = {
+        sampleRate: sampleRate,
+        channelData: float32Arrays
+    };
+    return new Blob([WavEncoder.encodeSync(audioInterface)], { type: "audio/wav" });
+}
+function convertToFileBlob(float32Arrays, channels, sampleRate, bRate) {
+    var blob;
+    startTiming("encode");
+    if (audio.format === "mp3") { //mp3
+        blob = convertToMp3Blob(float32Arrays, channels, sampleRate, bRate);
+    } else { //wav
+        blob = contertToWavData(float32Arrays, channels, sampleRate, bRate);
+    }
     stopTiming("encode");
     return blob;
 }
@@ -343,7 +358,7 @@ async function render() {
         }
         customEvent("render");
         stopTiming("render");
-        var blob = convertToMp3Blob(output, channels, audio.samplerate, audio.bitrate);
+        var blob = convertToFileBlob(output, channels, audio.samplerate, audio.bitrate);
     } catch (error) {
         stopTiming("render");
         console.error(error);
