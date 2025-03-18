@@ -289,7 +289,13 @@ function constructRenderDataArray(data) {
     });
     return renderDataArray;
 }
+var processRendering = false;
 async function render() {
+    if (processRendering) {
+        return;
+    }
+    processRendering = true;
+    document.querySelector("#renderBtn").disabled = true;
     if (document.querySelector("#renderOut").src) {
         URL.revokeObjectURL(document.querySelector("#renderOut").src);
     }
@@ -336,8 +342,11 @@ async function render() {
                             proccessedNodeCount++;
                         }
 
+                        var startTime = Math.floor(node.start * audio.samplerate);
+                        var endTime = Math.floor((node.start + node.duration) * audio.samplerate);
+
                         if (!node.ref.cache[c]) {
-                            newPcm = await filters[node.type].functor.apply(node, [initialPcm.slice(Math.floor(node.start * audio.samplerate), Math.floor((node.start + node.duration) * audio.samplerate)), c, data]);
+                            newPcm = await filters[node.type].functor.apply(node, [initialPcm.subarray(startTime, endTime), c, data]);
                             node.ref.cache[c] = newPcm;
                             if (c === 0) {
                                 hydrateLoopBackground(node.ref);
@@ -346,7 +355,7 @@ async function render() {
                             newPcm = node.ref.cache[c];
                         }
 
-                        initialPcm.set(newPcm, Math.floor(node.start * audio.samplerate));
+                        initialPcm.set(newPcm, startTime);
                         await wait(1 / 240);
                     }
                 }
@@ -375,6 +384,8 @@ async function render() {
     document.querySelector("#renderBtn").removeAttribute("disabled");
 
     hydrateZoom();
+    processRendering = false;
+    document.querySelector("#renderBtn").disabled = false;
 }
 
 addBlockType("audio", {
