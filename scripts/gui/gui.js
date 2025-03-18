@@ -145,7 +145,7 @@ function hydrateZoom() {
 function hydrateLoopBackground(elem) {
     var line = elem.querySelector(".backgroundSvg path");
     var d = "M 0 50 ";
-    var downsample = 128;
+    var downsample = 256;
     prevY = 0;
     elem.cache[0].forEach((v, i) => {
         var isFinalSample = i === (elem.cache[0].length - 1);
@@ -375,7 +375,10 @@ function addBlock(type, start, duration, title, layer = 0, data = {}, editorValu
     }
 
     if (!noTimeline) {
-        document.querySelector("#trackInternal .loop:last-of-type").after(loop);
+        (
+            document.querySelector("#trackInternal .loop:last-of-type") ||
+            document.querySelector("#time")
+        ).after(loop);
     }
 
     return loop;
