@@ -12,12 +12,22 @@ function serialise(forRender) {
     var x = Array.prototype.flatMap.apply(hNodes, [(node => {
         return serialiseNode(node, forRender);
     })]);
-    var out = { nodes: x, duration: audio.duration, bpm: bpm, zoom: zoom, loopInterval: loopi, stereo: audio.stereo, sampleRate: audio.samplerate, normalise: audio.normalise };
-    customEvent("serialise", {data: out});
+    var out = {
+        encformat: audio.format,
+        nodes: x,
+        duration: audio.duration,
+        bpm: bpm,
+        zoom: zoom,
+        loopInterval: loopi,
+        stereo: audio.stereo,
+        sampleRate: audio.samplerate,
+        normalise: audio.normalise
+    };
+    customEvent("serialise", { data: out });
     return out;
 }
 function serialiseNode(node, forRender) {
-    customEvent("preserialisenode", {node: node});
+    customEvent("preserialisenode", { node: node });
     var out = {};
     out.conf = node.conf;
     out.start = parseFloat(node.getAttribute("data-start")) || 0;
@@ -33,7 +43,7 @@ function serialiseNode(node, forRender) {
         out.wasMovedSinceRender = node.hasAttribute("data-wasMovedSinceRender");
         out.ref = node;
     }
-    customEvent("serialisenode", {node: node, data: out});
+    customEvent("serialisenode", { node: node, data: out });
     return out;
 }
 function deserialiseNode(serNode, markDirty) {
@@ -41,7 +51,7 @@ function deserialiseNode(serNode, markDirty) {
     if (markDirty) {
         markLoopDirty(x);
     }
-    customEvent("deserialisenode", {node: x, data: serNode});
+    customEvent("deserialisenode", { node: x, data: serNode });
     return x;
 }
 function deserialise(serialisedStr) {
@@ -60,6 +70,7 @@ function deserialise(serialisedStr) {
     ser.stereo ||= false;
     ser.sampleRate ||= 24000;
     ser.normalise ||= false;
+    ser.encformat ||= "mp3";
     document.querySelector("#duration").value = ser.duration;
     document.querySelector("#bpm").value = ser.bpm;
     document.querySelector("#editorlayer").value = ser.editorLayer;
@@ -67,6 +78,7 @@ function deserialise(serialisedStr) {
     document.querySelector("#stereobox").checked = ser.stereo;
     document.querySelector("#normalisebox").checked = ser.normalise;
     document.querySelector("#samplerate").value = ser.sampleRate;
+    document.querySelector("#encformat").value = ser.encformat;
     document.querySelector("#renderOut").currentTime = 0;
     gui.layer = ser.editorLayer;
     bpm = ser.bpm;
@@ -74,6 +86,7 @@ function deserialise(serialisedStr) {
     audio.duration = ser.duration;
     audio.normalise = ser.normalise;
     audio.stereo = ser.stereo;
+    audio.format = ser.encformat;
 
     if (audio.samplerate !== ser.sampleRate) {
         decodedPcmCache = {};
@@ -85,7 +98,7 @@ function deserialise(serialisedStr) {
         deserialiseNode(node);
     });
     proceduralAssets.clear();
-    customEvent("deserialise", {data: ser});
+    customEvent("deserialise", { data: ser });
     hydrate();
 }
 function load() {

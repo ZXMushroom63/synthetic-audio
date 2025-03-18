@@ -24,6 +24,7 @@ var audio = {
     length: 240000,
     stereo: false,
     normalise: true,
+    format: "wav"
 }
 var loopMap = {
 
@@ -145,13 +146,24 @@ function hydrateLoopBackground(elem) {
     var line = elem.querySelector(".backgroundSvg path");
     var d = "M 0 50 ";
     var downsample = 256;
+    prevY = 0;
     elem.cache[0].forEach((v, i) => {
-        if (i % downsample === 0) {
+        var isFinalSample = i === (elem.cache[0].length - 1);
+        if (i % downsample === 0 || isFinalSample) {
             var x = Math.round(i / elem.cache[0].length * 100 * 100) / 100; 
             var y = (v + 1)/2 * 100;
+            y ||= 50;
+            y = Math.min(100, Math.max(0, y));
+            if (x === NaN || ((Math.abs(y - prevY) < 3) && !isFinalSample)) {
+                return;
+            }
+            prevY = y;
             d += "L " + x.toFixed(2) + " " + y.toFixed(1) + " ";
         }
     });
+    d = d.replaceAll("NaN", "50");
+    d = d.replaceAll(".00 ", " ");
+    d = d.replaceAll(".0 ", " ");
     line.setAttributeNS(null, "d", d);
 }
 function hydrateEditorLayer() {
@@ -363,7 +375,10 @@ function addBlock(type, start, duration, title, layer = 0, data = {}, editorValu
     }
 
     if (!noTimeline) {
-        document.querySelector("#time").after(loop);
+        (
+            document.querySelector("#trackInternal .loop:last-of-type") ||
+            document.querySelector("#time")
+        ).after(loop);
     }
 
     return loop;

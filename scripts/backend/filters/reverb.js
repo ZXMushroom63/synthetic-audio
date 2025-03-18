@@ -47,6 +47,7 @@ addBlockType("reverb", {
         const reverb = await applyReverbOffline(inPcm, audio.samplerate, this.conf.ReverbTime, this.conf.DecayRate);
 
         reverb.forEach((x, i)=>{
+            reverb[i] ||= 0;
             reverb[i] *= volume(i, inPcm);
         });
         
