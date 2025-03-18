@@ -146,13 +146,20 @@ function hydrateLoopBackground(elem) {
     var line = elem.querySelector(".backgroundSvg path");
     var d = "M 0 50 ";
     var downsample = 256;
+    prevY = 0;
+    var stopIdx = Math.floor(elem.cache[0].length / downsample) * downsample;
     elem.cache[0].forEach((v, i) => {
         if (i % downsample === 0) {
             var x = Math.round(i / elem.cache[0].length * 100 * 100) / 100; 
             var y = (v + 1)/2 * 100;
+            if ((x === NaN) || (y === NaN) || ((Math.abs(y - prevY) < 0.05) && i !== stopIdx)) {
+                return;
+            }
+            prevY = y;
             d += "L " + x.toFixed(2) + " " + y.toFixed(1) + " ";
         }
     });
+    d = d.replaceAll("NaN", "0");
     line.setAttributeNS(null, "d", d);
 }
 function hydrateEditorLayer() {
