@@ -455,6 +455,9 @@ function init() {
     addEventListener("keyup", (e) => {
         keymap[e.key] = false;
     });
+    addEventListener("blur", (e) => {
+        keymap = {};
+    });
     addEventListener("wheel", (e) => {
         if (keymap["Control"]) {
             e.preventDefault();
