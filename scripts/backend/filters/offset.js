@@ -11,6 +11,6 @@ addBlockType("offset", {
         outPcm.forEach((x, i) => {
             outPcm[i] = inPcm[i + Math.floor(offset(i, outPcm) * audio.samplerate)] || 0;
         });
-        return inPcm;
+        return outPcm;
     }
 });
