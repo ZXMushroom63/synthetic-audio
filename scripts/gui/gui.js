@@ -145,7 +145,7 @@ function hydrateZoom() {
 function hydrateLoopBackground(elem) {
     var line = elem.querySelector(".backgroundSvg path");
     var d = "M 0 50 ";
-    var downsample = 64;
+    var downsample = 128;
     prevY = 0;
     elem.cache[0].forEach((v, i) => {
         var isFinalSample = i === (elem.cache[0].length - 1);
@@ -153,7 +153,8 @@ function hydrateLoopBackground(elem) {
             var x = Math.round(i / elem.cache[0].length * 100 * 100) / 100; 
             var y = (v + 1)/2 * 100;
             y ||= 50;
-            if (x === NaN || ((Math.abs(y - prevY) < 5) && !isFinalSample)) {
+            y = Math.min(100, Math.max(0, y));
+            if (x === NaN || ((Math.abs(y - prevY) < 3) && !isFinalSample)) {
                 return;
             }
             prevY = y;
