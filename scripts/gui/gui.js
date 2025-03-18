@@ -219,10 +219,10 @@ function addBlock(type, start, duration, title, layer = 0, data = {}, editorValu
                 if (keymap["Shift"]) {
                     bpmInterval = 0.001;
                 }
-                pos = (Math.round((pos / 100 * audio.duration) / bpmInterval) * bpmInterval) / audio.duration * 100;
-                pos = Math.round(pos / 100 * audio.duration / bpmInterval) * bpmInterval;
+                pos = (Math.round((pos / 100 * audio.duration) / bpmInterval) * bpmInterval);
                 var newDuration = ((pos - originalStart) * 1) + originalDuration;
-                var endPos = Math.ceil((originalStart + newDuration) / bpmInterval) * bpmInterval;
+                var endPos = Math.round((originalStart + newDuration) / bpmInterval) * bpmInterval;
+
                 newDuration = endPos - originalStart;
                 var internalWidth = newDuration * (zoom / audio.duration);
                 internal.style.width = internalWidth + "vw";
