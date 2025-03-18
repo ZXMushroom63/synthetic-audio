@@ -145,21 +145,24 @@ function hydrateZoom() {
 function hydrateLoopBackground(elem) {
     var line = elem.querySelector(".backgroundSvg path");
     var d = "M 0 50 ";
-    var downsample = 256;
+    var downsample = 64;
     prevY = 0;
-    var stopIdx = Math.floor(elem.cache[0].length / downsample) * downsample;
     elem.cache[0].forEach((v, i) => {
-        if (i % downsample === 0) {
+        var isFinalSample = i === (elem.cache[0].length - 1);
+        if (i % downsample === 0 || isFinalSample) {
             var x = Math.round(i / elem.cache[0].length * 100 * 100) / 100; 
             var y = (v + 1)/2 * 100;
-            if ((x === NaN) || (y === NaN) || ((Math.abs(y - prevY) < 0.05) && i !== stopIdx)) {
+            y ||= 50;
+            if (x === NaN || ((Math.abs(y - prevY) < 5) && !isFinalSample)) {
                 return;
             }
             prevY = y;
             d += "L " + x.toFixed(2) + " " + y.toFixed(1) + " ";
         }
     });
-    d = d.replaceAll("NaN", "0");
+    d = d.replaceAll("NaN", "50");
+    d = d.replaceAll(".00 ", " ");
+    d = d.replaceAll(".0 ", " ");
     line.setAttributeNS(null, "d", d);
 }
 function hydrateEditorLayer() {

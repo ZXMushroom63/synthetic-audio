@@ -86,6 +86,7 @@ function deserialise(serialisedStr) {
     audio.duration = ser.duration;
     audio.normalise = ser.normalise;
     audio.stereo = ser.stereo;
+    audio.format = ser.encformat;
 
     if (audio.samplerate !== ser.sampleRate) {
         decodedPcmCache = {};
