@@ -375,7 +375,7 @@ function addBlock(type, start, duration, title, layer = 0, data = {}, editorValu
     }
 
     if (!noTimeline) {
-        document.querySelector("#time").after(loop);
+        document.querySelector("#trackInternal .loop:last-of-type").after(loop);
     }
 
     return loop;
