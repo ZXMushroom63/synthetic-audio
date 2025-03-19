@@ -201,7 +201,7 @@ addEventListener("init", () => {
         if (!globalThis.vizDrawnWaveform) {
             return;
         }
-        var mappedData = (new Float32Array(globalThis.vizDrawnWaveform)).map(v => ((v / 255) - 0.5) * 2);
+        var mappedData = (new Float32Array(globalThis.vizDrawnWaveform)).map(v => ((v / 255) - 0.5) * -2);
         var factor = mappedData.length / target.samples.length;
         target.samples.forEach((x, i) => {
             var idx = i * factor;
