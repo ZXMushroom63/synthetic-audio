@@ -200,6 +200,9 @@ function hydrate() {
 function addBlock(type, start, duration, title, layer = 0, data = {}, editorValue = Math.min(gui.layer, 9), noTimeline) {
     var definition = window.filters[type];
     function resizeBlock(e) {
+        if (e.button !== 0) {
+            return;
+        }
         markLoopDirty(loop, true);
         if (!loop.noEditorLayer && (parseInt(loop.getAttribute("data-editlayer")) !== gui.layer)) {
             return;
