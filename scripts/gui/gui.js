@@ -13,7 +13,8 @@ var gui = {
     intervals: 1,
     marker: 0,
     layer: 0,
-    noWvLOD: false
+    noWvLOD: false,
+    substepping: 2,
 }
 var bpm = 240;
 var loopi = 0.001;
@@ -218,7 +219,7 @@ function addBlock(type, start, duration, title, layer = 0, data = {}, editorValu
         if (isRight) {
             document.onmousemove = function (j) {
                 var pos = ((originalBB.left - trackBB.left - (e.clientX - j.clientX)) / trackBB.width) * 100;
-                var bpmInterval = 60 / bpm;
+                var bpmInterval = 60 / (bpm * gui.substepping);
                 if (keymap["Shift"]) {
                     bpmInterval = 0.001;
                 }
@@ -236,7 +237,7 @@ function addBlock(type, start, duration, title, layer = 0, data = {}, editorValu
         } else {
             document.onmousemove = function (j) {
                 var pos = ((originalBB.left - trackBB.left - (e.clientX - j.clientX)) / trackBB.width) * 100;
-                var bpmInterval = 60 / bpm;
+                var bpmInterval = 60 / (bpm * gui.substepping);
                 if (keymap["Shift"]) {
                     bpmInterval = 0.001;
                 }
@@ -330,7 +331,7 @@ function addBlock(type, start, duration, title, layer = 0, data = {}, editorValu
             markLoopDirty(loop, true);
             document.onmousemove = function (j) {
                 var pos = Math.max(0, ((originalBB.left - trackBB.left - (e.clientX - j.clientX)) / trackBB.width) * 100);
-                var bpmInterval = 60 / bpm;
+                var bpmInterval = 60 / (bpm * gui.substepping);
                 if (keymap["Shift"]) {
                     bpmInterval = 0.001;
                 }
@@ -421,6 +422,9 @@ function init() {
         findLoops(".loop[data-type=audio], .loop[data-type=p_readasset]").forEach(x => markLoopDirty(x));
         hydrateBeatMarkers();
         hydrateZoom();
+    });
+    document.querySelector("#substepping").addEventListener("input", (e) => {
+        gui.substepping = Math.min(4, Math.max(1, parseInt(e.target.value))) || 1;
     });
     document.querySelector("#duration").addEventListener("input", () => {
         hydrate();

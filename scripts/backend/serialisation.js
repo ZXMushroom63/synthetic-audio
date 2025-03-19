@@ -21,7 +21,8 @@ function serialise(forRender) {
         loopInterval: loopi,
         stereo: audio.stereo,
         sampleRate: audio.samplerate,
-        normalise: audio.normalise
+        normalise: audio.normalise,
+        substepping: gui.substepping
     };
     customEvent("serialise", { data: out });
     return out;
@@ -66,6 +67,7 @@ function deserialise(serialisedStr) {
     ser.bpm ||= 240;
     ser.loopInterval ||= 0.001;
     ser.editorLayer ||= 0;
+    ser.substepping ||= 1;
     ser.editorLayer = Math.min(ser.editorLayer, 9)
     ser.stereo ||= false;
     ser.sampleRate ||= 24000;
@@ -79,8 +81,10 @@ function deserialise(serialisedStr) {
     document.querySelector("#normalisebox").checked = ser.normalise;
     document.querySelector("#samplerate").value = ser.sampleRate;
     document.querySelector("#encformat").value = ser.encformat;
+    document.querySelector("#substepping").value = ser.substepping;
     document.querySelector("#renderOut").currentTime = 0;
     gui.layer = ser.editorLayer;
+    gui.substepping = ser.substepping;
     bpm = ser.bpm;
     loopi = ser.loopInterval;
     audio.duration = ser.duration;
