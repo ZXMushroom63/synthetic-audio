@@ -225,6 +225,8 @@ addEventListener("init", () => {
         }
         var mappedData = (new Float32Array(globalThis.vizDrawnWaveform)).map(v => ((v / 255) - 0.5) * -2);
         var peak = mappedData.reduce((acc, v) => Math.max(acc, v)) - 0.05;
+        var valley = mappedData.reduce((acc, v) => Math.min(acc, v)) + 0.05;
+        var valleyMode = Math.abs(valley) > Math.abs(peak);
         var sampleStart = 0;
         var foundStart = false;
         var exitedStart = false;
@@ -233,7 +235,7 @@ addEventListener("init", () => {
         var sampleEnd = mappedData.length - 1;
         for (let i = 0; i < mappedData.length; i++) {
             const x = mappedData[i];
-            if (x > peak) {
+            if (valleyMode ? x < valley : x > peak) {
                 if (foundStart) {
                     if (exitedStart && (distFromStart >= minDist)) {
                         sampleEnd = i;
