@@ -276,6 +276,7 @@ function constructRenderDataArray(data) {
                         ) && (x.layer > dirtyNode.layer)) || (assetUserTypes.includes(x.type) && assetMap[x.conf.Asset]))
                     ) {
                         x.dirty = true;
+                        x.ref.setAttribute("data-dirty", "yes");
                         dirtyNodes.push(x);
                         if (x.type === "p_writeasset") {
                             //console.log("Dirty asset found: ", x.conf.Asset);
@@ -346,7 +347,7 @@ async function render() {
                         var endTime = Math.floor((node.start + node.duration) * audio.samplerate);
 
                         if (!node.ref.cache[c]) {
-                            newPcm = await filters[node.type].functor.apply(node, [initialPcm.subarray(startTime, endTime), c, data]);
+                            newPcm = await filters[node.type].functor.apply(node, [initialPcm.slice(startTime, endTime), c, data]);
                             node.ref.cache[c] = newPcm;
                             if (c === 0) {
                                 hydrateLoopBackground(node.ref);
