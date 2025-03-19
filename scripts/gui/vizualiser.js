@@ -51,6 +51,7 @@ addEventListener("load", () => {
     const previousByteData = [];
     const previousFFTData = [];
     function drawWaveform() {
+        globalThis.vizDrawnWaveform = previousByteData[0];
         canvasCtx.lineWidth = 2;
         canvasCtx.strokeStyle = 'rgb(255, 255, 255)';
 
@@ -110,9 +111,13 @@ addEventListener("load", () => {
         }
     }
     function calculateVolume() {
+        if (!previousByteData[0]) {
+            return 0;
+        }
         return previousByteData[0].reduce((acc, v)=>acc + Math.abs(v / 128 - 1)) / previousByteData[0].length * 2;
     }
     const dataHistrogramSize = 3;
+    globalThis.vizDrawnWaveform = null;
     function draw() {
         if (keepDrawing) { //if not true, visualiser if being redrawn while paused.
             analyser.getByteTimeDomainData(dataArray);
