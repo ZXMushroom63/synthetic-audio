@@ -345,11 +345,11 @@ addEventListener("init", () => {
         ctx.strokeStyle = "orange";
         ctx.lineWidth = 1;
 
-        ctx.moveTo(0, 720 * (target.midpoint + 1 / 2));
+        ctx.moveTo(0, 720 * ((-target.midpoint) + 1 / 2));
 
         ctx.beginPath();
-        ctx.moveTo(0, 720 * (target.midpoint + 1 / 2));
-        ctx.lineTo(1280, 720 * (target.midpoint + 1 / 2));
+        ctx.moveTo(0, 720 * ((-target.midpoint) + 1 / 2));
+        ctx.lineTo(1280, 720 * ((-target.midpoint) + 1 / 2));
         ctx.stroke();
 
         ctx.strokeStyle = "cyan";

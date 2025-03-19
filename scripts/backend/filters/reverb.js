@@ -50,6 +50,7 @@ addBlockType("reverb", {
             reverb[i] ||= 0;
             reverb[i] *= volume(i, inPcm);
         });
+        
         if (this.conf.Method === "Overwrite") {
             return reverb;
         }
