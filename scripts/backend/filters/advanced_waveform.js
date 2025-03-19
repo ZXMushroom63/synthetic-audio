@@ -14,6 +14,9 @@ addBlockType("p_waveform_plus", {
         "Exponent": [1, "number", 1],
         "UseCustomWaveform": [false, "checkbox"],
         "WaveformAsset": ["(none)", ["(none)"]],
+        "WaveformVolume": [1, "number", 1],
+        "WaveformAsset2": ["(none)", ["(none)"]],
+        "WaveformVolume2": [0, "number", 1],
         "Amplitude": [1, "number", 1],
         "AmplitudeSmoothTime": [0.006, "number"],
         "Decay": [0, "number", 1],
@@ -46,7 +49,10 @@ addBlockType("p_waveform_plus", {
         ],
         "Custom Waveforms": [
             "UseCustomWaveform",
-            "WaveformAsset"
+            "WaveformAsset",
+            "WaveformVolume",
+            "WaveformAsset2",
+            "WaveformVolume2"
         ],
         "Harmonics": [
             "Harmonics",
@@ -102,6 +108,9 @@ addBlockType("p_waveform_plus", {
         var period = _(this.conf.Period);
 
         var customWaveform = custom_waveforms[this.conf.WaveformAsset]?.calculated;
+        var customWaveform2 = custom_waveforms[this.conf.WaveformAsset2]?.calculated;
+        var wv1Volume = _(this.conf.WaveformVolume);
+        var wv2Volume = _(this.conf.WaveformVolume2);
 
         var semitones = _(this.conf.HarmonicsSemitoneOffset);
 
@@ -202,7 +211,10 @@ addBlockType("p_waveform_plus", {
 
                 if (this.conf.UseCustomWaveform) {
                     if (customWaveform) {
-                        y += -1*customWaveform[Math.floor((waveformTime + wavePhaseOffset) * 600) % 600] * volumeRatio;
+                        y += -1*customWaveform[Math.floor((waveformTime + wavePhaseOffset) * 600) % 600] * volumeRatio * wv1Volume(i, inPcm);
+                    }
+                    if (customWaveform2) {
+                        y += -1*customWaveform2[Math.floor((waveformTime + wavePhaseOffset) * 600) % 600] * volumeRatio * wv2Volume(i, inPcm);
                     }
                 } else {
                     y += waveforms.sin(waveformTime + wavePhaseOffset) * values.Sine * volumeRatio;
