@@ -8,9 +8,9 @@ const waveforms = {
         return Math.sign(Math.sin(t * this.tau));
     },
     sawtooth: function (t) {
-        return (((t) % 1) - 0.5);
+        return 2 * (((t + 0.5) % 1) - 0.5);
     },
     triangle: function (t) {
-        return 2 * Math.abs(2 * (t % 1) - 1) - 1;
+        return 2 * Math.abs(2 * ((t + 0.75) % 1) - 1) - 1;
     }
 }
