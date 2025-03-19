@@ -216,6 +216,55 @@ addEventListener("init", () => {
     });
     oscillatorControls.appendChild(loadWvFromDisplay);
 
+    const loadWvFromDisplaySmart = document.createElement("button");
+    loadWvFromDisplaySmart.innerText = "Smart";
+    loadWvFromDisplaySmart.classList.add("smallBtn");
+    loadWvFromDisplaySmart.addEventListener("click", () => {
+        if (!globalThis.vizDrawnWaveform) {
+            return;
+        }
+        var mappedData = (new Float32Array(globalThis.vizDrawnWaveform)).map(v => ((v / 255) - 0.5) * -2);
+        var peak = mappedData.reduce((acc, v) => Math.max(acc, v)) - 0.05;
+        var sampleStart = 0;
+        var foundStart = false;
+        var exitedStart = false;
+        const minDist = Math.floor((1 / 800)  * audioBuffer.sampleRate); //800hz is highest detectable pitch
+        var distFromStart = 0;
+        var sampleEnd = mappedData.length - 1;
+        for (let i = 0; i < mappedData.length; i++) {
+            const x = mappedData[i];
+            if (x > peak) {
+                if (foundStart) {
+                    if (exitedStart && (distFromStart >= minDist)) {
+                        sampleEnd = i;
+                        break;
+                    } else {
+                        distFromStart++;
+                    }
+                } else {
+                    sampleStart = i;
+                    foundStart = true;
+                }
+            } else if (foundStart) {
+                exitedStart = true;
+                distFromStart++;
+            }
+        }
+        mappedData = mappedData.subarray(sampleStart, sampleEnd);
+        var factor = mappedData.length / target.samples.length;
+        target.samples.forEach((x, i) => {
+            var idx = i * factor;
+            var idx2 = Math.floor((i + 1) * factor);
+            target.samples[i] = lerp(
+                mappedData[Math.floor(idx)],
+                mappedData[Math.floor(idx2)] || mappedData[0],
+                (idx % factor) / factor
+            );
+        });
+        drawWaveform();
+    });
+    oscillatorControls.appendChild(loadWvFromDisplaySmart);
+
     middle.appendChild(document.createElement("br"));
     middle.appendChild(oscillatorControls);
 
