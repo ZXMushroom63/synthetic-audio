@@ -42,7 +42,6 @@ function noteToFrequency(note, octave, accidental = '') {
 function frequencyToNote(frequency) {
     const A4 = 440;
     const notes = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
-    const semitoneRatio = Math.pow(2, 1 / 12);
     let noteNumber = 12 * (Math.log(frequency / A4) / Math.log(2)) + 57;
     let noteIndex = Math.round(noteNumber) % 12;
     let octave = Math.floor(Math.round(noteNumber) / 12);
