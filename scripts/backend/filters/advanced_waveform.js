@@ -87,10 +87,10 @@ addBlockType("p_waveform_plus", {
         var internal = loop.querySelector(".loopInternal");
         var txt = document.createElement("span");
         txt.classList.add("noteDisplay");
-        txt.style.font = "bold 3rem monospace";
-        txt.style.lineHeight = "2.45rem";
+        txt.style.font = "bold 2.5rem monospace";
+        txt.style.lineHeight = "2.5rem";
         txt.style.opacity = "0.65";
-        txt.style.marginLeft = "0.5rem";
+        txt.style.marginLeft = "0.75rem";
         txt.style.textShadow = "0 0 6px rgba(0,0,0,0.75)";
         txt.innerText = "U0";
         internal.appendChild(txt);
