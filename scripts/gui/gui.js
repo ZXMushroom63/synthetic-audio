@@ -366,7 +366,7 @@ function addBlock(type, start, duration, title, layer = 0, data = {}, editorValu
     backgroundSvg.setAttributeNS(null, "preserveAspectRatio", "none");
     const backgroundLine = document.createElementNS("http://www.w3.org/2000/svg", "path");
     backgroundLine.setAttributeNS(null, "d", "");
-    backgroundLine.setAttributeNS(null, "stroke", "white");
+    backgroundLine.setAttributeNS(null, "stroke", "rgba(255,255,255,0.6)");
     backgroundLine.setAttributeNS(null, "fill", "none");
     backgroundLine.style.strokeWidth = "0.1px";
     backgroundSvg.appendChild(backgroundLine);
