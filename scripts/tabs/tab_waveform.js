@@ -267,6 +267,37 @@ addEventListener("init", () => {
     });
     oscillatorControls.appendChild(loadWvFromDisplaySmart);
 
+    const copyWv = document.createElement("button");
+    copyWv.innerText = "Copy";
+    copyWv.style.marginLeft = "1rem";
+    copyWv.classList.add("smallBtn");
+    copyWv.addEventListener("click", () => {
+        if (!target) {
+            return;
+        }
+        navigator.clipboard.writeText("sp_wvform::" + float32arrayToString(target.samples));
+    });
+    oscillatorControls.appendChild(copyWv);
+
+    const pasteWv = document.createElement("button");
+    pasteWv.innerText = "Paste";
+    pasteWv.classList.add("smallBtn");
+    pasteWv.addEventListener("click", () => {
+        if (!target) {
+            return;
+        }
+        navigator.clipboard.readText().then(x => {
+            if (!target) {
+                return;
+            }
+            if (x.startsWith("sp_wvform::") && (x.length === 611)) {
+                target.samples.set(stringToFloat32array(x.replace("sp_wvform::", "")));
+                drawWaveform();
+            }
+        });
+    });
+    oscillatorControls.appendChild(pasteWv);
+
     middle.appendChild(document.createElement("br"));
     middle.appendChild(oscillatorControls);
 
