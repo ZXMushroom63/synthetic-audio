@@ -155,7 +155,7 @@ function hydrateLoopBackground(elem) {
             var y = (v + 1)/2 * 100;
             y ||= 50;
             y = Math.min(100, Math.max(0, y));
-            if (x === NaN || ((Math.abs(y - prevY) < 3) && !isFinalSample)) {
+            if (x === NaN || ((Math.abs(y - prevY) < 3) && !isFinalSample && (Math.abs(elem.cache[0][i+1] - v) > 0.1))) {
                 return;
             }
             prevY = y;
