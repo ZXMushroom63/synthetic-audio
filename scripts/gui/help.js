@@ -49,6 +49,7 @@ CTRL + SPACE = Go to ALL layer (layer 10, readonly)
 N = Open toolbox panel
 RMB on the visualiser to switch between waveform <-> EQ
 SHIFT + A = add a new loop via search
+ALT + SCROLL = modify value on respective loop
 
 
 
