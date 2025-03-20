@@ -4,7 +4,7 @@ function execZScroll(loop, value) {
         def.zscroll(loop, value);
     }
 }
-var minZscrollDelta = 5;
+var minZscrollDelta = 4;
 var zScrollProgress = 0;
 addEventListener("wheel", (e) => {
     if (e.altKey) {
@@ -13,7 +13,7 @@ addEventListener("wheel", (e) => {
         e.stopPropagation();
         var delta = Math.min(1, Math.max(-1, Math.round(e.deltaY)));
         zScrollProgress += delta;
-        if (Math.abs(zScrollProgress) > minZscrollDelta) {
+        if (Math.abs(zScrollProgress) >= minZscrollDelta) {
             zScrollProgress = 0;
             var currentlyActiveLoops = findLoops(".loop.active")
                 .sort((a, b) => {
