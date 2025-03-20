@@ -47,7 +47,7 @@ function frequencyToNote(frequency) {
     let noteIndex = Math.round(noteNumber) % 12;
     let octave = Math.floor(Math.round(noteNumber) / 12);
 
-    return notes[noteIndex] + octave;
+    return (notes[noteIndex] + octave) || "U0";
 }
 
 function getSemitoneCoefficient(semitones) {
