@@ -1,10 +1,18 @@
-
+function updateWaveformNoteDisplay(loop) {
+    var basic = new Float32Array(8);
+    var freq = _(loop.conf.Frequency)(4, basic);
+    var freqsemioffset = _(loop.conf.SemitonesOffset)(4, basic);
+    var internalSemiOffset = loop.conf.InternalSemiOffset;
+    var f = freq * Math.pow(2, (freqsemioffset + internalSemiOffset) / 12);
+    loop.querySelector(".noteDisplay").innerText = frequencyToNote(f);
+}
 addBlockType("p_waveform_plus", {
     color: "rgba(255,0,0,0.3)",
     title: "Advanced Synth",
     configs: {
         "Frequency": [100, "number", 1],
         "SemitonesOffset": [0, "number", 1],
+        "InternalSemiOffset": [0, "number"],
         "FrequencyDecay": [0, "number", 1],
         "Sine": [1, "number", 1],
         "Square": [0, "number", 1],
@@ -75,6 +83,23 @@ addBlockType("p_waveform_plus", {
     selectMiddleware: () => {
         return ["(none)", ...Object.keys(custom_waveforms)];
     },
+    initMiddleware: (loop) => {
+        var internal = loop.querySelector(".loopInternal");
+        var txt = document.createElement("span");
+        txt.classList.add("noteDisplay");
+        txt.style.font = "bold 3rem monospace";
+        txt.style.lineHeight = "2rem";
+        txt.style.opacity = "0.35";
+        txt.style.marginLeft = "0.5rem";
+        txt.innerText = "C4";
+        internal.appendChild(txt);
+        updateWaveformNoteDisplay(loop);
+    },
+    zscroll: (loop, value) => {
+        loop.conf.InternalSemiOffset += value;
+        updateWaveformNoteDisplay(loop);
+        filters["p_waveform_plus"].customGuiButtons.Preview.apply(loop, []);
+    },
     customGuiButtons: {
         "Preview": function () {
             if (document.querySelector("audio#loopsample").src) {
@@ -92,6 +117,7 @@ addBlockType("p_waveform_plus", {
             loop.conf.Harmonics = false;
             loop.querySelector("[data-key=Harmonics]").checked = false;
         }
+        updateWaveformNoteDisplay(loop);
     },
     functor: function (inPcm, channel, data) {
         var keys = ["Sine", "Square", "Sawtooth", "Triangle"];
@@ -153,7 +179,7 @@ addBlockType("p_waveform_plus", {
                 return [[k, x]];
             }));
 
-            var f = freq(i, inPcm) * Math.pow(2, freqsemioffset(i, inPcm) / 12);
+            var f = freq(i, inPcm) * Math.pow(2, (freqsemioffset(i, inPcm) + this.conf.InternalSemiOffset) / 12);
             f *= Math.exp(-fdecay(i, inPcm) * absoluteTime);
             t += f * dt;
             var y = 0;
