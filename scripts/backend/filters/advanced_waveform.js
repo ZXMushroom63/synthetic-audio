@@ -92,9 +92,9 @@ addBlockType("p_waveform_plus", {
         txt.style.opacity = "0.65";
         txt.style.marginLeft = "0.5rem";
         txt.style.textShadow = "0 0 6px rgba(0,0,0,0.75)";
-        txt.innerText = "C4";
+        txt.innerText = "U0";
         internal.appendChild(txt);
-        updateWaveformNoteDisplay(loop);
+        setTimeout(() => {updateWaveformNoteDisplay(loop)}, Math.random()*200);
     },
     zscroll: (loop, value) => {
         loop.conf.InternalSemiOffset += value;
