@@ -434,7 +434,7 @@ function init() {
         mouse.y = e.y;
     });
     addEventListener("keydown", (e) => {
-        if (e.key.toLowerCase() === " " && e.target && e.target.tagName === "BODY") {
+        if (e.key.toLowerCase() === " " && e.target && e.target.tagName === "BODY" && !e.ctrlKey && !e.altKey) {
             e.preventDefault();
             if (document.querySelector("#renderOut").paused) {
                 document.querySelector("#renderOut").play();
