@@ -41,7 +41,12 @@ function registerTool(name, fn, selected = false) {
         document.querySelectorAll(".tool.selected").forEach(x => x.classList.remove("selected"));
         tool.classList.add("selected");
         ACTIVE_TOOL = namespacedId;
-        ACTIVE_TOOL_FN = fn;
+        ACTIVE_TOOL_FN = function (...args) {
+            if (gui.layer === 10) {
+                return;
+            }
+            fn.apply(this, args);
+        };
     });
     document.querySelector(".toolbox").appendChild(tool);
     if (selected) {
