@@ -88,9 +88,10 @@ addBlockType("p_waveform_plus", {
         var txt = document.createElement("span");
         txt.classList.add("noteDisplay");
         txt.style.font = "bold 3rem monospace";
-        txt.style.lineHeight = "2rem";
-        txt.style.opacity = "0.35";
+        txt.style.lineHeight = "2.45rem";
+        txt.style.opacity = "0.65";
         txt.style.marginLeft = "0.5rem";
+        txt.style.textShadow = "0 0 6px rgba(0,0,0,0.75)";
         txt.innerText = "C4";
         internal.appendChild(txt);
         updateWaveformNoteDisplay(loop);
@@ -98,7 +99,9 @@ addBlockType("p_waveform_plus", {
     zscroll: (loop, value) => {
         loop.conf.InternalSemiOffset += value;
         updateWaveformNoteDisplay(loop);
-        filters["p_waveform_plus"].customGuiButtons.Preview.apply(loop, []);
+        if (globalThis.zscrollIsFirst) {
+            filters["p_waveform_plus"].customGuiButtons.Preview.apply(loop, []);
+        }
     },
     customGuiButtons: {
         "Preview": function () {

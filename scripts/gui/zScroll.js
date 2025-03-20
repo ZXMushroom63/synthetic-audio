@@ -6,7 +6,7 @@ function execZScroll(loop, value) {
 }
 var minZscrollDelta = 5;
 var zScrollProgress = 0;
-addEventListener("wheel", (e)=>{
+addEventListener("wheel", (e) => {
     if (e.altKey) {
         e.preventDefault();
         e.stopImmediatePropagation();
@@ -15,19 +15,31 @@ addEventListener("wheel", (e)=>{
         zScrollProgress += delta;
         if (Math.abs(zScrollProgress) > minZscrollDelta) {
             zScrollProgress = 0;
-            var currentlyActiveLoops = document.querySelectorAll(".loop.active");
+            var currentlyActiveLoops = findLoops(".loop.active")
+                .sort((a, b) => {
+                    return parseFloat(a.getAttribute("data-layer")) - parseFloat(b.getAttribute("data-layer"))
+                })
+                .sort((a, b) => {
+                    return parseFloat(a.getAttribute("data-start")) - parseFloat(b.getAttribute("data-start"))
+                });
             if (currentlyActiveLoops[0]) {
-                currentlyActiveLoops.forEach(x => {execZScroll(x, -delta)});
+                globalThis.zscrollMulti = true;
+                currentlyActiveLoops.forEach((x, i) => {
+                    globalThis.zscrollIsFirst = i === 0;
+                    execZScroll(x, -delta);
+                });
             } else {
                 var targetLoop = document.elementFromPoint(mouse.x, mouse.y)?.closest(".loop");
                 if (targetLoop) {
+                    globalThis.zscrollMulti = false;
+                    globalThis.zscrollIsFirst = true;
                     execZScroll(targetLoop, -delta);
                 }
             }
         }
     }
 }, { passive: false });
-addEventListener("keyup", (e)=>{
+addEventListener("keyup", (e) => {
     if (e.key === "Alt") {
         zScrollProgress = 0;
     }
