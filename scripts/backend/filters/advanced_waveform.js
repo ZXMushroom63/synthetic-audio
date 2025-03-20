@@ -10,7 +10,7 @@ addBlockType("p_waveform_plus", {
     color: "rgba(255,0,0,0.3)",
     title: "Advanced Synth",
     configs: {
-        "Frequency": [100, "number", 1],
+        "Frequency": [440, "number", 1],
         "SemitonesOffset": [0, "number", 1],
         "InternalSemiOffset": [0, "number"],
         "FrequencyDecay": [0, "number", 1],
