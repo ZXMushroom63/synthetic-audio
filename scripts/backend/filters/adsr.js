@@ -22,13 +22,14 @@ addBlockType("adsr", {
         var dec = Math.floor(this.conf.Decay * len) + atk;
         var sus = Math.floor(this.conf.Sustain * len) + dec;
         var rel = Math.floor(this.conf.Release * len) + sus;
+        var transient = this.conf.NoTransient ? this.conf.SustainStrength : this.conf.TransientStrength;
         inPcm.fill(0);
         for (index; index < atk; index++) {
-            inPcm[index] = lerp(0, this.conf.TransientStrength, Math.pow(index / atk, this.conf.AttackExp));
+            inPcm[index] = lerp(0, transient, Math.pow(index / atk, this.conf.AttackExp));
         }
         startIdx = index;
         for (index; index < dec; index++) {
-            inPcm[index] = lerp(this.conf.TransientStrength, this.conf.SustainStrength, Math.pow((index - startIdx) / (dec - startIdx), this.conf.DecayExp));
+            inPcm[index] = lerp(transient, this.conf.SustainStrength, Math.pow((index - startIdx) / (dec - startIdx), this.conf.DecayExp));
         }
         startIdx = index;
         for (index; index < sus; index++) {
