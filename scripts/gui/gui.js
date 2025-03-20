@@ -124,7 +124,7 @@ function hydrateLoopPosition(elem) {
     var bg = loopInternal.querySelector(".backgroundSvg");
     if (bg && (nInternalWidth > (9.9 * (!gui.noWvLOD)))) {
         bg.style.width = internalWidth;
-        bg.querySelector("path").style.strokeWidth = innerWidth / (nInternalWidth) * 0.0025 + "px";
+        bg.querySelector("path").style.strokeWidth = innerWidth / (nInternalWidth) * 0.0015 + "px";
         bg.style.display = "block";
     } else {
         bg.style.display = "none";
