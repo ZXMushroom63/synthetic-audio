@@ -124,7 +124,7 @@ function hydrateLoopPosition(elem) {
     var bg = loopInternal.querySelector(".backgroundSvg");
     if (bg && (nInternalWidth > (9.9 * (!gui.noWvLOD)))) {
         bg.style.width = internalWidth;
-        bg.querySelector("path").style.strokeWidth = innerWidth / (nInternalWidth) * 0.0015 + "px";
+        bg.querySelector("path").style.strokeWidth = innerWidth / (nInternalWidth) * 0.0025 + "px";
         bg.style.display = "block";
     } else {
         bg.style.display = "none";
@@ -366,7 +366,7 @@ function addBlock(type, start, duration, title, layer = 0, data = {}, editorValu
     backgroundSvg.setAttributeNS(null, "preserveAspectRatio", "none");
     const backgroundLine = document.createElementNS("http://www.w3.org/2000/svg", "path");
     backgroundLine.setAttributeNS(null, "d", "");
-    backgroundLine.setAttributeNS(null, "stroke", "rgba(255,255,255,0.6)");
+    backgroundLine.setAttributeNS(null, "stroke", "rgba(255,255,255,0.75)");
     backgroundLine.setAttributeNS(null, "fill", "none");
     backgroundLine.style.strokeWidth = "0.1px";
     backgroundSvg.appendChild(backgroundLine);
