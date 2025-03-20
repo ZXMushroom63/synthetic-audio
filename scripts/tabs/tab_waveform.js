@@ -120,7 +120,7 @@ addEventListener("init", () => {
     freq.classList.add("inputStyles");
     freq.style.marginLeft = "0.75rem";
     freq.type = "number";
-    freq.value = 100;
+    freq.value = 440;
     freq.addEventListener("input", () => {
         changeFrequency(freq.value);
     });
