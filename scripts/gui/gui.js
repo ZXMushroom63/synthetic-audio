@@ -218,6 +218,7 @@ function addBlock(type, start, duration, title, layer = 0, data = {}, editorValu
         loop.classList.add("active");
         if (isRight) {
             document.onmousemove = function (j) {
+                keymap["Alt"] = j.altKey;
                 var pos = ((originalBB.left - trackBB.left - (e.clientX - j.clientX)) / trackBB.width) * 100;
                 var bpmInterval = 60 / (bpm * (keymap["Alt"] ? 1 : gui.substepping));
                 if (keymap["Shift"]) {
@@ -236,6 +237,7 @@ function addBlock(type, start, duration, title, layer = 0, data = {}, editorValu
             }
         } else {
             document.onmousemove = function (j) {
+                keymap["Alt"] = j.altKey;
                 var pos = ((originalBB.left - trackBB.left - (e.clientX - j.clientX)) / trackBB.width) * 100;
                 var bpmInterval = 60 / (bpm * (keymap["Alt"] ? 1 : gui.substepping));
                 if (keymap["Shift"]) {
@@ -331,6 +333,7 @@ function addBlock(type, start, duration, title, layer = 0, data = {}, editorValu
             loop.classList.add("active");
             markLoopDirty(loop, true);
             document.onmousemove = function (j) {
+                keymap["Alt"] = j.altKey;
                 var pos = Math.max(0, ((originalBB.left - trackBB.left - (e.clientX - j.clientX)) / trackBB.width) * 100);
                 var bpmInterval = 60 / (bpm * (keymap["Alt"] ? 1 : gui.substepping));
                 if (keymap["Shift"]) {
