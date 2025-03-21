@@ -274,7 +274,7 @@ function addBlock(type, start, duration, title, layer = 0, data = {}, editorValu
     internal.classList.add("loopInternal");
     
     loop["conf"] = structuredClone(data);
-    const optionsMenu = createOptionsMenu(loop, data, definition);
+    const optionsMenu = createOptionsMenu(loop, definition);
 
     const span = document.createElement("span");
     span.innerText = title;

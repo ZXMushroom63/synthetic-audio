@@ -104,7 +104,7 @@ addBlockType("p_waveform_plus", {
             loop.conf.SemitonesOffset = parseFloat(loop.conf.SemitonesOffset) + loop.conf.InternalSemiOffset;
             loop.conf.InternalSemiOffset = 0;
         }
-        if (loop.conf.InternalSemiOffset === 0 && !loop.conf.Frequency.startsWith("#") && (typeof loop.conf.SemitonesOffset === "number")) {
+        if (loop.conf.InternalSemiOffset === 0 && !(("" + loop.conf.Frequency).startsWith("#")) && (typeof loop.conf.SemitonesOffset === "number")) {
             loop.conf.Frequency = ":" + frequencyToNote(_(loop.conf.Frequency)(0, new Float32Array(1)) * Math.pow(2, loop.conf.SemitonesOffset/12)) + ":";
             loop.conf.SemitonesOffset = 0;
         }

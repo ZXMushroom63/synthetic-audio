@@ -407,19 +407,18 @@ select:focus {
     display: none;
 }
 
-.loop details {
+.loopOptionsMenu details {
     margin-top: 1.75rem;
     margin-bottom: 0.25rem;
-    border-left: 2px solid white;
 }
 
-.loop details summary {
+.loopOptionsMenu details summary {
     transform: translateY(-0.75rem);
     text-decoration: underline;
     cursor: pointer;
 }
 
-.loop details:first(label) {
+.loopOptionsMenu details:first(label) {
     margin-top: 1rem;
 }
 
@@ -688,4 +687,11 @@ select option {
 
 input[type="number"]::-webkit-inner-spin-button {
     cursor: pointer;
+}
+
+.loopOptionsMenu.multiEditMenu details + br + details {
+    margin-top: 0.75rem;
+}
+.loopOptionsMenu.multiEditMenu details + br {
+    display: none;
 }
