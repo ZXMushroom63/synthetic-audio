@@ -1,7 +1,7 @@
 function viewHelp() {
-    var div = document.createElement("div");
-    div.innerHTML =
-        `
+  var div = document.createElement("div");
+  div.innerHTML =
+    `
 (click to close)
 
 
@@ -34,6 +34,7 @@ Negative layers to not output any sound into the mixer.
 ******************
 *      KEYS      *
 ******************
+CTRL + / = View specific help text for element.
 CTRL + (any number) = Go to that layer
 Spacebar =  Pause/Play playback
 SHIFT + LEFT = Playback to second 0
@@ -82,9 +83,37 @@ In any numberical input box, pressing 'b' on your keyboard will round the freque
 ''' evaluates any inline script at 0% (:a4: -> 440, #0.5~1 -> 0.5)
 
 `.replaceAll(" ", "&nbsp;").replaceAll("\n", "\<br\>");
-    div.style = "font-family: monospace; position: absolute; z-index: 99999; top: 0; left: 0; right: 0; bottom: 0; background-color: black; color: white; overflow-x: hidden; overflow-y: auto;";
+  div.style = "font-family: monospace; position: absolute; z-index: 99999; top: 0; left: 0; right: 0; bottom: 0; background-color: black; color: white; overflow-x: hidden; overflow-y: auto;";
+  div.addEventListener("click", () => {
+    div.remove();
+  });
+  document.body.appendChild(div);
+}
+const HELP_TEXT_DICT = {};
+function registerHelp(selector, helpText) {
+  var txt = ("(click to close)\n\n" + helpText).trim().replaceAll(" ", "&nbsp;").replaceAll("\n", "\<br\>");
+  HELP_TEXT_DICT[selector] = txt;
+}
+addEventListener("keydown", (e) => {
+  if (e.key === "/" && e.ctrlKey) {
+    e.preventDefault();
+    e.stopPropagation();
+    e.stopImmediatePropagation();
+    var target = document.elementFromPoint(mouse.x, mouse.y);
+    var help = Object.entries(HELP_TEXT_DICT).find(x => {
+      if (target.matches(x[0])) {
+        return true;
+      }
+    })?.[1];
+    if (!help) {
+      return;
+    }
+    var div = document.createElement("div");
+    div.innerHTML = help;
+    div.style = "font-family: monospace; position: absolute; z-index: 99999; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0, 0, 0, 0.8); color: white; overflow-x: hidden; overflow-y: auto;";
     div.addEventListener("click", () => {
-        div.remove();
+      div.remove();
     });
     document.body.appendChild(div);
-}
+  }
+});
