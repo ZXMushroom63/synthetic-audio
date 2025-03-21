@@ -7,6 +7,7 @@ self.addEventListener('fetch', event => {
                 return response;
             }
             return fetch(event.request).then(networkResponse => {
+                console.log("Cache candidate: ", networkResponse);
                 if (!networkResponse || networkResponse.status !== 200 || networkResponse.type !== 'basic') {
                     return networkResponse;
                 }
