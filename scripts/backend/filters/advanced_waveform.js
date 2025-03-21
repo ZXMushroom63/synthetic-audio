@@ -80,8 +80,10 @@ addBlockType("p_waveform_plus", {
             "uPhase"
         ]
     },
-    selectMiddleware: () => {
-        return ["(none)", ...Object.keys(custom_waveforms)];
+    selectMiddleware: (key) => {
+        if (key.startsWith("WaveformAsset")) {
+            return ["(none)", ...Object.keys(custom_waveforms)];
+        }
     },
     initMiddleware: (loop) => {
         var internal = loop.querySelector(".loopInternal");

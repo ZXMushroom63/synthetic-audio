@@ -45,7 +45,7 @@ function createOptionsMenu(loop, definition) {
             var s = document.createElement("select");
             s.setAttribute("data-key", key);
             var proxy = definition.selectMiddleware || (() => value[1]);
-            var opts = proxy(key);
+            var opts = proxy(key) || [];
             if (!opts.includes(value[0])) {
                 opts.push(value[0]);
             }
@@ -60,7 +60,7 @@ function createOptionsMenu(loop, definition) {
             });
             s.addEventListener("focus", () => {
                 loop["conf"][key] = s.value;
-                s.innerHTML = proxy(key).flatMap((a) => { return `<option${a === value[0] ? " selected" : ""}>${a}</option>` }).join("");
+                s.innerHTML = (proxy(key) || []).flatMap((a) => { return `<option${a === value[0] ? " selected" : ""}>${a}</option>` }).join("");
             });
             target.appendChild(s);
         } else {

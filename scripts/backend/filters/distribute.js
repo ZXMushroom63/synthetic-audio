@@ -12,12 +12,14 @@ addBlockType("distribute", {
         "SidechainPower": [2, "number"],
         "Silent": [false, "checkbox"],
     },
-    selectMiddleware: () => {
-        var assetNames = [...new Set(Array.prototype.flatMap.apply(
-            findLoops(".loop[data-type=p_writeasset]"),
-            [(node) => node.conf.Asset]
-        ))];
-        return ["(none)", ...assetNames];
+    selectMiddleware: (key) => {
+        if (key === "Asset") {
+            var assetNames = [...new Set(Array.prototype.flatMap.apply(
+                findLoops(".loop[data-type=p_writeasset]"),
+                [(node) => node.conf.Asset]
+            ))];
+            return ["(none)", ...assetNames];
+        }
     },
     functor: function (inPcm, channel, data) {
         var currentData = proceduralAssets.has(this.conf.Asset) ? proceduralAssets.get(this.conf.Asset)[channel] : [];

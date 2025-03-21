@@ -14,12 +14,14 @@ addBlockType("p_readasset", {
         "Silent": [false, "checkbox"],
     },
     assetUser: true,
-    selectMiddleware: () => {
-        var assetNames = [...new Set(Array.prototype.flatMap.apply(
-            findLoops(".loop[data-type=p_writeasset]"),
-            [(node) => node.conf.Asset]
-        ))];
-        return ["(none)", ...assetNames];
+    selectMiddleware: (key) => {
+        if (key === "Asset") {
+            var assetNames = [...new Set(Array.prototype.flatMap.apply(
+                findLoops(".loop[data-type=p_writeasset]"),
+                [(node) => node.conf.Asset]
+            ))];
+            return ["(none)", ...assetNames];
+        }
     },
     updateMiddleware: (loop) => {
         var newTitle = "Asset - " + loop.conf.Asset;
