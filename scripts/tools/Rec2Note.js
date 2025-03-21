@@ -95,7 +95,7 @@ addEventListener("init", () => {
         if (nodes.length !== 1) { return };
         const templateNode = nodes[0];
         const nodeType = templateNode.getAttribute("data-type");
-        if (!('Frequency' in templateNode.conf)) {
+        if (!('Frequency' in templateNode.conf) || (typeof templateNode.conf.Frequency !== "string")) {
             return;
         }
         const picker = document.createElement("input");
@@ -122,3 +122,10 @@ addEventListener("init", () => {
         picker.click();
     });
 });
+registerHelp(".tool[data-tool=🎤︎2♪]",
+`
+***********************
+*  THE REC2NOTE TOOL  *
+***********************
+This is an experimental tool that converts a recorded file (.mp3, .wav, etc) into actual notes. It can be activated by clicking on an applicable synth (must have a programmable Frequency field) and then uploading a file.
+`);

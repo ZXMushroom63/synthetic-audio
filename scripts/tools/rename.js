@@ -15,3 +15,13 @@ addEventListener("init", ()=>{
         });
     });
 });
+registerHelp(".tool[data-tool=RENAME]",
+`
+*********************
+*  THE RENAME TOOL  *
+*********************
+If the rename tool is enabled, when a 
+    - loop is clicked, or
+    - a group of loops are selected using RMB
+a popup asking for new names for those loops appears, and if the user presses 'Ok', all selected loop's names are changed.
+`);

@@ -117,7 +117,7 @@ function createOptionsMenu(loop, definition) {
             }
         });
     };
-    optionsMenu.addEventListener("mousedown", (e) => { e.stopPropagation(); });
+    optionsMenu.addEventListener("mousedown", (e) => { document.querySelector(".multiEditMenu").remove(); e.stopPropagation(); });
 
     return optionsMenu;
 }
@@ -211,8 +211,6 @@ function createMultiEditMenu(initData, editingTargets, propDefs, dropDownDefs) {
         }
         target.appendChild(document.createElement("br"));
     });
-
-    optionsMenu.addEventListener("mousedown", (e) => { e.stopPropagation(); });
     optionsMenu.classList.add("multiEditMenu");
     return optionsMenu;
 }
