@@ -198,3 +198,10 @@ registerHelp(".trayElem:has(#substepping), #substepping",
 
 The amount of extra snapping points between each beat.
 `);
+
+registerHelp("[data-tab=Timeline]",
+`
+> TIMELINE TAB
+
+This tab is where all your songs structure and melody resides.
+`);

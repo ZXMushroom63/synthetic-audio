@@ -5,6 +5,12 @@ var custom_waveforms = {};
 //
 //    ]
 // }
+registerHelp("[data-tab=Waveforms]",
+`
+> Waveforms TAB
+
+This tab is where custom waveforms or LFOs are designed.
+`);
 addEventListener("init", () => {
     var target = null;
     var selectedWaveformId = "";
@@ -230,7 +236,7 @@ addEventListener("init", () => {
         var sampleStart = 0;
         var foundStart = false;
         var exitedStart = false;
-        const minDist = Math.floor((1 / 800)  * audioBuffer.sampleRate); //800hz is highest detectable pitch
+        const minDist = Math.floor((1 / 800) * audioBuffer.sampleRate); //800hz is highest detectable pitch
         var distFromStart = 0;
         var sampleEnd = mappedData.length - 1;
         for (let i = 0; i < mappedData.length; i++) {

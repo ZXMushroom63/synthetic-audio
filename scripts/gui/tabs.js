@@ -2,6 +2,7 @@ var CURRENT_TAB = "";
 function registerTab(tabName, element, selected, listener = ()=>{}) {
     var tab_code = tabName.toUpperCase().trim().replaceAll(" ", "_");
     var tab = document.createElement("span");
+    tab.setAttribute("data-tab", tabName);
     tab.innerText = tabName;
     tab.classList.add("tab");
     if (selected) {
