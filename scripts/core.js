@@ -31,8 +31,7 @@ function noteToFrequency(note, octave, accidental = '') {
     }
     let index = notes.indexOf(note.toUpperCase() + accidental);
     if (index === -1) {
-        console.log("Invalid note or accidental.");
-        return 440;
+        return 0;
     }
     const halfSteps = (octave - 4) * 12 + index - notes.indexOf('A');
     const frequency = A4 * Math.pow(2, halfSteps / 12);
