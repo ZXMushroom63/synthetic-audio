@@ -11,7 +11,7 @@ self.addEventListener('fetch', event => {
                     return networkResponse;
                 }
 
-                if (!networkResponse.url.endsWith("/check.txt")) {
+                if (!networkResponse.url.endsWith("/check.txt") && !networkResponse.url.startsWith("chrome-extension://")) {
                     const responseToCache = networkResponse.clone();
 
                     caches.open(CACHE_NAME).then(cache => {
