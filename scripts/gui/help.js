@@ -118,3 +118,83 @@ addEventListener("keydown", (e) => {
     document.body.appendChild(div);
   }
 });
+
+registerHelp(".trayElem:has(#editorlayer), #editorlayer",
+`
+> EDITOR LAYER FIELD
+
+Editor layer are ways to have different notes with different filters playing at the same type.
+Layers 0-9 go into the volume mixer. They can be accessed using CTRL + 0, CTRL + 1, etc.
+Layer 10 is a readonly layer where all loops are visible (for demos). It can be accessed with CTRL + SPACE
+Negative layers can only be accessed using the number editor. Data does not go into the audio mixer, but assets are saved for future layers. It is primarily used for created loops/other assets that are used in layers 0-9.
+`);
+
+registerHelp(".trayElem:has(#bpm), #bpm",
+`
+> BPM FIELD
+
+The BPM of your song. It controls the distribution of the white bars on the timeline.
+`);
+
+registerHelp(".trayElem:has(#loopi), #loopi",
+`
+> LOOP INTERVAL FIELD
+
+The loop interval field can be changed to sizes such as 1, or 2 for songs that primarily use loops in order to make loops of durations like 5.9s round up to 6s.
+`);
+
+registerHelp(".trayElem:has(#duration), #duration",
+`
+> DURATION FIELD
+
+The duration of the song in seconds.
+`);
+
+registerHelp(".trayElem:has(#stereobox), #stereobox",
+`
+> STEREO AUDIO FIELD
+
+Whether or not to enable rendering different audio for each ear/side. Enabling this doubles render time.
+`);
+
+registerHelp(".trayElem:has(#normalisebox), #normalisebox",
+`
+> NORMALISE AUDIO FIELD
+
+Should the volume of the audio be automatically controlled so that no audio is overdriven. Disable for more direct control over the volume of your song.
+`);
+
+registerHelp(".trayElem:has(#samplerate), #samplerate",
+`
+> SAMPLERATE FIELD
+
+The quality of rendered audio. 48k is industry standard, but 24k is recommended for faster render times while editing.
+`);
+
+registerHelp(".trayElem:has(#nolod), #nolod",
+`
+> NO LOD FIELD
+
+Whether or not to disable level of detail features based on song length. Disable or any remotely powerful device.
+`);
+
+registerHelp(".trayElem:has(#forceWv), #forceWv",
+`
+> FORCE WAVEFORM FIELD
+
+Whether or not to show the waveform display on loops of any length.
+`);
+
+registerHelp(".trayElem:has(#encformat), #encformat",
+`
+> ENCODE FORMAT FIELD
+
+The encoding of the audio when rendering. Usually, you'll want to use .wav for blazing fast encoding, and .mp3 for efficient file compression.
+`);
+
+registerHelp(".trayElem:has(#substepping), #substepping",
+`
+> SUBSTEPPING FIELD
+
+The amount of extra snapping points between each beat.
+`);
