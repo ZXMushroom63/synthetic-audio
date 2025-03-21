@@ -117,7 +117,7 @@ function createOptionsMenu(loop, definition) {
             }
         });
     };
-    optionsMenu.addEventListener("mousedown", (e) => { document.querySelector(".multiEditMenu").remove(); e.stopPropagation(); });
+    optionsMenu.addEventListener("mousedown", (e) => { e.stopPropagation(); document.querySelector(".multiEditMenu").remove(); });
 
     return optionsMenu;
 }
