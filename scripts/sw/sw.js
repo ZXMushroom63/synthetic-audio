@@ -3,6 +3,7 @@ const CACHE_NAME = 'synthetic-cache';
 self.addEventListener('fetch', event => {
     event.respondWith(
         caches.match(event.request).then(response => {
+            console.log("Net request: ", event.request, "; current cache: ", response);;
             if (response) {
                 return response;
             }
