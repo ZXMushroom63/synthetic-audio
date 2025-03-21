@@ -51,7 +51,8 @@ N = Open toolbox panel
 RMB on the visualiser to switch between waveform <-> EQ
 SHIFT + A = add a new loop via search
 ALT + SCROLL = modify value on respective loop
-
+CTRL + S = write to autosave slot
+CTRL + SHIFT + S = save as file
 
 
 *******************

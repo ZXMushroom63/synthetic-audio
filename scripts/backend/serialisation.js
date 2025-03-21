@@ -105,6 +105,7 @@ function deserialise(serialisedStr) {
     customEvent("deserialise", { data: ser });
     hydrate();
 }
+globalThis.lastEditedFile = "mysong.sm";
 function load() {
     var x = document.createElement("input");
     x.type = "file";
@@ -112,6 +113,11 @@ function load() {
     x.oninput = () => {
         if (x.files[0]) {
             document.querySelector("title").innerText = x.files[0].name;
+            if (x.files[0].name.endsWith(".sm")) {
+                globalThis.lastEditedFile = x.files[0].name;
+            } else {
+                globalThis.lastEditedFile = "mysong.sm";
+            }
             var fr = new FileReader();
             var isMidi = false;
             fr.onload = () => {
@@ -132,8 +138,20 @@ function load() {
     x.click();
 }
 function writeAutosave() {
+    document.querySelector("#renderProgress").innerText = "Autosaved! " + (new Date).toTimeString()
     localStorage.setItem("synthetic/save", JSON.stringify(serialise()));
 }
 addEventListener("beforeunload", () => {
     writeAutosave();
+});
+addEventListener("keydown", (e) => {
+    if (e.key === "s" && !e.shiftKey && e.ctrlKey && !e.altKey && !e.metaKey) {
+        writeAutosave();
+        e.preventDefault();
+    }
+    if (e.key === "S" && e.shiftKey && e.ctrlKey && !e.altKey && !e.metaKey) {
+        saveAs(new Blob([JSON.stringify(serialise())], {type: 'text/json'}), globalThis.lastEditedFile);
+        document.querySelector("#renderProgress").innerText = "Writing! " + (new Date).toTimeString();
+        e.preventDefault();
+    }
 });

@@ -130,7 +130,7 @@
                     (no render task currently active)
                 </div>
                 <div id="controlsAndStuff">
-                    <button onclick="saveAs(new Blob([JSON.stringify(serialise())], {type: 'text/json'}), 'mysong.sm')">
+                    <button onclick="saveAs(new Blob([JSON.stringify(serialise())], {type: 'text/json'}), globalThis.lastEditedFile)">
                         Save
                     </button>
                     <button onclick="load()">
