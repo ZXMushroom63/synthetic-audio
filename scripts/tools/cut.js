@@ -31,3 +31,17 @@ addEventListener("init", () => {
         hydrateZoom();
     }, false);
 });
+registerHelp(".tool[data-tool=CUT]",
+`
+******************
+*  THE CUT TOOL  *
+******************
+If the cut tool is enabled, when a 
+ - loop is clicked, or
+ - a group of loops are selected using RMB
+any applicable loops are split at the playhead's location.
+
+On most filters and synths, this will just make two smaller notes rather than actually splitting the loop's start and end.
+Only loops with the 'StartOffset' config entry (play asset, or an audio file) are actually split.
+`
+);
