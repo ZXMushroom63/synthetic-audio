@@ -180,3 +180,13 @@ addEventListener("load", () => {
         }, 450);
     });
 });
+
+registerHelp("canvas#viz",
+`
+********************
+*  THE VISUALISER  *
+********************
+Audio visualiser, visible while audio is playing.
+Use RMB to switch between WAVEFORM and EQ visualiser modes.
+In EQ mode, the bars match up with the fields of an EQ filter.
+`);
