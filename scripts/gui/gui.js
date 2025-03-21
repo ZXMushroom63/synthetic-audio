@@ -219,7 +219,7 @@ function addBlock(type, start, duration, title, layer = 0, data = {}, editorValu
         if (isRight) {
             document.onmousemove = function (j) {
                 var pos = ((originalBB.left - trackBB.left - (e.clientX - j.clientX)) / trackBB.width) * 100;
-                var bpmInterval = 60 / (bpm * gui.substepping);
+                var bpmInterval = 60 / (bpm * (keymap["Alt"] ? 1 : gui.substepping));
                 if (keymap["Shift"]) {
                     bpmInterval = 0.001;
                 }
@@ -237,7 +237,7 @@ function addBlock(type, start, duration, title, layer = 0, data = {}, editorValu
         } else {
             document.onmousemove = function (j) {
                 var pos = ((originalBB.left - trackBB.left - (e.clientX - j.clientX)) / trackBB.width) * 100;
-                var bpmInterval = 60 / (bpm * gui.substepping);
+                var bpmInterval = 60 / (bpm * (keymap["Alt"] ? 1 : gui.substepping));
                 if (keymap["Shift"]) {
                     bpmInterval = 0.001;
                 }
@@ -332,7 +332,7 @@ function addBlock(type, start, duration, title, layer = 0, data = {}, editorValu
             markLoopDirty(loop, true);
             document.onmousemove = function (j) {
                 var pos = Math.max(0, ((originalBB.left - trackBB.left - (e.clientX - j.clientX)) / trackBB.width) * 100);
-                var bpmInterval = 60 / (bpm * gui.substepping);
+                var bpmInterval = 60 / (bpm * (keymap["Alt"] ? 1 : gui.substepping));
                 if (keymap["Shift"]) {
                     bpmInterval = 0.001;
                 }

@@ -15,7 +15,7 @@ function pickupLoop(loop, natural = false) {
         } else {
             pos = Math.max(0, ((originalBB.left - trackBB.left - (((originalBB.left + originalBB.right) / 2) - j.clientX)) / trackBB.width) * 100);
         }
-        var bpmInterval = 60 / (bpm * gui.substepping);
+        var bpmInterval = 60 / (bpm * (keymap["Alt"] ? 1 : gui.substepping));
         if (keymap["Shift"]) {
             bpmInterval = 0.001;
         }
