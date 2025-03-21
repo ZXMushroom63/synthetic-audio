@@ -570,11 +570,16 @@ select option {
     margin-top: 0.25rem;
     margin-bottom: 0.25rem;
     user-select: none;
+    transition: background-color 0.1s;
     border: 2px solid white;
 }
 
+.toolbox div.tool:hover {
+    background-color: rgba(0, 125, 255, 0.2);
+}
+
 .toolbox div.tool.selected {
-    background-color: rgba(0, 125, 255, 0.3);
+    background-color: rgba(0, 125, 255, 0.35);
     border: 2px solid white;
 }
 
