@@ -272,7 +272,8 @@ function addBlock(type, start, duration, title, layer = 0, data = {}, editorValu
     const internal = document.createElement("div");
     internal.style.backgroundColor = definition.color;
     internal.classList.add("loopInternal");
-
+    
+    loop["conf"] = structuredClone(data);
     const optionsMenu = createOptionsMenu(loop, data, definition);
 
     const span = document.createElement("span");

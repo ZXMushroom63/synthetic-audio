@@ -1,7 +1,6 @@
-function createOptionsMenu(loop, data, definition) {
+function createOptionsMenu(loop, definition) {
     const optionsMenu = document.createElement("div");
     optionsMenu.classList.add("loopOptionsMenu");
-    loop["conf"] = structuredClone(data);
     var dropdowns = definition.dropdowns || {};
     var dropdownsMap = Object.fromEntries(Object.keys(dropdowns).map(x => {
         var detail = document.createElement("details");
