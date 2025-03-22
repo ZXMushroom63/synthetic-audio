@@ -27,6 +27,7 @@ addEventListener("wheel", (e) => {
                 currentlyActiveLoops.forEach((x, i) => {
                     globalThis.zscrollIsFirst = i === 0;
                     execZScroll(x, -delta);
+                    markLoopDirty(x);
                 });
             } else {
                 var targetLoop = document.elementFromPoint(mouse.x, mouse.y)?.closest(".loop");
@@ -34,6 +35,7 @@ addEventListener("wheel", (e) => {
                     globalThis.zscrollMulti = false;
                     globalThis.zscrollIsFirst = true;
                     execZScroll(targetLoop, -delta);
+                    markLoopDirty(x);
                 }
             }
         }
