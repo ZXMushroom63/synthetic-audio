@@ -361,6 +361,16 @@ addEventListener("init", () => {
         "p_value": "𝑥",
         "adsr": "ADSR",
     };
+
+    const addModifierDiv = document.createElement("div");
+    addModifierDiv.style.width = "20vw";
+    addModifierDiv.style.position = "relative";
+    addModifierDiv.style.bottom = "calc(3rem + 3px)";
+    addModifierDiv.style.height = "0";
+    addModifierDiv.style.whiteSpace = "break-spaces";
+    addModifierDiv.style.borderTop = "1px solid white";
+    right.appendChild(addModifierDiv);
+
     Object.keys(supportedFilters).forEach(filter => {
         const addMod = document.createElement("button");
         addMod.classList.add("smallBtn");
@@ -382,7 +392,7 @@ addEventListener("init", () => {
             loadModifiersToTarget();
             drawWaveform();
         });
-        right.appendChild(addMod);
+        addModifierDiv.appendChild(addMod);
     });
 
     const applyMods = document.createElement("button");
@@ -398,7 +408,7 @@ addEventListener("init", () => {
         loadModifiersToTarget();
         drawWaveform();
     });
-    right.appendChild(applyMods);
+    addModifierDiv.appendChild(applyMods);
 
     var calculating = false;
     async function drawWaveform() {
