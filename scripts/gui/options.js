@@ -212,6 +212,7 @@ function createMultiEditMenu(initData, editingTargets, propDefs, dropDownDefs) {
         target.appendChild(document.createElement("br"));
     });
     optionsMenu.classList.add("multiEditMenu");
+    optionsMenu.addEventListener("mousedown", (e) => { e.stopPropagation(); });
     return optionsMenu;
 }
 function getSelectMiddleware(editingTargets) {
