@@ -111,7 +111,7 @@ addEventListener("keydown", (e) => {
     }
     var div = document.createElement("div");
     div.innerHTML = help;
-    div.style = "font-family: monospace; position: absolute; z-index: 99999; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0, 0, 0, 0.8); color: white; overflow-x: hidden; overflow-y: auto;";
+    div.style = "font-family: monospace; position: absolute; z-index: 99999; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0, 0, 0, 0.85); color: white; overflow-x: hidden; overflow-y: auto;";
     div.addEventListener("click", () => {
       div.remove();
     });

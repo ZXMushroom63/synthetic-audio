@@ -5,16 +5,12 @@ var custom_waveforms = {};
 //
 //    ]
 // }
-registerHelp("[data-tab=Waveforms]",
-`
-> Waveforms TAB
 
-This tab is where custom waveforms or LFOs are designed.
-`);
 addEventListener("init", () => {
     var target = null;
     var selectedWaveformId = "";
     const container = document.createElement("table");
+    container.id = "waveformManagerUI";
     const UI = document.createElement("tr");
     UI.style.borderTop = "1px solid white";
     container.appendChild(UI);
@@ -119,6 +115,7 @@ addEventListener("init", () => {
     oscillatorControls.style.lineHeight = "1.9rem";
     oscillatorControls.style.color = "white";
     oscillatorControls.style.fontFamily = "sans-serif";
+    oscillatorControls.setAttribute("data-helptarget", "oscillator_controls");
 
     oscillatorControls.innerText = "Frequency:";
 
@@ -349,6 +346,7 @@ addEventListener("init", () => {
     right.style.alignContent = "start";
     right.style.textAlign = "left";
     right.style.whiteSpace = "break-spaces";
+    right.setAttribute("data-helptarget", "wv_modifier_stack");
     UI.appendChild(right);
 
     var supportedFilters = {
@@ -669,3 +667,100 @@ addEventListener("init", () => {
     document.querySelector("#tabContent").appendChild(container);
     registerTab("Waveforms", container, false, drawWaveform);
 });
+
+registerHelp("[data-tab=Waveforms]",
+`
+> WAVEFORMS TAB
+
+This tab is where custom waveforms or LFOs are designed.
+`);
+
+registerHelp("[data-tab=Waveforms]",
+`
+> WAVEFORMS TAB
+
+This tab is where custom waveforms or LFOs are designed.
+`);
+
+registerHelp("#waveformManagerUI tr td:first-child button",
+`
+> Create new waveform button
+
+This tab is where custom waveforms or LFOs are designed.
+`);
+
+registerHelp("#waveformManagerUI tr td:first-child .wvform",
+`
+> A waveform entry
+
+A waveform. Click on it to select it, or use the Rename, Clone or Delete buttons.
+`);
+
+registerHelp("#waveformManagerUI tr canvas",
+`
+> Waveform display & canvas
+
+This is where the currently selected waveform is displayed.
+
+- The grey line is a constant midpoint where the value is equal to 0.
+- The orange line is the midpoint of the calculated waveform.
+- The cyan line is the raw data of the waveform.
+- The lime green line is the calculated data of the waveform, with all modifiers applied. If there are no modifiers, it overlaps the cyan line.
+
+you can use your mouse to input a waveform.
+`);
+
+registerHelp("[data-helptarget=oscillator_controls]",
+`
+> Oscillator controls & other actions
+
+This panel contains controls for playing, sculpting and exporting the waveform.
+
+Controls (oscillator):
+- Frequency: The frequency of the waveform oscillator
+- Volume: The volume of the waveform oscillator
+- Start/Stop button: Button to start/stop the oscillator
+
+Controls (sculpting):
+- Image Reference: Lets you upload an image of a waveform to trace over
+- Write from visualiser: If the audio visualiser contains active data, you can use this button to load that data into the selected waveform.
+- Smart: Write from visualiser, with an algorithm to automatically find the period of the waveform and get a single segment.
+
+Controls (exporting):
+- Copy: Copies the waveform to the user's clipboard
+- Paste: Attempts to load the user's clipboard into the current waveform
+`);
+
+registerHelp("[data-helptarget=oscillator_controls]",
+`
+> Oscillator controls & other actions
+
+This panel contains controls for playing, sculpting and exporting the waveform.
+
+Controls (oscillator):
+- Frequency: The frequency of the waveform oscillator
+- Volume: The volume of the waveform oscillator
+- Start/Stop button: Button to start/stop the oscillator
+
+Controls (sculpting):
+- Image Reference: Lets you upload an image of a waveform to trace over
+- Write from visualiser: If the audio visualiser contains active data, you can use this button to load that data into the selected waveform.
+- Smart: Write from visualiser, with an algorithm to automatically find the period of the waveform and get a single segment.
+
+Controls (exporting):
+- Copy: Copies the waveform to the user's clipboard
+- Paste: Attempts to load the user's clipboard into the current waveform
+`);
+
+registerHelp("[data-helptarget=wv_modifier_stack]",
+`
+> Waveform modifiers
+
+This panel contains waveform modifiers. These are versions of filters that can be applied in an order to affect the final waveform.
+Press any modifier button to add a modifier to a stack. You can drag the modifiers to rearrange them.
+
+The '𝑥' button can be used to set the waveform to any arbitrary value, by default silence.
+The '∿' button can be used to set the waveform to a basic oscillator.
+The 'ADSR' button can be used to create an LFO for a synths' amplitude.
+All the other buttons create a corresponding filter.
+`);
