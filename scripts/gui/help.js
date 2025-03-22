@@ -102,7 +102,7 @@ addEventListener("keydown", (e) => {
     e.stopImmediatePropagation();
     var target = document.elementFromPoint(mouse.x, mouse.y);
     var help = Object.entries(HELP_TEXT_DICT).find(x => {
-      if (target.matches(x[0])) {
+      if ((new Set(document.querySelectorAll(x[0]))).has(target)) {
         return true;
       }
     })?.[1];

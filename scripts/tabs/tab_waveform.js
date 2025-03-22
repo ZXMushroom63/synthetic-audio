@@ -731,7 +731,7 @@ Controls (exporting):
 - Paste: Attempts to load the user's clipboard into the current waveform
 `);
 
-registerHelp("[data-helptarget=oscillator_controls]",
+registerHelp("[data-helptarget=oscillator_controls], [data-helptarget=oscillator_controls] *",
 `
 > Oscillator controls & other actions
 
@@ -752,7 +752,7 @@ Controls (exporting):
 - Paste: Attempts to load the user's clipboard into the current waveform
 `);
 
-registerHelp("[data-helptarget=wv_modifier_stack]",
+registerHelp("[data-helptarget=wv_modifier_stack], [data-helptarget=wv_modifier_stack] *",
 `
 > Waveform modifiers
 
