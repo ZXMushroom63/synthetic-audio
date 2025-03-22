@@ -35,7 +35,7 @@ addEventListener("wheel", (e) => {
                     globalThis.zscrollMulti = false;
                     globalThis.zscrollIsFirst = true;
                     execZScroll(targetLoop, -delta);
-                    markLoopDirty(x);
+                    markLoopDirty(targetLoop);
                 }
             }
         }
