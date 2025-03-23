@@ -145,7 +145,7 @@ function hydrateZoom() {
 }
 function hydrateLoopBackground(elem) {
     var line = elem.querySelector(".backgroundSvg path");
-    var d = "M 0 50 ";
+    var d = "M0 50";
     var downsample = 256;
     prevY = 0;
     elem.cache[0].forEach((v, i) => {
@@ -155,11 +155,11 @@ function hydrateLoopBackground(elem) {
             var y = (v + 1)/2 * 100;
             y ||= 50;
             y = Math.min(100, Math.max(0, y));
-            if (x === NaN || ((Math.abs(y - prevY) < 3) && !isFinalSample && (Math.abs(elem.cache[0][i+1] - v) > 0.1))) {
+            if (x === NaN || ((Math.abs(y - prevY) < 5) && !isFinalSample && (Math.abs(elem.cache[0][i+1] - v) > 0.05))) {
                 return;
             }
             prevY = y;
-            d += "L " + x.toFixed(2) + " " + y.toFixed(1) + " ";
+            d += "L" + x.toFixed(2) + " " + Math.round(y) + "";
         }
     });
     d = d.replaceAll("NaN", "50");
