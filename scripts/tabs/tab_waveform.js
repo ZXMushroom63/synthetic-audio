@@ -85,7 +85,7 @@ addEventListener("init", () => {
                 var startIdx = Math.min(prevIdx, newIdx);
                 var endIdx = Math.max(newIdx, prevIdx);
                 var startValue = startIdx === prevIdx ? prevValue : newValue;
-                var endValue = startIdx === prevIdx ? prevValue : newValue;
+                var endValue = startIdx !== prevIdx ? prevValue : newValue;
                 for (let i = startIdx; i < endIdx; i++) {
                     target.samples[i] = -lerp(startValue, endValue, (i - startIdx) / (endIdx - startIdx + 1));
                 }
