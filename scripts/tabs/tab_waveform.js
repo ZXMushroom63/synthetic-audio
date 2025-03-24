@@ -279,7 +279,7 @@ addEventListener("init", () => {
         if (!target) {
             return;
         }
-        navigator.clipboard.writeText("sp_wvform::" + float32arrayToStringPlus(target.samples));
+        navigator.clipboard.writeText("sp_wvform::" + float32arrayToString(target.samples));
     });
     oscillatorControls.appendChild(copyWv);
 
@@ -295,7 +295,7 @@ addEventListener("init", () => {
                 return;
             }
             if (x.startsWith("sp_wvform::") && (x.length === 811)) {
-                target.samples.set(stringToFloat32arrayPlus(x.replace("sp_wvform::", "")));
+                target.samples.set(stringToFloat32array(x.replace("sp_wvform::", "")));
                 drawWaveform();
             }
         });
