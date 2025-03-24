@@ -251,10 +251,10 @@ addBlockType("p_waveform_plus", {
 
                 if (this.conf.UseCustomWaveform) {
                     if (customWaveform) {
-                        y += -1*customWaveform[Math.floor((waveformTime + wavePhaseOffset) * 600) % 600] * volumeRatio * wv1Volume(i, inPcm);
+                        y += -1*customWaveform[Math.floor((waveformTime + wavePhaseOffset) * 1600) % 1600] * volumeRatio * wv1Volume(i, inPcm);
                     }
                     if (customWaveform2) {
-                        y += -1*customWaveform2[Math.floor((waveformTime + wavePhaseOffset) * 600) % 600] * volumeRatio * wv2Volume(i, inPcm);
+                        y += -1*customWaveform2[Math.floor((waveformTime + wavePhaseOffset) * 1600) % 1600] * volumeRatio * wv2Volume(i, inPcm);
                     }
                 } else {
                     y += waveforms.sin(waveformTime + wavePhaseOffset) * values.Sine * volumeRatio;

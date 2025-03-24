@@ -1,6 +1,6 @@
 var custom_waveforms = {};
 //"X": {
-//    samples: [0,0,0,...] (len=600)
+//    samples: [0,0,0,...] (len=1600)
 //    modifiers: [
 //
 //    ]
@@ -35,9 +35,9 @@ addEventListener("init", () => {
         if (custom_waveforms[newWaveformName]) {
             return;
         }
-        var smp = new Float32Array(600).fill(0);
+        var smp = new Float32Array(1600).fill(0);
         smp.forEach((x, i) => {
-            smp[i] = waveforms.sin(i / 600);
+            smp[i] = waveforms.sin(i / 1600);
         });
         custom_waveforms[newWaveformName] = {
             samples: smp,
@@ -78,7 +78,7 @@ addEventListener("init", () => {
     var prevValue = -1;
     panel.addEventListener("mousemove", (e) => {
         if (isDrawing && target) {
-            var newIdx = Math.floor(e.offsetX * (600 / aabb.width));
+            var newIdx = Math.floor(e.offsetX * (1600 / aabb.width));
             var newValue = e.offsetY * (2 / aabb.height) - 1;
             target.samples[newIdx] = -newValue;
             if (prevIdx !== -1) {
@@ -306,7 +306,7 @@ addEventListener("init", () => {
     middle.appendChild(oscillatorControls);
 
     var audioContext = new AudioContext();
-    var audioBuffer = audioContext.createBuffer(1, 600, 48000);
+    var audioBuffer = audioContext.createBuffer(1, 1600, 48000);
     var audioBufferData = audioBuffer.getChannelData(0);
     var gainNode = audioContext.createGain();
     var source;
@@ -330,7 +330,7 @@ addEventListener("init", () => {
     }
     function changeFrequency(newFrequency) {
         if (source) {
-            source.playbackRate.value = 600 / 48000 * newFrequency;
+            source.playbackRate.value = 1600 / 48000 * newFrequency;
         }
     }
     function changeVolume(vol) {
@@ -456,7 +456,7 @@ addEventListener("init", () => {
 
         ctx.beginPath();
         for (let i = 0; i < target.samples.length; i++) {
-            ctx.lineTo(i / 600 * 1280, 720 * (-target.samples[i] + 1) / 2);
+            ctx.lineTo(i / 1600 * 1280, 720 * (-target.samples[i] + 1) / 2);
         }
 
         ctx.stroke();
@@ -468,7 +468,7 @@ addEventListener("init", () => {
 
         ctx.beginPath();
         for (let i = 0; i < target.calculated.length; i++) {
-            ctx.lineTo(i / 600 * 1280, 720 * (-target.calculated[i] + 1) / 2);
+            ctx.lineTo(i / 1600 * 1280, 720 * (-target.calculated[i] + 1) / 2);
         }
 
         ctx.stroke();
@@ -603,12 +603,46 @@ addEventListener("init", () => {
         drawModifierStack();
         drawWaveform();
     }
+    function upsampleFloat32Array(inputArray, targetLength) {
+        if (!(inputArray instanceof Float32Array)) {
+            throw new Error("Input must be a Float32Array.");
+        }
 
+        const inputLength = inputArray.length;
+        if (inputLength === 0 || targetLength <= inputLength) {
+            throw new Error("Target length must be greater than input length.");
+        }
+
+        const outputArray = new Float32Array(targetLength);
+        const scaleFactor = (inputLength - 1) / (targetLength - 1);
+
+        for (let i = 0; i < targetLength; i++) {
+            const position = i * scaleFactor;
+            const leftIndex = Math.floor(position);
+            const rightIndex = Math.ceil(position);
+            const weight = position - leftIndex;
+
+            if (rightIndex < inputLength) {
+                // Perform linear interpolation
+                outputArray[i] =
+                    inputArray[leftIndex] * (1 - weight) +
+                    inputArray[rightIndex] * weight;
+            } else {
+                // Handle the edge case for the last element
+                outputArray[i] = inputArray[leftIndex];
+            }
+        }
+
+        return outputArray;
+    }
     addEventListener('deserialise', (e) => {
         custom_waveforms = e.detail.data.waveforms || {};
         target = null;
         for (let id in custom_waveforms) {
             custom_waveforms[id].samples = new Float32Array(custom_waveforms[id].samples);
+            if (custom_waveforms[id].samples.length !== 1600) { //upsample old
+                custom_waveforms[id].samples = upsampleFloat32Array(custom_waveforms[id].samples, 1600);
+            }
             custom_waveforms[id].dirty = true;
             calculateWaveform(custom_waveforms[id]);
         }
@@ -680,35 +714,35 @@ addEventListener("init", () => {
 });
 
 registerHelp("[data-tab=Waveforms]",
-`
+    `
 > WAVEFORMS TAB
 
 This tab is where custom waveforms or LFOs are designed.
 `);
 
 registerHelp("[data-tab=Waveforms]",
-`
+    `
 > WAVEFORMS TAB
 
 This tab is where custom waveforms or LFOs are designed.
 `);
 
 registerHelp("#waveformManagerUI tr td:first-child button",
-`
+    `
 > Create new waveform button
 
 This tab is where custom waveforms or LFOs are designed.
 `);
 
 registerHelp("#waveformManagerUI tr td:first-child .wvform",
-`
+    `
 > A waveform entry
 
 A waveform. Click on it to select it, or use the Rename, Clone or Delete buttons.
 `);
 
 registerHelp("#waveformManagerUI tr canvas",
-`
+    `
 > Waveform display & canvas
 
 This is where the currently selected waveform is displayed.
@@ -722,7 +756,7 @@ you can use your mouse to input a waveform.
 `);
 
 registerHelp("[data-helptarget=oscillator_controls]",
-`
+    `
 > Oscillator controls & other actions
 
 This panel contains controls for playing, sculpting and exporting the waveform.
@@ -743,7 +777,7 @@ Controls (exporting):
 `);
 
 registerHelp("[data-helptarget=oscillator_controls], [data-helptarget=oscillator_controls] *",
-`
+    `
 > Oscillator controls & other actions
 
 This panel contains controls for playing, sculpting and exporting the waveform.
@@ -764,7 +798,7 @@ Controls (exporting):
 `);
 
 registerHelp("[data-helptarget=wv_modifier_stack], [data-helptarget=wv_modifier_stack] *",
-`
+    `
 > Waveform modifiers
 
 This panel contains waveform modifiers. These are versions of filters that can be applied in an order to affect the final waveform.
