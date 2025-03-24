@@ -197,7 +197,7 @@ addEventListener("init", () => {
     });
     oscillatorControls.appendChild(referenceUpload);
     oscillatorControls.appendChild(document.createElement("br"));
-    
+
     const loadWvFromDisplay = document.createElement("button");
     loadWvFromDisplay.innerText = "Write from visualiser";
     loadWvFromDisplay.classList.add("smallBtn");
@@ -279,7 +279,7 @@ addEventListener("init", () => {
         if (!target) {
             return;
         }
-        navigator.clipboard.writeText("sp_wvform::" + float32arrayToString(target.samples));
+        navigator.clipboard.writeText("sp_wvform::" + float32arrayToStringPlus(target.samples));
     });
     oscillatorControls.appendChild(copyWv);
 
@@ -294,8 +294,8 @@ addEventListener("init", () => {
             if (!target) {
                 return;
             }
-            if (x.startsWith("sp_wvform::") && (x.length === 611)) {
-                target.samples.set(stringToFloat32array(x.replace("sp_wvform::", "")));
+            if (x.startsWith("sp_wvform::") && (x.length === 311)) {
+                target.samples.set(stringToFloat32arrayPlus(x.replace("sp_wvform::", "")));
                 drawWaveform();
             }
         });
