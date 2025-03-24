@@ -1,41 +1,44 @@
+function loadFiltersAndPrims() {
+    var filtersDiv = document.querySelector("#addfilters");
+    var primsDiv = document.querySelector("#addprims");
+    Object.entries(filters)
+        .filter(x => !x[1].hidden)
+        .map(x => {
+            var ret = Object(x[1].title);
+            ret._key = x[0];
+            return ret
+        }).sort().map(x => x._key).forEach(k => {
+            if (k === "audio") {
+                return;
+            }
+            var span = document.createElement("span");
+            span.classList.add("addloop");
+            span.innerText = filters[k].title;
+            span.innerHTML += "&nbsp;";
+            var y = document.createElement("a");
+            y.innerText = "[Add]";
+            y.addEventListener("click", () => {
+                activateTool("MOVE");
+                const loop = addBlock(k, 0, 1, filters[k].title, 0, {});
+                hydrateLoopPosition(loop);
+                pickupLoop(loop);
+            });
+            span.appendChild(y);
+            if (k.startsWith("p_")) {
+                primsDiv.appendChild(span);
+            } else {
+                filtersDiv.appendChild(span);
+            }
+        });
+}
 addEventListener("init", () => {
+    loadFiltersAndPrims();
     document.querySelector("#loopSelector input").addEventListener("input", async () => {
         var loopsDiv = document.querySelector("#addloops");
-        var filtersDiv = document.querySelector("#addfilters");
-        var primsDiv = document.querySelector("#addprims");
         var fileInput = document.querySelector("#loopSelector input");
         var fileList = [...fileInput.files];
         if (fileList.length > 0) {
             document.querySelector("#loopSelector").remove();
-            Object.entries(filters)
-            .filter(x => !x[1].hidden)
-            .map(x=>{
-                var ret = Object(x[1].title);
-                ret._key = x[0];
-                return ret
-            }).sort().map(x=>x._key).forEach(k => {
-                if (k === "audio") {
-                    return;
-                }
-                var span = document.createElement("span");
-                span.classList.add("addloop");
-                span.innerText = filters[k].title;
-                span.innerHTML += "&nbsp;";
-                var y = document.createElement("a");
-                y.innerText = "[Add]";
-                y.addEventListener("click", () => {
-                    activateTool("MOVE");
-                    const loop = addBlock(k, 0, 1, filters[k].title, 0, {});
-                    hydrateLoopPosition(loop);
-                    pickupLoop(loop);
-                });
-                span.appendChild(y);
-                if (k.startsWith("p_")) {
-                    primsDiv.appendChild(span);
-                } else {
-                    filtersDiv.appendChild(span);
-                }
-            });
             for (let a = 0; a < fileList.length; a++) {
                 const file = fileList[a];
                 loopMap[file.name] = file;
@@ -92,6 +95,5 @@ addEventListener("init", () => {
         }
         hydrateZoom();
         document.querySelector("#renderProgress").innerText = "(no render task currently active)";
-        document.querySelector("#renderBtn").removeAttribute("disabled");
     });
 });

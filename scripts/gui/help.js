@@ -8,9 +8,6 @@ function viewHelp() {
 ******************
 *    STARTING    *
 ******************
-To start the program select any audio assets you want to use in the 'Select loops folder: ' input box.
-If you don't have any audio files, just select any file at all.
-
 Once the program has started, you can LOAD projects using the 'Load' button. Supported formats are:
   -  .sm (SYNTHETIC music file)
   -  .mid (midi file)
