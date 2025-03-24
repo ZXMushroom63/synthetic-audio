@@ -294,7 +294,7 @@ addEventListener("init", () => {
             if (!target) {
                 return;
             }
-            if (x.startsWith("sp_wvform::") && (x.length === 311)) {
+            if (x.startsWith("sp_wvform::") && (x.length === 811)) {
                 target.samples.set(stringToFloat32arrayPlus(x.replace("sp_wvform::", "")));
                 drawWaveform();
             }
