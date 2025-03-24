@@ -109,7 +109,7 @@ addEventListener("init", () => {
     const oscillatorControls = document.createElement("div");
     oscillatorControls.style.width = "80%";
     oscillatorControls.style.display = "inline-block";
-    oscillatorControls.style.height = "4rem";
+    oscillatorControls.style.height = "6rem";
     oscillatorControls.style.background = "rgba(0,0,0,0.7)";
     oscillatorControls.style.borderRadius = "0.35rem";
     oscillatorControls.style.lineHeight = "1.9rem";
@@ -196,7 +196,8 @@ addEventListener("init", () => {
         drawWaveform();
     });
     oscillatorControls.appendChild(referenceUpload);
-
+    oscillatorControls.appendChild(document.createElement("br"));
+    
     const loadWvFromDisplay = document.createElement("button");
     loadWvFromDisplay.innerText = "Write from visualiser";
     loadWvFromDisplay.classList.add("smallBtn");
