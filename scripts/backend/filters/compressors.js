@@ -1,6 +1,7 @@
 addBlockType("peakclip", {
     color: "rgba(0,255,0,0.3)",
     title: "Distortion / Clipper",
+    wet_and_dry_knobs: true,
     configs: {
         "Cap": [0.75, "number", 1]
     },

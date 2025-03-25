@@ -1,6 +1,7 @@
 addBlockType("tape", {
     color: "rgba(0,255,0,0.3)",
     title: "Tape Distortion",
+    wet_and_dry_knobs: true,
     configs: {
         "Drive": [1, "number", 1],
     },

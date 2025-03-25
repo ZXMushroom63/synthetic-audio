@@ -1,6 +1,7 @@
 addBlockType("reshape", {
     color: "rgba(0,255,0,0.3)",
     title: "Reshape",
+    wet_and_dry_knobs: true,
     configs: {
         "RemappingFunction": ["#-1~1", "number", 1],
     },

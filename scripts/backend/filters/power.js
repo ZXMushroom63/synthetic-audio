@@ -1,6 +1,7 @@
 addBlockType("power", {
     color: "rgba(0,255,0,0.3)",
     title: "Power",
+    wet_and_dry_knobs: true,
     configs: {
         "Exponent": [1.5, "number", 1]
     },

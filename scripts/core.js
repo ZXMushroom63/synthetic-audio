@@ -149,6 +149,24 @@ function addBlockType(id, data) {
     if (data.assetUser) {
         assetUserTypes.push(id);
     }
+    if (data.wet_and_dry_knobs) {
+        data.configs = Object.assign({
+            Dry: [0, "number", 1],
+            Wet: [1, "number", 1]
+        }, data.configs);
+        var oldFunctor = data.functor;
+        data.functor = async function (inPcm, channel, data) {
+            var dry = _(this.conf.Dry);
+            var wet = _(this.conf.Wet);
+            const out = await oldFunctor.apply(this, [inPcm, channel, data]);
+            out.forEach((x, i) => {
+                out[i] *= wet(i, inPcm);
+                out[i] += dry(i, inPcm) * inPcm[i];
+            });
+            return out;
+        }
+    }
+    
     filters[id] = data;
 }
 function wait(s) {

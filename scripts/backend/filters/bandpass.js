@@ -45,6 +45,7 @@ async function applyBandpassFilter(pcmData, sampleRate, lowCutoff, highCutoff, f
 addBlockType("bandpass", {
     color: "rgba(0,255,0,0.3)",
     title: "Bandpass Filter",
+    wet_and_dry_knobs: true,
     configs: {
         "LowCutoff": [200, "number", 1],
         "HighCutoff": [5000, "number", 1],

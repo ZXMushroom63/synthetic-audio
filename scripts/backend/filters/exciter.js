@@ -1,6 +1,7 @@
 addBlockType("exciter", {
     color: "rgba(0,255,0,0.3)",
     title: "Exciter / Overdrive",
+    wet_and_dry_knobs: true,
     configs: {
         "Mix": [0.5, "number", 1],
     },

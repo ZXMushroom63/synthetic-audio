@@ -24,6 +24,7 @@ async function applyEQFilter(pcmData, sampleRate, shelfValues, falloff) {
 addBlockType("eq", {
     color: "rgba(0,255,0,0.3)",
     title: "EQ Filter",
+    wet_and_dry_knobs: true,
     configs: {
         "SubBass": [1, "number", 1],
         "Bass": [1, "number", 1],

@@ -1,6 +1,7 @@
 addBlockType("comb", {
     color: "rgba(0,255,0,0.3)",
     title: "Comb Filter",
+    wet_and_dry_knobs: true,
     configs: {
         "Iterations": [1, "number"],
         "Delay": [0.01, "number", 1],

@@ -1,6 +1,7 @@
 addBlockType("clamp", {
     color: "rgba(0,255,0,0.3)",
     title: "Clamp",
+    wet_and_dry_knobs: true,
     configs: {
         "Min": [-1, "number", 1],
         "Max": [1, "number", 1],

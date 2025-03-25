@@ -1,6 +1,7 @@
 addBlockType("chorus", {
     color: "rgba(0,255,0,0.3)",
     title: "Chorus",
+    wet_and_dry_knobs: true,
     configs: {
         "DelayMs": [20, "number"],
         "DepthMs": [0.25, "number"],

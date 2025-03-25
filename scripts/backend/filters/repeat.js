@@ -1,6 +1,7 @@
 addBlockType("repeat", {
     color: "rgba(0,255,0,0.3)",
     title: "Repeat",
+    wet_and_dry_knobs: true,
     configs: {
         "RepeatDuration": [0.1, "number", 1],
         "FromEnd": [false, "checkbox"],

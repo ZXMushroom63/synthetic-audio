@@ -42,6 +42,7 @@ async function applyHighpassFilter(pcmData, sampleRate, threshold, falloff) {
 addBlockType("highpass", {
     color: "rgba(0,255,0,0.3)",
     title: "Highpass Filter",
+    wet_and_dry_knobs: true,
     configs: {
         "Threshold": [300, "number", 1],
         "Falloff": [1, "number", 1],
