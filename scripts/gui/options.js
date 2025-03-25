@@ -52,6 +52,7 @@ function createOptionsMenu(loop, definition) {
             s.innerHTML = opts.flatMap((a) => { return `<option${a === value[0] ? " selected" : ""}>${a}</option>` }).join("");
             s.addEventListener("input", () => {
                 loop["conf"][key] = s.value;
+                value[0] = s.value;
                 if (definition.updateMiddleware) {
                     definition.updateMiddleware(loop);
                 }
@@ -181,6 +182,7 @@ function createMultiEditMenu(initData, editingTargets, propDefs, dropDownDefs) {
             s.innerHTML = opts.flatMap((a) => { return `<option${a === value[0] ? " selected" : ""}>${a}</option>` }).join("");
             s.addEventListener("input", () => {
                 setProp(key, s.value, true);
+                value[0] = s.value;
                 updateMiddleware();
             });
             s.addEventListener("focus", () => {
