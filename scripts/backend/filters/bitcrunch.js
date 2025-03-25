@@ -16,7 +16,7 @@ addBlockType("bitcrunch", {
             var next = inPcm[i + x];
             for (let j = 0; j < x; j++) {
                 if (this.conf.SmoothDownsample) {
-                    inPcm[i + j + 1] = lerp(original, next, (j + 1) / x);
+                    inPcm[i + j + 1] = lerp(original || 0, next || 0, (j + 1) / x);
                 } else {
                     inPcm[i + j + 1] = original;
                 }
