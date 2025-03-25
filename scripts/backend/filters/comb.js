@@ -13,7 +13,7 @@ addBlockType("comb", {
         var out = (new Float32Array(inPcm.length)).fill(0);
         out.forEach((x, i) => {
             var delayImpl = delay(i, out) * audio.samplerate;
-            for (let j = 0; j < (this.conf.Iterations + 1); j++) {
+            for (let j = 1; j < (this.conf.Iterations + 1); j++) {
                 out[i] += inPcm[Math.floor(delayImpl * j) + i] * Math.pow(volRatio(i, out), j) || 0;
             }
         });
