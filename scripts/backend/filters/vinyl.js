@@ -2,7 +2,7 @@ addBlockType("vinyl", {
     color: "rgba(0, 255, 0, 0.3)",
     title: "Vinyl Distortion",
     configs: {
-        "Quantity": [500, "number"],
+        "Quantity": [50, "number"],
         "SeedLeft": [0, "number"],
         "SeedRight": [0, "number"],
         "Strength": [0.5, "number", 1],
