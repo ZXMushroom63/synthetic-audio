@@ -1,5 +1,5 @@
 addBlockType("distribute", {
-    color: "rgba(0,255,0,0.3)",
+    color: "rgba(255,0,255,0.3)",
     title: "Distribute",
     configs: {
         "Asset": ["(none)", ["(none)"]],
