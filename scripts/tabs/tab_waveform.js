@@ -258,13 +258,15 @@ addEventListener("init", () => {
         }
         mappedData = mappedData.subarray(sampleStart, sampleEnd);
         var factor = mappedData.length / target.samples.length;
+        console.log("f", factor);
+        var finalValue = mappedData[mappedData.length  - 1];
         target.samples.forEach((x, i) => {
             var idx = i * factor;
-            var idx2 = Math.floor((i + 1) * factor);
+            var k = (i % (1 / factor)) * factor;
             target.samples[i] = lerp(
                 mappedData[Math.floor(idx)],
-                mappedData[Math.floor(idx2)] || mappedData[0],
-                (idx % factor) / factor
+                mappedData[Math.ceil(idx)] || finalValue,
+                k
             );
         });
         drawWaveform();
