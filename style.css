@@ -4,7 +4,6 @@
     overflow-x: scroll;
     overflow-y: auto;
 }
-
 #tabContent>div,
 #tabContent>table,
 #tabContent>table>tr>td {
