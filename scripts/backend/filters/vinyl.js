@@ -9,7 +9,8 @@ addBlockType("vinyl", {
         "Down": [1, "number"],
         "Up": [1, "number"],
         "Pitch": [1, "number"],
-        "ForceUniformSpacing": [false, "checkbox"]
+        "ForceUniformSpacing": [false, "checkbox"],
+        "OverwriteMode": [false, "checkbox"]
     },
     functor: function (inPcm, channel, data) {
         const distribSampleRate = Math.floor(24000 * this.conf.Pitch);
@@ -22,7 +23,14 @@ addBlockType("vinyl", {
             distribution[position + 1] = this.conf.Up * strength(position, inPcm);
         }
         inPcm.forEach((x, i) => {
-            inPcm[i] += distribution[Math.floor(i * (distribSampleRate / audio.samplerate))];
+            var val = distribution[Math.floor(i * (distribSampleRate / audio.samplerate))];
+            if (this.conf.OverwriteMode) {
+                if (val !== 0) {
+                    inPcm[i] = val;
+                }
+            } else {
+                inPcm[i] += val;
+            }
         });
         return inPcm;
     }
