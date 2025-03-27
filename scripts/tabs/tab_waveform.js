@@ -207,13 +207,13 @@ addEventListener("init", () => {
         }
         var mappedData = (new Float32Array(globalThis.vizDrawnWaveform)).map(v => ((v / 255) - 0.5) * -2);
         var factor = mappedData.length / target.samples.length;
+        var finalValue = mappedData[mappedData.length - 1];
         target.samples.forEach((x, i) => {
             var idx = i * factor;
-            var idx2 = Math.floor((i + 1) * factor);
             target.samples[i] = lerp(
                 mappedData[Math.floor(idx)],
-                mappedData[Math.floor(idx2)] || mappedData[0],
-                (idx % factor) / factor
+                mappedData[Math.ceil(idx)] || finalValue,
+                (i % (1 / factor)) * factor
             );
         });
         drawWaveform();
