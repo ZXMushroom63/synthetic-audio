@@ -270,7 +270,9 @@ addBlockType("p_waveform_plus", {
 
             y = (Math.pow(Math.abs(y), exp(i, inPcm)) * Math.sign(y)) * amp(i, inPcm);
 
-            y *= Math.exp(-decay(i, inPcm) * absoluteTime);
+            var decayValue = Math.exp(-decay(i, inPcm) * absoluteTime);
+            
+            y *= decayValue;
 
             var ampSmoothingFactor = 1;
 
@@ -291,7 +293,7 @@ addBlockType("p_waveform_plus", {
                 }
             } else {
                 if (this.conf.Sidechain) {
-                    var sidechainCoefficient = Math.pow(1 - Math.max(Math.min(1, amp(i, inPcm) * ampSmoothingFactor * Math.exp(-decay(i, inPcm) * absoluteTime)), 0), Math.abs(this.conf.SidechainPower));
+                    var sidechainCoefficient = Math.pow(1 - Math.max(Math.min(1, amp(i, inPcm) * ampSmoothingFactor * decayValue), 0), Math.abs(this.conf.SidechainPower));
                     if (this.conf.SidechainPower < 0) {
                         y *= sidechainCoefficient;
                     } else {
