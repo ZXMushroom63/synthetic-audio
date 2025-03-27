@@ -12,15 +12,17 @@ addBlockType("smooth", {
         if (x === 0) {
             return inPcm;
         }
+        var len = inPcm.length;
+        var lastIdx = len - 1;
         for (let iter = 0; iter < x; iter++) {
-            let tempPcm = new Float32Array(inPcm.length);
-            for (let i = 0; i < inPcm.length; i++) {
+            let tempPcm = new Float32Array(len);
+            for (let i = 0; i < len; i++) {
                 var prevSampleIdx = i - 1;
                 var nextSampleIdx = i + 1;
                 if (prevSampleIdx === -1 && this.conf.Circular) {
-                    prevSampleIdx = inPcm.length - 1;
+                    prevSampleIdx = lastIdx;
                 }
-                if (nextSampleIdx === inPcm.length && this.conf.Circular) {
+                if (nextSampleIdx === len && this.conf.Circular) {
                     nextSampleIdx = 0;
                 }
                 var prevSample = inPcm[prevSampleIdx] || inPcm[i];
