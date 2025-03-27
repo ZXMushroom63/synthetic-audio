@@ -699,3 +699,23 @@ input[type="number"]::-webkit-inner-spin-button {
 .loopOptionsMenu.multiEditMenu details + br {
     display: none;
 }
+
+.addModifierDiv {
+    width: 20vw;
+    position: absolute;
+    background-color: rgba(0, 0, 0, 0.5);
+    white-space: break-spaces !important;
+    border: 1px solid white;
+    z-index: 700;
+    top: 0;
+    left: 0;
+    display: none;
+}
+
+button:hover .addModifierDiv {
+    display: block;
+}
+
+.addModifierDiv button {
+    background-color: black;
+}

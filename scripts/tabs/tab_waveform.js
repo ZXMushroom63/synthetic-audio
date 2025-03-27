@@ -354,25 +354,32 @@ addEventListener("init", () => {
 
     var supportedFilters = {
         "smooth": "Smooth",
-        "noise": "Rnd",
-        "compressor": "Cmp",
+        "noise": "noise",
+        "compressor": "Compressor",
         "bitcrunch": "Bcr",
         "quantise": "Quant",
         "normalise": "Norm",
         "power": "Pwr",
         "p_sinewave": "∿",
         "p_value": "𝑥",
-        "adsr": "ADSR",
+        "adsr": "ADSR"
     };
 
+    const addModifierBtn = document.createElement("button");
+    addModifierBtn.classList.add("smallBtn");
+    addModifierBtn.innerText = "Modifiers";
+    addModifierBtn.style.position = "absolute";
+    addModifierBtn.style.top = "-1.5rem";
+    addModifierBtn.style.left = "0";
     const addModifierDiv = document.createElement("div");
-    addModifierDiv.style.width = "20vw";
-    addModifierDiv.style.position = "relative";
-    addModifierDiv.style.bottom = "calc(3rem + 3px)";
-    addModifierDiv.style.height = "0";
-    addModifierDiv.style.whiteSpace = "break-spaces";
-    addModifierDiv.style.borderTop = "1px solid white";
-    right.appendChild(addModifierDiv);
+    addModifierDiv.classList.add("addModifierDiv");
+    addModifierBtn.style.zIndex = 700;
+    addModifierDiv.style.textAlign = "left";
+    addModifierDiv.style.paddingBottom = "2px";
+    addModifierBtn.style.backgroundColor = "black";
+    right.style.position = "relative";
+    addModifierBtn.appendChild(addModifierDiv);
+    right.appendChild(addModifierBtn);
 
     Object.keys(supportedFilters).forEach(filter => {
         const addMod = document.createElement("button");
@@ -382,9 +389,15 @@ addEventListener("init", () => {
             if (!target) {
                 return;
             }
+            var insertLayer = 0;
+            target.modifiers.forEach(x => {
+                if (x.layer === insertLayer) {
+                    insertLayer++;
+                }
+            });
             target.modifiers.push({
                 file: filters[filter].title + " (as modifier)",
-                layer: 0,
+                layer: insertLayer,
                 conf: {
                     CustomWaveformModifier: true,
                     Frequency: 1
@@ -400,7 +413,7 @@ addEventListener("init", () => {
 
     const applyMods = document.createElement("button");
     applyMods.classList.add("smallBtn");
-    applyMods.innerText = "APPLY";
+    applyMods.innerText = "Apply Modifiers";
     applyMods.addEventListener("click", () => {
         if (!target) {
             return;
@@ -411,7 +424,10 @@ addEventListener("init", () => {
         loadModifiersToTarget();
         drawWaveform();
     });
-    addModifierDiv.appendChild(applyMods);
+    addModifierDiv.insertAdjacentElement("afterbegin", document.createElement("br"));
+    addModifierDiv.insertAdjacentElement("afterbegin", document.createElement("br"));
+    addModifierDiv.insertAdjacentElement("afterbegin", applyMods);
+    
 
     var calculating = false;
     async function drawWaveform() {
