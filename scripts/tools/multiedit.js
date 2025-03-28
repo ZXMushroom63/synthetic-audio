@@ -13,6 +13,10 @@ addEventListener("init", () => {
             }
         });
         nodes.forEach(node => {
+            var def = filters[node.getAttribute("data-type")];
+            if (def.noMultiEdit) {
+                return;
+            }
             definitionSet.add(filters[node.getAttribute("data-type")]);
             Object.assign(initData, node.conf);
         });
