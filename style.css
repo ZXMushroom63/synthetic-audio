@@ -733,7 +733,6 @@ button:hover .addModifierDiv {
 .noteTextContent {
     font: 0.6rem sans-serif;
     margin-left: 0.7rem;
-    white-space: break-spaces;
     position: relative;
     top: 0.2rem;
     text-shadow: rgba(0, 0, 0, 0.8) 0px 0px 3px;
