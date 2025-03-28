@@ -110,7 +110,7 @@ function hydrateLoopPosition(elem) {
         return;
     }
     var elemType = elem.getAttribute("data-type");
-    var trueDuration = (parseFloat(loopDurationMap[elem.getAttribute("data-file")]) + 0.0) || ((elemType !== "distribute") * (proceduralAssets.get(elem.conf.Asset)?.length / audio.samplerate)) || 0;
+    var trueDuration = (parseFloat(loopDurationMap[elem.getAttribute("data-file")]) + 0.0) || ((elemType !== "distribute") * (proceduralAssets.get(elem.conf.Asset)?.[0]?.length / audio.samplerate)) || 0;
     trueDuration = (Math.round(trueDuration / loopi) * loopi) / (elem.conf.Speed || 1);
     var duration = parseFloat(elem.getAttribute("data-duration"));
     var start = parseFloat(elem.getAttribute("data-start"));
