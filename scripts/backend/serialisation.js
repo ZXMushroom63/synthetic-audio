@@ -72,7 +72,7 @@ function deserialise(serialisedStr) {
     ser.stereo ||= false;
     ser.sampleRate ||= 24000;
     ser.normalise ||= false;
-    ser.encformat ||= "mp3";
+    ser.encformat ||= "wav";
     document.querySelector("#duration").value = ser.duration;
     document.querySelector("#bpm").value = ser.bpm;
     document.querySelector("#editorlayer").value = ser.editorLayer;
