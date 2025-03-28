@@ -251,6 +251,17 @@ select,
     resize: horizontal;
     width: 8rem;
 }
+textarea {
+    background-color: rgba(125, 125, 255, 0.3);
+    color: white;
+    border: 0;
+    border-radius: 3px;
+    font-family: sans-serif;
+}
+
+textarea:focus {
+    outline: 0;
+}
 
 .loopOptionsMenu input.modifyable,
 select.modifyable {
