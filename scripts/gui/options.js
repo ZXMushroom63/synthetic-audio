@@ -65,7 +65,7 @@ function createOptionsMenu(loop, definition) {
             });
             target.appendChild(s);
         } else {
-            var input = document.createElement("input");
+            var input = document.createElement((value[1] === "textarea") ? "textarea" : "input");
             input.type = value[1];
             if (value[2] === 1) {
                 input.classList.add("modifyable");
@@ -190,7 +190,7 @@ function createMultiEditMenu(initData, editingTargets, propDefs, dropDownDefs) {
             });
             target.appendChild(s);
         } else {
-            var input = document.createElement("input");
+            var input = document.createElement((value[1] === "textarea") ? "textarea" : "input");
             input.type = value[1];
             if (value[2] === 1) {
                 input.classList.add("modifyable");
