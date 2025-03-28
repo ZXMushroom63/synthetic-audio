@@ -126,7 +126,7 @@ function hydrateLoopPosition(elem) {
         bg.style.width = internalWidth;
         bg.querySelector("path").style.strokeWidth = innerWidth / (nInternalWidth) * 0.0025 + "px";
         bg.style.display = "block";
-    } else {
+    } else if (bg) {
         bg.style.display = "none";
     }
     loopInternal.querySelector(".handleRight").style.right = "calc(-" + internalWidth + " - 1.5px)";
@@ -145,6 +145,9 @@ function hydrateZoom() {
 }
 function hydrateLoopBackground(elem) {
     var line = elem.querySelector(".backgroundSvg path");
+    if (!line) {
+        return;
+    }
     var d = "M0 50";
     var downsample = 256;
     prevY = 0;
@@ -276,7 +279,6 @@ function addBlock(type, start, duration, title, layer = 0, data = {}, editorValu
     internal.classList.add("loopInternal");
     
     loop["conf"] = structuredClone(data);
-    const optionsMenu = createOptionsMenu(loop, definition);
 
     const span = document.createElement("span");
     span.innerText = title;
@@ -295,6 +297,7 @@ function addBlock(type, start, duration, title, layer = 0, data = {}, editorValu
     handleRight.addEventListener("mousedown", resizeBlock);
     internal.appendChild(handleRight);
 
+    const optionsMenu = createOptionsMenu(loop, definition);
     internal.appendChild(optionsMenu);
 
 
@@ -313,8 +316,11 @@ function addBlock(type, start, duration, title, layer = 0, data = {}, editorValu
         e.stopImmediatePropagation();
         e.stopPropagation();
         document.querySelectorAll(".loopInternal.selected").forEach(a => { a.classList.remove("selected") });
+        
         optionsMenu.loadValues();
+        
         internal.classList.add("selected");
+        
         document.onmousedown = () => {
             document.querySelectorAll(".loopInternal.selected").forEach(a => { a.classList.remove("selected") });
         }
