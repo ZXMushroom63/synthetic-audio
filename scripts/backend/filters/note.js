@@ -12,7 +12,7 @@ addBlockType("note", {
         var internal = loop.querySelector(".loopInternal");
         var txt = document.createElement("span");
         txt.classList.add("noteTextContent");
-        txt.innerText = "Note text here...";
+        txt.innerText = loop.conf.Text;
         internal.appendChild(txt);
         loop.setAttribute("data-nodirty", "");
         loop.querySelector(".backgroundSvg").remove();
