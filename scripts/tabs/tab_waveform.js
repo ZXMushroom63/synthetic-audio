@@ -507,7 +507,7 @@ addEventListener("init", () => {
 
         ctx.fillStyle = "white";
         ctx.font = "12px monospace";
-        ctx.fillText("Intensity: " + (intensity.toFixed(1)), 4, 16);
+        ctx.fillText("Intensity: " + (intensity.toFixed(2)), 4, 16);
 
         calculating = false;
     }
