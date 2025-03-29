@@ -242,7 +242,7 @@ addBlockType("p_waveform_plus", {
                 }
 
                 if (this.conf.UseCustomWaveform) {
-                    const wavetable_pos = wavetablePos(1, inPcm);
+                    const wavetable_pos = wavetablePos(i, inPcm);
                     if (customWaveform) {
                         y += -1*customWaveform[Math.floor((waveformTime + wavePhaseOffset) * 1600) % 1600] * volumeRatio * (1 - wavetable_pos);
                     }
