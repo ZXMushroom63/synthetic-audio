@@ -92,8 +92,7 @@ addEventListener("init", () => {
                 loopsDiv.appendChild(span);
                 loopMap[file.name] = file;
             }
-            proceduralAssets.clear();
-            findLoops(".loop").forEach(x => x.setAttribute("data-dirty", "yes"));
+            findLoops(".loop[data-type=audio]").forEach(x => x.setAttribute("data-dirty", "yes"));
         }
         hydrateZoom();
         document.querySelector("#renderProgress").innerText = "(no render task currently active)";
