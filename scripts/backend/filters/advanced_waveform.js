@@ -22,9 +22,8 @@ addBlockType("p_waveform_plus", {
         "Exponent": [1, "number", 1],
         "UseCustomWaveform": [false, "checkbox"],
         "WaveformAsset": ["(none)", ["(none)"]],
-        "WaveformVolume": [1, "number", 1],
         "WaveformAsset2": ["(none)", ["(none)"]],
-        "WaveformVolume2": [0, "number", 1],
+        "WavetablePos": [0, "number", 1],
         "Amplitude": [1, "number", 1],
         "AmplitudeSmoothTime": [0.006, "number"],
         "Decay": [0, "number", 1],
@@ -58,9 +57,8 @@ addBlockType("p_waveform_plus", {
         "Custom Waveforms": [
             "UseCustomWaveform",
             "WaveformAsset",
-            "WaveformVolume",
             "WaveformAsset2",
-            "WaveformVolume2"
+            "WavetablePos"
         ],
         "Harmonics": [
             "Harmonics",
@@ -144,8 +142,7 @@ addBlockType("p_waveform_plus", {
 
         var customWaveform = custom_waveforms[this.conf.WaveformAsset]?.calculated;
         var customWaveform2 = custom_waveforms[this.conf.WaveformAsset2]?.calculated;
-        var wv1Volume = _(this.conf.WaveformVolume);
-        var wv2Volume = _(this.conf.WaveformVolume2);
+        var wavetablePos = _(this.conf.WavetablePos);
 
         var semitones = _(this.conf.HarmonicsSemitoneOffset);
 
@@ -245,11 +242,12 @@ addBlockType("p_waveform_plus", {
                 }
 
                 if (this.conf.UseCustomWaveform) {
+                    const wavetable_pos = wavetablePos(1, inPcm);
                     if (customWaveform) {
-                        y += -1*customWaveform[Math.floor((waveformTime + wavePhaseOffset) * 1600) % 1600] * volumeRatio * wv1Volume(i, inPcm);
+                        y += -1*customWaveform[Math.floor((waveformTime + wavePhaseOffset) * 1600) % 1600] * volumeRatio * (1 - wavetable_pos);
                     }
                     if (customWaveform2) {
-                        y += -1*customWaveform2[Math.floor((waveformTime + wavePhaseOffset) * 1600) % 1600] * volumeRatio * wv2Volume(i, inPcm);
+                        y += -1*customWaveform2[Math.floor((waveformTime + wavePhaseOffset) * 1600) % 1600] * volumeRatio * wavetable_pos;
                     }
                 } else {
                     y += waveforms.sin(waveformTime + wavePhaseOffset) * values.Sine * volumeRatio;
