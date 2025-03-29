@@ -492,12 +492,23 @@ addEventListener("init", () => {
 
         ctx.moveTo(0, 720 * (-target.calculated[0] + 1) / 2);
 
+        var prevValue = target.calculated[0];
+        var intensity = 0;
+
         ctx.beginPath();
         for (let i = 0; i < target.calculated.length; i++) {
-            ctx.lineTo(i / 1600 * 1280, 720 * (-target.calculated[i] + 1) / 2);
+            var v = target.calculated[i];
+            intensity += Math.abs(v - prevValue);
+            prevValue = v;
+            ctx.lineTo(i / 1600 * 1280, 720 * (-v + 1) / 2);
         }
 
         ctx.stroke();
+
+        ctx.fillStyle = "white";
+        ctx.font = "12px monospace";
+        ctx.fillText("Intensity: " + (intensity.toFixed(1)), 4, 16);
+
         calculating = false;
     }
 
