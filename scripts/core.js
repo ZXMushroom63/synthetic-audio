@@ -415,7 +415,8 @@ addBlockType("audio", {
         "Speed": [1, "number", 1]
     },
     functor: function (inPcm, channel, data) {
-        var currentData = decodedPcmCache[this.file] ? decodedPcmCache[this.file].getChannelData(channel) : [];
+        var obj = decodedPcmCache[this.file];
+        var currentData = obj ? obj.getChannelData(Math.min(channel, obj.numberOfChannels - 1)) : [];
         var duration = Math.floor(Math.round(((loopDurationMap[this.file] || 0) + 0.0) / data.loopInterval) * data.loopInterval * audio.samplerate);
         applySoundbiteToPcm(this.conf.Reverse, this.conf.Looping, currentData, inPcm, duration, _(this.conf.Speed), this.conf.Volume, this.conf.StartOffset);
         return inPcm;
