@@ -503,6 +503,8 @@ addEventListener("init", () => {
             ctx.lineTo(i / 1600 * 1280, 720 * (-v + 1) / 2);
         }
 
+        intensity += Math.abs(prevValue - target.calculated[0]);
+
         ctx.stroke();
 
         ctx.fillStyle = "white";
