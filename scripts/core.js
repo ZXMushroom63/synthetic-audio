@@ -12,7 +12,7 @@ function stopTiming(name) {
     return dt;
 }
 function findLoops(selector) {
-    return Array.prototype.filter.apply(document.querySelectorAll(selector), [(x)=>!x._ignore]);
+    return Array.prototype.filter.apply(document.querySelectorAll(selector), [(x) => !x._ignore]);
 }
 function noteToFrequency(note, octave, accidental = '') {
     const A4 = 440;
@@ -144,49 +144,53 @@ function convertToFileBlob(float32Arrays, channels, sampleRate, bRate) {
 var filters = {};
 var decodedPcmCache = {};
 const assetUserTypes = [];
+function addWetDryKnobs(data) {
+    data.configs = Object.assign({
+        Dry: [0, "number", 1],
+        Wet: [1, "number", 1]
+    }, data.configs);
+    var oldFunctor = data.functor;
+    data.functor = async function (inPcm, channel, data) {
+        var dry = _(this.conf.Dry);
+        var wet = _(this.conf.Wet);
+        const out = await oldFunctor.apply(this, [inPcm, channel, data]);
+        out.forEach((x, i) => {
+            out[i] *= wet(i, inPcm);
+            out[i] += dry(i, inPcm) * inPcm[i];
+        });
+        return out;
+    }
+}
+function addAmpSmoothKnob(data) {
+    data.configs["AmplitudeSmoothing"] = [0.0, "number"];
+    var oldFunctor = data.functor;
+    data.functor = async function (inPcm, channel, data) {
+        const out = await oldFunctor.apply(this, [inPcm, channel, data]);
+        const AmpSmoothingStart = Math.floor(audio.samplerate * this.conf.AmplitudeSmoothing);
+        const AmpSmoothingEnd = inPcm.length - AmpSmoothingStart;
+        out.forEach((x, i) => {
+            var ampSmoothingFactor = 1;
+            if (i < AmpSmoothingStart) {
+                ampSmoothingFactor = i / AmpSmoothingStart;
+            }
 
+            if (i > AmpSmoothingEnd) {
+                ampSmoothingFactor = 1 - ((i - AmpSmoothingEnd) / AmpSmoothingStart);
+            }
+            out[i] *= ampSmoothingFactor;
+        });
+        return out;
+    }
+}
 function addBlockType(id, data) {
     if (data.assetUser) {
         assetUserTypes.push(id);
     }
-    var oldFunctor;
     if (data.wet_and_dry_knobs) {
-        data.configs = Object.assign({
-            Dry: [0, "number", 1],
-            Wet: [1, "number", 1]
-        }, data.configs);
-        oldFunctor = data.functor;
-        data.functor = async function (inPcm, channel, data) {
-            var dry = _(this.conf.Dry);
-            var wet = _(this.conf.Wet);
-            const out = await oldFunctor.apply(this, [inPcm, channel, data]);
-            out.forEach((x, i) => {
-                out[i] *= wet(i, inPcm);
-                out[i] += dry(i, inPcm) * inPcm[i];
-            });
-            return out;
-        }
+        addWetDryKnobs(data);
     }
     if (data.amplitude_smoothing_knob) {
-        data.configs["AmplitudeSmoothing"] = [0.0, "number"];
-        oldFunctor = data.functor;
-        data.functor = async function (inPcm, channel, data) {
-            const out = await oldFunctor.apply(this, [inPcm, channel, data]);
-            const AmpSmoothingStart = Math.floor(audio.samplerate * this.conf.AmplitudeSmoothing);
-            const AmpSmoothingEnd = inPcm.length - AmpSmoothingStart;
-            out.forEach((x, i) => {
-                var ampSmoothingFactor = 1;
-                if (i < AmpSmoothingStart) {
-                    ampSmoothingFactor = i / AmpSmoothingStart;
-                }
-    
-                if (i > AmpSmoothingEnd) {
-                    ampSmoothingFactor = 1 - ((i - AmpSmoothingEnd) / AmpSmoothingStart);
-                }
-                out[i] *= ampSmoothingFactor;
-            });
-            return out;
-        }
+        addAmpSmoothKnob(data);
     }
     filters[id] = data;
 }
@@ -416,7 +420,7 @@ async function render() {
         document.querySelector("#renderOut").src = URL.createObjectURL(blob);
     }
 
-    
+
     findLoops(".loop[data-deleted]").forEach(x => x.remove());
 
     document.querySelector("#renderBtn").removeAttribute("disabled");
