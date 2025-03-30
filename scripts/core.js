@@ -267,7 +267,11 @@ function constructRenderDataArray(data) {
             return (x.editorLayer === editorLayer);
         });
         var usedLayers = [...new Set(nodesForLevel.flatMap(x => { return x.layer }).sort((a, b) => { return a - b }))];
-        renderDataArray.push(constructAbstractLayerMapsForLevel(nodesForLevel, usedLayers, editorLayer < 0));
+        var editorOnlyFlag = editorLayer < 0;
+        if (gui.isolate) {
+            editorOnlyFlag = gui.layer !== editorLayer;
+        }
+        renderDataArray.push(constructAbstractLayerMapsForLevel(nodesForLevel, usedLayers, editorOnlyFlag));
     });
     var assetMap = {};
     renderDataArray.forEach(editorLayer => {

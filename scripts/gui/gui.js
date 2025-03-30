@@ -9,6 +9,7 @@ function resetDrophandlers(cancel) {
 }
 var gui = {
     noLOD: true,
+    isolate: false,
     LOD: 1,
     intervals: 1,
     marker: 0,
@@ -511,6 +512,13 @@ function init() {
             gui.noLOD = false;
         }
         hydrateBeatMarkers();
+    });
+    document.querySelector("#isolate").addEventListener("input", () => {
+        if (document.querySelector("#isolate").checked) {
+            gui.isolate = true;
+        } else {
+            gui.isolate = false;
+        }
     });
     document.querySelector("#forceWv").addEventListener("input", () => {
         if (document.querySelector("#forceWv").checked) {

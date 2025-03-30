@@ -175,6 +175,13 @@ registerHelp(".trayElem:has(#nolod), #nolod",
 Whether or not to disable level of detail features based on song length. Disable or any remotely powerful device.
 `);
 
+registerHelp(".trayElem:has(#isolate), #isolate",
+`
+> ISOLATE LAYER FIELD
+
+Whether or not to only forward the current layer into the mixer. Used for editing one layer of a song.
+`);
+
 registerHelp(".trayElem:has(#forceWv), #forceWv",
 `
 > FORCE WAVEFORM FIELD
