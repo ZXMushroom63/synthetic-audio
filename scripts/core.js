@@ -149,12 +149,13 @@ function addBlockType(id, data) {
     if (data.assetUser) {
         assetUserTypes.push(id);
     }
+    var oldFunctor;
     if (data.wet_and_dry_knobs) {
         data.configs = Object.assign({
             Dry: [0, "number", 1],
             Wet: [1, "number", 1]
         }, data.configs);
-        var oldFunctor = data.functor;
+        oldFunctor = data.functor;
         data.functor = async function (inPcm, channel, data) {
             var dry = _(this.conf.Dry);
             var wet = _(this.conf.Wet);
@@ -168,7 +169,7 @@ function addBlockType(id, data) {
     }
     if (data.amplitude_smoothing_knob) {
         data.configs["AmplitudeSmoothing"] = [0.0, "number"];
-        var oldFunctor = data.functor;
+        oldFunctor = data.functor;
         data.functor = async function (inPcm, channel, data) {
             const out = await oldFunctor.apply(this, [inPcm, channel, data]);
             const AmpSmoothingStart = Math.floor(audio.samplerate * this.conf.AmplitudeSmoothing);
