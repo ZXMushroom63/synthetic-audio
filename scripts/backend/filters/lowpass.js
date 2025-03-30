@@ -44,6 +44,7 @@ addBlockType("lowpass", {
     color: "rgba(0,255,0,0.3)",
     title: "Lowpass Filter",
     wet_and_dry_knobs: true,
+    amplitude_smoothing_knob: true,
     configs: {
         "Threshold": [300, "number", 1],
         "Falloff": [1, "number", 1],

@@ -166,7 +166,27 @@ function addBlockType(id, data) {
             return out;
         }
     }
+    if (data.amplitude_smoothing_knob) {
+        data.configs["AmplitudeSmoothing"] = [0.0, "number"];
+        var oldFunctor = data.functor;
+        data.functor = async function (inPcm, channel, data) {
+            const out = await oldFunctor.apply(this, [inPcm, channel, data]);
+            const AmpSmoothingStart = Math.floor(audio.samplerate * this.conf.AmplitudeSmoothing);
+            const AmpSmoothingEnd = inPcm.length - AmpSmoothingStart;
+            out.forEach((x, i) => {
+                var ampSmoothingFactor = 1;
+                if (i < AmpSmoothingStart) {
+                    ampSmoothingFactor = i / AmpSmoothingStart;
+                }
     
+                if (i > AmpSmoothingEnd) {
+                    ampSmoothingFactor = 1 - ((i - AmpSmoothingEnd) / AmpSmoothingStart);
+                }
+                out[i] *= ampSmoothingFactor;
+            });
+            return out;
+        }
+    }
     filters[id] = data;
 }
 function wait(s) {

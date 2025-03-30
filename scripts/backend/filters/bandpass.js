@@ -46,6 +46,7 @@ addBlockType("bandpass", {
     color: "rgba(0,255,0,0.3)",
     title: "Bandpass Filter",
     wet_and_dry_knobs: true,
+    amplitude_smoothing_knob: true,
     configs: {
         "LowCutoff": [200, "number", 1],
         "HighCutoff": [5000, "number", 1],

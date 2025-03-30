@@ -25,6 +25,7 @@ addBlockType("eq", {
     color: "rgba(0,255,0,0.3)",
     title: "EQ Filter",
     wet_and_dry_knobs: true,
+    amplitude_smoothing_knob: true,
     configs: {
         "SubBass": [1, "number", 1],
         "Bass": [1, "number", 1],
