@@ -5,6 +5,7 @@ addEventListener("init", ()=>{
             if (!canDuplicateKeybind) {
                 return;
             }
+            keymap["Shift"] = false;
             canDuplicateKeybind = false;
             if (!findLoops(".loop.active:not([data-deleted])")[0]) {
                 var x = document.elementsFromPoint(mouse.x, mouse.y).find(x => !x.classList.contains("deactivated"));
