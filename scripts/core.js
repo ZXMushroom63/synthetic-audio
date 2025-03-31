@@ -242,7 +242,8 @@ function sumFloat32ArraysNormalised(arrays) {
 
     return result;
 }
-function constructAbstractLayerMapsForLevel(nodes, usedLayers, editorOnly) {
+var layerCache = {};
+function constructAbstractLayerMapsForLevel(nodes, usedLayers) {
     var abstractLayerMaps = [];
 
     nodes.forEach(x => {
@@ -255,7 +256,6 @@ function constructAbstractLayerMapsForLevel(nodes, usedLayers, editorOnly) {
     nodes.forEach(x => {
         abstractLayerMaps[x.layer].push(x);
     });
-    abstractLayerMaps.editorOnly = editorOnly;
     return abstractLayerMaps;
 }
 function constructRenderDataArray(data) {
@@ -266,12 +266,15 @@ function constructRenderDataArray(data) {
         var nodesForLevel = data.nodes.filter(x => {
             return (x.editorLayer === editorLayer);
         });
-        var usedLayers = [...new Set(nodesForLevel.flatMap(x => { return x.layer }).sort((a, b) => { return a - b }))];
+        const usedLayers = [...new Set(nodesForLevel.flatMap(x => { return x.layer }).sort((a, b) => { return a - b }))];
         var editorOnlyFlag = editorLayer < 0;
         if (gui.isolate) {
             editorOnlyFlag = gui.layer !== editorLayer;
         }
-        renderDataArray.push(constructAbstractLayerMapsForLevel(nodesForLevel, usedLayers, editorOnlyFlag));
+        const abstractLayerMap = constructAbstractLayerMapsForLevel(nodesForLevel, usedLayers);
+        abstractLayerMap.editorOnly = editorOnlyFlag;
+        abstractLayerMap.layerId = editorLayer;
+        renderDataArray.push(abstractLayerMap);
     });
     var assetMap = {};
     renderDataArray.forEach(editorLayer => {
@@ -331,6 +334,9 @@ function constructRenderDataArray(data) {
                     }
                 }
             });
+            dirtyNodes.forEach((x) => {
+                delete layerCache[x.editorLayer];
+            });
         }
     });
     return renderDataArray;
@@ -366,46 +372,55 @@ async function render() {
             for (let q = 0; q < renderDataArray.length; q++) {
                 var initialPcm = new Float32Array(audio.length).fill(0);
                 const abstractLayerMaps = renderDataArray[q];
-                for (let l = 0; l < abstractLayerMaps.length; l++) {
-                    const layer = abstractLayerMaps[l];
-                    for (let n = 0; n < layer.length; n++) {
-                        const node = layer[n];
-
-                        if (node.deleted) {
-                            continue;
-                        }
-
-                        var newPcm;
-
-                        if (node.dirty || (!node.ref.cache)) {
-                            node.dirty = false;
-                            node.ref.removeAttribute("data-dirty");
-                            node.ref.removeAttribute("data-wasMovedSinceRender");
-                            node.ref.cache = [null, null];
-                            node.ref.startOld = node.start;
-                            node.ref.layerOld = node.layer;
-                            node.ref.endOld = node.end;
-                            proccessedNodeCount++;
-                        }
-
-                        var startTime = Math.floor(node.start * audio.samplerate);
-                        var endTime = Math.floor((node.start + node.duration) * audio.samplerate);
-
-                        if (!node.ref.cache[c]) {
-                            newPcm = await filters[node.type].functor.apply(node, [initialPcm.slice(startTime, endTime), c, data]);
-                            node.ref.cache[c] = newPcm;
-                            if (c === 0) {
-                                hydrateLoopBackground(node.ref);
+                if (!layerCache[abstractLayerMaps.layerId]) {
+                    console.log(`Recalculating layer ${abstractLayerMaps.layerId}`);
+                    for (let l = 0; l < abstractLayerMaps.length; l++) {
+                        const layer = abstractLayerMaps[l];
+                        for (let n = 0; n < layer.length; n++) {
+                            const node = layer[n];
+    
+                            if (node.deleted) {
+                                continue;
                             }
-                        } else {
-                            newPcm = node.ref.cache[c];
+    
+                            var newPcm;
+    
+                            if (node.dirty || (!node.ref.cache)) {
+                                node.dirty = false;
+                                node.ref.removeAttribute("data-dirty");
+                                node.ref.removeAttribute("data-wasMovedSinceRender");
+                                node.ref.cache = [null, null];
+                                node.ref.startOld = node.start;
+                                node.ref.layerOld = node.layer;
+                                node.ref.endOld = node.end;
+                                proccessedNodeCount++;
+                            }
+    
+                            var startTime = Math.floor(node.start * audio.samplerate);
+                            var endTime = Math.floor((node.start + node.duration) * audio.samplerate);
+    
+                            if (!node.ref.cache[c]) {
+                                newPcm = await filters[node.type].functor.apply(node, [initialPcm.slice(startTime, endTime), c, data]);
+                                node.ref.cache[c] = newPcm;
+                                if (c === 0) {
+                                    hydrateLoopBackground(node.ref);
+                                }
+                            } else {
+                                newPcm = node.ref.cache[c];
+                            }
+    
+                            initialPcm.set(newPcm, startTime);
+                            await wait(1 / 240);
                         }
-
-                        initialPcm.set(newPcm, startTime);
-                        await wait(1 / 240);
+                        if (!layerCache[abstractLayerMaps.layerId]) {
+                            layerCache[abstractLayerMaps.layerId] = [null, null];
+                        }
+                        layerCache[abstractLayerMaps.layerId][c] = initialPcm;
                     }
+                } else {
+                    initialPcm = layerCache[abstractLayerMaps.layerId][c];
                 }
-                if (!abstractLayerMaps.editorOnly) {
+                if (abstractLayerMaps.editorOnly) {
                     channelPcms.push(initialPcm);
                 }
             }

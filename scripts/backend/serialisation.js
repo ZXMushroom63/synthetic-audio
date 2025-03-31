@@ -59,6 +59,7 @@ function deserialise(serialisedStr) {
     if (!serialisedStr) {
         return hydrate();
     }
+    layerCache = {};
     var ser = JSON.parse(serialisedStr);
     findLoops(".loop").forEach(x => { x.remove() });
     ser.nodes ||= [];
