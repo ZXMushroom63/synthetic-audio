@@ -372,7 +372,7 @@ async function render() {
             for (let q = 0; q < renderDataArray.length; q++) {
                 var initialPcm = new Float32Array(audio.length).fill(0);
                 const abstractLayerMaps = renderDataArray[q];
-                if (!layerCache[abstractLayerMaps.layerId]) {
+                if (!layerCache[abstractLayerMaps.layerId] || !layerCache[abstractLayerMaps.layerId][c]) {
                     console.log(`Recalculating layer ${abstractLayerMaps.layerId}`);
                     for (let l = 0; l < abstractLayerMaps.length; l++) {
                         const layer = abstractLayerMaps[l];
@@ -420,7 +420,7 @@ async function render() {
                 } else {
                     initialPcm = layerCache[abstractLayerMaps.layerId][c];
                 }
-                if (abstractLayerMaps.editorOnly) {
+                if (!abstractLayerMaps.editorOnly) {
                     channelPcms.push(initialPcm);
                 }
             }
