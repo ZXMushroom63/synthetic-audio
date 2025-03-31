@@ -5,6 +5,7 @@ addEventListener("init", ()=>{
             decodedPcmCache = {};
             proceduralAssets.clear();
             findLoops(".loop").forEach(x => x.setAttribute("data-dirty", "yes"));
+            layerCache = {};
         }
     });
 });
