@@ -369,6 +369,7 @@ addEventListener("init", () => {
         "speed": "Speed",
         "value_gate": "Gate",
         "warp": "Warp",
+        "mirror": "Mirror",
         "p_sinewave": "∿",
         "p_value": "𝑥",
         "adsr": "ADSR"
