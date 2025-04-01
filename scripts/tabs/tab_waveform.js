@@ -1,3 +1,4 @@
+const WAVEFORM_RES = 1600; //must increase this
 var custom_waveforms = {};
 //"X": {
 //    samples: [0,0,0,...] (len=1600)
@@ -35,9 +36,9 @@ addEventListener("init", () => {
         if (custom_waveforms[newWaveformName]) {
             return;
         }
-        var smp = new Float32Array(1600).fill(0);
+        var smp = new Float32Array(WAVEFORM_RES).fill(0);
         smp.forEach((x, i) => {
-            smp[i] = waveforms.sin(i / 1600);
+            smp[i] = waveforms.sin(i / WAVEFORM_RES);
         });
         custom_waveforms[newWaveformName] = {
             samples: smp,
@@ -78,7 +79,7 @@ addEventListener("init", () => {
     var prevValue = -1;
     panel.addEventListener("mousemove", (e) => {
         if (isDrawing && target) {
-            var newIdx = Math.floor(e.offsetX * (1600 / aabb.width));
+            var newIdx = Math.floor(e.offsetX * (WAVEFORM_RES / aabb.width));
             var newValue = e.offsetY * (2 / aabb.height) - 1;
             target.samples[newIdx] = -newValue;
             if (prevIdx !== -1) {
@@ -295,7 +296,7 @@ addEventListener("init", () => {
             if (!target) {
                 return;
             }
-            if (x.startsWith("sp_wvform::") && (x.length === 1611)) {
+            if (x.startsWith("sp_wvform::") && (x.length === (WAVEFORM_RES + 11))) {
                 target.samples.set(stringToFloat32array(x.replace("sp_wvform::", "")));
                 drawWaveform(true);
             }
@@ -307,7 +308,7 @@ addEventListener("init", () => {
     middle.appendChild(oscillatorControls);
 
     var audioContext = new AudioContext();
-    var audioBuffer = audioContext.createBuffer(1, 1600, 48000);
+    var audioBuffer = audioContext.createBuffer(1, WAVEFORM_RES, 48000);
     var audioBufferData = audioBuffer.getChannelData(0);
     var gainNode = audioContext.createGain();
     var source;
@@ -331,7 +332,7 @@ addEventListener("init", () => {
     }
     function changeFrequency(newFrequency) {
         if (source) {
-            source.playbackRate.value = 1600 / 48000 * newFrequency;
+            source.playbackRate.value = WAVEFORM_RES / 48000 * newFrequency;
         }
     }
     function changeVolume(vol) {
@@ -367,6 +368,7 @@ addEventListener("init", () => {
         "reverse": "Reverse",
         "speed": "Speed",
         "value_gate": "Gate",
+        "warp": "Warp",
         "p_sinewave": "∿",
         "p_value": "𝑥",
         "adsr": "ADSR"
@@ -482,7 +484,7 @@ addEventListener("init", () => {
 
         ctx.beginPath();
         for (let i = 0; i < target.samples.length; i++) {
-            ctx.lineTo(i / 1600 * 1280, 720 * (-target.samples[i] + 1) / 2);
+            ctx.lineTo(i / WAVEFORM_RES * 1280, 720 * (-target.samples[i] + 1) / 2);
         }
 
         ctx.stroke();
@@ -500,7 +502,7 @@ addEventListener("init", () => {
             var v = target.calculated[i];
             intensity += Math.abs(v - prevValue);
             prevValue = v;
-            ctx.lineTo(i / 1600 * 1280, 720 * (-v + 1) / 2);
+            ctx.lineTo(i / WAVEFORM_RES * 1280, 720 * (-v + 1) / 2);
         }
 
         intensity += Math.abs(prevValue - target.calculated[0]);
@@ -681,8 +683,8 @@ addEventListener("init", () => {
         target = null;
         for (let id in custom_waveforms) {
             custom_waveforms[id].samples = new Float32Array(custom_waveforms[id].samples);
-            if (custom_waveforms[id].samples.length !== 1600) { //upsample old
-                custom_waveforms[id].samples = upsampleFloat32Array(custom_waveforms[id].samples, 1600);
+            if (custom_waveforms[id].samples.length !== WAVEFORM_RES) { //upsample old
+                custom_waveforms[id].samples = upsampleFloat32Array(custom_waveforms[id].samples, WAVEFORM_RES);
             }
             calculateWaveform(custom_waveforms[id], true);
         }

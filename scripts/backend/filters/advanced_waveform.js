@@ -244,10 +244,10 @@ addBlockType("p_waveform_plus", {
                 if (this.conf.UseCustomWaveform) {
                     const wavetable_pos = wavetablePos(i, inPcm);
                     if (customWaveform) {
-                        y += -1*customWaveform[Math.floor((waveformTime + wavePhaseOffset) * 1600) % 1600] * volumeRatio * (1 - wavetable_pos);
+                        y += -1*customWaveform[Math.floor((waveformTime + wavePhaseOffset) * WAVEFORM_RES) % WAVEFORM_RES] * volumeRatio * (1 - wavetable_pos);
                     }
                     if (customWaveform2) {
-                        y += -1*customWaveform2[Math.floor((waveformTime + wavePhaseOffset) * 1600) % 1600] * volumeRatio * wavetable_pos;
+                        y += -1*customWaveform2[Math.floor((waveformTime + wavePhaseOffset) * WAVEFORM_RES) % WAVEFORM_RES] * volumeRatio * wavetable_pos;
                     }
                 } else {
                     y += waveforms.sin(waveformTime + wavePhaseOffset) * values.Sine * volumeRatio;

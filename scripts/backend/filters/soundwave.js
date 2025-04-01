@@ -11,7 +11,7 @@ addBlockType("p_sinewave", {
     functor: function (inPcm, channel, data) {
         var f = this.conf.Frequency;
         if (this.conf.CustomWaveformModifier) {
-            f = audio.samplerate / 1600 * this.conf.Frequency;
+            f = audio.samplerate / WAVEFORM_RES * this.conf.Frequency;
         }
         inPcm.forEach((x, i) => {
             var outValue = 0;
