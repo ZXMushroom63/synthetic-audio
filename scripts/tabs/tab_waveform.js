@@ -93,7 +93,7 @@ addEventListener("init", () => {
             prevIdx = newIdx;
             prevValue = newValue;
             target.samples[target.samples.length - 1] = target.samples[target.samples.length - 2];
-            drawWaveform();
+            drawWaveform(true);
             e.preventDefault();
         }
     });
@@ -216,7 +216,7 @@ addEventListener("init", () => {
                 (i % (1 / factor)) * factor
             );
         });
-        drawWaveform();
+        drawWaveform(true);
     });
     oscillatorControls.appendChild(loadWvFromDisplay);
 
@@ -258,7 +258,6 @@ addEventListener("init", () => {
         }
         mappedData = mappedData.subarray(sampleStart, sampleEnd);
         var factor = mappedData.length / target.samples.length;
-        console.log("f", factor);
         var finalValue = mappedData[mappedData.length  - 1];
         target.samples.forEach((x, i) => {
             var idx = i * factor;
@@ -269,7 +268,7 @@ addEventListener("init", () => {
                 k
             );
         });
-        drawWaveform();
+        drawWaveform(true);
     });
     oscillatorControls.appendChild(loadWvFromDisplaySmart);
 
@@ -298,7 +297,7 @@ addEventListener("init", () => {
             }
             if (x.startsWith("sp_wvform::") && (x.length === 1611)) {
                 target.samples.set(stringToFloat32array(x.replace("sp_wvform::", "")));
-                drawWaveform();
+                drawWaveform(true);
             }
         });
     });
@@ -414,7 +413,7 @@ addEventListener("init", () => {
             });
             drawModifierStack();
             loadModifiersToTarget();
-            drawWaveform();
+            drawWaveform(true);
         });
         addModifierDiv.appendChild(addMod);
     });
@@ -430,7 +429,7 @@ addEventListener("init", () => {
         target.samples = target.calculated;
         drawModifierStack();
         loadModifiersToTarget();
-        drawWaveform();
+        drawWaveform(true);
     });
     addModifierDiv.insertAdjacentElement("afterbegin", document.createElement("br"));
     addModifierDiv.insertAdjacentElement("afterbegin", document.createElement("br"));
@@ -438,7 +437,7 @@ addEventListener("init", () => {
     
 
     var calculating = false;
-    async function drawWaveform() {
+    async function drawWaveform(dirty) {
         if (!target) {
             return;
         }
@@ -446,8 +445,8 @@ addEventListener("init", () => {
             return;
         }
         calculating = true;
-        calculateWaveform(target);
-        await wait(1/30);
+        calculateWaveform(target, dirty);
+        await wait(1/120);
         ctx.clearRect(0, 0, 1280, 720);
 
         if (imageSrc) {
@@ -515,7 +514,7 @@ addEventListener("init", () => {
         calculating = false;
     }
 
-    function calculateWaveform(t) {
+    function calculateWaveform(t, d) {
         if (!t) {
             return;
         }
@@ -525,7 +524,9 @@ addEventListener("init", () => {
         });
         t.midpoint = t.calculated.reduce((p, a) => p + a) / t.calculated.length / 2;
         audioBufferData.set(t.calculated);
-        t.dirty = true;
+        if (d) {
+            t.dirty = d;
+        }
     }
 
     function drawModifierStack() {
@@ -683,8 +684,7 @@ addEventListener("init", () => {
             if (custom_waveforms[id].samples.length !== 1600) { //upsample old
                 custom_waveforms[id].samples = upsampleFloat32Array(custom_waveforms[id].samples, 1600);
             }
-            custom_waveforms[id].dirty = true;
-            calculateWaveform(custom_waveforms[id]);
+            calculateWaveform(custom_waveforms[id], true);
         }
     });
 
@@ -702,7 +702,7 @@ addEventListener("init", () => {
     addEventListener("loopchanged", (e) => {
         if (e.detail.loop.isWaveformLoop) {
             loadModifiersToTarget();
-            drawWaveform();
+            drawWaveform(true);
         }
     });
 
@@ -734,14 +734,14 @@ addEventListener("init", () => {
     addEventListener("loopdeleted", (e) => {
         if (e.detail.loop.isWaveformLoop) {
             loadModifiersToTarget();
-            drawWaveform();
+            drawWaveform(true);
         }
     });
 
     addEventListener("loopmoved", (e) => {
         if (e.detail.loop.isWaveformLoop) {
             loadModifiersToTarget();
-            drawWaveform();
+            drawWaveform(true);
         }
     });
 

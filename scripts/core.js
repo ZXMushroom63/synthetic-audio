@@ -353,7 +353,6 @@ async function render() {
         URL.revokeObjectURL(document.querySelector("#renderOut").src);
     }
     var output = [];
-    hydrate();
     startTiming("render");
     var data = serialise(true);
     var channels = data.stereo ? 2 : 1;
@@ -445,7 +444,6 @@ async function render() {
 
     document.querySelector("#renderBtn").removeAttribute("disabled");
 
-    hydrateZoom();
     processRendering = false;
     document.querySelector("#renderBtn").disabled = false;
 }
