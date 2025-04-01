@@ -447,7 +447,7 @@ addEventListener("init", () => {
         }
         calculating = true;
         calculateWaveform(target);
-        await wait(1/60);
+        await wait(1/30);
         ctx.clearRect(0, 0, 1280, 720);
 
         if (imageSrc) {
