@@ -186,6 +186,7 @@ function addBlockType(id, data) {
     if (data.assetUser) {
         assetUserTypes.push(id);
     }
+    data.async = data.functor.constructor.name === "AsyncFunction";
     if (data.wet_and_dry_knobs) {
         addWetDryKnobs(data);
     }

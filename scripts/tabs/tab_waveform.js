@@ -354,7 +354,7 @@ addEventListener("init", () => {
 
     var supportedFilters = {
         "smooth": "Smooth",
-        "noise": "noise",
+        "noise": "Noise",
         "compressor": "Compressor",
         "bitcrunch": "Bitcrunch",
         "quantise": "Quantise",
@@ -438,7 +438,7 @@ addEventListener("init", () => {
     
 
     var calculating = false;
-    async function drawWaveform() {
+    function drawWaveform() {
         if (!target) {
             return;
         }
@@ -446,7 +446,7 @@ addEventListener("init", () => {
             return;
         }
         calculating = true;
-        await calculateWaveform(target);
+        calculateWaveform(target);
         ctx.clearRect(0, 0, 1280, 720);
 
         if (imageSrc) {
@@ -514,11 +514,11 @@ addEventListener("init", () => {
         calculating = false;
     }
 
-    async function calculateWaveform(t) {
+    function calculateWaveform(t) {
         if (!t) {
             return;
         }
-        t.calculated = await applyModifierStack(structuredClone(t.samples), t.modifiers);
+        t.calculated = applyModifierStackSync(structuredClone(t.samples), t.modifiers);
         t.calculated.forEach((x, i) => {
             t.calculated[i] = Math.max(-1, Math.min(1, x));
         });
