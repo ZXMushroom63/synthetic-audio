@@ -438,7 +438,7 @@ addEventListener("init", () => {
     
 
     var calculating = false;
-    function drawWaveform() {
+    async function drawWaveform() {
         if (!target) {
             return;
         }
@@ -447,6 +447,7 @@ addEventListener("init", () => {
         }
         calculating = true;
         calculateWaveform(target);
+        await wait(1/60);
         ctx.clearRect(0, 0, 1280, 720);
 
         if (imageSrc) {
