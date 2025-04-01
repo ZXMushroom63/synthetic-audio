@@ -449,7 +449,7 @@ addEventListener("init", () => {
         }
         calculating = true;
         calculateWaveform(target, dirty);
-        await wait(1/120);
+        await wait(1/60);
         ctx.clearRect(0, 0, 1280, 720);
 
         if (imageSrc) {
@@ -478,7 +478,7 @@ addEventListener("init", () => {
         ctx.lineTo(1280, 720 * ((-target.midpoint) + 1 / 2));
         ctx.stroke();
 
-        ctx.strokeStyle = "cyan";
+        ctx.strokeStyle = "rgba(0,255,255,0.5)";
         ctx.lineWidth = 1;
 
         ctx.moveTo(0, 720 * ((-target.samples[0] + 1) / 2));
@@ -580,7 +580,7 @@ addEventListener("init", () => {
             item.style.whiteSpace = "break-spaces";
 
             if (selectedWaveformId === id) {
-                item.style.background = "rgba(255,255,255,0.1)";
+                item.style.background = "rgba(255,255,255,0.2)";
             }
 
             const renameBtn = document.createElement("button");
