@@ -1,6 +1,6 @@
-addBlockType("sample", {
+addBlockType("warp", {
     color: "rgba(0,255,0,0.3)",
-    title: "Sample",
+    title: "Warp",
     wet_and_dry_knobs: true,
     configs: {
         "Position": ["#0~1", "number", 1],
