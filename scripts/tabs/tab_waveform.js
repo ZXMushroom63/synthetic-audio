@@ -549,6 +549,7 @@ addEventListener("init", () => {
             modifier.forceDelete = true;
             modifier.noEditorLayer = true;
             modifier.updateSuppression = true;
+            modifier.setAttribute("data-nodirty", "");
             right.appendChild(modifier);
         });
 
