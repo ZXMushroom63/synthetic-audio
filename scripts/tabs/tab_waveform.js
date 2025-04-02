@@ -370,6 +370,7 @@ addEventListener("init", () => {
         "value_gate": "Gate",
         "warp": "Warp",
         "mirror": "Mirror",
+        "reshape": "Reshape",
         "p_sinewave": "∿",
         "p_value": "𝑥",
         "adsr": "ADSR"
