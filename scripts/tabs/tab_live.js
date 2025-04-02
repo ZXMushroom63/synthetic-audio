@@ -1,26 +1,5 @@
-//WIP
-// (async function () { //audio interfaces appear as input output sources on pc
-//     try {
-//         const source = audioContext.createMediaStreamSource(audioStream);
-//         const compressor = audioContext.createDynamicsCompressor();
-
-//         compressor.threshold.value = -24; // Threshold in dB
-//         compressor.knee.value = 30;       // Knee width in dB
-//         compressor.ratio.value = 12;      // Compression ratio
-//         compressor.attack.value = 0.003;  // Attack time in seconds
-//         compressor.release.value = 0.25;  // Release time in seconds
-
-//         source.connect(compressor);
-//         compressor.connect(audioContext.destination);
-
-//         console.log("Audio interface signal is being compressed in real-time!");
-//     } catch (error) {
-//         console.error("Error accessing the audio interface:", error);
-//     }
-// })();
-
 var liveSetModifiers = [];
-
+var liveFunctorStack = [];
 addEventListener("init", () => {
     const container = document.createElement("div");
     container.style.fontFamily = "sans-serif";
@@ -29,7 +8,7 @@ addEventListener("init", () => {
     <div id="liveTabLeft">Audio Input: <button class="smallBtn" id="liveTabStartInput">Start Input</button><br>
     <span id="liveTabInputStatus">Connection State: <code>false</code></span><br><br>
     Audio Output: <code>stdout</code><br>
-    <button class="smallBtn" id="liveTabStopInput">Stop Input</button><br><br><div id="liveTabModifierStack"></div></div>
+    <button class="smallBtn" id="liveTabStopInput">Stop Input</button><br><br><div style="max-width:max(20vw,10rem)" id="liveTabModifierStack"></div></div>
     <div id="liveTabRight"></div>
     `;
     container.querySelector("#liveTabLeft").style.width = "50vw";
@@ -92,8 +71,10 @@ addEventListener("init", () => {
     processor.onaudioprocess = function (audioProcessingEvent) {
         const inputBuffer = audioProcessingEvent.inputBuffer;
         const outputBuffer = audioProcessingEvent.outputBuffer;
+        console.log(inputBuffer.getChannelData(0));
         outputBuffer.getChannelData(0).set(inputBuffer.getChannelData(0));
     }
+    processor.connect(audioCtx.destination);
     container.querySelector("#liveTabStartInput").addEventListener("click", async () => {
         if (connected) {
             return;
@@ -104,6 +85,7 @@ addEventListener("init", () => {
                 audioStream.disconnect();
             }
             audioStream = audioCtx.createMediaStreamSource(mediaSource);
+            audioStream.connect(processor);
             connected = true;
             container.querySelector("#liveTabInputStatus code").innerText = connected;
         }
@@ -149,6 +131,7 @@ addEventListener("init", () => {
 
     function loadModifiersToTarget() {
         liveSetModifiers = [...rightCol.querySelectorAll(".loop")].map((n) => { return serialiseNode(n, false) }).sort((a, b) => a.layer - b.layer);
+        liveFunctorStack = liveSetModifiers.map(x => filters[x.type].functor);
     }
 
     registerTab("Live", container, false, () => { setTimeout(drawModifierStack, 150); });
@@ -164,17 +147,17 @@ addEventListener("init", () => {
         e.detail.data.liveSet = liveSetModifiers;
     });
     addEventListener("loopchanged", (e) => {
-        if (e.detail.loop.isWaveformLoop) {
+        if (e.detail.loop.isLivesetLoop) {
             loadModifiersToTarget();
         }
     });
     addEventListener("loopdeleted", (e) => {
-        if (e.detail.loop.isWaveformLoop) {
+        if (e.detail.loop.isLivesetLoop) {
             loadModifiersToTarget();
         }
     });
     addEventListener("loopmoved", (e) => {
-        if (e.detail.loop.isWaveformLoop) {
+        if (e.detail.loop.isLivesetLoop) {
             loadModifiersToTarget();
         }
     });
