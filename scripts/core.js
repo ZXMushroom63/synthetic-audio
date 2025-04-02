@@ -150,14 +150,25 @@ function addWetDryKnobs(data) {
         Wet: [1, "number", 1]
     }, data.configs);
     var oldFunctor = data.functor;
-    data.functor = async function (inPcm, channel, data) {
+    data.functor = function (inPcm, channel, data) {
         var dry = _(this.conf.Dry);
         var wet = _(this.conf.Wet);
-        const out = await oldFunctor.apply(this, [inPcm, channel, data]);
-        out.forEach((x, i) => {
-            out[i] *= wet(i, inPcm);
-            out[i] += dry(i, inPcm) * inPcm[i];
-        });
+        const out = oldFunctor.apply(this, [inPcm, channel, data]);
+        function applyFn(data) {
+            data.forEach((x, i) => {
+                data[i] *= wet(i, inPcm);
+                data[i] += dry(i, inPcm) * inPcm[i];
+            });
+        }
+        if (out instanceof Promise) {
+            return new Promise((res, rej)=>{
+                out.then(data => {
+                    applyFn(data);
+                    res(data);
+                });
+            });
+        }
+        applyFn(out);
         return out;
     }
 }
@@ -168,17 +179,28 @@ function addAmpSmoothKnob(data) {
         const out = await oldFunctor.apply(this, [inPcm, channel, data]);
         const AmpSmoothingStart = Math.floor(audio.samplerate * this.conf.AmplitudeSmoothing);
         const AmpSmoothingEnd = inPcm.length - AmpSmoothingStart;
-        out.forEach((x, i) => {
-            var ampSmoothingFactor = 1;
-            if (i < AmpSmoothingStart) {
-                ampSmoothingFactor = i / AmpSmoothingStart;
-            }
+        function applyFn(data) {
+            data.forEach((x, i) => {
+                var ampSmoothingFactor = 1;
+                if (i < AmpSmoothingStart) {
+                    ampSmoothingFactor = i / AmpSmoothingStart;
+                }
 
-            if (i > AmpSmoothingEnd) {
-                ampSmoothingFactor = 1 - ((i - AmpSmoothingEnd) / AmpSmoothingStart);
-            }
-            out[i] *= ampSmoothingFactor;
-        });
+                if (i > AmpSmoothingEnd) {
+                    ampSmoothingFactor = 1 - ((i - AmpSmoothingEnd) / AmpSmoothingStart);
+                }
+                data[i] *= ampSmoothingFactor;
+            });
+        }
+        if (out instanceof Promise) {
+            return new Promise((res, rej)=>{
+                out.then(data => {
+                    applyFn(data);
+                    res(data);
+                });
+            });
+        }
+        applyFn(out);
         return out;
     }
 }
