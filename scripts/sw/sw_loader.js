@@ -1,7 +1,7 @@
 globalThis.sw = null;
 if ('serviceWorker' in navigator) {
     addEventListener('load', () => {
-        navigator.serviceWorker.register('/synthetic-audio/worker.js').then(registration => {
+        navigator.serviceWorker.register('./worker.js').then(registration => {
             globalThis.sw = registration;
             console.log('ServiceWorker registration successful with scope: ', registration.scope);
         }, err => {
