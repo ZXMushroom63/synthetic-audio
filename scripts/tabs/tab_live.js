@@ -5,16 +5,19 @@ addEventListener("init", () => {
     container.style.fontFamily = "sans-serif";
     container.style.color = "white";
     container.innerHTML = `
-    <div id="liveTabLeft">Audio Input: <button class="smallBtn" id="liveTabStartInput">Start Input</button><br><select width="50vw" id="liveTabInputOptions"></select><br>
+    <div id="liveTabLeft">Audio Input: <button class="smallBtn" id="liveTabStartInput">Start Input</button><br><select style="width:calc(50vw - 4rem); min-width:15rem" id="liveTabInputOptions"></select><br>
     <span id="liveTabInputStatus">Connection State: <code>false</code></span><br><br>
     Audio Output: <code>stdout</code><br>
-    <button class="smallBtn" id="liveTabStopInput">Stop Input</button><br><br><div style="max-width:max(20vw,10rem)" id="liveTabModifierStack"></div></div>
+    <button class="smallBtn" id="liveTabStopInput">Stop Input</button><br><br><div style="max-width:max(20vw,10rem)" id="liveTabModifierStack"></div><br><br><canvas id="liveTabVisualiser"></canvas></div>
     <div id="liveTabRight"></div>
     `;
-    container.querySelector("#liveTabLeft").style.width = "50vw";
-    container.querySelector("#liveTabLeft").style.display = "inline-block";
-    container.querySelector("#liveTabLeft").style.height = "calc(100vh - 15rem)";
-    container.querySelector("#liveTabLeft").style.borderRight = "1px solid white";
+    const leftCol = container.querySelector("#liveTabLeft");
+    leftCol.style.width = "50vw";
+    leftCol.style.display = "inline-block";
+    leftCol.style.height = "calc(100vh - 15rem)";
+    leftCol.style.borderRight = "1px solid white";
+    leftCol.style.overflowY = "auto";
+    leftCol.style.overflowX = "hidden";
     var supportedFilters = {
         "smooth": "Smooth",
         "compressor": "Compressor",
@@ -71,26 +74,69 @@ addEventListener("init", () => {
     rightCol.style.height = "calc(100vh - 15rem)";
     rightCol.style.display = "inline-block";
     rightCol.style.position = "absolute";
+    rightCol.style.overflowY = "auto";
+    rightCol.style.overflowX = "hidden";
+    const viz = container.querySelector("#liveTabVisualiser");
+    viz.width = 1280;
+    viz.height = 480;
+    viz.style.border = "1px solid white";
+    viz.style.width = "calc(50vw - 2px)";
+    viz.style.imageRendering = "pixellated";
+    var ctx = viz.getContext("2d");
+    console.log(ctx);
     document.querySelector("#tabContent").appendChild(container);
     var connected = false;
     var audioStream;
     var mediaSource;
     var audioCtx = new AudioContext();
-    const BUF_LEN = 4096;
-    var processor = audioCtx.createScriptProcessor(BUF_LEN, 2, 2);
+    const BUF_LEN = 1024;
+    var processor = audioCtx.createScriptProcessor(BUF_LEN, 1, 1);
     processor.onaudioprocess = function (audioProcessingEvent) {
         const inputBuffer = audioProcessingEvent.inputBuffer;
         const outputBuffer = audioProcessingEvent.outputBuffer;
         for (let c = 0; c < inputBuffer.numberOfChannels; c++) {
             var data = inputBuffer.getChannelData(c);
+            ctx.clearRect(0,0,1280,480);
+            ctx.fillStyle = "white";
+            ctx.font = "16px sans-serif";
+            ctx.strokeStyle = "white";
+
+            ctx.lineWidth = 2;
+            ctx.moveTo(640, 0);
+            ctx.beginPath();
+            ctx.moveTo(640, 0);
+            ctx.lineTo(640, 480);
+            ctx.stroke();
+
+            ctx.strokeStyle = "rgba(0,255,255,0.5)";
+            ctx.lineWidth = 2;
+            ctx.moveTo(0, 480 * ((data[0] + 1) / 2));
+            ctx.beginPath();
+            for (let i = 0; i < data.length; i++) {
+                ctx.lineTo(i / BUF_LEN * 640, 480 * ((data[i] + 1) / 2));
+            }
+            ctx.stroke();
+
             liveFunctorStack.forEach((fn, idx) => {
                 data = fn.apply(liveSetModifiers[idx], [data.slice(0, BUF_LEN), c, {}])
             });
+
+            ctx.strokeStyle = "lime";
+            ctx.lineWidth = 2;
+            ctx.moveTo(0, 480 * ((data[0] + 1) / 2));
+            ctx.beginPath();
+            for (let i = 0; i < data.length; i++) {
+                ctx.lineTo(i / BUF_LEN * 640 + 640, 480 * ((data[i] + 1) / 2));
+            }
+            ctx.stroke();
+
+            ctx.fillText("Raw Signal", 4, 8+8);
+            ctx.fillText("Processed Signal", 644, 8+8);
+            
             outputBuffer.getChannelData(c).set(data);
         }
-
     }
-    processor.connect(audioCtx.destination);
+    
     container.querySelector("#liveTabStartInput").addEventListener("click", async () => {
         if (connected) {
             return;
@@ -102,6 +148,7 @@ addEventListener("init", () => {
             if (audioStream) {
                 audioStream.disconnect();
             }
+            processor.connect(audioCtx.destination);
             audioStream = audioCtx.createMediaStreamSource(mediaSource);
             audioStream.connect(processor);
             connected = true;
@@ -119,6 +166,7 @@ addEventListener("init", () => {
                 }
             });
         }
+        processor.disconnect();
         audioStream.disconnect();
         audioStream = null;
         connected = false;
