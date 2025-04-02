@@ -5,7 +5,7 @@ addEventListener("init", () => {
     container.style.fontFamily = "sans-serif";
     container.style.color = "white";
     container.innerHTML = `
-    <div id="liveTabLeft">Audio Input: <button class="smallBtn" id="liveTabStartInput">Start Input</button><br>
+    <div id="liveTabLeft">Audio Input: <button class="smallBtn" id="liveTabStartInput">Start Input</button><br><select width="50vw" id="liveTabInputOptions"></select><br>
     <span id="liveTabInputStatus">Connection State: <code>false</code></span><br><br>
     Audio Output: <code>stdout</code><br>
     <button class="smallBtn" id="liveTabStopInput">Stop Input</button><br><br><div style="max-width:max(20vw,10rem)" id="liveTabModifierStack"></div></div>
@@ -17,7 +17,6 @@ addEventListener("init", () => {
     container.querySelector("#liveTabLeft").style.borderRight = "1px solid white";
     var supportedFilters = {
         "smooth": "Smooth",
-        "noise": "Noise",
         "compressor": "Compressor",
         "bitcrunch": "Bitcrunch",
         "quantise": "Quantise",
@@ -27,14 +26,24 @@ addEventListener("init", () => {
         "exciter": "Exciter",
         "fuzz": "Fuzz",
         "tape": "Tape",
-        "vinyl": "Vinyl",
         "reverse": "Reverse",
         "speed": "Speed",
         "value_gate": "Gate",
         "warp": "Warp",
-        "mirror": "Mirror"
+        "reshape": "Reshape"
     };
+    const inputSelect = container.querySelector("#liveTabInputOptions");
     const modifierStackMenu = container.querySelector("#liveTabModifierStack");
+    navigator.mediaDevices.enumerateDevices().then(x => {
+        x.filter(
+            (device) => device.kind === "audioinput"
+        ).forEach((inputDevice, i) => {
+            const option = document.createElement("option");
+            option.value = inputDevice.deviceId;
+            option.textContent = inputDevice.label || `Audio Input ${i + 1}`;
+            inputSelect.appendChild(option);
+        });
+    });
     modifierStackMenu.style.whiteSpace = "break-spaces";
     Object.keys(supportedFilters).forEach(filter => {
         const addMod = document.createElement("button");
@@ -56,7 +65,7 @@ addEventListener("init", () => {
         });
         modifierStackMenu.appendChild(addMod);
     });
-    
+
     const rightCol = container.querySelector("#liveTabRight");
     rightCol.style.width = "50vw";
     rightCol.style.height = "calc(100vh - 15rem)";
@@ -67,19 +76,28 @@ addEventListener("init", () => {
     var audioStream;
     var mediaSource;
     var audioCtx = new AudioContext();
-    var processor = audioCtx.createScriptProcessor(512, 1, 1);
+    const BUF_LEN = 4096;
+    var processor = audioCtx.createScriptProcessor(BUF_LEN, 2, 2);
     processor.onaudioprocess = function (audioProcessingEvent) {
         const inputBuffer = audioProcessingEvent.inputBuffer;
         const outputBuffer = audioProcessingEvent.outputBuffer;
-        console.log(inputBuffer.getChannelData(0));
-        outputBuffer.getChannelData(0).set(inputBuffer.getChannelData(0));
+        for (let c = 0; c < inputBuffer.numberOfChannels; c++) {
+            var data = inputBuffer.getChannelData(c);
+            liveFunctorStack.forEach((fn, idx) => {
+                data = fn.apply(liveSetModifiers[idx], [data.slice(0, BUF_LEN), c, {}])
+            });
+            outputBuffer.getChannelData(c).set(data);
+        }
+
     }
     processor.connect(audioCtx.destination);
     container.querySelector("#liveTabStartInput").addEventListener("click", async () => {
         if (connected) {
             return;
         }
-        mediaSource = await navigator.mediaDevices.getUserMedia({ audio: true });
+        mediaSource = await navigator.mediaDevices.getUserMedia({
+            audio: { deviceId: { exact: inputSelect.value } },
+        });
         if (mediaSource) {
             if (audioStream) {
                 audioStream.disconnect();
@@ -166,5 +184,5 @@ registerHelp("[data-tab=Live]",
     `
 > LIVE TAB
 
-This tab lets you design live filters.
+This tab lets you design live filters, for use on a physical guitar or something.
 `);
