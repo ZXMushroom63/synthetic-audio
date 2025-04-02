@@ -4,8 +4,8 @@ addBlockType("reverse", {
     wet_and_dry_knobs: true,
     configs: {
     },
-    functor: async function (inPcm, channel, data) {
-        inPcm.reverse()
+    functor: function (inPcm, channel, data) {
+        inPcm.reverse();
         return inPcm;
     }
 });
