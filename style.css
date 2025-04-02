@@ -745,3 +745,15 @@ button:hover .addModifierDiv {
     margin-left: 0.75rem;
     text-shadow: 0px 0px 5px rgba(0, 0, 0, 0.8);
 }
+
+code {
+    border: 1px solid white;
+    background-color: rgba(199, 199, 255, 0.1);
+    transition: background-color 0.5s;
+    padding: 2px 4px;
+    border-radius: 4px;
+}
+
+code:hover {
+    background-color: rgba(199, 199, 255, 0.2);
+}
