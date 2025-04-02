@@ -7,9 +7,9 @@ addBlockType("mirror", {
         "Invert": [true, "checkbox"],
     },
     functor: function (inPcm, channel, data) {
-        var mid = Math.floor(WAVEFORM_RES / 2);
+        var mid = Math.floor(inPcm.length / 2);
         var isLeft = (this.conf.Side === "LEFT");
-        var sub = !isLeft ? inPcm.slice(mid, WAVEFORM_RES) : inPcm.slice(0, mid);
+        var sub = !isLeft ? inPcm.slice(mid, inPcm.length) : inPcm.slice(0, mid);
         if (this.conf.Invert) {
             sub.forEach((x, i)=>{
                 sub[i] *= -1;
