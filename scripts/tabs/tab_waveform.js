@@ -763,13 +763,6 @@ registerHelp("[data-tab=Waveforms]",
 This tab is where custom waveforms or LFOs are designed.
 `);
 
-registerHelp("[data-tab=Waveforms]",
-    `
-> WAVEFORMS TAB
-
-This tab is where custom waveforms or LFOs are designed.
-`);
-
 registerHelp("#waveformManagerUI tr td:first-child button",
     `
 > Create new waveform button
