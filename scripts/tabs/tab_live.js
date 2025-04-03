@@ -1,17 +1,19 @@
 var liveSetModifiers = [];
 var liveFunctorStack = [];
+// todo: add Live EQ, Live Delay, and Live Reverb
 addEventListener("init", () => {
     const container = document.createElement("div");
     container.style.fontFamily = "sans-serif";
     container.style.color = "white";
     container.innerHTML = `
-    <div id="liveTabLeft">Audio Input: <button class="smallBtn" id="liveTabStartInput">Start Input</button><button class="smallBtn" id="liveTabStopInput">Stop Input</button><button class="smallBtn" id="liveTabRequest">Request Perms</button><br><select style="width:calc(50vw - 4rem); min-width:15rem" id="liveTabInputOptions"></select><br>
+    <div id="liveTabLeft">Audio Input: <button class="smallBtn" id="liveTabStartInput">Start Input</button><button class="smallBtn" id="liveTabStopInput">Stop Input</button><button class="smallBtn" id="liveTabRequest">Request Perms</button><br><select style="width:calc(40vw - 4rem); min-width:15rem" id="liveTabInputOptions"></select><br>
     <span id="liveTabInputStatus">Connection State: <code>false</code></span><br><br>
     Audio Output: <code>stdout</code><br><br><div style="max-width:max(20vw,10rem)" id="liveTabModifierStack"></div><br><br><canvas id="liveTabVisualiser"></canvas></div>
     <div id="liveTabRight"></div>
+    <div id="liveTabFilters"></div>
     `;
     const leftCol = container.querySelector("#liveTabLeft");
-    leftCol.style.width = "50vw";
+    leftCol.style.width = "40vw";
     leftCol.style.display = "inline-block";
     leftCol.style.height = "calc(100vh - 15rem)";
     leftCol.style.borderRight = "1px solid white";
@@ -72,17 +74,26 @@ addEventListener("init", () => {
     });
 
     const rightCol = container.querySelector("#liveTabRight");
-    rightCol.style.width = "50vw";
+    rightCol.style.width = "25vw";
     rightCol.style.height = "calc(100vh - 15rem)";
     rightCol.style.display = "inline-block";
     rightCol.style.position = "absolute";
     rightCol.style.overflowY = "auto";
     rightCol.style.overflowX = "hidden";
+    rightCol.style.borderRight = "1px solid white";
+    
+    const filterCol = container.querySelector("#liveTabFilters");
+    filterCol.style.width = "35vw";
+    filterCol.style.height = "calc(100vh - 15rem)";
+    filterCol.style.display = "inline-block";
+    filterCol.style.overflowY = "auto";
+    filterCol.style.overflowX = "hidden";
+
     const viz = container.querySelector("#liveTabVisualiser");
     viz.width = 1280;
     viz.height = 480;
     viz.style.border = "1px solid white";
-    viz.style.width = "calc(50vw - 2px)";
+    viz.style.width = "calc(40vw - 2px)";
     viz.style.imageRendering = "pixellated";
     var ctx = viz.getContext("2d");
     console.log(ctx);
@@ -93,6 +104,7 @@ addEventListener("init", () => {
     var audioCtx = new AudioContext();
     const BUF_LEN = 1024;
     var processor = audioCtx.createScriptProcessor(BUF_LEN, 1, 1);
+    var graph = [processor, audioCtx.destination];
     processor.onaudioprocess = function (audioProcessingEvent) {
         const inputBuffer = audioProcessingEvent.inputBuffer;
         const outputBuffer = audioProcessingEvent.outputBuffer;
@@ -195,7 +207,7 @@ addEventListener("init", () => {
             modifier.querySelector(".handleLeft").remove();
             modifier.style.top = mod.layer * 3 + "rem";
             modifier.querySelector(".handleRight").remove();
-            modifier.querySelector(".loopInternal").style.width = "calc(50vw - 0.5rem)";
+            modifier.querySelector(".loopInternal").style.width = "calc(25vw - 4px)";
             modifier.referenceBB = rightCol.getBoundingClientRect();
             modifier.horizontalBlocked = true;
             modifier.isLivesetLoop = true;
