@@ -18,7 +18,7 @@ addBlockType("window", {
     color: "rgba(0,255,0,0.3)",
     title: "Window",
     configs: {
-        "WindowSize": [0.05, "number", 1],
+        "WindowSize": [0.02, "number", 1],
         "Volume": [1, "number", 1],
         "Replace": [true, "checkbox"]
     },
