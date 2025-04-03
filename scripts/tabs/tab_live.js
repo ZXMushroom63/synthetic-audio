@@ -5,7 +5,7 @@ addEventListener("init", () => {
     container.style.fontFamily = "sans-serif";
     container.style.color = "white";
     container.innerHTML = `
-    <div id="liveTabLeft">Audio Input: <button class="smallBtn" id="liveTabStartInput">Start Input</button><button class="smallBtn" id="liveTabStopInput">Stop Input</button><br><select style="width:calc(50vw - 4rem); min-width:15rem" id="liveTabInputOptions"></select><br>
+    <div id="liveTabLeft">Audio Input: <button class="smallBtn" id="liveTabStartInput">Start Input</button><button class="smallBtn" id="liveTabStopInput">Stop Input</button><button class="smallBtn" id="liveTabRequest">Request Perms</button><br><select style="width:calc(50vw - 4rem); min-width:15rem" id="liveTabInputOptions"></select><br>
     <span id="liveTabInputStatus">Connection State: <code>false</code></span><br><br>
     Audio Output: <code>stdout</code><br><br><div style="max-width:max(20vw,10rem)" id="liveTabModifierStack"></div><br><br><canvas id="liveTabVisualiser"></canvas></div>
     <div id="liveTabRight"></div>
@@ -136,11 +136,23 @@ addEventListener("init", () => {
             outputBuffer.getChannelData(c).set(data);
         }
     }
+
+    container.querySelector("#liveTabRequest").addEventListener("click", async ()=>{
+        (await navigator.mediaDevices.getUserMedia({
+            audio: true,
+        })).getTracks().forEach((track) => {
+            if (track.readyState == 'live') {
+                track.stop();
+            }
+        });
+        location.reload();
+    });
     
     container.querySelector("#liveTabStartInput").addEventListener("click", async () => {
         if (connected) {
             return;
         }
+        
         mediaSource = await navigator.mediaDevices.getUserMedia({
             audio: { deviceId: { exact: inputSelect.value } },
         });
