@@ -13,12 +13,6 @@ addEventListener("init", () => {
     <div id="liveTabFilters"></div>
     `;
     const leftCol = container.querySelector("#liveTabLeft");
-    leftCol.style.width = "40vw";
-    leftCol.style.display = "inline-block";
-    leftCol.style.height = "calc(100vh - 15rem)";
-    leftCol.style.borderRight = "1px solid white";
-    leftCol.style.overflowY = "auto";
-    leftCol.style.overflowX = "hidden";
     var supportedFilters = {
         "smooth": "Smooth",
         "compressor": "Compressor",
@@ -74,21 +68,9 @@ addEventListener("init", () => {
     });
 
     const rightCol = container.querySelector("#liveTabRight");
-    rightCol.style.width = "25vw";
-    rightCol.style.height = "calc(100vh - 15rem)";
-    rightCol.style.display = "inline-block";
-    rightCol.style.position = "absolute";
-    rightCol.style.overflowY = "auto";
-    rightCol.style.overflowX = "hidden";
-    rightCol.style.borderRight = "1px solid white";
     
     const filterCol = container.querySelector("#liveTabFilters");
-    filterCol.style.width = "35vw";
-    filterCol.style.height = "calc(100vh - 15rem)";
-    filterCol.style.display = "inline-block";
-    filterCol.style.overflowY = "auto";
-    filterCol.style.overflowX = "hidden";
-
+    
     const viz = container.querySelector("#liveTabVisualiser");
     viz.width = 1280;
     viz.height = 480;

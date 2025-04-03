@@ -757,3 +757,29 @@ code {
 code:hover {
     background-color: rgba(199, 199, 255, 0.2);
 }
+
+#liveTabLeft {
+    width: 40vw;
+    display: inline-block;
+    height: calc(100vh - 15rem);
+    border-right: 1px solid white;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+#liveTabRight {
+    width: 25vw;
+    display: inline-block;
+    height: calc(100vh - 15rem);
+    border-right: 1px solid white;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+#liveTabFilters {
+    width: 35vw;
+    display: inline-block;
+    height: calc(100vh - 15rem);
+    overflow-y: auto;
+    overflow-x: hidden;
+}
