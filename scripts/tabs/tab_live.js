@@ -33,7 +33,9 @@ addEventListener("init", () => {
         "value_gate": "Gate",
         "warp": "Warp",
         "reshape": "Reshape",
-        "mirror": "Mirror"
+        "mirror": "Mirror",
+        "comb": "Comb",
+        "window": "Window"
     };
     const inputSelect = container.querySelector("#liveTabInputOptions");
     const modifierStackMenu = container.querySelector("#liveTabModifierStack");

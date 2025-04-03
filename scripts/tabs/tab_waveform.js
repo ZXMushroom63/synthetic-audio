@@ -371,6 +371,7 @@ addEventListener("init", () => {
         "warp": "Warp",
         "mirror": "Mirror",
         "reshape": "Reshape",
+        "window": "Window",
         "p_sinewave": "∿",
         "p_value": "𝑥",
         "adsr": "ADSR"
