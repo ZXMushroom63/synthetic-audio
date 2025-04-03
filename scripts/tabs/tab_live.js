@@ -58,7 +58,7 @@ addEventListener("init", () => {
                 }
             });
             liveSetModifiers.push({
-                file: filters[filter].title + " (as modifier)",
+                file: filters[filter].title + " (as component)",
                 layer: insertLayer,
                 type: filter
             });
@@ -70,7 +70,7 @@ addEventListener("init", () => {
     const rightCol = container.querySelector("#liveTabRight");
     
     const filterCol = container.querySelector("#liveTabFilters");
-    
+
     const viz = container.querySelector("#liveTabVisualiser");
     viz.width = 1280;
     viz.height = 480;
