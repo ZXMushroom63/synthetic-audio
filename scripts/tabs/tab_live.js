@@ -10,7 +10,14 @@ addEventListener("init", () => {
     <span id="liveTabInputStatus">Connection State: <code>false</code></span><br><br>
     Audio Output: <code>stdout</code><br><br><div style="max-width:max(20vw,10rem)" id="liveTabModifierStack"></div><br><br><canvas id="liveTabVisualiser"></canvas></div>
     <div id="liveTabRight"></div>
-    <div id="liveTabFilters"></div>
+    <div id="liveTabFilters">
+        <label>Delay: </label><input type="checkbox" data-key="delay"><br>
+        <label>DelayFeedbackGain: </label><input type="number" value="-2" data-key="delaygain"><br>
+        <label>DelayDuration: </label><input type="number" value="0.5" data-key="delayduration"><br>
+        <label>Reverb: </label><input type="checkbox" data-key="reverb"><br>
+        <label>ReverbTime: </label><input type="number" value="2.0" data-key="reverbtime"><br>
+        <label>ReverbDecayRate: </label><input type="number" value="8.0" data-key="reverbdecay"><br>
+    </div>
     `;
     const leftCol = container.querySelector("#liveTabLeft");
     var supportedFilters = {
@@ -31,7 +38,7 @@ addEventListener("init", () => {
         "reshape": "Reshape",
         "mirror": "Mirror",
         "comb": "Comb",
-        "window": "Window"
+        "window": "Window",
     };
     const inputSelect = container.querySelector("#liveTabInputOptions");
     const modifierStackMenu = container.querySelector("#liveTabModifierStack");
@@ -68,7 +75,7 @@ addEventListener("init", () => {
     });
 
     const rightCol = container.querySelector("#liveTabRight");
-    
+
     const filterCol = container.querySelector("#liveTabFilters");
 
     const viz = container.querySelector("#liveTabVisualiser");
@@ -78,7 +85,6 @@ addEventListener("init", () => {
     viz.style.width = "calc(40vw - 2px)";
     viz.style.imageRendering = "pixellated";
     var ctx = viz.getContext("2d");
-    console.log(ctx);
     document.querySelector("#tabContent").appendChild(container);
     var connected = false;
     var audioStream;
@@ -86,54 +92,64 @@ addEventListener("init", () => {
     var audioCtx = new AudioContext();
     const BUF_LEN = 1024;
     var processor = audioCtx.createScriptProcessor(BUF_LEN, 1, 1);
-    var graph = [processor, audioCtx.destination];
+
+    // processor, delay, reverb, dest
+    var graph = [processor, null, null, null, audioCtx.destination];
+    var lastFrameTime = Date.now();
     processor.onaudioprocess = function (audioProcessingEvent) {
+        var rightNow = Date.now();
+        var dt = rightNow - lastFrameTime;
         const inputBuffer = audioProcessingEvent.inputBuffer;
         const outputBuffer = audioProcessingEvent.outputBuffer;
         for (let c = 0; c < inputBuffer.numberOfChannels; c++) {
-            var data = inputBuffer.getChannelData(c);
-            ctx.clearRect(0,0,1280,480);
-            ctx.fillStyle = "white";
-            ctx.font = "16px sans-serif";
-            ctx.strokeStyle = "white";
-
-            ctx.lineWidth = 2;
-            ctx.moveTo(640, 0);
-            ctx.beginPath();
-            ctx.moveTo(640, 0);
-            ctx.lineTo(640, 480);
-            ctx.stroke();
-
-            ctx.strokeStyle = "rgba(0,255,255,0.5)";
-            ctx.lineWidth = 2;
-            ctx.moveTo(0, 480 * ((data[0] + 1) / 2));
-            ctx.beginPath();
-            for (let i = 0; i < data.length; i++) {
-                ctx.lineTo(i / BUF_LEN * 640, 480 * ((data[i] + 1) / 2));
-            }
-            ctx.stroke();
+            var data, originalData;
+            data = originalData = inputBuffer.getChannelData(c);
 
             liveFunctorStack.forEach((fn, idx) => {
-                data = fn.apply(liveSetModifiers[idx], [data.slice(0, BUF_LEN), c, {}])
+                data = fn.apply(liveSetModifiers[idx], [data.slice(0, BUF_LEN), c, {}]);
             });
 
-            ctx.strokeStyle = "lime";
-            ctx.lineWidth = 2;
-            ctx.moveTo(0, 480 * ((data[0] + 1) / 2));
-            ctx.beginPath();
-            for (let i = 0; i < data.length; i++) {
-                ctx.lineTo(i / BUF_LEN * 640 + 640, 480 * ((data[i] + 1) / 2));
-            }
-            ctx.stroke();
-
-            ctx.fillText("Raw Signal", 4, 8+8);
-            ctx.fillText("Processed Signal", 644, 8+8);
-            
             outputBuffer.getChannelData(c).set(data);
+
+            if (dt > (1 / 5)) {
+                lastFrameTime = rightNow;
+                ctx.clearRect(0, 0, 1280, 480);
+                ctx.fillStyle = "white";
+                ctx.font = "16px sans-serif";
+                ctx.strokeStyle = "white";
+
+                ctx.lineWidth = 2;
+                ctx.moveTo(640, 0);
+                ctx.beginPath();
+                ctx.moveTo(640, 0);
+                ctx.lineTo(640, 480);
+                ctx.stroke();
+
+                ctx.strokeStyle = "rgba(0,255,255,0.5)";
+                ctx.lineWidth = 2;
+                ctx.moveTo(0, 480 * ((originalData[0] + 1) / 2));
+                ctx.beginPath();
+                for (let i = 0; i < originalData.length; i++) {
+                    ctx.lineTo(i / BUF_LEN * 640, 480 * ((originalData[i] + 1) / 2));
+                }
+                ctx.stroke();
+
+                ctx.strokeStyle = "lime";
+                ctx.lineWidth = 2;
+                ctx.moveTo(0, 480 * ((data[0] + 1) / 2));
+                ctx.beginPath();
+                for (let i = 0; i < data.length; i++) {
+                    ctx.lineTo(i / BUF_LEN * 640 + 640, 480 * ((data[i] + 1) / 2));
+                }
+                ctx.stroke();
+
+                ctx.fillText("Raw Signal", 4, 8 + 8);
+                ctx.fillText("Processed Signal", 644, 8 + 8);
+            }
         }
     }
 
-    container.querySelector("#liveTabRequest").addEventListener("click", async ()=>{
+    container.querySelector("#liveTabRequest").addEventListener("click", async () => {
         (await navigator.mediaDevices.getUserMedia({
             audio: true,
         })).getTracks().forEach((track) => {
@@ -141,14 +157,24 @@ addEventListener("init", () => {
                 track.stop();
             }
         });
-        location.reload();
+        inputSelect.innerHTML = "";
+        navigator.mediaDevices.enumerateDevices().then(x => {
+            x.filter(
+                (device) => device.kind === "audioinput"
+            ).forEach((inputDevice, i) => {
+                const option = document.createElement("option");
+                option.value = inputDevice.deviceId;
+                option.textContent = inputDevice.label || `Audio Input ${i + 1}`;
+                inputSelect.appendChild(option);
+            });
+        });
     });
-    
+
     container.querySelector("#liveTabStartInput").addEventListener("click", async () => {
         if (connected) {
             return;
         }
-        
+
         mediaSource = await navigator.mediaDevices.getUserMedia({
             audio: { deviceId: { exact: inputSelect.value } },
         });

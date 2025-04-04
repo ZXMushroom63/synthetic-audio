@@ -242,7 +242,8 @@ h4 {
 
 .loopOptionsMenu input:not([type=checkbox]),
 select,
-.inputStyles {
+.inputStyles,
+#liveTabFilters input:not([type=checkbox]) {
     background-color: transparent;
     border: 0;
     color: white;
