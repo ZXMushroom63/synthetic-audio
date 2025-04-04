@@ -26,7 +26,7 @@ async function applyCompressorOffline(pcmData, sampleRate, v_threshold = -24, v_
 
 addBlockType("compressor_advanced", {
     color: "rgba(0,255,0,0.3)",
-    title: "Advanced Compressor",
+    title: "Complex Compressor",
     wet_and_dry_knobs: true,
     configs: {
         "Threshold_dB": [-24, "number"],

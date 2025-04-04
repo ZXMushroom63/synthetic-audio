@@ -719,7 +719,7 @@ input[type="number"]::-webkit-inner-spin-button {
     border: 1px solid white;
     z-index: 700;
     top: 0;
-    left: 0;
+    left: -1rem;
     display: none;
 }
 

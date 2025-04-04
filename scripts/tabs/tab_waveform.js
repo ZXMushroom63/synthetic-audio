@@ -371,10 +371,11 @@ addEventListener("init", () => {
         "warp": "Warp",
         "mirror": "Mirror",
         "reshape": "Reshape",
+        "modulo": "Modulo",
         "window": "Window",
         "p_sinewave": "∿",
         "p_value": "𝑥",
-        "adsr": "ADSR"
+        "adsr": "ADSR",
     };
 
     const addModifierBtn = document.createElement("button");

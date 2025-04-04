@@ -36,6 +36,7 @@ addEventListener("init", () => {
         "value_gate": "Gate",
         "warp": "Warp",
         "reshape": "Reshape",
+        "modulo": "Modulo",
         "mirror": "Mirror",
         "comb": "Comb",
         "window": "Window",
