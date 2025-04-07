@@ -19,7 +19,7 @@ addBlockType("warp", {
         }
         out.forEach((x, i)=>{
             var chunkBase = Math.floor(i / chunk) * chunk;
-            out[i] = inPcm[chunkBase + Math.floor(chunk*pos(i%chunk, chunkPcm))] || 0;
+            out[i] = inPcm[chunkBase + Math.round(chunk * pos(i%chunk, chunkPcm))] || 0;
         });
         return out;
     }

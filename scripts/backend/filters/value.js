@@ -7,10 +7,11 @@ addBlockType("p_value", {
         "Additive": [false, "checkbox"]
     },
     functor: function (inPcm, channel, data) {
+        var smallerPcm = new Float32Array(inPcm.length - 1);
         var val = _(this.conf.Value);
         var vol = _(this.conf.Volume);
         inPcm.forEach((x, i) => {
-            var value = parseFloat(val(i, inPcm));
+            var value = parseFloat(val(i, smallerPcm));
             if (this.conf.Additive) {
                 inPcm[i] += value * vol(i, inPcm);
             } else {
