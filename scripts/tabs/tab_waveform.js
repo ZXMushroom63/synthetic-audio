@@ -697,10 +697,12 @@ addEventListener("init", () => {
 
     addEventListener('serialise', (e) => {
         var out = structuredClone(custom_waveforms);
-
+``
         for (let id in out) {
             out[id].samples = [...custom_waveforms[id].samples];
+            delete out[id].calculated;
             delete out[id].dirty;
+            delete out[id].midpoint;
         }
 
         e.detail.data.waveforms = out;
