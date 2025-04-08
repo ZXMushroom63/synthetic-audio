@@ -336,13 +336,13 @@ function constructRenderDataArray(data) {
                         (!dirtyNodes.includes(x)) &&
                         (((
                             (x.start >= dirtyNode.start &&
-                                x.start <= dirtyNode.end) ||
+                                x.start < dirtyNode.end) ||
 
-                            (x.end >= dirtyNode.start &&
+                            (x.end > dirtyNode.start &&
                                 x.end <= dirtyNode.end) ||
 
-                            (x.end >= dirtyNode.start &&
-                                x.start <= dirtyNode.end)
+                            (x.end > dirtyNode.start &&
+                                x.start < dirtyNode.end)
 
                         ) && (x.layer > dirtyNode.layer)) || (assetUserTypes.includes(x.type) && assetMap[x.conf.Asset]))
                     ) {
