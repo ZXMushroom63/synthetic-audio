@@ -4,7 +4,8 @@ addBlockType("smooth", {
     wet_and_dry_knobs: true,
     configs: {
         "Iterations": [1, "number"],
-        "Circular": [false, "checkbox"]
+        "Circular": [false, "checkbox"],
+        "MaintainAnchors": [false, "checkbox"]
     },
     functor: function (inPcm, channel, data) {
         var sampleRateAnchor = audio.samplerate / 24000;
@@ -19,6 +20,12 @@ addBlockType("smooth", {
             for (let i = 0; i < len; i++) {
                 var prevSampleIdx = i - 1;
                 var nextSampleIdx = i + 1;
+                var isAnchor = false;
+                isAnchor = (prevSampleIdx === -1) || (nextSampleIdx === len);
+                if (this.conf.MaintainAnchors && isAnchor) {
+                    tempPcm[i] = inPcm[i];
+                    continue;
+                }
                 if (prevSampleIdx === -1 && this.conf.Circular) {
                     prevSampleIdx = lastIdx;
                 }
