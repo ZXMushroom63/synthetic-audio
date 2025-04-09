@@ -570,17 +570,24 @@ addEventListener("init", () => {
     function hydrateWaveformTab() {
         aabb = panel.getBoundingClientRect();
         left.querySelectorAll(".wvform").forEach(x => { x.remove() });
-
+        var i = 0;
+        var count = Object.keys(custom_waveforms).length;
         for (let id in custom_waveforms) {
+            i++;
             var item = document.createElement("div");
             item.style.borderTop = "1px solid white";
-            item.style.borderBottom = "1px solid white";
+
+            if (i === count) {
+                item.style.borderBottom = "1px solid white";
+            } else if (i === 1) {
+                item.style.marginTop = "1rem";
+            }
+
             item.classList.add("wvform");
-            item.innerText = id.substring(0, 15);
+            item.innerText = id.substring(0, 15) + " ";
             item.style.color = "white";
             item.style.fontFamily = "sans-serif";
-            item.style.padding = "2rem 0.5rem";
-            item.style.marginTop = "1rem";
+            item.style.padding = "1rem 0.5rem";
             item.style.width = "20vw";
             item.style.whiteSpace = "break-spaces";
 
@@ -589,6 +596,7 @@ addEventListener("init", () => {
             }
 
             const renameBtn = document.createElement("button");
+            renameBtn.classList.add("smallBtn");
             renameBtn.innerText = "✏️";
             renameBtn.addEventListener("click", (e) => {
                 var newId = cleanString(prompt("Rename to: ", id));
@@ -605,6 +613,7 @@ addEventListener("init", () => {
             item.appendChild(renameBtn);
 
             const deleteBtn = document.createElement("button");
+            deleteBtn.classList.add("smallBtn");
             deleteBtn.innerText = "🗑️";
             deleteBtn.addEventListener("click", (e) => {
                 if (target === custom_waveforms[id]) {
@@ -617,6 +626,7 @@ addEventListener("init", () => {
             item.appendChild(deleteBtn);
 
             const duplicateBtn = document.createElement("button");
+            duplicateBtn.classList.add("smallBtn");
             duplicateBtn.innerText = "📋";
             duplicateBtn.addEventListener("click", (e) => {
                 var newId = cleanString(prompt("Copy waveform to: ", id + " clone"));
