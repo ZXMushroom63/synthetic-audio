@@ -312,11 +312,11 @@ addEventListener("init", () => {
     var audioBufferData = audioBuffer.getChannelData(0);
     var gainNode = audioContext.createGain();
     var source;
+    
     function createSource() {
         source = audioContext.createBufferSource();
         source.buffer = audioBuffer;
         source.loop = true;
-        source.connect(audioContext.destination);
         source.connect(gainNode);
         gainNode.connect(audioContext.destination);
     }
