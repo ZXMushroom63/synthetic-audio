@@ -376,6 +376,7 @@ addEventListener("init", () => {
         "p_sinewave": "∿",
         "p_value": "𝑥",
         "adsr": "ADSR",
+        "sculpt": "Sculpt",
     };
 
     const addModifierBtn = document.createElement("button");
@@ -409,7 +410,7 @@ addEventListener("init", () => {
                 }
             });
             target.modifiers.push({
-                file: filters[filter].title + " (as modifier)",
+                file: filters[filter].title + (filter.startsWith("sculpt") ? " (as sculptor)" : " (as modifier)"),
                 layer: insertLayer,
                 conf: {
                     CustomWaveformModifier: true,
