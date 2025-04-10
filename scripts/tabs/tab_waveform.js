@@ -579,7 +579,8 @@ addEventListener("init", () => {
 
             if (i === count) {
                 item.style.borderBottom = "1px solid white";
-            } else if (i === 1) {
+            }
+            if (i === 1) {
                 item.style.marginTop = "1rem";
             }
 
