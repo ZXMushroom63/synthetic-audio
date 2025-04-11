@@ -12,7 +12,7 @@ addEventListener("init", () => {
     <div id="liveTabRight"></div>
     <div id="liveTabFilters">
         <label>Delay: </label><input type="checkbox" data-key="delay"><br>
-        <label>DelayFeedbackGain: </label><input type="number" value="-2" data-key="delaygain"><br>
+        <label>DelayFeedbackGain: </label><input type="number" value="0.4" data-key="delaygain"><br>
         <label>DelayDuration: </label><input type="number" value="0.5" data-key="delayduration"><br>
         <label>Reverb: </label><input type="checkbox" data-key="reverb"><br>
         <label>ReverbTime: </label><input type="number" value="2.0" data-key="reverbtime"><br>
@@ -94,8 +94,71 @@ addEventListener("init", () => {
     const BUF_LEN = 1024;
     var processor = audioCtx.createScriptProcessor(BUF_LEN, 1, 1);
 
-    // processor, delay, reverb, dest
-    var graph = [processor, null, null, null, audioCtx.destination];
+    var graph = [audioCtx.destination];
+    var usedNodes = [];
+    function killGraph() {
+        try {
+            processor.disconnect(graph[0]);
+        } catch (error) {
+            
+        }
+        graph.forEach(x => x.disconnect());
+        usedNodes.forEach(x => x.disconnect());
+        usedNodes = [];
+        graph = [audioCtx.destination];
+    }
+    var data = Object.fromEntries([...filterCol.querySelectorAll("[data-key]")].map(x => {
+        const k = x.getAttribute("data-key");
+        x.addEventListener("input", () => {
+            data[k] = x.type === "checkbox" ? x.checked : parseFloat(x.value);
+            killGraph();
+            buildGraph();
+        });
+        return [k, x.type === "checkbox" ? x.checked : parseFloat(x.value)];
+    }));
+    console.log(data);
+    function buildGraph() {
+        graph = [audioCtx.destination];
+        if (data["reverb"]) {
+            const convolver = audioCtx.createConvolver();
+            const impulseBuffer = audioCtx.createBuffer(1, audioCtx.sampleRate * data["reverbtime"], audioCtx.sampleRate);
+            const impulseData = impulseBuffer.getChannelData(0);
+            Math.newRandom(0);
+            for (let i = 0; i < impulseData.length; i++) {
+                impulseData[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / impulseData.length, data["reverbdecay"]);
+            }
+            convolver.buffer = impulseBuffer;
+            var blank = audioCtx.createGain();
+            var blank2 = audioCtx.createGain();
+            blank.connect(convolver);
+            convolver.connect(blank2);
+            graph.unshift(blank2);
+            graph.unshift(blank);
+            usedNodes.push(blank, blank2, convolver);
+        }
+        if (data["delay"]) {
+            var delay = audioCtx.createDelay(4);
+            delay.delayTime.setValueAtTime(data["delayduration"], 0);
+            var gain = audioCtx.createGain();
+            gain.gain.setValueAtTime(data["delaygain"], 0);
+            var blank = audioCtx.createGain();
+            blank.connect(delay);
+            delay.connect(gain);
+            gain.connect(delay);
+            gain.connect(blank);
+            graph.unshift(blank);
+            usedNodes.push(blank, gain, delay);
+        }
+        graph.forEach((x, i) => {
+            if (graph[i - 1]) {
+                graph[i - 1].connect(x);
+            }
+        });
+        processor.connect(graph[0]);
+        console.log(graph);
+    }
+    console.log(processor);
+
     var lastFrameTime = Date.now();
     processor.onaudioprocess = function (audioProcessingEvent) {
         var rightNow = Date.now();
@@ -183,7 +246,7 @@ addEventListener("init", () => {
             if (audioStream) {
                 audioStream.disconnect();
             }
-            processor.connect(audioCtx.destination);
+            processor.connect(graph[0]);
             audioStream = audioCtx.createMediaStreamSource(mediaSource);
             audioStream.connect(processor);
             connected = true;
