@@ -270,14 +270,15 @@ function constructAbstractLayerMapsForLevel(nodes, usedLayers) {
     var abstractLayerMaps = [];
 
     nodes.forEach(x => {
-        x.layer = usedLayers.indexOf(x.layer);
+        x.compilerLayer = usedLayers.indexOf(x.layer);
     });
+
     abstractLayerMaps = new Array(usedLayers.length).fill(0);
     abstractLayerMaps.flatMap((x, i) => {
         abstractLayerMaps[i] = new Array();
     });
     nodes.forEach(x => {
-        abstractLayerMaps[x.layer].push(x);
+        abstractLayerMaps[x.compilerLayer].push(x);
     });
     return abstractLayerMaps;
 }
@@ -315,6 +316,7 @@ function constructRenderDataArray(data) {
                 });
             }
         });
+        console.log(dirtyNodes);
         dirtyNodes.push({
             start: -1,
             end: -2,
