@@ -115,7 +115,6 @@ addEventListener("init", () => {
         });
         return [k, x.type === "checkbox" ? x.checked : parseFloat(x.value)];
     }));
-    console.log(data);
     function buildGraph() {
         graph = [audioCtx.destination];
         if (data["reverb"]) {
@@ -154,9 +153,7 @@ addEventListener("init", () => {
             }
         });
         processor.connect(graph[0]);
-        console.log(graph);
     }
-    console.log(processor);
 
     var lastFrameTime = Date.now();
     processor.onaudioprocess = function (audioProcessingEvent) {
