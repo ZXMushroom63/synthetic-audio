@@ -784,3 +784,8 @@ code:hover {
     overflow-y: auto;
     overflow-x: hidden;
 }
+
+#pluginsUI {
+    overflow-y: auto;
+    overflow-x: hidden;
+}
