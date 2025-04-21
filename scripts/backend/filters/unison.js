@@ -27,16 +27,16 @@ addBlockType("unison", {
         var pan = _(this.conf.uPan);
 
         var outPcm = new Float32Array(inPcm.length);
+        var uTimeOffset = this.conf.uTimeOffset;
         outPcm.forEach((x, i) => {
-            var uTimeOffset = this.conf.uTimeOffset;
             var panAmount = pan(i, inPcm);
             for (let h = 0; h < this.conf.uVoices; h++) {
                 var volumeRatio = 1;
                 var timeOffset = i;
 
                 var detunePosition = (h + 0.5) - (this.conf.uVoices / 2);
-                timeOffset *= this.conf.uDetune * Math.trunc(detunePosition);
-                timeOffset += uTimeOffset * h;
+                timeOffset *= 1 + (this.conf.uDetune * Math.trunc(detunePosition));
+                timeOffset += (uTimeOffset * audio.samplerate) * h;
                 if (this.conf.uAmplitudeConstant) {
                     volumeRatio = Math.trunc(detunePosition) === 0 ? 1 : this.conf.uAmplitudeRatio;
                 } else {
