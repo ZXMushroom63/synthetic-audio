@@ -49,7 +49,8 @@ function serialiseNode(node, forRender) {
 }
 function deserialiseNode(serNode, markDirty) {
     if (!filters[serNode.type]) {
-        return console.log("Unknown node: " + serNode.type);
+        console.log("Unknown node: " + serNode.type);
+        return null;
     }
     var x = addBlock(serNode.type, serNode.start, serNode.duration, serNode.file, serNode.layer, serNode.conf, serNode.editorLayer || 0);
     if (markDirty) {
