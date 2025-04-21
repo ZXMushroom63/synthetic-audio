@@ -1,6 +1,5 @@
 var liveSetModifiers = [];
 var liveFunctorStack = [];
-// todo: add Live EQ, Live Delay, and Live Reverb
 addEventListener("init", () => {
     const container = document.createElement("div");
     container.style.fontFamily = "sans-serif";
