@@ -377,6 +377,7 @@ addEventListener("init", () => {
         "p_value": "𝑥",
         "adsr": "ADSR",
         "sculpt": "Sculpt",
+        "randomwalk": "Walk",
     };
 
     const addModifierBtn = document.createElement("button");
