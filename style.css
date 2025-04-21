@@ -789,3 +789,19 @@ code:hover {
     overflow-y: auto;
     overflow-x: hidden;
 }
+
+#pluginsUI>div {
+    border-bottom: 1px solid white;
+    color: white;
+    font-family: sans-serif;
+}
+#pluginsUI>div:first-of-type {
+    margin-top: 1rem;
+    border-top: 1px solid white;
+    padding: 4px 2px;
+}
+#pluginsUI>div a {
+    text-decoration-color: red;
+    cursor: pointer;
+    user-select: none;
+}
