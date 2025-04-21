@@ -77,7 +77,9 @@ addEventListener("init", ()=>{
                     hydrateZoom();
                     if (!e.shiftKey) {
                         pastedLoops.forEach(loop => {
-                            pickupLoop(loop, true);
+                            if (loop) {
+                                pickupLoop(loop, true);
+                            }
                         });
                     }
                 });
