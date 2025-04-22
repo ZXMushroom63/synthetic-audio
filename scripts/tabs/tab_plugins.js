@@ -116,20 +116,21 @@ addEventListener("init", async () => {
             if (!mod.endsWith(".js")) {
                 continue;
             }
-            document.querySelector("#renderProgress").innerText = `Downloading SYNTHETIC Extras (${(i / (modList.length - 1) * 100).toFixed(1)}%)`;
+            document.querySelector("#renderProgress").innerText = `Downloading SYNTHETIC Extras (${(i / (modList.length) * 100).toFixed(1)}%)`;
             await addFileMod(mod, await (await fetch("https://zxmushroom63.github.io/synthetic-audio/extras/data/" + mod)).text())
             await drawModArray();
         }
+        document.querySelector("#renderProgress").innerText = `Downloaded SYNTHETIC Extras.`;
     }, "dlsn");
     mkBtn("Download FluidR3-GM fonts", async () => {
         var fontList = await (await fetch("https://gleitz.github.io/midi-js-soundfonts/FluidR3_GM/names.json")).json();
         for (let i = 0; i < fontList.length; i++) {
             const font = fontList[i];
-            document.querySelector("#renderProgress").innerText = `Downloading FluidR3-GM sound fonts: (${(i / (fontList.length - 1) * 100).toFixed(1)}%); current: ${font}`;
+            document.querySelector("#renderProgress").innerText = `Downloading FluidR3-GM sound fonts: (${(i / (fontList.length) * 100).toFixed(1)}%); current: ${font}`;
             await addFileMod(font + ".sf.js", patchSoundFont(await (await fetch("https://gleitz.github.io/midi-js-soundfonts/FluidR3_GM/" + font + "-ogg.js")).text()));
             await drawModArray();
         }
-
+        document.querySelector("#renderProgress").innerText = `Downloaded FluidR3-GM sound fonts.`;
     }, "dl_fluidr3");
     mkBtn("Clear plugins", async () => { await resetMods(); drawModArray(); }, "dlsf");
     container.appendChild(document.createElement("br"));
