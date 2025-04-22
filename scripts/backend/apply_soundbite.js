@@ -30,7 +30,7 @@ function applySoundbiteToPcm(reverse, looping, currentData, inPcm, duration, spe
         }
     }
 }
-function applySoundbiteToPcmSidechain(reverse, looping, currentData, inPcm, duration, speed, volume, offset, sideChain, silent) {
+function applySoundbiteToPcmSidechain(reverse, looping, currentData, inPcm, duration, speed, volume, offset, sideChainRaw, silent) {
     var offsetValue = Math.floor(offset * audio.samplerate);
     if (typeof speed !== "function") {
         var oldSpeed = speed;
@@ -52,8 +52,18 @@ function applySoundbiteToPcmSidechain(reverse, looping, currentData, inPcm, dura
     LOOKUPTABLE_PERSAMPLE.forEach((x, i)=>{
         LOOKUPTABLE_PERSAMPLE[i] = lerp(LOOKUPTABLE[Math.floor(i / PCMBINSIZE)] || 0, LOOKUPTABLE[Math.ceil(i / PCMBINSIZE)] || 0, (i % PCMBINSIZE) / PCMBINSIZE);
     });
+    const AmpSmoothingStart = Math.floor(audio.samplerate * 0.01);
+    const AmpSmoothingEnd = inPcm.length - AmpSmoothingStart;
     if (looping) {
         for (let i = 0; i < inPcm.length; i++) {
+            var sideChain = sideChainRaw;
+            if (i < AmpSmoothingStart) {
+                sideChain *= i / AmpSmoothingStart;
+            }
+
+            if (i > AmpSmoothingEnd) {
+                sideChain *= 1 - ((i - AmpSmoothingEnd) / AmpSmoothingStart);
+            }
             var idx = (Math.floor(i * speed(i, inPcm)) + offsetValue) % duration;
             var sidechainCoefficient = Math.pow(1 - Math.max(Math.min(1, LOOKUPTABLE_PERSAMPLE[idx] || 0), 0), Math.abs(sideChain)) || 0;
             var y = (currentData[idx] || 0) * volume;
@@ -68,6 +78,14 @@ function applySoundbiteToPcmSidechain(reverse, looping, currentData, inPcm, dura
         }
     } else {
         for (let i = 0; i < inPcm.length; i++) {
+            var sideChain = sideChainRaw;
+            if (i < AmpSmoothingStart) {
+                sideChain *= i / AmpSmoothingStart;
+            }
+
+            if (i > AmpSmoothingEnd) {
+                sideChain *= 1 - ((i - AmpSmoothingEnd) / AmpSmoothingStart);
+            }
             var idx = Math.floor(i * speed(i, inPcm)) + offsetValue;
             var sidechainCoefficient = Math.pow(1 - Math.max(Math.min(1, LOOKUPTABLE_PERSAMPLE[idx]), 0), Math.abs(sideChain)) || 0;
             
