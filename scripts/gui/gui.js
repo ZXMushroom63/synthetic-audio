@@ -547,7 +547,5 @@ function init() {
             targets.forEach(t => { deleteLoop(t); });
         }
     });
-
-    loadAutosave();
 }
 addEventListener("load", init);

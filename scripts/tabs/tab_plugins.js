@@ -2,7 +2,9 @@
 //https://www.webaudiomodules.com/community/plugins.json
 //.sf2 support   https://danigb.github.io/soundfont-player/
 // TODO: Add separate Unison node
-addEventListener("init", () => {
+// https://gleitz.github.io/midi-js-soundfonts/FluidR3_GM/names.json
+// https://gleitz.github.io/midi-js-soundfonts/FluidR3_GM/{id}-ogg.js
+addEventListener("init", async () => {
     const container = document.createElement("div");
     container.id = "pluginsUI";
     container.style.borderTop = "1px solid white";
@@ -23,8 +25,15 @@ addEventListener("init", () => {
         var button = document.createElement("button");
         button.innerText = name;
         button.addEventListener("click", cb);
+        button.classList.add("smallBtn");
         container.appendChild(button);
         return button;
+    }
+    function patchSoundFont(sf) {
+        return sf
+            .replace("if (typeof(MIDI) === 'undefined') var MIDI = {};", "")
+            .replace("if (typeof(MIDI.Soundfont) === 'undefined') MIDI.Soundfont = {};", "")
+            .replace("MIDI.Soundfont.", "SFREGISTRY.");
     }
     mkBtn("Upload hvcc (.js)", () => {
         var f = document.createElement("input");
@@ -93,25 +102,13 @@ addEventListener("init", () => {
                 var fr = new FileReader();
                 fr.readAsText(x);
                 fr.addEventListener("load", async () => {
-                    await addFileMod(x.name, fr.result
-                        .replace("if (typeof(MIDI) === 'undefined') var MIDI = {};", "")
-                        .replace("if (typeof(MIDI.Soundfont) === 'undefined') MIDI.Soundfont = {};", "")
-                        .replace("MIDI.Soundfont.", "SFREGISTRY.")
-                    );
+                    await addFileMod(x.name, patchSoundFont(fr.result));
                     await drawModArray();
                 });
             });
         });
         f.click();
     }, "usf");
-    mkBtn("Add remote", async () => {
-        var url = prompt("Plugin URL: ", "https://example.com/plugin.js");
-        if (!url || !url.endsWith(".js")) {
-            return;
-        }
-        await addMod(url);
-        await drawModArray();
-    }, "remote");
     mkBtn("Download SYNTHETIC Extras", async () => {
         var modList = (await (await fetch("https://zxmushroom63.github.io/synthetic-audio/extras/list.txt")).text()).split("\n").filter(x => !!x);
         for (let i = 0; i < modList.length; i++) {
@@ -119,17 +116,27 @@ addEventListener("init", () => {
             if (!mod.endsWith(".js")) {
                 continue;
             }
+            document.querySelector("#renderProgress").innerText = `Downloading SYNTHETIC Extras (${(i / (modList.length - 1) * 100).toFixed(1)}%)`;
             await addFileMod(mod, await (await fetch("https://zxmushroom63.github.io/synthetic-audio/extras/data/" + mod)).text())
             await drawModArray();
         }
     }, "dlsn");
-    mkBtn("Download starter fonts", () => { }, "dlsf");
+    mkBtn("Download FluidR3-GM fonts", async () => {
+        var fontList = await (await fetch("https://gleitz.github.io/midi-js-soundfonts/FluidR3_GM/names.json")).json();
+        for (let i = 0; i < fontList.length; i++) {
+            const font = fontList[i];
+            document.querySelector("#renderProgress").innerText = `Downloading FluidR3-GM sound fonts: (${(i / (fontList.length - 1) * 100).toFixed(1)}%); current: ${font}`;
+            await addFileMod(font + ".sf.js", patchSoundFont(await (await fetch("https://gleitz.github.io/midi-js-soundfonts/FluidR3_GM/" + font + "-ogg.js")).text()));
+            await drawModArray();
+        }
+
+    }, "dl_fluidr3");
     mkBtn("Clear plugins", async () => { await resetMods(); drawModArray(); }, "dlsf");
     container.appendChild(document.createElement("br"));
 
     async function drawModArray() {
         container.querySelectorAll("div").forEach(x => x.remove());
-        var modsArr = await getMods();
+        var modsArr = (await getMods()).map(x => { var z = Object(/\..+/.exec(x)[0] || ""); z.__key = x; return z; }).sort().map(z => z.__key);
         modsArr.forEach((mod, i) => {
             var entry = document.createElement("div");
 
@@ -137,7 +144,7 @@ addEventListener("init", () => {
 
             var remove = document.createElement("a");
             remove.innerText = "❌";
-            
+
             remove.addEventListener("click", async () => {
                 await removeMod(i);
                 await drawModArray();
@@ -151,4 +158,16 @@ addEventListener("init", () => {
 
     document.querySelector("#tabContent").appendChild(container);
     registerTab("Plugins", container, false, drawModArray);
+
+    var modList = await getMods();
+    for (let i = 0; i < modList.length; i++) {
+        document.querySelector("#renderProgress").innerText = `Loading plugins (${(i / (modList.length - 1) * 100).toFixed(1)}%)`;
+        const mod = await getMod(modList[i]);
+        try {
+            (new Function(await mod)).apply(globalThis, []);
+        } catch (error) {
+            console.error("Failed to load " + modList[i]);
+        }
+    }
+    setTimeout(loadAutosave, 100);
 });
