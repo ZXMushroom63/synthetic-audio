@@ -162,7 +162,7 @@ addEventListener("init", async () => {
 
     var modList = await getMods();
     for (let i = 0; i < modList.length; i++) {
-        document.querySelector("#renderProgress").innerText = `Loading plugins (${(i / (modList.length - 1) * 100).toFixed(1)}%)`;
+        document.querySelector("#renderProgress").innerText = `Loading plugins (${(i / (modList.length) * 100).toFixed(1)}%)`;
         const mod = await getMod(modList[i]);
         try {
             (new Function(await mod)).apply(globalThis, []);
@@ -170,5 +170,6 @@ addEventListener("init", async () => {
             console.error("Failed to load " + modList[i]);
         }
     }
+    document.querySelector("#renderProgress").innerText = `Welcome to SYNTHETIC Audio! Press the 'Help' button for the manual.`;
     setTimeout(loadAutosave, 100);
 });
