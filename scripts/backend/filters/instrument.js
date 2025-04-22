@@ -4,7 +4,7 @@ function updateInstrumentNoteDisplay(loop) {
     var freq = _(loop.conf.Note)(0, basic);
     var note = frequencyToNote(freq);
     loop.querySelector(".noteDisplay").innerText = note;
-    var newTitle = this.conf.Instrument + " - " + note;
+    var newTitle = loop.conf.Instrument + " - " + note;
     loop.setAttribute("data-file", newTitle);
     loop.querySelector(".loopInternal .name").innerText = newTitle;
 }
