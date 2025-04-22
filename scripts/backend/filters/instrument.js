@@ -4,6 +4,9 @@ function updateInstrumentNoteDisplay(loop) {
     var freq = _(loop.conf.Note)(0, basic);
     var note = frequencyToNote(freq);
     loop.querySelector(".noteDisplay").innerText = note;
+    var newTitle = this.conf.Instrument + " - " + note;
+    loop.setAttribute("data-file", newTitle);
+    loop.querySelector(".loopInternal .name").innerText = newTitle;
 }
 addBlockType("instrument", {
     color: "rgba(0,255,255,0.3)",
