@@ -226,7 +226,7 @@ function wait(s) {
     });
 }
 async function decodeUsedAudioFiles(ax) {
-    document.querySelector("#renderProgress").innerText = "Decoding PCM Data...";
+    document.querySelector("#renderProgress").innerText = "Decoding loop PCM Data...";
     var usedAudioFiles = Array.prototype.flatMap.apply(document.querySelectorAll("div.loop[data-type=audio]"), [((x) => { return x.getAttribute("data-file") })]);
     usedAudioFiles = [...new Set(usedAudioFiles)];
     for (let i = 0; i < usedAudioFiles.length; i++) {
@@ -239,11 +239,32 @@ async function decodeUsedAudioFiles(ax) {
             continue;
         }
 
+        document.querySelector("#renderProgress").innerText = `Decoding loop PCM Data... (${((i / usedAudioFiles.length) * 100).toFixed(1)}%)`;
         const arraybuffer = await file.arrayBuffer();
         decodedPcmCache[fileName] = await ax.decodeAudioData(arraybuffer);
         await wait(0.02);
     }
-
+}
+async function decodeUsedSoundFonts(ax) {
+    document.querySelector("#renderProgress").innerText = "Decoding font PCM Data...";
+    var usedInstruments = Array.prototype.flatMap.apply(document.querySelectorAll("div.loop[data-type=instrument]"), [((x) => { return x.conf.Instrument })]);
+    usedInstruments = [...new Set(usedInstruments)];
+    usedInstruments = usedInstruments.filter(x => x !== "(none)");
+    for (let i = 0; i < usedInstruments.length; i++) {
+        const instrumentName = usedInstruments[i];
+        if (SFCACHE[instrumentName]) {
+            continue;
+        }
+        SFCACHE[instrumentName] = {};
+        var instrument = SFREGISTRY[instrumentName];
+        var j = 0;
+        for (const note in instrument) {
+            j++;
+            document.querySelector("#renderProgress").innerText = `Decoding font PCM Data... (${((i / 88) * 100).toFixed(1)}%)`;
+            const arraybuffer = await (await fetch(instrument[note])).arrayBuffer();
+            SFCACHE[instrumentName][note] = await ax.decodeAudioData(arraybuffer);
+        }
+    }
 }
 function sumFloat32ArraysNormalised(arrays) {
     if (arrays.length === 0) return new Float32Array(0);
@@ -317,7 +338,6 @@ function constructRenderDataArray(data) {
                 });
             }
         });
-        console.log(dirtyNodes);
         dirtyNodes.push({
             start: -1,
             end: -2,
@@ -386,7 +406,7 @@ async function render() {
 
     document.querySelector("#renderBtn").setAttribute("disabled", "true");
     await decodeUsedAudioFiles(ax);
-
+    await decodeUsedSoundFonts(ax);
     var renderDataArray = constructRenderDataArray(data);
     document.querySelector("#renderProgress").innerText = "Processing layers...";
     var success = true;

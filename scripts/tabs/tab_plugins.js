@@ -63,7 +63,9 @@ addEventListener("init", async () => {
             fr.onload = () => {
                 libWorkletData = "data:text/js;base64," + btoa(fr.result)
                 fr.onload = async () => {
-                    wrapperContent = fr.result.replace(audioLibWorklet.name, libWorkletData);
+                    wrapperContent = fr.result;
+                    wrapperContent = wrapperContent.replace("var ", "this.HVCC_MODULES.");
+                    wrapperContent = wrapperContent.replace(audioLibWorklet.name, libWorkletData);
                     await addFileMod(wrapperModule.name.replace(".js", ".pd.js"), wrapperContent);
                     await drawModArray();
                 }
@@ -137,7 +139,9 @@ addEventListener("init", async () => {
 
     async function drawModArray() {
         container.querySelectorAll("div").forEach(x => x.remove());
-        var modsArr = (await getMods()).map(x => { var z = Object(/\..+/.exec(x)[0] || ""); z.__key = x; return z; }).sort().map(z => z.__key);
+        var modsArr = (await getMods()).map((x, i) => { var z = Object(/\..+/.exec(x)[0] || ""); z.__key = x; z.__idx = i; return z; }).sort();
+        var idxMap = modsArr.map(z => z.__idx);
+        modsArr = modsArr.map(z => z.__key);
         modsArr.forEach((mod, i) => {
             var entry = document.createElement("div");
 
@@ -147,10 +151,18 @@ addEventListener("init", async () => {
             remove.innerText = "❌";
 
             remove.addEventListener("click", async () => {
-                await removeMod(i);
+                await removeMod(idxMap[i]);
                 await drawModArray();
             });
 
+            var download = document.createElement("a");
+            download.innerText = "💾";
+
+            download.addEventListener("click", async () => {
+                saveAs(new Blob([await getMod(mod)], {type: "text/javascript"}), mod);
+            });
+
+            entry.insertAdjacentElement("afterbegin", download);
             entry.insertAdjacentElement("afterbegin", remove);
 
             container.appendChild(entry);
@@ -169,6 +181,9 @@ addEventListener("init", async () => {
         } catch (error) {
             console.error("Failed to load " + modList[i]);
         }
+    }
+    for (module in HVCC_MODULES) {
+        
     }
     document.querySelector("#renderProgress").innerText = `Welcome to SYNTHETIC Audio! Press the 'Help' button for the manual.`;
     setTimeout(loadAutosave, 100);
