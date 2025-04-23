@@ -407,6 +407,7 @@ async function render() {
     document.querySelector("#renderBtn").setAttribute("disabled", "true");
     await decodeUsedAudioFiles(ax);
     await decodeUsedSoundFonts(ax);
+
     var renderDataArray = constructRenderDataArray(data);
     document.querySelector("#renderProgress").innerText = "Processing layers...";
     var success = true;
@@ -417,7 +418,7 @@ async function render() {
             for (let q = 0; q < renderDataArray.length; q++) {
                 var initialPcm = new Float32Array(audio.length).fill(0);
                 const abstractLayerMaps = renderDataArray[q];
-                if (!layerCache[abstractLayerMaps.layerId] || !layerCache[abstractLayerMaps.layerId][c]) {
+                if (!layerCache[abstractLayerMaps.layerId] || !layerCache[abstractLayerMaps.layerId][c] || layerCache[abstractLayerMaps.layerId][c].length !== audio.length) {
                     console.log(`Recalculating layer ${abstractLayerMaps.layerId}`);
                     for (let l = 0; l < abstractLayerMaps.length; l++) {
                         const layer = abstractLayerMaps[l];
