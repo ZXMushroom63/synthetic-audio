@@ -47,6 +47,9 @@ addBlockType("instrument", {
     },
     customGuiButtons: {
         "Preview": function () {
+            if (SFCACHE[this.conf.Instrument]) {
+                return;
+            }
             if (document.querySelector("audio#loopsample").src) {
                 URL.revokeObjectURL(document.querySelector("audio#loopsample").src);
             }
