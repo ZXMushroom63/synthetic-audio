@@ -38,7 +38,6 @@ addBlockType("instrument", {
         setTimeout(() => {updateInstrumentNoteDisplay(loop)}, Math.random()*200);
     },
     zscroll: (loop, value) => {
-        debugger;
         loop.conf.Note = ":" + frequencyToNote(_(loop.conf.Note)(0, new Float32Array(1)) * Math.pow(2, value/12)) + ":";
         updateInstrumentNoteDisplay(loop);
         if (globalThis.zscrollIsFirst) {
