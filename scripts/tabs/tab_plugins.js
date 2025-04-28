@@ -214,11 +214,12 @@ addEventListener("init", async () => {
         }
 
         addBlockType("hvcc:" + patch.replace("_Module", ""), {
-            title: patch.replace("_Module", ""),
+            title: toTitleCase(patch.replace("_Module", "")),
             color: "rgba(0, 64, 255, 0.6)",
             amplitude_smoothing_knob: true,
             wet_and_dry_knobs: true,
             configs: confs,
+            isPlugin: true,
             meta: meta,
             functor: hvcc2functor(HVCC_MODULES[patch], meta)
         });
@@ -226,6 +227,7 @@ addEventListener("init", async () => {
 
     // load autosave
     document.querySelector("#renderProgress").innerText = `Welcome to SYNTHETIC Audio! Press the 'Help' button for the manual.`;
+    loadFiltersAndPrims();
     setTimeout(loadAutosave, 100);
 });
 registerHelp("[data-helptarget=uhvcc]",

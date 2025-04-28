@@ -1,6 +1,7 @@
 function loadFiltersAndPrims() {
     var filtersDiv = document.querySelector("#addfilters");
     var primsDiv = document.querySelector("#addprims");
+    var plugsDiv = document.querySelector("#addplugs");
     Object.entries(filters)
         .filter(x => !x[1].hidden)
         .map(x => {
@@ -11,6 +12,7 @@ function loadFiltersAndPrims() {
             if (k === "audio") {
                 return;
             }
+            const def = filters[k];
             var span = document.createElement("span");
             span.classList.add("addloop");
             span.innerText = filters[k].title;
@@ -24,15 +26,16 @@ function loadFiltersAndPrims() {
                 pickupLoop(loop);
             });
             span.appendChild(y);
-            if (k.startsWith("p_")) {
+            if (k.startsWith("p_") || def.forcePrimitive) {
                 primsDiv.appendChild(span);
+            } else if (def.isPlugin) {
+                plugsDiv.appendChild(span);
             } else {
                 filtersDiv.appendChild(span);
             }
         });
 }
 addEventListener("init", () => {
-    loadFiltersAndPrims();
     document.querySelector("#loopSelector input").addEventListener("input", async () => {
         var loopsDiv = document.querySelector("#addloops");
         var fileInput = document.querySelector("#loopSelector input");
