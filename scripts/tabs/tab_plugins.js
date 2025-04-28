@@ -65,7 +65,7 @@ addEventListener("init", async () => {
                 fr.onload = async () => {
                     wrapperContent = fr.result;
                     wrapperContent = wrapperContent.replace("var ", "this.HVCC_MODULES.");
-                    wrapperContent = wrapperContent.replace(audioLibWorklet.name, libWorkletData);
+                    wrapperContent = wrapperContent.replace('"'+audioLibWorklet.name+'"', `HVCC_WORKLET_CACHE["${wrapperModule.name}"]||(HVCC_WORKLET_CACHE["${wrapperModule.name}"]=URL.createObjectURL(new Blob([await (await fetch("${libWorkletData}")).text()], {type:"text/javascript"})))`);
                     await addFileMod(wrapperModule.name.replace(".js", ".pd.js"), wrapperContent);
                     await drawModArray();
                 }
@@ -172,6 +172,7 @@ addEventListener("init", async () => {
     document.querySelector("#tabContent").appendChild(container);
     registerTab("Plugins", container, false, drawModArray);
 
+    // load the mods
     var modList = await getMods();
     for (let i = 0; i < modList.length; i++) {
         document.querySelector("#renderProgress").innerText = `Loading plugins (${(i / (modList.length) * 100).toFixed(1)}%)`;
@@ -182,9 +183,47 @@ addEventListener("init", async () => {
             console.error("Failed to load " + modList[i]);
         }
     }
-    for (module in HVCC_MODULES) {
-        
+
+    // compile HVCC patches and add nodes for them
+    for (patch in HVCC_MODULES) {
+        document.querySelector("#renderProgress").innerText = `Compiling HVCC patch... (${patch})`;
+
+        HVCC_MODULES[patch] = await HVCC_MODULES[patch]();
+
+        //todo: table support, dropdown support
+        const blankLibLoader = new HVCC_MODULES[patch].AudioLibLoader();
+        const confs = {};
+        const meta = {selectData: {}, selectMapping: {}};
+        for (param in blankLibLoader.paramsIn) {
+            var dfault = blankLibLoader.paramsIn[param].default;
+            if (dfault === 440) {
+                dfault = ":a4:";
+            }
+
+            var selTest = param.split("__");
+            if (selTest.length === 2) {
+                var possibleOptions = selTest[1].split("_");
+                meta.selectData[param] = possibleOptions;
+                meta.selectMapping[param] = selTest[0];
+                meta.selectMapping[param] = selTest[0];
+                confs[selTest[0]] = [possibleOptions[dfault] || possibleOptions[0], possibleOptions];
+                continue;
+            }
+            confs[param] = [dfault, "number", 1];
+        }
+
+        addBlockType("hvcc:" + patch.replace("_Module", ""), {
+            title: patch.replace("_Module", ""),
+            color: "rgba(0, 64, 255, 0.6)",
+            amplitude_smoothing_knob: true,
+            wet_and_dry_knobs: true,
+            configs: confs,
+            meta: meta,
+            functor: hvcc2functor(HVCC_MODULES[patch], meta)
+        });
     }
+
+    // load autosave
     document.querySelector("#renderProgress").innerText = `Welcome to SYNTHETIC Audio! Press the 'Help' button for the manual.`;
     setTimeout(loadAutosave, 100);
 });
