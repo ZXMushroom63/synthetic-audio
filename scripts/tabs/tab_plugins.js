@@ -198,7 +198,7 @@ addEventListener("init", async () => {
         for (param in blankLibLoader.paramsIn) {
             var dfault = blankLibLoader.paramsIn[param].default;
             if (dfault === 440) {
-                dfault = ":a4:";
+                dfault = ":A4:";
             }
 
             var selTest = param.split("__");
