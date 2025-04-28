@@ -24,6 +24,7 @@ addEventListener("init", async () => {
     function mkBtn(name, cb, flag) {
         var button = document.createElement("button");
         button.innerText = name;
+        button.setAttribute("data-helptarget", flag);
         button.addEventListener("click", cb);
         button.classList.add("smallBtn");
         container.appendChild(button);
@@ -227,3 +228,40 @@ addEventListener("init", async () => {
     document.querySelector("#renderProgress").innerText = `Welcome to SYNTHETIC Audio! Press the 'Help' button for the manual.`;
     setTimeout(loadAutosave, 100);
 });
+registerHelp("[data-helptarget=uhvcc]",
+    `
+> HVCC Plugins
+
+> Prerequisites: Install emsdk (<a href="https://emscripten.org/docs/getting_started/downloads.html">tutorial</a>)
+
+Synthetic Audio supports using pure data/plugdata patches compiled with the heavy compiler collection (maintained by Wasted Audio, https://github.com/Wasted-Audio/hvcc).
+Specifically, until further notice, you must use my fork which adds various features and fixes for the web compile target: https://github.com/ZXMushroom63/hvcc
+Clone the repository, move into the \`hvcc/\` directory, and run \`pip3 install -e .\`
+
+Make a patch (I recommend <a href="https://plugdata.org/">plugdata</a> for the editor), and save it to a file. While creating your patch, I'd recommend enabling 'compiled mode' to disable features that are not supported by hvcc.
+When you are done, go to the folder containing the patch, and run \`hvcc mypatch.pd -g js\`
+
+Open SYNTHETIC's plugins tab, and press 'Upload hvcc (.js)'. Go to the folder containing your patches, open the \`js/\` directory, and select BOTH .js files. SYNTHETIC will patch them to add offline support as well as editor integration. On reloading SYNTHETIC you will be able to find the patch available as a filter when using the Shift + A shortcut or in the Plugins category in the add menu.
+
+
+Making different types of input:
+SYNTHETIC offers an extension to the default @hv_param inputs. Providing a default value of '440' in a receive object will make the parameter apepar as :A4: in the editor.
+[r NoteInput @hv_param 0 1000 440]
+
+You can also create dropdowns, that return the index of the selected element, using a double underscore (__) to seperate the name and options of the dropdown, and a single underscore (_) to seperate the options.
+[r MyDropdown__firstoption_secondoption_thirdoption @hv_param 0 2 0]
+`);
+registerHelp("[data-helptarget=ujs]",
+    `
+> Generic Plugins
+
+I sincerely doubt there will be any of these every made, but it's effectively a userscript. Use the \`addNodeType\` global method as indicated by every single filter in the scripts/backend/filters/ folder.
+`);
+registerHelp("[data-helptarget=usf]",
+    `
+> Soundfonts
+
+Find a .sf2 that has been converted to javascript and upload it with this button. Uploaded fonts will be accessible through the Instrument node.
+
+<a href="https://github.com/gleitz/midi-js-soundfonts/">example</a>
+`);
