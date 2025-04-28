@@ -12,9 +12,11 @@ addBlockType("instrument", {
     color: "rgba(0,255,255,0.3)",
     title: "Instrument",
     amplitude_smoothing_knob: true,
+    forcePrimitive: true,
     configs: {
         "Note": [":A4:", "number", 1],
         "Volume": [1, "number"],
+        "FadeTime": [0.5, "number"],
         "Reverse": [false, "checkbox"],
         "Speed": [1, "number"],
         "Sidechain": [false, "checkbox"],
@@ -62,6 +64,7 @@ addBlockType("instrument", {
         if (!SFCACHE[this.conf.Instrument]) {
             return inPcm;
         }
+        
         var note = _(this.conf.Note)(0, new Float32Array(1));
         note = frequencyToNote(note, true);
         var currentData = SFCACHE[this.conf.Instrument][note];
@@ -69,6 +72,12 @@ addBlockType("instrument", {
             return inPcm;
         }
         currentData = currentData.getChannelData(Math.max(channel, currentData.numberOfChannels - 1));
+        const FADETIME = this.conf.FadeTime * audio.samplerate;
+        const FADESTART = inPcm.length - FADETIME;
+        const tail = currentData.subarray(FADESTART);
+        tail.forEach((x, i)=>{
+            tail[i] = x * (1 - i / FADETIME);
+        });
         var duration = Math.floor(Math.round((((currentData.length / audio.samplerate) || 0) + 0.0) / data.loopInterval) * data.loopInterval * audio.samplerate);
         if (this.conf.Sidechain) {
             applySoundbiteToPcmSidechain(this.conf.Reverse, this.conf.Looping, currentData, inPcm, duration, this.conf.Speed, this.conf.Volume, 0, this.conf.SidechainPower, false);
