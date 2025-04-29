@@ -7,6 +7,13 @@ if ('serviceWorker' in navigator) {
         }, err => {
             console.log('ServiceWorker registration failed: ', err);
         });
+
+        navigator.serviceWorker.register('./coi-serviceworker.min.js').then(registration => {
+            globalThis.sw = registration;
+            console.log('COOP-bypass worker registered with scope: ', registration.scope);
+        }, err => {
+            console.log('COOP-bypass worker registration failed: ', err);
+        });
     });
 }
 function updateApp() {
