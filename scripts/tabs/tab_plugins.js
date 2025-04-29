@@ -66,7 +66,8 @@ addEventListener("init", async () => {
                 fr.onload = async () => {
                     wrapperContent = fr.result;
                     wrapperContent = wrapperContent.replace("var ", "this.HVCC_MODULES.");
-                    wrapperContent = wrapperContent.replace('"'+audioLibWorklet.name+'"', `HVCC_WORKLET_CACHE["${wrapperModule.name}"]||(HVCC_WORKLET_CACHE["${wrapperModule.name}"]=URL.createObjectURL(new Blob([await (await fetch("${libWorkletData}")).text()], {type:"text/javascript"})))`);
+                    wrapperContent = wrapperContent.replace(audioLibWorklet.name, libWorkletData);
+                    wrapperContent = wrapperContent.replace("audioWorkletSupported=", "audioWorkletSupported=false&&"); //SYNTHETIC runs in one thread for everything else, and I do not intend to upload data to the service worker just to satisfy some stupid CORS restrictions in order to use a mediocre new technology.
                     await addFileMod(wrapperModule.name.replace(".js", ".pd.js"), wrapperContent);
                     await drawModArray();
                 }
@@ -86,9 +87,9 @@ addEventListener("init", async () => {
             files.forEach(x => {
                 var fr = new FileReader();
                 fr.readAsText(x);
-                fr.addEventListener("load", () => {
-                    addFileMod(x.name, fr.result);
-                    drawModArray();
+                fr.addEventListener("load", async () => {
+                    await addFileMod(x.name, fr.result);
+                    await drawModArray();
                 });
             });
         });
