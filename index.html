@@ -9,7 +9,7 @@
     <link rel="manifest" href="manifest.json" />
 </head>
 <body>
-    <!-- CACHE SERVICE WORKER -->
+    <!-- SERVICE WORKER LOADER -->
     <script src="scripts/sw/sw_loader.js"></script>
 
     <!-- LIBRARIES -->
@@ -22,6 +22,7 @@
     <script src="lib/lfo.js"></script>
     <script src="lib/modapi_modloader_idb.js"></script>
     <script src="lib/plugin_constants.js"></script>
+    <script src="lib/to_title_case.js"></script>
 
     <!-- GUI MODULES -->
     <script src="scripts/gui/help.js"></script>
@@ -119,6 +120,10 @@
     <script src="scripts/backend/filters/randomwalk.js"></script>
     <script src="scripts/backend/filters/unison.js"></script>
     <script src="scripts/backend/filters/instrument.js"></script>
+
+    <!-- FFMPEG CODECS -->
+    <script src="https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@latest/dist/ffmpeg.min.js"></script>
+    <script src="lib/init_ffmpeg.js"></script>
 
     <div class="toolbox">
         <button id="toolboxRunButton">Run</button><br>
@@ -250,6 +255,11 @@
         <details>
             <summary>Primitives</summary>
             <div id="addprims">
+            </div>
+        </details>
+        <details>
+            <summary>Plugins</summary>
+            <div id="addplugs">
             </div>
         </details>
     </div>

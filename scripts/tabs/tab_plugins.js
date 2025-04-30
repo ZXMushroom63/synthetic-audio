@@ -24,6 +24,7 @@ addEventListener("init", async () => {
     function mkBtn(name, cb, flag) {
         var button = document.createElement("button");
         button.innerText = name;
+        button.setAttribute("data-helptarget", flag);
         button.addEventListener("click", cb);
         button.classList.add("smallBtn");
         container.appendChild(button);
@@ -66,6 +67,7 @@ addEventListener("init", async () => {
                     wrapperContent = fr.result;
                     wrapperContent = wrapperContent.replace("var ", "this.HVCC_MODULES.");
                     wrapperContent = wrapperContent.replace(audioLibWorklet.name, libWorkletData);
+                    wrapperContent = wrapperContent.replace("audioWorkletSupported=", "audioWorkletSupported=false&&"); //SYNTHETIC runs in one thread for everything else, and I do not intend to upload data to the service worker just to satisfy some stupid CORS restrictions in order to use a mediocre new technology.
                     await addFileMod(wrapperModule.name.replace(".js", ".pd.js"), wrapperContent);
                     await drawModArray();
                 }
@@ -85,9 +87,9 @@ addEventListener("init", async () => {
             files.forEach(x => {
                 var fr = new FileReader();
                 fr.readAsText(x);
-                fr.addEventListener("load", () => {
-                    addFileMod(x.name, fr.result);
-                    drawModArray();
+                fr.addEventListener("load", async () => {
+                    await addFileMod(x.name, fr.result);
+                    await drawModArray();
                 });
             });
         });
@@ -172,6 +174,7 @@ addEventListener("init", async () => {
     document.querySelector("#tabContent").appendChild(container);
     registerTab("Plugins", container, false, drawModArray);
 
+    // load the mods
     var modList = await getMods();
     for (let i = 0; i < modList.length; i++) {
         document.querySelector("#renderProgress").innerText = `Loading plugins (${(i / (modList.length) * 100).toFixed(1)}%)`;
@@ -182,9 +185,86 @@ addEventListener("init", async () => {
             console.error("Failed to load " + modList[i]);
         }
     }
-    for (module in HVCC_MODULES) {
-        
+
+    // compile HVCC patches and add nodes for them
+    for (patch in HVCC_MODULES) {
+        document.querySelector("#renderProgress").innerText = `Compiling HVCC patch... (${patch})`;
+
+        HVCC_MODULES[patch] = await HVCC_MODULES[patch]();
+
+        //todo: table support, dropdown support
+        const blankLibLoader = new HVCC_MODULES[patch].AudioLibLoader();
+        const confs = {};
+        const meta = {selectData: {}, selectMapping: {}};
+        for (param in blankLibLoader.paramsIn) {
+            var dfault = blankLibLoader.paramsIn[param].default;
+            if (dfault === 440) {
+                dfault = ":A4:";
+            }
+
+            var selTest = param.split("__");
+            if (selTest.length === 2) {
+                var possibleOptions = selTest[1].split("_");
+                meta.selectData[param] = possibleOptions;
+                meta.selectMapping[param] = selTest[0];
+                meta.selectMapping[param] = selTest[0];
+                confs[selTest[0]] = [possibleOptions[dfault] || possibleOptions[0], possibleOptions];
+                continue;
+            }
+            confs[param] = [dfault, "number", 1];
+        }
+
+        addBlockType("hvcc:" + patch.replace("_Module", ""), {
+            title: toTitleCase(patch.replace("_Module", "")),
+            color: "rgba(0, 64, 255, 0.6)",
+            amplitude_smoothing_knob: true,
+            wet_and_dry_knobs: true,
+            configs: confs,
+            isPlugin: true,
+            meta: meta,
+            functor: hvcc2functor(HVCC_MODULES[patch], meta)
+        });
     }
+
+    // load autosave
     document.querySelector("#renderProgress").innerText = `Welcome to SYNTHETIC Audio! Press the 'Help' button for the manual.`;
+    loadFiltersAndPrims();
     setTimeout(loadAutosave, 100);
 });
+registerHelp("[data-helptarget=uhvcc]",
+    `
+> HVCC Plugins
+
+> Prerequisites: Install emsdk (https://emscripten.org/docs/getting_started/downloads.html)
+
+Synthetic Audio supports using pure data/plugdata patches compiled with the heavy compiler collection (maintained by Wasted Audio, https://github.com/Wasted-Audio/hvcc).
+Specifically, until further notice, you must use my fork which adds various features and fixes for the web compile target: https://github.com/ZXMushroom63/hvcc
+Clone the repository, move into the \`hvcc/\` directory, and run \`pip3 install -e .\`
+
+Make a patch (I recommend plugdata for the editor), and save it to a file. While creating your patch, I'd recommend enabling 'compiled mode' to disable features that are not supported by hvcc.
+When you are done, go to the folder containing the patch, and run \`hvcc mypatch.pd -g js\`
+
+Open SYNTHETIC's plugins tab, and press 'Upload hvcc (.js)'. Go to the folder containing your patches, open the \`js/\` directory, and select BOTH .js files. SYNTHETIC will patch them to add offline support as well as editor integration. On reloading SYNTHETIC you will be able to find the patch available as a filter when using the Shift + A shortcut or in the Plugins category in the add menu.
+
+
+Making different types of input:
+SYNTHETIC offers an extension to the default @hv_param inputs. Providing a default value of '440' in a receive object will make the parameter apepar as :A4: in the editor.
+[r NoteInput @hv_param 0 1000 440]
+
+You can also create dropdowns, that return the index of the selected element, using a double underscore (__) to seperate the name and options of the dropdown, and a single underscore (_) to seperate the options.
+[r MyDropdown__firstoption_secondoption_thirdoption @hv_param 0 2 0]
+`);
+registerHelp("[data-helptarget=ujs]",
+    `
+> Generic Plugins
+
+I sincerely doubt there will be any of these every made, but it's effectively a userscript. Use the \`addNodeType\` global method as indicated by every single filter in the scripts/backend/filters/ folder.
+`);
+registerHelp("[data-helptarget=usf]",
+    `
+> Soundfonts
+
+Find a .sf2 that has been converted to javascript and upload it with this button. Uploaded fonts will be accessible through the Instrument node.
+
+Example: https://github.com/gleitz/midi-js-soundfonts/
+`);

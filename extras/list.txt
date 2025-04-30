@@ -1,1 +1,2 @@
-none.pd.js
+freqshift.pd.js
+colouriser.pd.js
