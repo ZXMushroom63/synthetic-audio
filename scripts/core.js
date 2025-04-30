@@ -120,9 +120,7 @@ async function convertToFileBlob(float32Arrays, channels, sampleRate, bRate) {
         const codec = codec_registry[audio.format];
         ffmpeg.FS("writeFile", 'input.wav', new Uint8Array(convertToWavData(float32Arrays, channels, sampleRate, bRate)));
         const fname = codec.codec().pop();
-        console.log(ffmpeg.FS("readdir", "./"));
         await ffmpeg.run(...codec.codec());
-        console.log(ffmpeg.FS("readdir", "./"));
         const data = ffmpeg.FS("readFile", fname);
         blob = new Blob([data.buffer], {type: codec.mime});
         ffmpeg.exit();
