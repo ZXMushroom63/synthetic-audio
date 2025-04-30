@@ -463,6 +463,7 @@ async function render() {
         }
         customEvent("render");
         stopTiming("render");
+        document.querySelector("#renderProgress").innerText = "Encoding...";
         var blob = await convertToFileBlob(output, channels, audio.samplerate, audio.bitrate);
     } catch (error) {
         stopTiming("render");
