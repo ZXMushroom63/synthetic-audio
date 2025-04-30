@@ -21,7 +21,7 @@ var bpm = 240;
 var loopi = 0.001;
 var audio = {
     samplerate: 24000,
-    bitrate: 128,
+    bitrate: 320,
     duration: 10,
     length: 240000,
     stereo: false,

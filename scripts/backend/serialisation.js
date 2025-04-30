@@ -21,6 +21,7 @@ function serialise(forRender) {
         loopInterval: loopi,
         stereo: audio.stereo,
         sampleRate: audio.samplerate,
+        bitRate: audio.bitrate,
         normalise: audio.normalise,
         substepping: gui.substepping
     };
@@ -76,6 +77,7 @@ function deserialise(serialisedStr) {
     ser.editorLayer = Math.min(ser.editorLayer, 9)
     ser.stereo ||= false;
     ser.sampleRate ||= 24000;
+    ser.bitRate ||= 320;
     ser.normalise ||= false;
     ser.encformat ||= "wav";
     document.querySelector("#duration").value = ser.duration;
@@ -85,6 +87,7 @@ function deserialise(serialisedStr) {
     document.querySelector("#stereobox").checked = ser.stereo;
     document.querySelector("#normalisebox").checked = ser.normalise;
     document.querySelector("#samplerate").value = ser.sampleRate;
+    document.querySelector("#bitrate").value = ser.bitRate;
     document.querySelector("#encformat").value = ser.encformat;
     document.querySelector("#substepping").value = ser.substepping;
     document.querySelector("#renderOut").currentTime = 0;
@@ -96,6 +99,7 @@ function deserialise(serialisedStr) {
     audio.normalise = ser.normalise;
     audio.stereo = ser.stereo;
     audio.format = ser.encformat;
+    audio.bitrate = ser.bitRate;
 
     if (audio.samplerate !== ser.sampleRate) {
         decodedPcmCache = {};

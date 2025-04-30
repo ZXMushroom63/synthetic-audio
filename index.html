@@ -13,7 +13,6 @@
     <script src="scripts/sw/sw_loader.js"></script>
 
     <!-- LIBRARIES -->
-    <script src="lib/lamejs.min.js"></script>
     <script src="lib/wav-encoder.js"></script>
     <script src="lib/floats2str.js"></script>
     <script src="lib/filesaver.min.js"></script>
@@ -43,6 +42,7 @@
     <script src="scripts/gui/zScroll.js"></script>
     <script src="scripts/gui/loop_debug_info.js"></script>
     <script src="scripts/gui/touch_support.js"></script>
+    <script src="scripts/gui/encoders.js"></script>
 
     <!-- TOOLS -->
     <script src="scripts/tools/move.js"></script>
@@ -210,12 +210,19 @@
                         Normalised: <input checked type="checkbox" id="normalisebox">
                     </span>
                     <span class="trayElem">
-                        Quality: <select id="samplerate">
+                        Quality: <select id="samplerate" style="width:7.5rem">
                             <option value="8000">Trash (8k)</option>
                             <option value="16000">Low (16k)</option>
                             <option value="24000" selected>Medium (24k)</option>
                             <option value="48000">High (48k)</option>
                             <option value="88200">Extreme (88.2k)</option>
+                        </select>
+                        <select id="bitrate" style="width:4.5rem">
+                            <option value="64">64kbps</option>
+                            <option value="96">96kbps</option>
+                            <option value="128">128kbps</option>
+                            <option value="256">256kbps</option>
+                            <option value="320" selected>320kbps</option>
                         </select>
                     </span>
                     <span class="trayElem">
@@ -226,8 +233,6 @@
                     </span>
                     <span class="trayElem">
                         Format: <select id="encformat">
-                            <option value="mp3">.mp3 (slow, small)</option>
-                            <option value="wav" selected>.wav (fast, larger)</option>
                         </select>
                     </span>
                     <span class="trayElem">

@@ -1,4 +1,4 @@
-addEventListener("init", ()=>{
+addEventListener("init", () => {
     document.querySelector("#samplerate").addEventListener("input", (e) => {
         if (audio.samplerate !== parseInt(e.target.value)) {
             audio.samplerate = parseInt(e.target.value);
@@ -9,5 +9,8 @@ addEventListener("init", ()=>{
             findLoops(".loop").forEach(x => x.setAttribute("data-dirty", "yes"));
             layerCache = {};
         }
+    });
+    document.querySelector("#bitrate").addEventListener("input", (e) => {
+        audio.bitrate = parseInt(e.target.value);
     });
 });

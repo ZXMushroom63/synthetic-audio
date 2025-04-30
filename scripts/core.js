@@ -101,42 +101,33 @@ function float32ToInt16(float32Array) {
     }
     return int16Array;
 }
-function convertToMp3Blob(float32Arrays, channels, sampleRate, bRate) {
-    let mp3Encoder = new lamejs.Mp3Encoder(channels, sampleRate, bRate);
-    let samples = float32Arrays.flatMap(float32ToInt16);
-    let mp3Data = [];
-    let sampleBlockSize = 1152;
-
-    for (let i = 0; i < samples[0].length; i += sampleBlockSize) {
-        let sampleChunk = samples.map(channel => channel.subarray(i, i + sampleBlockSize));
-        let mp3buf = mp3Encoder.encodeBuffer(...sampleChunk);
-        if (mp3buf.length > 0) {
-            mp3Data.push(mp3buf);
-        }
-    }
-
-    let mp3buf = mp3Encoder.flush();
-    if (mp3buf.length > 0) {
-        mp3Data.push(mp3buf);
-    }
-
-    let blob = new Blob(mp3Data, { type: 'audio/mp3' });
-    return blob;
-}
-function contertToWavData(float32Arrays, channels, sampleRate, bRate) {
+function convertToWavData(float32Arrays, channels, sampleRate, bRate) {
     const audioInterface = {
         sampleRate: sampleRate,
         channelData: float32Arrays
     };
-    return new Blob([WavEncoder.encodeSync(audioInterface)], { type: "audio/wav" });
+    return WavEncoder.encodeSync(audioInterface);
 }
-function convertToFileBlob(float32Arrays, channels, sampleRate, bRate) {
-    var blob;
+async function convertToFileBlob(float32Arrays, channels, sampleRate, bRate) {
     startTiming("encode");
-    if (audio.format === "mp3") { //mp3
-        blob = convertToMp3Blob(float32Arrays, channels, sampleRate, bRate);
-    } else { //wav
-        blob = contertToWavData(float32Arrays, channels, sampleRate, bRate);
+    var blob;
+    
+    if (audio.format !== "wav") {
+        if (ffmpeg.isLoaded()) {
+            ffmpeg.exit();
+        }
+        await ffmpeg.load();
+        const codec = codec_registry[audio.format];
+        ffmpeg.FS("writeFile", 'input.wav', new Uint8Array(convertToWavData(float32Arrays, channels, sampleRate, bRate)));
+        const fname = codec.codec().pop();
+        console.log(ffmpeg.FS("readdir", "./"));
+        await ffmpeg.run(...codec.codec());
+        console.log(ffmpeg.FS("readdir", "./"));
+        const data = ffmpeg.FS("readFile", fname);
+        blob = new Blob([data.buffer], {type: codec.mime});
+        ffmpeg.exit();
+    } else {
+       blob = new Blob([convertToWavData(float32Arrays, channels, sampleRate, bRate)], { type: "audio/wav" });
     }
     stopTiming("encode");
     return blob;
@@ -474,7 +465,7 @@ async function render() {
         }
         customEvent("render");
         stopTiming("render");
-        var blob = convertToFileBlob(output, channels, audio.samplerate, audio.bitrate);
+        var blob = await convertToFileBlob(output, channels, audio.samplerate, audio.bitrate);
     } catch (error) {
         stopTiming("render");
         console.error(error);
