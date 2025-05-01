@@ -6,7 +6,7 @@ function execZScroll(loop, value) {
 }
 var minZscrollDelta = 4;
 var zScrollProgress = 0;
-addEventListener("wheel", (e) => {
+function zscroll(e) {
     if (e.altKey) {
         e.preventDefault();
         e.stopImmediatePropagation();
@@ -39,6 +39,15 @@ addEventListener("wheel", (e) => {
                 }
             }
         }
+    }
+}
+addEventListener("wheel", zscroll, { passive: false });
+addEventListener("mousedown", () => {
+    var targetLoop = document.elementFromPoint(mouse.x, mouse.y)?.closest(".loop");
+    if (targetLoop) {
+        globalThis.zscrollMulti = false;
+        globalThis.zscrollIsFirst = true;
+        execZScroll(targetLoop, 0);
     }
 }, { passive: false });
 addEventListener("keyup", (e) => {
