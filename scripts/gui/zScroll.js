@@ -44,7 +44,7 @@ function zscroll(e) {
 addEventListener("wheel", zscroll, { passive: false });
 addEventListener("mousedown", () => {
     var targetLoop = document.elementFromPoint(mouse.x, mouse.y)?.closest(".loop");
-    if (targetLoop) {
+    if (targetLoop && keymap["Alt"]) {
         globalThis.zscrollMulti = false;
         globalThis.zscrollIsFirst = true;
         execZScroll(targetLoop, 0);
