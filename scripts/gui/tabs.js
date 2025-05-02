@@ -32,12 +32,16 @@ function registerTab(tabName, element, selected, listener = ()=>{}) {
         overflowTab.innerText = "...";
         overflowTab.classList.add("tab");
         overflowTab.id = "overflowTab";
+        const overflowWrapper = document.createElement("div");
+        overflowWrapper.id = "overflowWrapper";
+        overflowTab.appendChild(overflowWrapper);
         document.querySelector("#controlsAndStuff").appendChild(overflowTab);
     }
     if (registeredTabCounter < maxVisibleTabs) {
         document.querySelector("#controlsAndStuff").appendChild(tab);
     } else {
-        document.querySelector("#overflowTab").appendChild(tab);
+        document.querySelector("#overflowWrapper").appendChild(tab);
+        document.querySelector("#overflowWrapper").appendChild(document.createElement("br"));
     }
     registeredTabCounter++;
 }
