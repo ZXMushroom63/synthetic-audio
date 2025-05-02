@@ -1,3 +1,7 @@
+body {
+    font-family: sans-serif;
+    color: white;
+}
 #track {
     min-height: 16rem;
     border-radius: 0.5rem;
@@ -836,4 +840,16 @@ code:hover {
 }
 #overflowTab:hover #overflowWrapper {
     display: block;
+}
+.miscModuleTitle {
+    color: white;
+    font-family: sans-serif;
+    text-decoration: underline;
+    font-weight: bold;
+}
+.miscModule {
+    border: 1px solid white;
+    display: inline-block;
+    padding: 0.5rem;
+    margin: 0.2rem;
 }
