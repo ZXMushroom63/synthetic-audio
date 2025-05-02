@@ -13,7 +13,7 @@ addEventListener("init", () => {
         }
     });
     document.querySelector("#trackInternal").addEventListener("mousedown", (e) => {
-        if (e.button !== 2) {
+        if (e.button !== 2 && !(e.button === 0 && keymap["Shift"])) {
             return;
         }
         e.preventDefault();
