@@ -27,13 +27,15 @@ addEventListener("init", () => {
         var selectBox = document.createElement("div");
         selectBox.classList.add("selectbox");
         selectBox.style.color = "red";
+        selectBox.style.display = "none";
         selectBox.style.top = a.y + "px";
         selectBox.style.left = a.x + "px";
-        selectBox.style.bottom = (a.y + 1) + "px";
-        selectBox.style.right = (a.x + 1) + "px";
+        selectBox.style.bottom = b.y + "px";
+        selectBox.style.right = b.x + "px";
         document.querySelector("#trackInternal").appendChild(selectBox);
         window.oncontextmenu = (e) => { e.preventDefault() };
         window.onmousemove = function (e) {
+            selectBox.style.display = "block";
             window.lastScrollEvent = e;
             e.preventDefault();
             e.stopImmediatePropagation();
@@ -53,7 +55,7 @@ addEventListener("init", () => {
             selectBox.style.top = pos1.y + "px";
             selectBox.style.left = pos1.x + "px";
             selectBox.style.bottom = (window.innerHeight - pos2.y) + "px";
-            selectBox.style.right = (window.innerWidth - pos2.x) + "px";
+            selectBox.style.right = (window.innerWidth - pos2.x + 8) + "px";
         }
         window.onmouseup = function (e) {
             e.preventDefault();
