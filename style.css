@@ -834,7 +834,7 @@ code:hover {
     z-index: 9999;
     padding: 8px 8px;
     display: none;
-    background-color: rgba(20,20,20,0.8);
+    background-color: rgba(0,0,0,0.8);
     border: 1px solid white;
     border-radius: 0.3rem;
 }
