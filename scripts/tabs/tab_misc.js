@@ -47,7 +47,6 @@ addEventListener("init", () => {
         <option value="1,2,2,2,1,2,2">Phrygian (Diatonic)</option>
         <option value="2,2,2,1,2,2,1">Lydian (Diatonic)</option>
         <option value="2,2,1,2,2,1,2">Mixolydian (Diatonic)</option>
-        <option value="2,1,2,2,1,2,2">Aeolian (Diatonic)</option>
     </select><br>
     <span class="scaleout">(trigger a change)</span><br>
     <button id="scaleCopyNote">Copy (note)</button>
