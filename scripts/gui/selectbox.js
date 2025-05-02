@@ -13,7 +13,9 @@ addEventListener("init", () => {
         }
     });
     document.querySelector("#trackInternal").addEventListener("mousedown", (e) => {
-        if (e.button !== 2 && !(e.button === 0 && keymap["Shift"])) {
+        var loop = document.elementsFromPoint(mouse.x, mouse.y).find(x => !x.classList.contains("deactivated"));
+        var isShiftScroll = (e.button === 0 && keymap["Shift"]);
+        if (e.button !== 2 && !isShiftScroll || (loop && loop.closest(".loop") && e.button !== 2)) {
             return;
         }
         e.preventDefault();
