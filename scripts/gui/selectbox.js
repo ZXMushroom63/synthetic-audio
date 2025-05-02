@@ -84,7 +84,14 @@ addEventListener("init", () => {
                 }
             });
             selectedLoops = selectedLoops.filter(x => !x.classList.contains("deactivated"));
+            var oldActiveTool = ACTIVE_TOOL;
+            if (keymap["Alt"]) {
+                activateTool("MULTI-EDIT")
+            }
             ACTIVE_TOOL_FN(selectedLoops);
+            if (keymap["Alt"]) {
+                activateTool(oldActiveTool)
+            }
         }
     });
     document.querySelector("#trackInternal").addEventListener("contextmenu", (e) => { e.preventDefault() });

@@ -454,15 +454,15 @@ function init() {
             }
             return;
         }
-        keymap[e.key] = true;
+        
     });
     addEventListener("keydown", (e) => {
+        keymap[e.key] = true;
         if (e.key === "ArrowLeft" && e.target && e.target.tagName === "BODY" && e.shiftKey) {
             e.preventDefault();
             document.querySelector("#renderOut").currentTime = 0;
             return;
         }
-        keymap[e.key] = true;
     });
     addEventListener("keydown", (e) => {
         if (e.key === "Escape") {

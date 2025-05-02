@@ -45,9 +45,12 @@ CTRL + X = Cut selected/hovered loop(s)
 TAB = Focus next input (in edit panel)
 CTRL + SPACE = Go to ALL layer (layer 10, readonly)
 N = Open toolbox panel
-RMB on the visualiser to switch between waveform <-> EQ
+RMB on timeline = select multiple nodes
+ALT + RMB on timeline = select multiple nodes, temporarily switch tool to Multi-Edit
+RMB on the visualiser = switch between waveform <-> EQ
 SHIFT + A = add a new loop via search
-ALT + SCROLL = modify value on respective loop
+ALT + SCROLL = modify target value on respective loop (usually the note), and play preview if applicable
+ALT + CLICK = play loop preview if applicable
 CTRL + S = write to autosave slot
 CTRL + SHIFT + S = save as file
 
@@ -62,6 +65,7 @@ For a exponential interpolation (squared), try inputting:   #0~24@2
 For interpolating using a custom waveform, use #100~500@!custom_waveform_name
   |- You can cycle through the waveform at a frequency (eg: 2Hz) using #100~500@!custom_waveform_name!2
 
+For writing arithmetic, do: #1*4
 
 For writing an arbitrary script, do: #(()=>{/*/code/*/ return 1;})()
 These scripts have access to the following variables:
