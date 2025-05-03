@@ -30,11 +30,11 @@ addEventListener("init", async () => {
         container.appendChild(button);
         return button;
     }
-    function patchSoundFont(sf) {
+    function patchSoundFont(sf, prefix = "") {
         return sf
             .replace("if (typeof(MIDI) === 'undefined') var MIDI = {};", "")
             .replace("if (typeof(MIDI.Soundfont) === 'undefined') MIDI.Soundfont = {};", "")
-            .replace("MIDI.Soundfont.", "SFREGISTRY.");
+            .replace("MIDI.Soundfont.", "SFREGISTRY."+prefix);
     }
     mkBtn("Upload hvcc (.js)", () => {
         var f = document.createElement("input");
@@ -144,7 +144,7 @@ addEventListener("init", async () => {
         for (let i = 0; i < fontList.length; i++) {
             const font = fontList[i];
             document.querySelector("#renderProgress").innerText = `Downloading MusyngKite sound fonts: (${(i / (fontList.length) * 100).toFixed(1)}%); current: ${font}`;
-            await addFileMod(font + ".sf.js", patchSoundFont(await (await fetch("https://gleitz.github.io/midi-js-soundfonts/MusyngKite/" + font + "-ogg.js?plugin=true")).text()));
+            await addFileMod("HD_" + font + ".sf.js", patchSoundFont(await (await fetch("https://gleitz.github.io/midi-js-soundfonts/MusyngKite/" + font + "-ogg.js?plugin=true")).text()), "HD_");
             await drawModArray();
         }
         document.querySelector("#renderProgress").innerText = `Downloaded MusyngKite sound fonts.`;
