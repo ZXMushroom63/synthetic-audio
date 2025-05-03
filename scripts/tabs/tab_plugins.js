@@ -144,12 +144,12 @@ addEventListener("init", async () => {
         for (let i = 0; i < fontList.length; i++) {
             const font = fontList[i];
             document.querySelector("#renderProgress").innerText = `Downloading MusyngKite sound fonts: (${(i / (fontList.length) * 100).toFixed(1)}%); current: ${font}`;
-            await addFileMod("HD_" + font + ".sf.js", patchSoundFont(await (await fetch("https://gleitz.github.io/midi-js-soundfonts/MusyngKite/" + font + "-ogg.js?plugin=true")).text()), "HD_");
+            await addFileMod("Musyng_" + font + ".sf.js", patchSoundFont(await (await fetch("https://gleitz.github.io/midi-js-soundfonts/MusyngKite/" + font + "-ogg.js?plugin=true")).text(), "musyng_"));
             await drawModArray();
         }
         document.querySelector("#renderProgress").innerText = `Downloaded MusyngKite sound fonts.`;
     }, "dl_musyng");
-    mkBtn("Clear plugins", async () => { await resetMods(); drawModArray(); }, "dlsf");
+    mkBtn("Clear plugins", async () => { await resetMods(); drawModArray(); }, "clmods");
     container.appendChild(document.createElement("br"));
 
     async function drawModArray() {
@@ -299,5 +299,5 @@ registerHelp("[data-helptarget=dl_musyng]",
     `
 > MusyngKite
 
-Same as FluidR3-GM, but much higher wuality, and larger.
+Same as instruments FluidR3-GM, but higher quality with different tones.
 `);
