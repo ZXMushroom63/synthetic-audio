@@ -299,5 +299,5 @@ registerHelp("[data-helptarget=dl_musyng]",
     `
 > MusyngKite
 
-Same as instruments FluidR3-GM, but higher quality with different tones.
+Same as instruments FluidR3-GM, but higher quality and more life-accurate.
 `);
