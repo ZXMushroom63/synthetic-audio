@@ -114,28 +114,41 @@ addEventListener("init", async () => {
         f.click();
     }, "usf");
     mkBtn("Download SYNTHETIC Extras", async () => {
-        var modList = (await (await fetch("https://zxmushroom63.github.io/synthetic-audio/extras/list.txt")).text()).split("\n").filter(x => !!x);
+        var modList = (await (await fetch("https://zxmushroom63.github.io/synthetic-audio/extras/list.txt?plugin=true")).text()).split("\n").filter(x => !!x);
         for (let i = 0; i < modList.length; i++) {
             const mod = modList[i];
             if (!mod.endsWith(".js")) {
                 continue;
             }
             document.querySelector("#renderProgress").innerText = `Downloading SYNTHETIC Extras (${(i / (modList.length) * 100).toFixed(1)}%)`;
-            await addFileMod(mod, await (await fetch("https://zxmushroom63.github.io/synthetic-audio/extras/data/" + mod)).text())
+            await addFileMod(mod, await (await fetch("https://zxmushroom63.github.io/synthetic-audio/extras/data/" + mod + "?plugin=true")).text())
             await drawModArray();
         }
         document.querySelector("#renderProgress").innerText = `Downloaded SYNTHETIC Extras.`;
     }, "dlsn");
-    mkBtn("Download FluidR3-GM fonts", async () => {
-        var fontList = await (await fetch("https://gleitz.github.io/midi-js-soundfonts/FluidR3_GM/names.json")).json();
+    mkBtn("Download FluidR3-GM fonts (148MB)", async () => {
+        var fontList = await (await fetch("https://gleitz.github.io/midi-js-soundfonts/FluidR3_GM/names.json?plugin=true")).json();
         for (let i = 0; i < fontList.length; i++) {
             const font = fontList[i];
             document.querySelector("#renderProgress").innerText = `Downloading FluidR3-GM sound fonts: (${(i / (fontList.length) * 100).toFixed(1)}%); current: ${font}`;
-            await addFileMod(font + ".sf.js", patchSoundFont(await (await fetch("https://gleitz.github.io/midi-js-soundfonts/FluidR3_GM/" + font + "-ogg.js")).text()));
+            await addFileMod(font + ".sf.js", patchSoundFont(await (await fetch("https://gleitz.github.io/midi-js-soundfonts/FluidR3_GM/" + font + "-ogg.js?plugin=true")).text()));
             await drawModArray();
         }
         document.querySelector("#renderProgress").innerText = `Downloaded FluidR3-GM sound fonts.`;
     }, "dl_fluidr3");
+    mkBtn("Download MusyngKite fonts (1.75GB)", async () => {
+        if (!confirm("The MusyngKite soundfont is nearly identical to FluidR3-GM, but with better audio quality and a much larger file size (1.75GB). Are you sure you want to download it?")) {
+            return;
+        }
+        var fontList = await (await fetch("https://gleitz.github.io/midi-js-soundfonts/MusyngKite/names.json?plugin=true")).json();
+        for (let i = 0; i < fontList.length; i++) {
+            const font = fontList[i];
+            document.querySelector("#renderProgress").innerText = `Downloading MusyngKite sound fonts: (${(i / (fontList.length) * 100).toFixed(1)}%); current: ${font}`;
+            await addFileMod(font + ".sf.js", patchSoundFont(await (await fetch("https://gleitz.github.io/midi-js-soundfonts/MusyngKite/" + font + "-ogg.js?plugin=true")).text()));
+            await drawModArray();
+        }
+        document.querySelector("#renderProgress").innerText = `Downloaded MusyngKite sound fonts.`;
+    }, "dl_musyng");
     mkBtn("Clear plugins", async () => { await resetMods(); drawModArray(); }, "dlsf");
     container.appendChild(document.createElement("br"));
 
@@ -267,4 +280,24 @@ registerHelp("[data-helptarget=usf]",
 Find a .sf2 that has been converted to javascript and upload it with this button. Uploaded fonts will be accessible through the Instrument node.
 
 Example: https://github.com/gleitz/midi-js-soundfonts/
+`);
+registerHelp("[data-helptarget=dlsn]",
+    `
+> SYNTHETIC Extras
+
+A collection of PlugData patches that I've compiled for compatability with SYNTHETIC using the Heavy compiler.
+`);
+registerHelp("[data-helptarget=dl_fluidr3]",
+    `
+> FluidR3-GM
+
+https://member.keymusician.com/Member/FluidR3_GM/index.html
+
+A soundfont containing many instruments.
+`);
+registerHelp("[data-helptarget=dl_musyng]",
+    `
+> MusyngKite
+
+Same as FluidR3-GM, but much higher wuality, and larger.
 `);

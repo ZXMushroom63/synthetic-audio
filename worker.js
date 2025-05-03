@@ -11,7 +11,7 @@ self.addEventListener('fetch', event => {
                     return networkResponse;
                 }
 
-                if (!networkResponse.url.endsWith("/check.txt") && !networkResponse.url.startsWith("chrome-extension://") && !networkResponse.url.startsWith("data:") && !networkResponse.url.startsWith("blob:")) {
+                if (!(new URLSearchParams(networkResponse.url)).get("plugin") === "true" && !networkResponse.url.endsWith("/check.txt") && !networkResponse.url.startsWith("chrome-extension://") && !networkResponse.url.startsWith("data:") && !networkResponse.url.startsWith("blob:")) {
                     const responseToCache = networkResponse.clone();
 
                     caches.open(CACHE_NAME).then(cache => {
