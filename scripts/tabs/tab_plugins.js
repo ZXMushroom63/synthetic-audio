@@ -144,7 +144,7 @@ addEventListener("init", async () => {
         for (let i = 0; i < fontList.length; i++) {
             const font = fontList[i];
             document.querySelector("#renderProgress").innerText = `Downloading MusyngKite sound fonts: (${(i / (fontList.length) * 100).toFixed(1)}%); current: ${font}`;
-            await addFileMod("Musyng_" + font + ".sf.js", patchSoundFont(await (await fetch("https://gleitz.github.io/midi-js-soundfonts/MusyngKite/" + font + "-ogg.js?plugin=true")).text(), "musyng_"));
+            await addFileMod("musyng_" + font + ".sf.js", patchSoundFont(await (await fetch("https://gleitz.github.io/midi-js-soundfonts/MusyngKite/" + font + "-ogg.js?plugin=true")).text(), "musyng_"));
             await drawModArray();
         }
         document.querySelector("#renderProgress").innerText = `Downloaded MusyngKite sound fonts.`;
