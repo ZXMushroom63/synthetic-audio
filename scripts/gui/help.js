@@ -15,7 +15,7 @@ Once the program has started, you can LOAD projects using the 'Load' button. Sup
 You can add nodes (tracks, loops, assets and filters) using the 'Add Tracks' menu in the top right.
   |- Click to expand or shrink categories.
 
-You can move tracks using the LEFT MOUSE BUTTON. Holding 'Alt' while doing this ignores the 'Substepping' option.
+You can move tracks using the LEFT MOUSE BUTTON. Holding 'Ctrl' while doing this ignores the 'Substepping' option.
 Dragging the handles on the left and right of nodes allows you to change the duration.
 Right click on a node to edit it's properties.
 
