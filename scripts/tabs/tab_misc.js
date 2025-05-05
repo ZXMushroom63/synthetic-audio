@@ -59,14 +59,14 @@ addEventListener("init", () => {
     const scaleBtn = scaleGeneratorModule.querySelector("#scaleCopyNote");
     const scaleCopyDemo = scaleGeneratorModule.querySelector("#scaleCopyDemo");
     function updateScales() {
-        var startingPitch = _(note.value)(0, new Float32Array(1)) || 440;
+        var startingPitch = _(note.value || ":C#:")(0, new Float32Array(1)) || 440;
         var scale = scales.value.split(",").map(x => parseInt(x));
         var notes = [];
         var offset = 0;
         var firstNote = frequencyToNote(startingPitch);
         notes.push(firstNote);
         firstNote = firstNote.substring(0, firstNote.length - 1);
-        var text = scales.selectedOptions[0].textContent.trim() + " scale; Key of " + firstNote + ": \n" + firstNote + ", ";
+        var text = (scales.selectedOptions[0]?.textContent || "2,2,1,2,2,2,1").trim() + " scale; Key of " + firstNote + ": \n" + firstNote + ", ";
         text += scale.map(x => {
             offset += x;
             var note = frequencyToNote(startingPitch * Math.pow(2, offset / 12));
