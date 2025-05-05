@@ -37,17 +37,16 @@ addEventListener("init", () => {
     bpmClickerModule.appendChild(bpmClickerButton);
 
 
-    const scaleGeneratorModule = mkModule("Scale Generator");
+    const scaleGeneratorModule = mkModule("Heptatonic Scale Generator");
     scaleGeneratorModule.innerHTML += `
     <input class="inputStyles" style="width:4rem" value=":C#:" type="text">
     <select>
-        <option value="2,2,1,2,2,2,1">Major</option>
-        <option value="2,1,2,2,1,2,2">Minor</option>
-        <option value="1,2,2,1,2,2,2">Locrian</option>
-        <option value="1,2,2,2,1,2,2">Phrygian</option>
-        <option value="2,2,2,1,2,2,1">Lydian</option>
-        <option value="2,2,1,2,2,1,2">Mixolydian</option>
-        <option value="2,1,2,2,1,2,2">Aeolian</option>
+        <option value="2,2,1,2,2,2,1">Major (Diatonic)</option>
+        <option value="2,1,2,2,1,2,2">Minor (Diatonic)</option>
+        <option value="1,2,2,1,2,2,2">Locrian (Diatonic)</option>
+        <option value="1,2,2,2,1,2,2">Phrygian (Diatonic)</option>
+        <option value="2,2,2,1,2,2,1">Lydian (Diatonic)</option>
+        <option value="2,2,1,2,2,1,2">Mixolydian (Diatonic)</option>
     </select><br>
     <span class="scaleout">(trigger a change)</span><br>
     <button id="scaleCopyNote">Copy (note)</button>
