@@ -8,6 +8,14 @@ function serialise(forRender) {
                 }
             ]
         )
+    } else {
+        hNodes = Array.prototype.filter.apply(hNodes,
+            [
+                (node) => {
+                    return !filters[node.getAttribute("data-type")].noRender;
+                }
+            ]
+        )
     }
     var x = Array.prototype.flatMap.apply(hNodes, [(node => {
         return serialiseNode(node, forRender);

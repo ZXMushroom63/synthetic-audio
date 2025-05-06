@@ -10,6 +10,7 @@ addBlockType("note", {
     functor: function (inPcm, channel, data) {
         return inPcm;
     },
+    noRender: true,
     noMultiEdit: true,
     initMiddleware: function (loop) {
         var internal = loop.querySelector(".loopInternal");
