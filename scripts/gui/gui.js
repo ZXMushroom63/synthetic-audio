@@ -17,11 +17,11 @@ var gui = {
     noWvLOD: false,
     substepping: 2,
 }
-var bpm = 240;
 var loopi = 0.001;
 var audio = {
     samplerate: 24000,
     bitrate: 320,
+    bpm: 240,
     duration: 10,
     length: 240000,
     stereo: false,
@@ -93,7 +93,7 @@ function hydrateBeatMarkers() {
     updateLOD();
     var track = document.querySelector("#trackInternal");
     document.querySelectorAll(".beatMarker").forEach(x => { x.remove() });
-    bpm = parseInt(document.querySelector("#bpm").value);
+    audio.bpm = parseInt(document.querySelector("#bpm").value);
     loopi = parseFloat(document.querySelector("#loopi").value);
 
     var trueBPM = bpm;

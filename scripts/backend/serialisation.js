@@ -93,7 +93,7 @@ function deserialise(serialisedStr) {
     document.querySelector("#renderOut").currentTime = 0;
     gui.layer = ser.editorLayer;
     gui.substepping = ser.substepping;
-    bpm = ser.bpm;
+    audio.bpm = ser.bpm;
     loopi = ser.loopInterval;
     audio.duration = ser.duration;
     audio.normalise = ser.normalise;
