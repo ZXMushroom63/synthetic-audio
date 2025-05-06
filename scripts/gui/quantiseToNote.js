@@ -10,6 +10,13 @@ addEventListener("keydown", (e) => {
     }
 });
 addEventListener("keydown", (e) => {
+    if ((e.key === "t") && (e.target.tagName === "INPUT") && parseFloat(e.target.value)) {
+        e.target.value = (parseFloat(e.target.value) / bpm * 60).toFixed(5);
+        e.preventDefault();
+        e.target.dispatchEvent(new Event('input', { bubbles: true }));
+    }
+});
+addEventListener("keydown", (e) => {
     if ((e.key === "o") && (e.target.tagName === "INPUT") && parseFloat(e.target.value)) {
         const n = parseFloat(e.target.value) * Math.pow(2, 1/12);
         e.target.value = n.toFixed("1");

@@ -78,9 +78,10 @@ In purple input boxes, you can also use autocomplete for notes.
 :a:  =  :a4:  =  440
 :g#3:  =  207
 
-In any numberical input box, pressing 'b' on your keyboard will round the frequency into the nearest note.
+In any input box, pressing 'b' on your keyboard will round the frequency into the nearest note.
 'o' will shift the frequency up 1 semitone,
 'u' will shift down 1 semitone.
+'t' will convert beats into seconds
 
 ';' will turn a frequency into a note representation (440 -> :a4:)
 ''' evaluates any inline script at 0% (:a4: -> 440, #0.5~1 -> 0.5)
