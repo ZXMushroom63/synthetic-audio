@@ -16,7 +16,7 @@ function serialise(forRender) {
         encformat: audio.format,
         nodes: x,
         duration: audio.duration,
-        bpm: bpm,
+        bpm: audio.bpm,
         zoom: zoom,
         loopInterval: loopi,
         stereo: audio.stereo,

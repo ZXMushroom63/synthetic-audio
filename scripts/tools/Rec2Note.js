@@ -70,7 +70,7 @@ async function fileToNotes(file) {
 
     await audioContext.startRendering();
 
-    var interval = 1 / (bpm / 60);
+    var interval = 1 / (audio.bpm / 60);
     return notes.map((note)=>{
         var f = frequencyToNote(note.frequency);
         var start = Math.round(note.startTime / interval) * interval;

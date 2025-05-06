@@ -94,7 +94,7 @@ addEventListener("init", () => {
         }
         scaleCopyDemo.onclick = () => {
             var titleText = text.split("\n")[0];
-            var noteLength = 1 / (bpm / 60);
+            var noteLength = 1 / (audio.bpm / 60);
             var spp_demoscale = "sp_loopdata::" + JSON.stringify(
                 notes.map((x, i) => {
                     return {

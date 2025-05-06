@@ -98,7 +98,7 @@ function hydrateBeatMarkers() {
     audio.beatLength = 1 / audio.bpm * 60;
     loopi = parseFloat(document.querySelector("#loopi").value);
 
-    var trueBPM = bpm;
+    var trueBPM = audio.bpm;
     trueBPM = trueBPM / gui.LOD;
     var beatCount = Math.floor(audio.duration / 60 * trueBPM);
     for (let i = 0; i < beatCount; i++) {
@@ -115,6 +115,11 @@ function hydrateLoopPosition(elem) {
     var elemType = elem.getAttribute("data-type");
     var trueDuration = (parseFloat(loopDurationMap[elem.getAttribute("data-file")]) + 0.0) || ((elemType !== "distribute") * (proceduralAssets.get(elem.conf.Asset)?.[0]?.length / audio.samplerate)) || 0;
     trueDuration = (Math.round(trueDuration / loopi) * loopi) / (elem.conf.Speed || 1);
+    var def = filters[elem.getAttribute("data-type")];
+    if (def.findLoopMarker) {
+        trueDuration = def.findLoopMarker(elem);
+    }
+
     var duration = parseFloat(elem.getAttribute("data-duration"));
     var start = parseFloat(elem.getAttribute("data-start"));
     elem.style.left = (start / audio.duration * 100) + "%";
@@ -226,7 +231,7 @@ function addBlock(type, start, duration, title, layer = 0, data = {}, editorValu
             document.onmousemove = function (j) {
                 keymap["Control"] = j.ctrlKey;
                 var pos = ((originalBB.left - trackBB.left - (e.clientX - j.clientX)) / trackBB.width) * 100;
-                var bpmInterval = 60 / (bpm * (keymap["Control"] ? 1 : gui.substepping));
+                var bpmInterval = 60 / (audio.bpm * (keymap["Control"] ? 1 : gui.substepping));
                 if (keymap["Shift"]) {
                     bpmInterval = 0.001;
                 }
@@ -245,7 +250,7 @@ function addBlock(type, start, duration, title, layer = 0, data = {}, editorValu
             document.onmousemove = function (j) {
                 keymap["Control"] = j.ctrlKey;
                 var pos = ((originalBB.left - trackBB.left - (e.clientX - j.clientX)) / trackBB.width) * 100;
-                var bpmInterval = 60 / (bpm * (keymap["Control"] ? 1 : gui.substepping));
+                var bpmInterval = 60 / (audio.bpm * (keymap["Control"] ? 1 : gui.substepping));
                 if (keymap["Shift"]) {
                     bpmInterval = 0.001;
                 }
@@ -344,7 +349,7 @@ function addBlock(type, start, duration, title, layer = 0, data = {}, editorValu
             document.onmousemove = function (j) {
                 keymap["Control"] = j.ctrlKey;
                 var pos = Math.max(0, ((originalBB.left - trackBB.left - (e.clientX - j.clientX)) / trackBB.width) * 100);
-                var bpmInterval = 60 / (bpm * (keymap["Control"] ? 1 : gui.substepping));
+                var bpmInterval = 60 / (audio.bpm * (keymap["Control"] ? 1 : gui.substepping));
                 if (keymap["Shift"]) {
                     bpmInterval = 0.001;
                 }
