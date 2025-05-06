@@ -62,7 +62,7 @@ addNodeDropdown.querySelector("input").addEventListener("keydown", (e) => {
         addNodeDropdown.style.display = "none";
         activateTool("MOVE");
         var opt = calcOptions(addNodeDropdown.querySelector("input").value.toLowerCase())[0];
-        const loop = addBlock(opt[0], 0, 1, opt[1], 0, {});
+        const loop = addBlock(opt[0], 0, audio.beatSize, opt[1], 0, {});
         hydrateLoopPosition(loop);
         pickupLoop(loop);
     }

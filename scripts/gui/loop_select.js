@@ -21,7 +21,7 @@ function loadFiltersAndPrims() {
             y.innerText = "[Add]";
             y.addEventListener("click", () => {
                 activateTool("MOVE");
-                const loop = addBlock(k, 0, 1, filters[k].title, 0, {});
+                const loop = addBlock(k, 0, audio.beatSize, filters[k].title, 0, {});
                 hydrateLoopPosition(loop);
                 pickupLoop(loop);
             });
@@ -87,7 +87,7 @@ addEventListener("init", () => {
                 y.innerText = "[Add]";
                 y.addEventListener("click", () => {
                     activateTool("MOVE");
-                    const loop = addBlock("audio", 0, 1, file.name, 0, {});
+                    const loop = addBlock("audio", 0, audio.beatSize, file.name, 0, {});
                     hydrateLoopPosition(loop);
                     pickupLoop(loop);
                 });

@@ -22,6 +22,7 @@ var audio = {
     samplerate: 24000,
     bitrate: 320,
     bpm: 240,
+    bpmSize: 1 / 240 * 60,
     duration: 10,
     length: 240000,
     stereo: false,
@@ -94,6 +95,7 @@ function hydrateBeatMarkers() {
     var track = document.querySelector("#trackInternal");
     document.querySelectorAll(".beatMarker").forEach(x => { x.remove() });
     audio.bpm = parseInt(document.querySelector("#bpm").value);
+    audio.beatLength = 1 / audio.bpm * 60;
     loopi = parseFloat(document.querySelector("#loopi").value);
 
     var trueBPM = bpm;

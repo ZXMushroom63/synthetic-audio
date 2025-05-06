@@ -94,6 +94,7 @@ function deserialise(serialisedStr) {
     gui.layer = ser.editorLayer;
     gui.substepping = ser.substepping;
     audio.bpm = ser.bpm;
+    audio.beatLength = 1 / audio.bpm * 60;
     loopi = ser.loopInterval;
     audio.duration = ser.duration;
     audio.normalise = ser.normalise;

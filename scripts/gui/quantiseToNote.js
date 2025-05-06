@@ -11,7 +11,7 @@ addEventListener("keydown", (e) => {
 });
 addEventListener("keydown", (e) => {
     if ((e.key === "t") && (e.target.tagName === "INPUT") && parseFloat(e.target.value)) {
-        e.target.value = (parseFloat(e.target.value) / bpm * 60).toFixed(5);
+        e.target.value = (parseFloat(e.target.value) / audio.bpm * 60).toFixed(5);
         e.preventDefault();
         e.target.dispatchEvent(new Event('input', { bubbles: true }));
     }
