@@ -95,7 +95,7 @@ function hydrateBeatMarkers() {
     var track = document.querySelector("#trackInternal");
     document.querySelectorAll(".beatMarker").forEach(x => { x.remove() });
     audio.bpm = parseInt(document.querySelector("#bpm").value);
-    audio.beatLength = 1 / audio.bpm * 60;
+    audio.beatSize = 1 / audio.bpm * 60;
     loopi = parseFloat(document.querySelector("#loopi").value);
 
     var trueBPM = audio.bpm;
