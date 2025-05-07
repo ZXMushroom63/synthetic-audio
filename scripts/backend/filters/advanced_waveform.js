@@ -202,7 +202,7 @@ addBlockType("p_waveform_plus", {
                 return [[k, x]];
             }));
             if (this.conf.BadSine && i % badsineinterval === 0) {
-                badsineamount = Math.random();
+                badsineamount = 2*(Math.random() - 0.5);
             }
             var f = (
                     freq(i, inPcm)
