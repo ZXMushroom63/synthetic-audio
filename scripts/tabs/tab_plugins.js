@@ -151,8 +151,15 @@ addEventListener("init", async () => {
     }, "dl_musyng");
     mkBtn("Clear plugins", async () => { await resetMods(); drawModArray(); }, "clmods");
     container.appendChild(document.createElement("br"));
+    const quotaEstimate = document.createElement("span");
+    quotaEstimate.innerText = "Storage Quota Usage: (loading...)";
+    quotaEstimate.style.fontSize = "10px";
+    container.appendChild(quotaEstimate);
+    container.appendChild(document.createElement("br"));
 
     async function drawModArray() {
+        const quotaEstimateData = await navigator.storage.estimate();
+        quotaEstimate.innerText = `Storage Quota Usage: ${(quotaEstimateData.usage/quotaEstimateData.quota*100).toFixed(1)}% (${(quotaEstimateData.usage / (Math.pow(1024, 2))).toFixed(1)}MB)`
         container.querySelectorAll("div").forEach(x => x.remove());
         var modsArr = (await getMods()).map((x, i) => { var z = Object(/\..+/.exec(x)[0] || ""); z.__key = x; z.__idx = i; return z; }).sort();
         var idxMap = modsArr.map(z => z.__idx);
