@@ -139,6 +139,18 @@ function hydrateLoopPosition(elem) {
     var internalWidth = nInternalWidth + "vw";
     var loopInternal = elem.querySelector(".loopInternal");
     loopInternal.style.width = internalWidth;
+
+    //Debug info
+    loopInternal.setAttribute("title", `Type: ${loop.getAttribute("data-type")
+        }\nDuration: ${parseFloat(loop.getAttribute("data-duration")).toFixed(2)
+        }s\nPos: ${"X: "
+        + parseFloat(loop.getAttribute("data-start")).toFixed(2)
+        + "s, Y: "
+        + loop.getAttribute("data-layer")
+        + ", Z: "
+        + loop.getAttribute("data-editlayer")
+        }`);
+    
     var bg = loopInternal.querySelector(".backgroundSvg");
     if (bg && (nInternalWidth > (9.9 * (!gui.noWvLOD)))) {
         bg.style.width = internalWidth;
@@ -172,11 +184,11 @@ function hydrateLoopBackground(elem) {
     elem.cache[0].forEach((v, i) => {
         var isFinalSample = i === (elem.cache[0].length - 1);
         if (i % downsample === 0 || isFinalSample) {
-            var x = Math.round(i / elem.cache[0].length * 100 * 100) / 100; 
-            var y = (v + 1)/2 * 100;
+            var x = Math.round(i / elem.cache[0].length * 100 * 100) / 100;
+            var y = (v + 1) / 2 * 100;
             y ||= 50;
             y = Math.min(100, Math.max(0, y));
-            if (x === NaN || ((Math.abs(y - prevY) < 5) && !isFinalSample && (Math.abs(elem.cache[0][i+1] - v) > 0.05))) {
+            if (x === NaN || ((Math.abs(y - prevY) < 5) && !isFinalSample && (Math.abs(elem.cache[0][i + 1] - v) > 0.05))) {
                 return;
             }
             prevY = y;
@@ -295,7 +307,7 @@ function addBlock(type, start, duration, title, layer = 0, data = {}, editorValu
     const internal = document.createElement("div");
     internal.style.backgroundColor = definition.color;
     internal.classList.add("loopInternal");
-    
+
     loop["conf"] = structuredClone(data);
 
     const span = document.createElement("span");
@@ -334,11 +346,11 @@ function addBlock(type, start, duration, title, layer = 0, data = {}, editorValu
         e.stopImmediatePropagation();
         e.stopPropagation();
         document.querySelectorAll(".loopInternal.selected").forEach(a => { a.classList.remove("selected") });
-        
+
         optionsMenu.loadValues();
-        
+
         internal.classList.add("selected");
-        
+
         document.onmousedown = () => {
             document.querySelectorAll(".loopInternal.selected").forEach(a => { a.classList.remove("selected") });
         }
@@ -471,7 +483,7 @@ function init() {
             }
             return;
         }
-        
+
     });
     addEventListener("keydown", (e) => {
         keymap[e.key] = true;
