@@ -117,7 +117,17 @@ function hydrateLoopPosition(elem) {
     trueDuration = (Math.round(trueDuration / loopi) * loopi) / (elem.conf.Speed || 1);
     var def = filters[elem.getAttribute("data-type")];
     if (def.findLoopMarker) {
-        trueDuration = def.findLoopMarker(elem);
+        const loopProvided = def.findLoopMarker(elem);
+        if (loopProvided) {
+            trueDuration = loopProvided;
+        }
+    }
+    var startOffset = elem.conf.StartOffset || 0;
+    if (def.findLoopMarkerOffset) {
+        const loopProvided = def.findLoopMarkerOffset(elem);
+        if (loopProvided) {
+            startOffset = loopProvided;
+        }
     }
 
     var duration = parseFloat(elem.getAttribute("data-duration"));
@@ -143,7 +153,7 @@ function hydrateLoopPosition(elem) {
     }
     var trueWidth = trueDuration * zoomConstant;
     loopInternal.style.backgroundImage = `repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.0), rgba(255, 255, 255, 0.0) ${trueWidth - 0.15}vw, rgba(255, 255, 255, 1) ${trueWidth - 0.15}vw, rgba(255, 255, 255, 1) ${trueWidth + 0.0}vw)`;
-    loopInternal.style.backgroundPositionX = `-${(elem.conf.StartOffset || 0) * zoomConstant}vw`;
+    loopInternal.style.backgroundPositionX = `-${startOffset * zoomConstant}vw`;
 }
 function hydrateZoom() {
     document.querySelector("#trackInternal").style.width = zoom + "vw";

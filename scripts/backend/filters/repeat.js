@@ -33,5 +33,16 @@ addBlockType("repeat", {
         }
 
         return out;
-    }
+    },
+    findLoopMarker: function (loop) {
+        if (parseFloat(loop.conf.RepeatDuration)) {
+            return parseFloat(loop.conf.RepeatDuration);
+        }
+    },
+    findLoopMarkerOffset: function (loop) {
+        if (loop.conf.FromEnd && parseFloat(loop.conf.RepeatDuration)) {
+            const repeatDuration = parseFloat(loop.conf.RepeatDuration);
+            return repeatDuration - (parseFloat(loop.getAttribute("data-duration")) % repeatDuration);
+        }
+    },
 });
