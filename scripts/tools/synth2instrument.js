@@ -31,7 +31,8 @@ addEventListener("init", () => {
                         Note: ":" + node.__determinedFreq + ":",
                         Volume: parseFloat(node.conf.Amplitude) || 1,
                         AmplitudeSmoothing: parseFloat(node.conf.AmplitudeSmoothing) || 0,
-                        Instrument: defaultInstrument || "(none)"
+                        Instrument: defaultInstrument || "(none)",
+                        FadeTime: 0.1
                     },
                     parseInt(node.getAttribute("data-editlayer")),
                 );
