@@ -1,0 +1,70 @@
+
+addEventListener("init", () => {
+    registerTool("Synth Converter", (nodes) => {
+        if (!nodes) { return };
+
+        const valid_types = ["p_waveform_plus", "instrument"];
+        var foundValidType = false;
+        for (let i = 0; i < nodes.length; i++) {
+            const loop = nodes[i];
+            foundValidType ||= valid_types.includes(loop.getAttribute("data-type"));
+            if (foundValidType) {
+                break;
+            }
+        }
+        if (!foundValidType) { return }
+        const defaultInstrument = Object.keys(SFREGISTRY)[0];
+
+        var mode = parseInt(prompt("Select mode: \n1 - Synth to Instrument\n2 - Instrument to Synth", "1"));
+        if (mode === 1) {
+            nodes.map(node => {
+                if (node.getAttribute("data-type") !== "p_waveform_plus") {
+                    return;
+                }
+                deleteLoop(node);
+                return addBlock("instrument",
+                    parseFloat(node.getAttribute("data-start")),
+                    parseFloat(node.getAttribute("data-duration")),
+                    node.getAttribute("data-file"),
+                    parseInt(node.getAttribute("data-layer")),
+                    {
+                        Note: ":" + node.__determinedFreq + ":",
+                        Volume: parseFloat(node.conf.Amplitude) || 1,
+                        AmplitudeSmoothing: parseFloat(node.conf.AmplitudeSmoothing) || 0,
+                        Instrument: defaultInstrument || "(none)"
+                    },
+                    parseInt(node.getAttribute("data-editlayer")),
+                );
+            }).forEach(hydrateLoopPosition);
+        } else if (mode === 2) {
+            nodes.map(node => {
+                if (node.getAttribute("data-type") !== "instrument") {
+                    return;
+                }
+                deleteLoop(node);
+                return addBlock("p_waveform_plus",
+                    parseFloat(node.getAttribute("data-start")),
+                    parseFloat(node.getAttribute("data-duration")),
+                    node.getAttribute("data-file"),
+                    parseInt(node.getAttribute("data-layer")),
+                    {
+                        Frequency: ":" + node.__determinedFreq + ":",
+                        Amplitude: parseFloat(node.conf.Volume) || 1,
+                        AmplitudeSmoothing: parseFloat(node.conf.AmplitudeSmoothing) || 0
+                    },
+                    parseInt(node.getAttribute("data-editlayer")),
+                );
+            }).forEach(hydrateLoopPosition);
+        }
+    });
+});
+registerHelp(".tool[data-tool=SYNTH_CONVERTER]",
+    `
+*********************
+*  THE RENAME TOOL  *
+*********************
+If the rename tool is enabled, when a 
+    - loop is clicked, or
+    - a group of loops are selected using RMB
+a popup asking for new names for those loops appears, and if the user presses 'Ok', all selected loop's names are changed.
+`);

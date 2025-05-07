@@ -572,6 +572,7 @@ select option {
 }
 
 .toolbox div.tool {
+    white-space: normal;
     width: 4rem;
     height: 4rem;
     color: white;

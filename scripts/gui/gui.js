@@ -141,14 +141,14 @@ function hydrateLoopPosition(elem) {
     loopInternal.style.width = internalWidth;
 
     //Debug info
-    loopInternal.setAttribute("title", `Type: ${loop.getAttribute("data-type")
-        }\nDuration: ${parseFloat(loop.getAttribute("data-duration")).toFixed(2)
+    loopInternal.setAttribute("title", `Type: ${elem.getAttribute("data-type")
+        }\nDuration: ${duration.toFixed(2)
         }s\nPos: ${"X: "
-        + parseFloat(loop.getAttribute("data-start")).toFixed(2)
+        + start.toFixed(2)
         + "s, Y: "
-        + loop.getAttribute("data-layer")
+        + elem.getAttribute("data-layer")
         + ", Z: "
-        + loop.getAttribute("data-editlayer")
+        + elem.getAttribute("data-editlayer")
         }`);
     
     var bg = loopInternal.querySelector(".backgroundSvg");

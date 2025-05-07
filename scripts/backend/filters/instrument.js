@@ -3,6 +3,7 @@ function updateInstrumentNoteDisplay(loop) {
     var basic = new Float32Array(1);
     var freq = _(loop.conf.Note)(0, basic);
     var note = frequencyToNote(freq);
+    loop.__determinedFreq = note;
     loop.querySelector(".noteDisplay").innerText = note;
     var newTitle = loop.conf.Instrument + " - " + note;
     loop.setAttribute("data-file", newTitle);

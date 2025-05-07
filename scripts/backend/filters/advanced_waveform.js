@@ -4,7 +4,8 @@ function updateWaveformNoteDisplay(loop) {
     var freqsemioffset = _(loop.conf.SemitonesOffset)(4, basic);
     var internalSemiOffset = loop.conf.InternalSemiOffset;
     var f = freq * Math.pow(2, (freqsemioffset + internalSemiOffset) / 12);
-    loop.querySelector(".noteDisplay").innerText = frequencyToNote(f);
+    loop.__determinedFreq = frequencyToNote(f);
+    loop.querySelector(".noteDisplay").innerText = loop.__determinedFreq;
 }
 addBlockType("p_waveform_plus", {
     color: "rgba(255,0,0,0.3)",
