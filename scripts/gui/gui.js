@@ -542,9 +542,7 @@ function init() {
                 return;
             }
             e.preventDefault();
-            [...findLoops(".loop")].filter(x => !x.classList.contains("deactivated")).forEach(x => {
-                pickupLoop(x, true);
-            });
+            ACTIVE_TOOL_FN([...findLoops(".loop")].filter(x => !x.classList.contains("deactivated")));
         }
     });
 

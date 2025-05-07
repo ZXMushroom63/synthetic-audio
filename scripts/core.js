@@ -9,7 +9,7 @@ function stopTiming(name) {
     var dt = performance.now() - timers[name];
     console.log(`${name} took ${(dt).toFixed(1)} ms.`);
     delete timers[name];
-    return dt;
+    return dt / 1000;
 }
 function findLoops(selector) {
     return Array.prototype.filter.apply(document.querySelectorAll(selector), [(x) => !x._ignore]);
@@ -462,15 +462,15 @@ async function render() {
             output.push(sumFloat32ArraysNormalised(channelPcms));
         }
         customEvent("render");
-        stopTiming("render");
+        var renderTime = stopTiming("render");
         document.querySelector("#renderProgress").innerText = "Encoding...";
         var blob = await convertToFileBlob(output, channels, audio.samplerate, audio.bitrate);
     } catch (error) {
         stopTiming("render");
-        console.error(error);
+        console.log(error);
         success = false;
     }
-    document.querySelector("#renderProgress").innerText = success ? "Render successful! (" + proccessedNodeCount + ")" : "Render failed.";
+    document.querySelector("#renderProgress").innerText = success ? "Render successful! (" + proccessedNodeCount + " in "+renderTime.toFixed(1)+"s)" : "Render failed.";
     if (success) {
         document.querySelector("#renderOut").src = URL.createObjectURL(blob);
     }
