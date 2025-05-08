@@ -64,6 +64,7 @@ const multiplayer = {
                 target.setAttribute("data-layer", res.layer);
                 target.setAttribute("data-editlayer", res.editorLayer);
                 target.querySelector(".loopInternal .name").innerText = res.file;
+                target.classList.remove("selected");
                 hydrateLoopPosition(target);
             }
             multiplayer.isHooked = false;
