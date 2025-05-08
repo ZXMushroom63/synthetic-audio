@@ -710,7 +710,7 @@ addEventListener("init", () => {
 
     addEventListener('serialise', (e) => {
         var out = structuredClone(custom_waveforms);
-``
+
         for (let id in out) {
             out[id].samples = [...custom_waveforms[id].samples];
             delete out[id].calculated;
@@ -729,7 +729,7 @@ addEventListener("init", () => {
     });
 
     addEventListener("preserialisenode", (e) => {
-        if ((e.detail.node.getAttribute("data-type") === "p_waveform_plus") && e.detail.node.conf.UseCustomWaveform && (custom_waveforms[e.detail.node.conf.WaveformAsset]?.dirty)) {
+        if ((e.detail.node.getAttribute("data-type") === "p_waveform_plus") && e.detail.node.conf.UseCustomWaveform && (custom_waveforms[e.detail.node.conf.WaveformAsset]?.dirty || custom_waveforms[e.detail.node.conf.WaveformAsset2]?.dirty)) {
             markLoopDirty(e.detail.node);
             return;
         }

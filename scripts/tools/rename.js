@@ -12,6 +12,9 @@ addEventListener("init", ()=>{
             }
             node.setAttribute("data-file", newName);
             node.querySelector(".loopInternal .name").innerText = newName;
+            if (multiplayer.on) {
+                multiplayer.patchLoop(loop);
+            }
         });
     });
 });

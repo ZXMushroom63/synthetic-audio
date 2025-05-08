@@ -1,4 +1,4 @@
-function serialise(forRender) {
+function serialise(forRender, forMultiplayer) {
     var hNodes = findLoops(".loop");
     if (!forRender) {
         hNodes = Array.prototype.filter.apply(hNodes,
@@ -18,7 +18,7 @@ function serialise(forRender) {
         )
     }
     var x = Array.prototype.flatMap.apply(hNodes, [(node => {
-        return serialiseNode(node, forRender);
+        return serialiseNode(node, forRender, forMultiplayer);
     })]);
     var out = {
         encformat: audio.format,
@@ -36,10 +36,13 @@ function serialise(forRender) {
     customEvent("serialise", { data: out });
     return out;
 }
-function serialiseNode(node, forRender) {
+function serialiseNode(node, forRender, forMultiplayer) {
     customEvent("preserialisenode", { node: node });
     var out = {};
     out.conf = node.conf;
+    if (forMultiplayer) {
+        out.conf.uuid = node.getAttribute("data-uuid");
+    }
     out.start = parseFloat(node.getAttribute("data-start")) || 0;
     out.duration = parseFloat(node.getAttribute("data-duration")) || 0;
     out.end = out.start + out.duration;
@@ -69,6 +72,9 @@ function deserialiseNode(serNode, markDirty) {
     return x;
 }
 function deserialise(serialisedStr) {
+    if (!multiplayer.isHooked && multiplayer.on) {
+        return multiplayer.write(serialisedStr);
+    }
     if (!serialisedStr) {
         return hydrate();
     }

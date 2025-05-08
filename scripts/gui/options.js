@@ -58,6 +58,9 @@ function createOptionsMenu(loop, definition) {
                 }
                 hydrateLoopPosition(loop);
                 markLoopDirty(loop);
+                if (multiplayer.on) {
+                    multiplayer.patchLoop(loop);
+                }
             });
             s.addEventListener("focus", () => {
                 loop["conf"][key] = s.value;
@@ -88,6 +91,9 @@ function createOptionsMenu(loop, definition) {
                 }
                 hydrateLoopPosition(loop);
                 markLoopDirty(loop);
+                if (multiplayer.on) {
+                    multiplayer.patchLoop(loop);
+                }
             });
             target.appendChild(input);
         }
@@ -239,6 +245,9 @@ function getPropertySetter(editingTargets) {
                 if (markDirty) {
                     hydrateLoopPosition(targ.loop);
                     markLoopDirty(targ.loop);
+                    if (multiplayer.on) {
+                        multiplayer.patchLoop(loop);
+                    }
                 }
             }
         });

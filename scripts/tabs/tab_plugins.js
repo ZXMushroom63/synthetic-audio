@@ -34,7 +34,7 @@ addEventListener("init", async () => {
         return sf
             .replace("if (typeof(MIDI) === 'undefined') var MIDI = {};", "")
             .replace("if (typeof(MIDI.Soundfont) === 'undefined') MIDI.Soundfont = {};", "")
-            .replace("MIDI.Soundfont.", "SFREGISTRY."+prefix);
+            .replace("MIDI.Soundfont.", "SFREGISTRY." + prefix);
     }
     mkBtn("Upload hvcc (.js)", () => {
         var f = document.createElement("input");
@@ -159,7 +159,7 @@ addEventListener("init", async () => {
 
     async function drawModArray() {
         const quotaEstimateData = await navigator.storage.estimate();
-        quotaEstimate.innerText = `Storage Quota Usage: ${(quotaEstimateData.usage/quotaEstimateData.quota*100).toFixed(1)}% (${(quotaEstimateData.usage / (Math.pow(1024, 2))).toFixed(1)}MB)`
+        quotaEstimate.innerText = `Storage Quota Usage: ${(quotaEstimateData.usage / quotaEstimateData.quota * 100).toFixed(1)}% (${(quotaEstimateData.usage / (Math.pow(1024, 2))).toFixed(1)}MB)`
         container.querySelectorAll("div").forEach(x => x.remove());
         var modsArr = (await getMods()).map((x, i) => { var z = Object(/\..+/.exec(x)[0] || ""); z.__key = x; z.__idx = i; return z; }).sort();
         var idxMap = modsArr.map(z => z.__idx);
@@ -181,7 +181,7 @@ addEventListener("init", async () => {
             download.innerText = "💾";
 
             download.addEventListener("click", async () => {
-                saveAs(new Blob([await getMod(mod)], {type: "text/javascript"}), mod);
+                saveAs(new Blob([await getMod(mod)], { type: "text/javascript" }), mod);
             });
 
             entry.insertAdjacentElement("afterbegin", download);
@@ -193,6 +193,8 @@ addEventListener("init", async () => {
 
     document.querySelector("#tabContent").appendChild(container);
     registerTab("Plugins", container, false, drawModArray);
+
+    document.body.style.pointerEvents = "none";
 
     // load the mods
     var modList = await getMods();
@@ -215,7 +217,7 @@ addEventListener("init", async () => {
         //todo: table support, dropdown support
         const blankLibLoader = new HVCC_MODULES[patch].AudioLibLoader();
         const confs = {};
-        const meta = {selectData: {}, selectMapping: {}};
+        const meta = { selectData: {}, selectMapping: {} };
         for (param in blankLibLoader.paramsIn) {
             var dfault = blankLibLoader.paramsIn[param].default;
             if (dfault === 440) {
@@ -249,7 +251,27 @@ addEventListener("init", async () => {
     // load autosave
     document.querySelector("#renderProgress").innerText = `Welcome to SYNTHETIC Audio! Press the 'Help' button for the manual.`;
     loadFiltersAndPrims();
-    setTimeout(loadAutosave, 100);
+    const multiplayer_support = globalThis.multiplayer_support = !(location.protocol === "file:") && ((await fetch("/multiplayer_check")).status === 200);
+    if (!multiplayer_support) {
+        setTimeout(()=>{
+            loadAutosave();
+            document.body.style.pointerEvents = "all";
+        }, 100);
+    } else {
+        document.querySelector("#renderProgress").innerText = `Initialising multiplayer system...`;
+        const socketio = document.createElement("script");
+        socketio.src = "/socket.io/socket.io.js";
+        socketio.addEventListener("load", () => {
+            document.querySelector("#renderProgress").innerText = `Multiplayer system initialised! Connecting to server...`;
+            const socket = globalThis.socket = io();
+            multiplayer.enable(socket);
+            socket.on('connect', () => {
+                document.querySelector("#renderProgress").innerText = `Welcome to SYNTHETIC Audio! Press the 'Help' button for the manual. (Connected as ${socket.id})`;
+                document.body.style.pointerEvents = "all";
+            });
+        });
+        document.body.appendChild(socketio);
+    }
 });
 registerHelp("[data-helptarget=uhvcc]",
     `

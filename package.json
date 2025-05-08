@@ -1,0 +1,32 @@
+{
+  "name": "synthetic-audio",
+  "version": "1.0.0",
+  "description": "Web DAW",
+  "main": "server/index.js",
+  "directories": {
+    "lib": "lib"
+  },
+  "scripts": {
+    "host": "node server/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ZXMushroom63/synthetic-audio.git"
+  },
+  "keywords": [
+    "DAW",
+    "audio",
+    "javascript",
+    "html5"
+  ],
+  "author": "ZXMushroom63",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ZXMushroom63/synthetic-audio/issues"
+  },
+  "homepage": "https://github.com/ZXMushroom63/synthetic-audio#readme",
+  "dependencies": {
+    "express": "^5.1.0",
+    "socket.io": "^4.8.1"
+  }
+}

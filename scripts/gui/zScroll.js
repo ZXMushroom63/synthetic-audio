@@ -28,6 +28,9 @@ function zscroll(e) {
                     globalThis.zscrollIsFirst = i === 0;
                     execZScroll(x, -delta);
                     markLoopDirty(x);
+                    if (multiplayer.on) {
+                        multiplayer.patchLoop(loop);
+                    }
                 });
             } else {
                 var targetLoop = document.elementFromPoint(mouse.x, mouse.y)?.closest(".loop");
@@ -36,6 +39,9 @@ function zscroll(e) {
                     globalThis.zscrollIsFirst = true;
                     execZScroll(targetLoop, -delta);
                     markLoopDirty(targetLoop);
+                    if (multiplayer.on) {
+                        multiplayer.patchLoop(serialiseNode(loop, false, true));
+                    }
                 }
             }
         }

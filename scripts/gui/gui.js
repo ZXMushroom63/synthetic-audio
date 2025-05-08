@@ -34,6 +34,9 @@ var loopMap = {
 };
 var loopDurationMap = {};
 function deleteLoop(loop) {
+    if (!multiplayer.isHooked && multiplayer.on) {
+        return multiplayer.deleteLoop(loop.getAttribute("data-uuid"));
+    }
     if (loop.forceDelete) {
         loop.remove();
     }
@@ -84,6 +87,12 @@ function updateLOD() {
 }
 
 function markLoopDirty(loop, wasMoved) {
+    if (!multiplayer.isHooked && multiplayer.on) {
+        return multiplayer.markLoopDirty(JSON.stringify({
+            uuid: loop.getAttribute("data-uuid"),
+            wasMoved: wasMoved
+        }));
+    }
     loop.setAttribute("data-dirty", "yes");
     if (wasMoved) {
         loop.setAttribute("data-wasMovedSinceRender", "yes");
@@ -267,6 +276,9 @@ function addBlock(type, start, duration, title, layer = 0, data = {}, editorValu
                 backgroundSvg.style.width = internalWidth + "vw";
                 handleRight.style.right = `calc(-${internalWidth}vw - 1.5px)`;
                 loop.setAttribute("data-duration", newDuration);
+                if (multiplayer.on) {
+                    multiplayer.patchLoop(loop);
+                }
             }
         } else {
             document.onmousemove = function (j) {
@@ -286,6 +298,9 @@ function addBlock(type, start, duration, title, layer = 0, data = {}, editorValu
                 backgroundSvg.style.width = internalWidth + "vw";
                 handleRight.style.right = `calc(-${internalWidth}vw - 1.5px)`;
                 loop.setAttribute("data-duration", newDuration);
+                if (multiplayer.on) {
+                    multiplayer.patchLoop(loop);
+                }
             }
         }
         document.onmouseup = function (q) {
@@ -297,6 +312,13 @@ function addBlock(type, start, duration, title, layer = 0, data = {}, editorValu
     const loop = document.createElement("div");
     markLoopDirty(loop);
     loop.setAttribute("data-type", type);
+    
+    if (data.uuid) {
+        loop.setAttribute("data-uuid", data.uuid);
+        delete data.uuid;
+    } else {
+        loop.setAttribute("data-uuid", crypto.randomUUID());
+    }
     loop.setAttribute("data-start", start);
     loop.setAttribute("data-duration", duration);
     loop.setAttribute("data-layer", layer);
@@ -388,6 +410,9 @@ function addBlock(type, start, duration, title, layer = 0, data = {}, editorValu
                     loop.setAttribute("data-layer", layer);
                 }
                 customEvent("loopmoved", { loop: loop });
+                if (multiplayer.on) {
+                    multiplayer.patchLoop(loop);
+                }
             }
         } else {
             ACTIVE_TOOL_FN([loop]);
@@ -424,7 +449,9 @@ function addBlock(type, start, duration, title, layer = 0, data = {}, editorValu
             document.querySelector("#time")
         ).after(loop);
     }
-
+    if (!multiplayer.isHooked && multiplayer.on) {
+        multiplayer.addBlock(JSON.stringify(serialiseNode(loop, false, true)));
+    }
     return loop;
 }
 function addIgnoredBlock(type, start, duration, title, layer = 0, data = {}, editorValue = Math.min(gui.layer, 9)) {
@@ -433,6 +460,9 @@ function addIgnoredBlock(type, start, duration, title, layer = 0, data = {}, edi
     return loop;
 }
 function loadAutosave() {
+    if (multiplayer_support) {
+        return;
+    }
     deserialise(localStorage.getItem("synthetic/save"));
 }
 function init() {
@@ -455,10 +485,16 @@ function init() {
         }
     });
     document.querySelector("#bpm").addEventListener("input", () => {
+        if (!multiplayer.isHooked && multiplayer.on) {
+            multiplayer.modifyProperty("#bpm", "bpm", document.querySelector("#bpm").value);
+        }
         hydrateBeatMarkers();
         hydrateZoom();
     });
     document.querySelector("#loopi").addEventListener("input", () => {
+        if (!multiplayer.isHooked && multiplayer.on) {
+            multiplayer.modifyProperty("#loopi", "loopi", document.querySelector("#loopi").value);
+        }
         findLoops(".loop[data-type=audio], .loop[data-type=p_readasset]").forEach(x => markLoopDirty(x));
         hydrateBeatMarkers();
         hydrateZoom();
@@ -467,6 +503,9 @@ function init() {
         gui.substepping = Math.min(4, Math.max(1, parseInt(e.target.value))) || 1;
     });
     document.querySelector("#duration").addEventListener("input", () => {
+        if (!multiplayer.isHooked && multiplayer.on) {
+            multiplayer.modifyProperty("#duration", "duration", document.querySelector("#duration").value);
+        }
         hydrate();
     });
     addEventListener("mousemove", (e) => {
@@ -521,6 +560,9 @@ function init() {
         }
     }));
     document.querySelector("#stereobox").addEventListener("input", () => {
+        if (!multiplayer.isHooked && multiplayer.on) {
+            multiplayer.modifyProperty("#stereobox", "stereobox", document.querySelector("#stereobox").checked);
+        }
         if (document.querySelector("#stereobox").checked) {
             audio.stereo = true;
         } else {
@@ -528,6 +570,9 @@ function init() {
         }
     });
     document.querySelector("#normalisebox").addEventListener("input", () => {
+        if (!multiplayer.isHooked && multiplayer.on) {
+            multiplayer.modifyProperty("#normalisebox", "normalisebox", document.querySelector("#normalisebox").checked);
+        }
         if (document.querySelector("#normalisebox").checked) {
             audio.normalise = true;
         } else {
