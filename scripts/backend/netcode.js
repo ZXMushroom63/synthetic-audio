@@ -18,6 +18,10 @@ const multiplayer = {
     },
     enable: function (socket) {
         multiplayer.on = true;
+        const syncBtn = document.querySelector("data-convert-to-sync");
+        syncBtn.innerText = "Sync";
+        syncBtn.removeAttribute("onclick");
+        syncBtn.onclick = multiplayer.sync;
         socket.on('connect', () => {
             multiplayer.sync();
         });
@@ -81,6 +85,12 @@ const multiplayer = {
             target.dispatchEvent(new Event('input', { bubbles: true }));
             multiplayer.isHooked = false;
         });
+        socket.on('custom', (data) => {
+            const res = JSON.parse(data);
+            multiplayer.isHooked = true;
+            customEvent("netcode:" + res.mode, res.data);
+            multiplayer.isHooked = false;
+        });
     },
     addBlock: function (data) {
         socket.emit('add_loop', data);
@@ -114,5 +124,11 @@ const multiplayer = {
                 value
             }));
         }, 200);
+    },
+    custom: function (method, data) {
+        socket.emit('custom', JSON.stringify({
+            mode: method,
+            data: data
+        }));
     }
 }

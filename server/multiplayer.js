@@ -71,6 +71,24 @@ function multiplayer_support(server, debugMode) {
             socket.broadcast.emit("modify_prop", data);
             debugWriteState();
         });
+        socket.on("custom", (data)=>{
+            socket.broadcast.emit("custom", data);
+        });
+        socket.on("write_path", (data)=>{
+            const res = JSON.parse(data);
+            try {
+                const path = res.path.split(".");
+                var v = localState;
+                var last = path.pop();
+                path.forEach(k => {
+                    v = v[k];
+                });
+                v[last] = res.data;
+            } catch (error) {
+                console.log("failed to write to path: " + res.path);
+            }
+            debugWriteState();
+        });
     });
 }
 module.exports = {multiplayer_support};
