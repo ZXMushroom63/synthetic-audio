@@ -251,7 +251,12 @@ addEventListener("init", async () => {
     // load autosave
     document.querySelector("#renderProgress").innerText = `Welcome to SYNTHETIC Audio! Press the 'Help' button for the manual.`;
     loadFiltersAndPrims();
-    const multiplayer_support = globalThis.multiplayer_support = !(location.protocol === "file:") && ((await fetch("/multiplayer_check")).status === 200);
+    globalThis.multiplayer_support = false;
+    try {
+        globalThis.multiplayer_support = !(location.protocol === "file:") && ((await fetch("/multiplayer_check")).status === 200);
+    } catch (error) {
+        console.log("Multiplayer not supported on instance.")
+    }
     if (!multiplayer_support) {
         setTimeout(()=>{
             loadAutosave();
