@@ -12,6 +12,8 @@ const { writeFile } = require("node:fs/promises");
 // on join -> send global write with last updated session /DONE
 // on request sync -> send global write /DONE
 
+// custom_broadcast -> broadcast to other clients
+// cl->srv | path_write -> write state to the server
 function multiplayer_support(server, debugMode) {
     var localState = {};
     function debugWriteState() {

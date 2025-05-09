@@ -34,7 +34,7 @@ var loopMap = {
 };
 var loopDurationMap = {};
 function deleteLoop(loop) {
-    if (!multiplayer.isHooked && multiplayer.on) {
+    if (!multiplayer.isHooked && multiplayer.on && !loop._ignore) {
         return multiplayer.deleteLoop(loop.getAttribute("data-uuid"));
     }
     if (loop.forceDelete) {
@@ -87,7 +87,7 @@ function updateLOD() {
 }
 
 function markLoopDirty(loop, wasMoved) {
-    if (!multiplayer.isHooked && multiplayer.on) {
+    if (!multiplayer.isHooked && multiplayer.on && !loop._ignore) {
         return multiplayer.markLoopDirty(JSON.stringify({
             uuid: loop.getAttribute("data-uuid"),
             wasMoved: wasMoved
@@ -449,7 +449,7 @@ function addBlock(type, start, duration, title, layer = 0, data = {}, editorValu
             document.querySelector("#time")
         ).after(loop);
     }
-    if (!multiplayer.isHooked && multiplayer.on) {
+    if (!multiplayer.isHooked && multiplayer.on && !loop._ignore) {
         multiplayer.addBlock(JSON.stringify(serialiseNode(loop, false, true)));
     }
     return loop;

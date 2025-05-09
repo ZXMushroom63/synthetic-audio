@@ -39,7 +39,7 @@ function zscroll(e) {
                     globalThis.zscrollIsFirst = true;
                     execZScroll(targetLoop, -delta);
                     markLoopDirty(targetLoop);
-                    if (multiplayer.on) {
+                    if (!multiplayer.isHooked && multiplayer.on && !loop._ignore) {
                         multiplayer.patchLoop(serialiseNode(loop, false, true));
                     }
                 }
