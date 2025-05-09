@@ -18,7 +18,7 @@ const multiplayer = {
     },
     enable: function (socket) {
         multiplayer.on = true;
-        const syncBtn = document.querySelector("data-convert-to-sync");
+        const syncBtn = document.querySelector("[data-convert-to-sync]");
         syncBtn.innerText = "Sync";
         syncBtn.removeAttribute("onclick");
         syncBtn.onclick = multiplayer.sync;

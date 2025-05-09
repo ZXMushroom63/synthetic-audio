@@ -525,7 +525,10 @@ button:hover {
     overflow-x: visible;
     overflow-y: visible;
 }
-
+::-webkit-scrollbar {
+    display: none;
+    visibility: hidden;
+}
 * {
     white-space: nowrap;
 }
