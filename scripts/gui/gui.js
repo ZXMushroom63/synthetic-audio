@@ -121,6 +121,7 @@ function hydrateLoopPosition(elem) {
     if (elem.updateSuppression) {
         return;
     }
+    hydrateLoopSpecificLayer(elem);
     var elemType = elem.getAttribute("data-type");
     var trueDuration = (parseFloat(loopDurationMap[elem.getAttribute("data-file")]) + 0.0) || ((elemType !== "distribute") * (proceduralAssets.get(elem.conf.Asset)?.[0]?.length / audio.samplerate)) || 0;
     trueDuration = (Math.round(trueDuration / loopi) * loopi) / (elem.conf.Speed || 1);
@@ -159,7 +160,7 @@ function hydrateLoopPosition(elem) {
         + ", Z: "
         + elem.getAttribute("data-editlayer")
         }`);
-    
+
     var bg = loopInternal.querySelector(".backgroundSvg");
     if (bg && (nInternalWidth > (9.9 * (!gui.noWvLOD)))) {
         bg.style.width = internalWidth;
@@ -209,13 +210,16 @@ function hydrateLoopBackground(elem) {
     d = d.replaceAll(".0 ", " ");
     line.setAttributeNS(null, "d", d);
 }
+function hydrateLoopSpecificLayer(elem) {
+    if (elem.noEditorLayer || (parseInt(elem.getAttribute("data-editlayer")) === gui.layer) || (gui.layer === 10)) {
+        elem.classList.remove("deactivated");
+    } else {
+        elem.classList.add("deactivated");
+    }
+}
 function hydrateEditorLayer() {
     findLoops(".loop").forEach(elem => {
-        if (elem.noEditorLayer || (parseInt(elem.getAttribute("data-editlayer")) === gui.layer) || (gui.layer === 10)) {
-            elem.classList.remove("deactivated");
-        } else {
-            elem.classList.add("deactivated");
-        }
+        hydrateLoopSpecificLayer(elem);
     });
 }
 function hydrate() {
@@ -312,7 +316,7 @@ function addBlock(type, start, duration, title, layer = 0, data = {}, editorValu
     const loop = document.createElement("div");
     markLoopDirty(loop);
     loop.setAttribute("data-type", type);
-    
+
     if (data.uuid) {
         loop.setAttribute("data-uuid", data.uuid);
         delete data.uuid;
