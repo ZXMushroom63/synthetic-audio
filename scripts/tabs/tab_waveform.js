@@ -63,8 +63,8 @@ addEventListener("init", () => {
         multiplayer.writePath("waveforms." + wv.uuid + ".samples", [...wv.samples]);
     }
     multiplayer.listen("waveform_samples", (ev)=>{
-        custom_waveforms[ev.detail.uuid].dirty = true;
         custom_waveforms[ev.detail.uuid].samples = new Float32Array(ev.detail.samples);
+        calculateWaveform(custom_waveforms[ev.detail.uuid], true);
         if (target && target.uuid === ev.detail.uuid) {
             drawWaveform();
         }
@@ -80,10 +80,10 @@ addEventListener("init", () => {
         multiplayer.writePath("waveforms." + wv.uuid + ".modifiers", wv.modifiers);
     }
     multiplayer.listen("waveform_modifiers", (ev)=>{
-        custom_waveforms[ev.detail.uuid].dirty = true;
         custom_waveforms[ev.detail.uuid].modifiers = ev.detail.modifiers;
+        calculateWaveform(custom_waveforms[ev.detail.uuid], true);
         if (target && target.uuid === ev.detail.uuid) {
-            hydrateWaveformTab();
+            drawModifierStack();
         }
     });
     var target = null;
@@ -607,7 +607,7 @@ addEventListener("init", () => {
         calculating = false;
     }
 
-    function calculateWaveform(t, d) {
+    function calculateWaveform(t, dirty) {
         if (!t) {
             return;
         }
@@ -617,8 +617,8 @@ addEventListener("init", () => {
         });
         t.midpoint = t.calculated.reduce((p, a) => p + a) / t.calculated.length / 2;
         audioBufferData.set(t.calculated);
-        if (d) {
-            t.dirty = d;
+        if (dirty) {
+            t.dirty = dirty;
         }
     }
 
@@ -690,7 +690,7 @@ addEventListener("init", () => {
                 if (!newId) {
                     return;
                 }
-                custom_waveforms[newId] = custom_waveforms[id];
+                custom_waveforms[newId] = structuredClone(custom_waveforms[id]);
                 custom_waveforms[newId].uuid = newId;
                 net_push_waveform(custom_waveforms[newId]);
                 if (newId !== id) {
