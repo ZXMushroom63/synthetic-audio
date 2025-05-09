@@ -42,6 +42,8 @@ function serialiseNode(node, forRender, forMultiplayer) {
     out.conf = node.conf;
     if (forMultiplayer) {
         out.conf.uuid = node.getAttribute("data-uuid");
+    } else {
+        delete out.conf.uuid;
     }
     out.start = parseFloat(node.getAttribute("data-start")) || 0;
     out.duration = parseFloat(node.getAttribute("data-duration")) || 0;

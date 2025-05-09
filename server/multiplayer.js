@@ -14,6 +14,7 @@ const { writeFile } = require("node:fs/promises");
 
 // custom_broadcast -> broadcast to other clients
 // cl->srv | path_write -> write state to the server
+// ^ use the above to implement netwrok support for other tabs
 function multiplayer_support(server, debugMode) {
     var localState = {};
     function debugWriteState() {
