@@ -1,4 +1,5 @@
 const { Server } = require("socket.io");
+const { writeFile } = require("node:fs/promises");
 //TODO: add multiplayer support
 //opcodes
 // global_write (deserialise & hydrate) /DONE
@@ -10,8 +11,15 @@ const { Server } = require("socket.io");
 
 // on join -> send global write with last updated session /DONE
 // on request sync -> send global write /DONE
-function multiplayer_support(server) {
+
+function multiplayer_support(server, debugMode) {
     var localState = {};
+    function debugWriteState() {
+        if (!debugMode) {
+            return;
+        }
+        writeFile("./debug_state.json", JSON.stringify(localState, null, 2));
+    }
     const io = new Server(server);
     io.on("connection", (socket)=>{
         console.log('a user connected: '+socket.id);
@@ -23,12 +31,14 @@ function multiplayer_support(server) {
             try {
                 localState = JSON.parse(data);
                 io.emit("deserialise", JSON.stringify(localState));
+                debugWriteState();
             } catch (error) {
             }
         });
         socket.on("add_loop", (data)=>{
             localState.nodes.push(JSON.parse(data));
             socket.broadcast.emit("add_loop", data);
+            debugWriteState();
         });
         socket.on("delete_loop", (uuid)=>{
             const target = localState.nodes.find(x => x.conf.uuid === uuid);
@@ -36,6 +46,7 @@ function multiplayer_support(server) {
                 localState.nodes.splice(localState.nodes.indexOf(target),1);
             }
             io.emit("delete_loop", uuid);
+            debugWriteState();
         });
         socket.on("dirty_loop", (data)=>{
             io.emit("dirty_loop", data);
@@ -46,13 +57,17 @@ function multiplayer_support(server) {
             if (target) {
                 localState.nodes.splice(localState.nodes.indexOf(target),1);
                 localState.nodes.push(loop);
+            } else {
+                console.log("Failed to process 'patch_loop' on uuid: "+loop.conf.uuid);
             }
             socket.broadcast.emit("patch_loop", data);
+            debugWriteState();
         });
         socket.on("modify_prop", (data)=>{
             const res = JSON.parse(data);
             localState[res.key] = res.value;
             socket.broadcast.emit("modify_prop", data);
+            debugWriteState();
         });
     });
 }

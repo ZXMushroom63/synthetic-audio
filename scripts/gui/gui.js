@@ -276,7 +276,7 @@ function addBlock(type, start, duration, title, layer = 0, data = {}, editorValu
                 backgroundSvg.style.width = internalWidth + "vw";
                 handleRight.style.right = `calc(-${internalWidth}vw - 1.5px)`;
                 loop.setAttribute("data-duration", newDuration);
-                if (multiplayer.on) {
+                if (!multiplayer.isHooked && multiplayer.on && !loop._ignore) {
                     multiplayer.patchLoop(loop);
                 }
             }
@@ -298,7 +298,7 @@ function addBlock(type, start, duration, title, layer = 0, data = {}, editorValu
                 backgroundSvg.style.width = internalWidth + "vw";
                 handleRight.style.right = `calc(-${internalWidth}vw - 1.5px)`;
                 loop.setAttribute("data-duration", newDuration);
-                if (multiplayer.on) {
+                if (!multiplayer.isHooked && multiplayer.on && !loop._ignore) {
                     multiplayer.patchLoop(loop);
                 }
             }
@@ -410,7 +410,7 @@ function addBlock(type, start, duration, title, layer = 0, data = {}, editorValu
                     loop.setAttribute("data-layer", layer);
                 }
                 customEvent("loopmoved", { loop: loop });
-                if (multiplayer.on) {
+                if (!multiplayer.isHooked && multiplayer.on && !loop._ignore) {
                     multiplayer.patchLoop(loop);
                 }
             }

@@ -6,6 +6,7 @@ const server = createServer(app);
 app.use(express.static('.'));
 const multiplayerEnabled = true;
 const port = 80;
+const logging = true;
 const blacklistMiddleware = (req, res, next) => {
     const requestedPath = req.path;
     if (requestedPath.startsWith(`/server/`)) {
@@ -24,7 +25,7 @@ app.get('/multiplayer_check', (req, res) => {
 });
 
 if (multiplayerEnabled) {
-    multiplayer_support(server);
+    multiplayer_support(server, logging);
 }
 
 app.use(blacklistMiddleware);

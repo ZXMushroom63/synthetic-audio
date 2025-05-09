@@ -28,7 +28,7 @@ function zscroll(e) {
                     globalThis.zscrollIsFirst = i === 0;
                     execZScroll(x, -delta);
                     markLoopDirty(x);
-                    if (multiplayer.on) {
+                    if (!multiplayer.isHooked && multiplayer.on && !loop._ignore) {
                         multiplayer.patchLoop(loop);
                     }
                 });

@@ -33,9 +33,6 @@ function pickupLoop(loop, natural = false) {
         layer = Math.round(layer - 0.5);
         loop.style.top = layer * 3 + "rem";
         loop.setAttribute("data-new-layer", layer);
-        if (multiplayer.on) {
-            multiplayer.patchLoop(loop);
-        }
     }
     function mouseUp(unused, cancel) {
         dropHandlers.splice(dropHandlers.indexOf(mouseUp), 1);
@@ -52,6 +49,9 @@ function pickupLoop(loop, natural = false) {
         hydrateLoopPosition(loop);
         document.removeEventListener("mouseup", mouseUp);
         document.removeEventListener("mousemove", mouseMove);
+        if (!multiplayer.isHooked && multiplayer.on && !loop._ignore) {
+            multiplayer.patchLoop(loop);
+        }
     }
     dropHandlers.push(mouseUp);
     var trackBB = document.querySelector("#trackInternal").getBoundingClientRect();
