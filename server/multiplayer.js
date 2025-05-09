@@ -14,6 +14,7 @@ const { writeFile } = require("node:fs/promises");
 
 // custom_broadcast -> broadcast to other clients
 // cl->srv | path_write -> write state to the server
+// cl->srv | path_delete -> write state to the server
 // ^ use the above to implement netwrok support for other tabs
 function multiplayer_support(server, debugMode) {
     var localState = {};
@@ -85,6 +86,21 @@ function multiplayer_support(server, debugMode) {
                     v = v[k];
                 });
                 v[last] = res.data;
+            } catch (error) {
+                console.log("failed to write to path: " + res.path);
+            }
+            debugWriteState();
+        });
+        socket.on("delete_path", (data)=>{
+            const res = JSON.parse(data);
+            try {
+                const path = res.path.split(".");
+                var v = localState;
+                var last = path.pop();
+                path.forEach(k => {
+                    v = v[k];
+                });
+                delete v[last];
             } catch (error) {
                 console.log("failed to write to path: " + res.path);
             }

@@ -3,6 +3,7 @@ function getLoopByUUID(uuid) {
 }
 var patchMessagesByUUIDTimers = {};
 var settingMessagesByUUIDTimers = {};
+var customBufferedMessagesByUUIDTimers = {};
 const multiplayer = {
     isHooked: false,
     on: false,
@@ -15,6 +16,18 @@ const multiplayer = {
     sync: function () {
         socket.emit('sync');
         console.log("Requesting sync...");
+    },
+    patchLoop: function (target, res) {
+        target.conf = res.conf;
+        target.setAttribute("data-start", res.start);
+        target.setAttribute("data-duration", res.duration);
+        target.setAttribute("data-file", res.file);
+        target.setAttribute("data-layer", res.layer);
+        target.setAttribute("data-editlayer", res.editorLayer);
+        target.querySelector(".loopInternal .name").innerText = res.file;
+        target.classList.remove("selected");
+        customEvent("loopmoved", {loop: target});
+        hydrateLoopPosition(target);
     },
     enable: function (socket) {
         multiplayer.on = true;
@@ -61,15 +74,7 @@ const multiplayer = {
             multiplayer.isHooked = true;
             const target = getLoopByUUID(res.conf.uuid);
             if (target) {
-                target.conf = res.conf;
-                target.setAttribute("data-start", res.start);
-                target.setAttribute("data-duration", res.duration);
-                target.setAttribute("data-file", res.file);
-                target.setAttribute("data-layer", res.layer);
-                target.setAttribute("data-editlayer", res.editorLayer);
-                target.querySelector(".loopInternal .name").innerText = res.file;
-                target.classList.remove("selected");
-                hydrateLoopPosition(target);
+                patchLoop(target, res);
             }
             multiplayer.isHooked = false;
         });
@@ -130,5 +135,33 @@ const multiplayer = {
             mode: method,
             data: data
         }));
+    },
+    writePath: function (path, value) {
+        socket.emit('write_path', JSON.stringify({
+            path: path,
+            data: value
+        }));
+    },
+    deletePath: function (path) {
+        socket.emit('delete_path', JSON.stringify({
+            path: path
+        }));
+    },
+    custom_buffered: function (method, data, syncId) {
+        syncId ||= "x";
+        customBufferedMessagesByUUIDTimers[method] ||= {};
+        if (customBufferedMessagesByUUIDTimers[method][syncId]) {
+            clearTimeout(customBufferedMessagesByUUIDTimers[method][syncId]);
+        }
+        customBufferedMessagesByUUIDTimers[method][syncId] = setTimeout(() => {
+            delete customBufferedMessagesByUUIDTimers[method][syncId];
+            socket.emit('custom', JSON.stringify({
+                mode: method,
+                data: data
+            }));
+        }, 200);
+    },
+    listen: function (ev, listener) {
+        addEventListener("netcode:"+ev, listener);
     }
 }

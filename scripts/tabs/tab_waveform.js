@@ -8,6 +8,83 @@ var custom_waveforms = {};
 // }
 
 addEventListener("init", () => {
+    //netcode syncing
+    //only 1 waveform can be edited at once
+    //set_waveform (new waveform) /DONE
+    //delete_waveform /DONE
+    //set_samples_block /DONE
+    //set_modifiers_block /DONE
+    //edit_modifier
+    function serialiseWaveform(wv) {
+        wv.samples = [...wv.samples];
+        delete wv.calculated;
+        delete wv.dirty;
+        delete wv.uuid;
+        delete wv.midpoint;
+        return wv;
+    }
+    function net_push_waveform(wv) {
+        if (!multiplayer.on) {
+            return;
+        }
+        multiplayer.custom("waveform_send", {
+            waveform: wv,
+            uuid: wv.uuid
+        });
+        multiplayer.writePath("waveforms." + wv.uuid, serialiseWaveform(structuredClone(wv)));
+    }
+    multiplayer.listen("waveform_send", (ev)=>{
+        custom_waveforms[ev.detail.uuid] = ev.detail.waveform;
+        custom_waveforms[ev.detail.uuid].dirty = true;
+        hydrateWaveformTab();
+    });
+    function net_remove_waveform(wv) {
+        if (!multiplayer.on) {
+            return;
+        }
+        multiplayer.custom("waveform_remove", {
+            uuid: wv.uuid
+        });
+        multiplayer.deletePath("waveforms." + wv.uuid);
+    }
+    multiplayer.listen("waveform_remove", (ev)=>{
+        delete custom_waveforms[ev.detail.uuid];
+        hydrateWaveformTab();
+    });
+    function net_push_samples(wv) {
+        if (!multiplayer.on) {
+            return;
+        }
+        multiplayer.custom_buffered("waveform_samples", {
+            samples: [...wv.samples],
+            uuid: wv.uuid
+        }, wv.uuid);
+        multiplayer.writePath("waveforms." + wv.uuid + ".samples", [...wv.samples]);
+    }
+    multiplayer.listen("waveform_samples", (ev)=>{
+        custom_waveforms[ev.detail.uuid].dirty = true;
+        custom_waveforms[ev.detail.uuid].samples = new Float32Array(ev.detail.samples);
+        if (target && target.uuid === ev.detail.uuid) {
+            drawWaveform();
+        }
+    });
+    function net_push_modifiers(wv) {
+        if (!multiplayer.on) {
+            return;
+        }
+        multiplayer.custom_buffered("waveform_modifiers", {
+            modifiers: wv.modifiers,
+            uuid: wv.uuid
+        }, wv.uuid);
+        multiplayer.writePath("waveforms." + wv.uuid + ".modifiers", wv.modifiers);
+    }
+    multiplayer.listen("waveform_modifiers", (ev)=>{
+        custom_waveforms[ev.detail.uuid].dirty = true;
+        custom_waveforms[ev.detail.uuid].modifiers = ev.detail.modifiers;
+        if (target && target.uuid === ev.detail.uuid) {
+            hydrateWaveformTab();
+        }
+    });
     var target = null;
     var selectedWaveformId = "";
     const container = document.createElement("table");
@@ -42,8 +119,10 @@ addEventListener("init", () => {
         });
         custom_waveforms[newWaveformName] = {
             samples: smp,
-            modifiers: []
+            modifiers: [],
+            uuid: newWaveformName
         };
+        net_push_waveform(custom_waveforms[newWaveformName]);
         hydrateWaveformTab();
     });
     left.appendChild(makeNewWaveform);
@@ -94,6 +173,7 @@ addEventListener("init", () => {
             prevIdx = newIdx;
             prevValue = newValue;
             target.samples[target.samples.length - 1] = target.samples[target.samples.length - 2];
+            net_push_samples(target);
             drawWaveform(true);
             e.preventDefault();
         }
@@ -217,6 +297,7 @@ addEventListener("init", () => {
                 (i % (1 / factor)) * factor
             );
         });
+        net_push_samples(target);
         drawWaveform(true);
     });
     oscillatorControls.appendChild(loadWvFromDisplay);
@@ -259,7 +340,7 @@ addEventListener("init", () => {
         }
         mappedData = mappedData.subarray(sampleStart, sampleEnd);
         var factor = mappedData.length / target.samples.length;
-        var finalValue = mappedData[mappedData.length  - 1];
+        var finalValue = mappedData[mappedData.length - 1];
         target.samples.forEach((x, i) => {
             var idx = i * factor;
             var k = (i % (1 / factor)) * factor;
@@ -269,6 +350,7 @@ addEventListener("init", () => {
                 k
             );
         });
+        net_push_samples(target);
         drawWaveform(true);
     });
     oscillatorControls.appendChild(loadWvFromDisplaySmart);
@@ -312,7 +394,7 @@ addEventListener("init", () => {
     var audioBufferData = audioBuffer.getChannelData(0);
     var gainNode = audioContext.createGain();
     var source;
-    
+
     function createSource() {
         source = audioContext.createBufferSource();
         source.buffer = audioBuffer;
@@ -421,6 +503,7 @@ addEventListener("init", () => {
             });
             drawModifierStack();
             loadModifiersToTarget();
+            net_push_modifiers(target);
             drawWaveform(true);
         });
         addModifierDiv.appendChild(addMod);
@@ -435,6 +518,7 @@ addEventListener("init", () => {
         }
         target.modifiers = [];
         target.samples = target.calculated;
+        net_push_waveform(target);
         drawModifierStack();
         loadModifiersToTarget();
         drawWaveform(true);
@@ -442,7 +526,7 @@ addEventListener("init", () => {
     addModifierDiv.insertAdjacentElement("afterbegin", document.createElement("br"));
     addModifierDiv.insertAdjacentElement("afterbegin", document.createElement("br"));
     addModifierDiv.insertAdjacentElement("afterbegin", applyMods);
-    
+
 
     var calculating = false;
     async function drawWaveform(dirty) {
@@ -454,7 +538,7 @@ addEventListener("init", () => {
         }
         calculating = true;
         calculateWaveform(target, dirty);
-        await wait(1/60);
+        await wait(1 / 60);
         ctx.clearRect(0, 0, 1280, 720);
 
         if (imageSrc) {
@@ -606,7 +690,10 @@ addEventListener("init", () => {
                     return;
                 }
                 custom_waveforms[newId] = custom_waveforms[id];
+                custom_waveforms[newId].uuid = newId;
+                net_push_waveform(custom_waveforms[newId]);
                 if (newId !== id) {
+                    net_remove_waveform(custom_waveforms[id]);
                     delete custom_waveforms[id];
                 }
                 e.stopPropagation();
@@ -621,6 +708,7 @@ addEventListener("init", () => {
                 if (target === custom_waveforms[id]) {
                     target = null;
                 }
+                net_remove_waveform(custom_waveforms[id]);
                 delete custom_waveforms[id];
                 e.stopPropagation();
                 hydrateWaveformTab();
@@ -639,6 +727,7 @@ addEventListener("init", () => {
                     return;
                 }
                 custom_waveforms[newId] = structuredClone(custom_waveforms[id]);
+                custom_waveforms[newId].uuid = newId;
                 e.stopPropagation();
                 hydrateWaveformTab();
             });
@@ -704,6 +793,7 @@ addEventListener("init", () => {
             if (custom_waveforms[id].samples.length !== WAVEFORM_RES) { //upsample old
                 custom_waveforms[id].samples = upsampleFloat32Array(custom_waveforms[id].samples, WAVEFORM_RES);
             }
+            custom_waveforms[id].uuid = id;
             calculateWaveform(custom_waveforms[id], true);
         }
     });
@@ -712,10 +802,7 @@ addEventListener("init", () => {
         var out = structuredClone(custom_waveforms);
 
         for (let id in out) {
-            out[id].samples = [...custom_waveforms[id].samples];
-            delete out[id].calculated;
-            delete out[id].dirty;
-            delete out[id].midpoint;
+            serialiseWaveform(out[id]);
         }
 
         e.detail.data.waveforms = out;
@@ -756,6 +843,7 @@ addEventListener("init", () => {
     addEventListener("loopdeleted", (e) => {
         if (e.detail.loop.isWaveformLoop) {
             loadModifiersToTarget();
+            net_push_modifiers(target);
             drawWaveform(true);
         }
     });
@@ -763,6 +851,7 @@ addEventListener("init", () => {
     addEventListener("loopmoved", (e) => {
         if (e.detail.loop.isWaveformLoop) {
             loadModifiersToTarget();
+            net_push_modifiers(target);
             drawWaveform(true);
         }
     });
