@@ -17,7 +17,7 @@ const { writeFile } = require("node:fs/promises");
 // cl->srv | path_delete -> write state to the server
 // ^ use the above to implement netwrok support for other tabs
 function multiplayer_support(server, debugMode) {
-    var localState = {};
+    var localState = {nodes:[]};
     function debugWriteState() {
         if (!debugMode) {
             return;
