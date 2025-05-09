@@ -28,8 +28,8 @@ function zscroll(e) {
                     globalThis.zscrollIsFirst = i === 0;
                     execZScroll(x, -delta);
                     markLoopDirty(x);
-                    if (!multiplayer.isHooked && multiplayer.on && !loop._ignore) {
-                        multiplayer.patchLoop(loop);
+                    if (!multiplayer.isHooked && multiplayer.on && !x._ignore) {
+                        multiplayer.patchLoop(x);
                     }
                 });
             } else {
@@ -39,8 +39,8 @@ function zscroll(e) {
                     globalThis.zscrollIsFirst = true;
                     execZScroll(targetLoop, -delta);
                     markLoopDirty(targetLoop);
-                    if (!multiplayer.isHooked && multiplayer.on && !loop._ignore) {
-                        multiplayer.patchLoop(serialiseNode(loop, false, true));
+                    if (!multiplayer.isHooked && multiplayer.on && !targetLoop._ignore) {
+                        multiplayer.patchLoop(targetLoop);
                     }
                 }
             }

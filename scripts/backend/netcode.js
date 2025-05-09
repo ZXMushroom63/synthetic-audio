@@ -17,7 +17,7 @@ const multiplayer = {
         socket.emit('sync');
         console.log("Requesting sync...");
     },
-    patchLoop: function (target, res) {
+    _patchLoop: function (target, res) {
         target.conf = res.conf;
         target.setAttribute("data-start", res.start);
         target.setAttribute("data-duration", res.duration);
@@ -74,7 +74,7 @@ const multiplayer = {
             multiplayer.isHooked = true;
             const target = getLoopByUUID(res.conf.uuid);
             if (target) {
-                multiplayer.patchLoop(target, res);
+                multiplayer._patchLoop(target, res);
             }
             multiplayer.isHooked = false;
         });
