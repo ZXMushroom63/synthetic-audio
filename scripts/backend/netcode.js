@@ -74,7 +74,7 @@ const multiplayer = {
             multiplayer.isHooked = true;
             const target = getLoopByUUID(res.conf.uuid);
             if (target) {
-                patchLoop(target, res);
+                multiplayer.patchLoop(target, res);
             }
             multiplayer.isHooked = false;
         });

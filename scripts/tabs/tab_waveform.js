@@ -27,14 +27,15 @@ addEventListener("init", () => {
         if (!multiplayer.on) {
             return;
         }
+        const serialisedWv = serialiseWaveform(structuredClone(wv));
         multiplayer.custom("waveform_send", {
-            waveform: wv,
+            waveform: serialisedWv,
             uuid: wv.uuid
         });
-        multiplayer.writePath("waveforms." + wv.uuid, serialiseWaveform(structuredClone(wv)));
+        multiplayer.writePath("waveforms." + wv.uuid, serialisedWv);
     }
     multiplayer.listen("waveform_send", (ev)=>{
-        custom_waveforms[ev.detail.uuid] = ev.detail.waveform;
+        custom_waveforms[ev.detail.uuid] = deserialiseWaveform(ev.detail.waveform, ev.detail.uuid);
         custom_waveforms[ev.detail.uuid].dirty = true;
         hydrateWaveformTab();
     });
@@ -785,16 +786,20 @@ addEventListener("init", () => {
 
         return outputArray;
     }
+    function deserialiseWaveform(wv, uuid) {
+        wv.samples = new Float32Array(wv.samples);
+        if (wv.samples.length !== WAVEFORM_RES) { //upsample old
+            wv.samples = upsampleFloat32Array(wv.samples, WAVEFORM_RES);
+        }
+        wv.uuid = uuid;
+        calculateWaveform(wv, true);
+        return wv;
+    }
     addEventListener('deserialise', (e) => {
         custom_waveforms = e.detail.data.waveforms || {};
         target = null;
         for (let id in custom_waveforms) {
-            custom_waveforms[id].samples = new Float32Array(custom_waveforms[id].samples);
-            if (custom_waveforms[id].samples.length !== WAVEFORM_RES) { //upsample old
-                custom_waveforms[id].samples = upsampleFloat32Array(custom_waveforms[id].samples, WAVEFORM_RES);
-            }
-            custom_waveforms[id].uuid = id;
-            calculateWaveform(custom_waveforms[id], true);
+            deserialiseWaveform(custom_waveforms[id], id);
         }
     });
 
@@ -811,6 +816,9 @@ addEventListener("init", () => {
     addEventListener("loopchanged", (e) => {
         if (e.detail.loop.isWaveformLoop) {
             loadModifiersToTarget();
+            if (!multiplayer.isHooked) {
+                net_push_modifiers(target);
+            }
             drawWaveform(true);
         }
     });
@@ -843,7 +851,9 @@ addEventListener("init", () => {
     addEventListener("loopdeleted", (e) => {
         if (e.detail.loop.isWaveformLoop) {
             loadModifiersToTarget();
-            net_push_modifiers(target);
+            if (!multiplayer.isHooked) {
+                net_push_modifiers(target);
+            }
             drawWaveform(true);
         }
     });
@@ -851,7 +861,9 @@ addEventListener("init", () => {
     addEventListener("loopmoved", (e) => {
         if (e.detail.loop.isWaveformLoop) {
             loadModifiersToTarget();
-            net_push_modifiers(target);
+            if (!multiplayer.isHooked) {
+                net_push_modifiers(target);
+            }
             drawWaveform(true);
         }
     });
