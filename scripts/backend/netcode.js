@@ -27,6 +27,7 @@ const multiplayer = {
         target.querySelector(".loopInternal .name").innerText = res.file;
         target.classList.remove("selected");
         customEvent("loopmoved", {loop: target});
+        filters[target.getAttribute("data-type")].updateMiddleware(target);
         hydrateLoopPosition(target);
     },
     enable: function (socket) {
