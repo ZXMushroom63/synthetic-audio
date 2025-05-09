@@ -455,8 +455,10 @@ function addBlock(type, start, duration, title, layer = 0, data = {}, editorValu
     return loop;
 }
 function addIgnoredBlock(type, start, duration, title, layer = 0, data = {}, editorValue = Math.min(gui.layer, 9)) {
+    multiplayer.isHooked = true;
     var loop = addBlock(type, start, duration, title, layer, data, editorValue, true);
     loop._ignore = true;
+    multiplayer.isHooked = false;
     return loop;
 }
 function loadAutosave() {
