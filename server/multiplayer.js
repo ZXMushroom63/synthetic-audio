@@ -1,5 +1,6 @@
 const { Server } = require("socket.io");
 const { writeFile } = require("node:fs/promises");
+const { v4 } = require("uuid")
 //TODO: add multiplayer support
 //opcodes
 // global_write (deserialise & hydrate) /DONE
@@ -34,6 +35,10 @@ function multiplayer_support(server, debugMode) {
         socket.on("global_write", (data)=>{
             try {
                 localState = JSON.parse(data);
+                localState.nodes ||= [];
+                localState.nodes.forEach(n => {
+                    n.conf.uuid = v4();
+                });
                 io.emit("deserialise", JSON.stringify(localState));
                 debugWriteState();
             } catch (error) {
