@@ -245,8 +245,8 @@ function getPropertySetter(editingTargets) {
                 if (markDirty) {
                     hydrateLoopPosition(targ.loop);
                     markLoopDirty(targ.loop);
-                    if (!multiplayer.isHooked && multiplayer.on && !loop._ignore) {
-                        multiplayer.patchLoop(loop);
+                    if (!multiplayer.isHooked && multiplayer.on && !targ.loop._ignore) {
+                        multiplayer.patchLoop(targ.loop);
                     }
                 }
             }
