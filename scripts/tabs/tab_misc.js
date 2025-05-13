@@ -37,16 +37,22 @@ addEventListener("init", () => {
     bpmClickerModule.appendChild(bpmClickerButton);
 
 
-    const scaleGeneratorModule = mkModule("Heptatonic Scale Generator");
+    const scaleGeneratorModule = mkModule("Scale Generator");
     scaleGeneratorModule.innerHTML += `
     <input class="inputStyles" style="width:4rem" value=":C#:" type="text">
     <select>
-        <option value="2,2,1,2,2,2,1">Major (Diatonic)</option>
-        <option value="2,1,2,2,1,2,2">Minor (Diatonic)</option>
+        <option value="2,2,1,2,2,2,1">Major/Ionian (Diatonic)</option>
+        <option value="2,1,2,2,1,2,2">Minor/Aeolian (Diatonic)</option>
+        <option value="2,1,2,2,2,1,2">Dorian (Diatonic)</option>
         <option value="1,2,2,1,2,2,2">Locrian (Diatonic)</option>
         <option value="1,2,2,2,1,2,2">Phrygian (Diatonic)</option>
         <option value="2,2,2,1,2,2,1">Lydian (Diatonic)</option>
         <option value="2,2,1,2,2,1,2">Mixolydian (Diatonic)</option>
+        <option value="2,2,3,2,3">Major (Pentatonic)</option>
+        <option value="3,2,2,3,2">Minor (Pentatonic)</option>
+        <option value="3,2,1,1,3,2">Blues</option>
+        <option value="2,1,2,2,1,2,3">Harmonic Minor</option>
+        <option value="2,1,2,2,1,3,2">Melodic Minor Ascending</option>
     </select><br>
     <span class="scaleout">(trigger a change)</span><br>
     <button id="scaleCopyNote">Copy (note)</button>
