@@ -51,8 +51,8 @@ addEventListener("init", () => {
         <option value="2,2,3,2,3">Major (Pentatonic)</option>
         <option value="3,2,2,3,2">Minor (Pentatonic)</option>
         <option value="3,2,1,1,3,2">Blues</option>
-        <option value="2,1,2,2,1,2,3">Harmonic Minor</option>
-        <option value="2,1,2,2,1,3,2">Melodic Minor Ascending</option>
+        <option value="2,1,2,2,1,3,1">Harmonic Minor</option>
+        <option value="2,1,2,2,2,2,1">Melodic Minor Ascending</option>
     </select><br>
     <span class="scaleout">(trigger a change)</span><br>
     <button id="scaleCopyNote">Copy (note)</button>
@@ -71,7 +71,7 @@ addEventListener("init", () => {
         var firstNote = frequencyToNote(startingPitch);
         notes.push(firstNote);
         firstNote = firstNote.substring(0, firstNote.length - 1);
-        var text = (scales.selectedOptions[0]?.textContent || "2,2,1,2,2,2,1").trim() + " scale; Key of " + firstNote + ": \n" + firstNote + ", ";
+        var text = (scales.selectedOptions[0]?.textContent || "(error)").trim() + " scale; Key of " + firstNote + ": \n" + firstNote + ", ";
         text += scale.map(x => {
             offset += x;
             var note = frequencyToNote(startingPitch * Math.pow(2, offset / 12));
