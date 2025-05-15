@@ -288,7 +288,7 @@ addEventListener("init", () => {
             return;
         }
         var mappedData = (new Float32Array(globalThis.vizDrawnWaveform)).map(v => ((v / 255) - 0.5) * -2);
-        var factor = mappedData.length / target.samples.length;
+        var factor = (mappedData.length - 1) / target.samples.length;
         var finalValue = mappedData[mappedData.length - 1];
         target.samples.forEach((x, i) => {
             var idx = i * factor;
@@ -340,7 +340,7 @@ addEventListener("init", () => {
             }
         }
         mappedData = mappedData.subarray(sampleStart, sampleEnd);
-        var factor = mappedData.length / target.samples.length;
+        var factor = (mappedData.length - 1) / target.samples.length;
         var finalValue = mappedData[mappedData.length - 1];
         target.samples.forEach((x, i) => {
             var idx = i * factor;
