@@ -45,12 +45,15 @@ function multiplayer_support(server, debugMode) {
             }
         });
         socket.on("add_loop", (data)=>{
-            localState.nodes.push(JSON.parse(data));
+            const res = JSON.parse(data);
+            console.log("Loop added: " + res.conf.uuid);
+            localState.nodes.push(res);
             socket.broadcast.emit("add_loop", data);
             debugWriteState();
         });
         socket.on("delete_loop", (uuid)=>{
             const target = localState.nodes.find(x => x.conf.uuid === uuid);
+            console.log("Deleted loop: " + uuid);
             if (target) {
                 localState.nodes.splice(localState.nodes.indexOf(target),1);
             }
