@@ -314,7 +314,9 @@ function addBlock(type, start, duration, title, layer = 0, data = {}, editorValu
         }
     }
     const loop = document.createElement("div");
-    markLoopDirty(loop);
+    if (!noTimeline) {
+        markLoopDirty(loop);
+    }
     loop.setAttribute("data-type", type);
 
     if (data.uuid) {
