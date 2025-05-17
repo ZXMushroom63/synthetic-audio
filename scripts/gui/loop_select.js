@@ -35,6 +35,10 @@ function loadFiltersAndPrims() {
             }
         });
 }
+async function importAudioFile(file) {
+    loopMap[file.name] = file;
+    loopDurationMap[file.name] = await getDurationOfLoop(file);
+}
 addEventListener("init", () => {
     document.querySelector("#loopSelector input").addEventListener("input", async () => {
         var loopsDiv = document.querySelector("#addloops");
@@ -44,13 +48,9 @@ addEventListener("init", () => {
             document.querySelector("#loopSelector").remove();
             for (let a = 0; a < fileList.length; a++) {
                 const file = fileList[a];
-                loopMap[file.name] = file;
-            }
-            for (let a = 0; a < fileList.length; a++) {
-                const file = fileList[a];
-                loopDurationMap[file.name] = await getDurationOfLoop(file);
+                document.querySelector("#renderProgress").innerText = "Processing audio... (" + (a / fileList.length * 100).toFixed(1) + "%)";
+                await importAudioFile(file);
                 if (a % 50 === 0) {
-                    document.querySelector("#renderProgress").innerText = "Processing audio... (" + (a / fileList.length * 100).toFixed(1) + "%)";
                     hydrateZoom();
                 }
             }
@@ -95,7 +95,7 @@ addEventListener("init", () => {
                 loopsDiv.appendChild(span);
                 loopMap[file.name] = file;
             }
-            findLoops(".loop[data-type=audio]").forEach(x => x.setAttribute("data-dirty", "yes"));
+            findLoops(".loop[data-type=audio]").forEach(x => markLoopDirty(x));
         }
         hydrateZoom();
         document.querySelector("#renderProgress").innerText = "(no render task currently active)";
