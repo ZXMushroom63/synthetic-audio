@@ -858,5 +858,5 @@ code:hover {
     margin: 0.2rem;
 }
 .loop.caret .loopInternal {
-    box-shadow: 4px 0px 0px 0px rgba(255,255,255,0.75);
+    box-shadow: 2px 0px 0px 0px rgb(0 100 255);
 }
