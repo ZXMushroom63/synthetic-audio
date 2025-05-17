@@ -170,14 +170,17 @@ function writeAutosave() {
 addEventListener("beforeunload", () => {
     writeAutosave();
 });
+function save() {
+    saveAs(new Blob([JSON.stringify(serialise())], { type: 'application/vnd.synthetic.project' }), globalThis.lastEditedFile);
+    document.querySelector("#renderProgress").innerText = "Writing! " + (new Date).toTimeString();
+}
 addEventListener("keydown", (e) => {
     if (e.key === "s" && !e.shiftKey && e.ctrlKey && !e.altKey && !e.metaKey) {
         writeAutosave();
         e.preventDefault();
     }
     if (e.key === "S" && e.shiftKey && e.ctrlKey && !e.altKey && !e.metaKey) {
-        saveAs(new Blob([JSON.stringify(serialise())], {type: 'text/json'}), globalThis.lastEditedFile);
-        document.querySelector("#renderProgress").innerText = "Writing! " + (new Date).toTimeString();
+        save();
         e.preventDefault();
     }
 });

@@ -21,7 +21,7 @@ function minimisePosition(loopArr) {
         loop.start += posOffset;
     });
 }
-addEventListener("init", ()=>{
+addEventListener("init", () => {
     addEventListener("keydown", (e) => {
         if (e.ctrlKey && ((e.key.toLowerCase() === "c") || (e.key.toLowerCase() === "x")) && (CURRENT_TAB === "TIMELINE")) {
             if ((e.target.tagName === "INPUT") || (e.target.contentEditable === "true")) {
@@ -50,6 +50,28 @@ addEventListener("init", ()=>{
             }
         }
     });
+    function pasteData(clipText, shiftKey) {
+        if (!clipText.startsWith("sp_loopdata::")) {
+            return;
+        }
+        var data = JSON.parse(clipText.replace("sp_loopdata::", ""));
+        data.forEach(entry => {
+            entry.editorLayer = Math.min(gui.layer, 9);
+        });
+        minimisePosition(data);
+        var pastedLoops = [];
+        data.forEach(target => {
+            pastedLoops.push(deserialiseNode(target, true));
+        });
+        hydrateZoom();
+        if (!shiftKey) {
+            pastedLoops.forEach(loop => {
+                if (loop) {
+                    pickupLoop(loop, true);
+                }
+            });
+        }
+    }
     addEventListener("keydown", (e) => {
         if (e.ctrlKey && e.key.toLowerCase() === "v" && (CURRENT_TAB === "TIMELINE")) {
             if (document.activeElement !== document.body) {
@@ -57,32 +79,35 @@ addEventListener("init", ()=>{
             }
             e.preventDefault();
             resetDrophandlers(false);
-            console.log("requesting clipboard");
             navigator.clipboard
                 .readText()
-                .then((clipText) => {
-                    console.log("recieved clipboard: " + clipText)
-                    if (!clipText.startsWith("sp_loopdata::")) {
-                        return;
-                    }
-                    var data = JSON.parse(clipText.replace("sp_loopdata::", ""));
-                    data.forEach(entry => {
-                        entry.editorLayer = Math.min(gui.layer, 9);
-                    });
-                    minimisePosition(data);
-                    var pastedLoops = [];
-                    data.forEach(target => {
-                        pastedLoops.push(deserialiseNode(target, true));
-                    });
-                    hydrateZoom();
-                    if (!e.shiftKey) {
-                        pastedLoops.forEach(loop => {
-                            if (loop) {
-                                pickupLoop(loop, true);
-                            }
-                        });
-                    }
+                .then((text)=>{
+                    pasteData(text, e.shiftKey);
                 });
+        }
+    });
+    addEventListener("dragover", (e) => {
+        if (CURRENT_TAB === "TIMELINE") {
+            e.preventDefault();
+        }
+    });
+    addEventListener("drop", (e) => {
+        if (CURRENT_TAB === "TIMELINE") {
+            e.preventDefault();
+            const item = [...e.dataTransfer.items].find(x => x.kind === "file");
+            if (item) {
+                const file = item.getAsFile();
+                if (file.name.endsWith(".loops")) {
+                    const fr = new FileReader();
+                    fr.onload = () => {
+                        resetDrophandlers(false);
+                        pasteData(fr.result, e.shiftKey);
+                    };
+                    fr.readAsText(file);
+                } else if (file.type.startsWith("audio/")) {
+                    alert("Drag and drop audio not supported yet. Use the loop folder instead.")
+                }
+            }
         }
     });
 });

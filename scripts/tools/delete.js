@@ -1,4 +1,3 @@
-
 addEventListener("init", () => {
     registerTool("Delete", (nodes) => {
         if (!nodes) {
