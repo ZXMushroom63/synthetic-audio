@@ -56,6 +56,7 @@ function serialiseNode(node, forRender, forMultiplayer) {
         out.dirty = node.hasAttribute("data-dirty");
         out.deleted = node.hasAttribute("data-deleted");
         out.wasMovedSinceRender = node.hasAttribute("data-wasMovedSinceRender");
+        out.definition = filters[out.type];
         out.ref = node;
     }
     customEvent("serialisenode", { node: node, data: out });

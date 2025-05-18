@@ -217,8 +217,13 @@ addEventListener("init", async () => {
         //todo: table support, dropdown support
         const blankLibLoader = new HVCC_MODULES[patch].AudioLibLoader();
         const confs = {};
-        const meta = { selectData: {}, selectMapping: {} };
+        var tables = [];
+        const meta = { selectData: {}, selectMapping: {}, tables: [], ignore: [] };
         for (param in blankLibLoader.paramsIn) {
+            if (param.startsWith("tlen_")) {
+                meta.ignore.push(param);
+                continue;
+            }
             var dfault = blankLibLoader.paramsIn[param].default;
             if (dfault === 440) {
                 dfault = ":A4:";
@@ -235,6 +240,11 @@ addEventListener("init", async () => {
             }
             confs[param] = [dfault, "number", 1];
         }
+        for (table in blankLibLoader.tables) {
+            tables.push(table);
+            confs[table] = ["(none)", ["(none)"]];
+        }
+        meta.tables = tables;
 
         addBlockType("hvcc:" + patch.replace("_Module", ""), {
             title: toTitleCase(patch.replace("_Module", "")),
@@ -244,7 +254,18 @@ addEventListener("init", async () => {
             configs: confs,
             isPlugin: true,
             meta: meta,
-            functor: hvcc2functor(HVCC_MODULES[patch], meta)
+            assetUser: tables.length > 0,
+            assetUserKeys: tables,
+            functor: hvcc2functor(HVCC_MODULES[patch], meta),
+            selectMiddleware: (key) => {
+                if (tables.includes(key)) {
+                    var assetNames = [...new Set(Array.prototype.flatMap.apply(
+                        findLoops(".loop[data-type=p_writeasset]"),
+                        [(node) => node.conf.Asset]
+                    ))];
+                    return ["(none)", ...assetNames];
+                }
+            },
         });
     }
 
@@ -258,7 +279,7 @@ addEventListener("init", async () => {
         console.log("Multiplayer not supported on instance.")
     }
     if (!multiplayer_support) {
-        setTimeout(()=>{
+        setTimeout(() => {
             loadAutosave();
             document.body.style.pointerEvents = "all";
         }, 100);
@@ -297,9 +318,19 @@ Open SYNTHETIC's plugins tab, and press 'Upload hvcc (.js)'. Go to the folder co
 Making different types of input:
 SYNTHETIC offers an extension to the default @hv_param inputs. Providing a default value of '440' in a receive object will make the parameter apepar as :A4: in the editor.
 [r NoteInput @hv_param 0 1000 440]
+Note that receivers will all be updated at once, so try only triggering updates from one receiver.
 
 You can also create dropdowns, that return the index of the selected element, using a double underscore (__) to seperate the name and options of the dropdown, and a single underscore (_) to seperate the options.
 [r MyDropdown__firstoption_secondoption_thirdoption @hv_param 0 2 0]
+
+You can load audio samples into by creating a table or an array with a @hv_table suffix. This will let users select any procedural audio assets from a dropdown.
+[table mysamples 100 @hv_table]
+When a table is filled, you can get it's size using [r tlen_mysamples @hv_param 0 99999999 0]
+
+As always, samplerate can be found using:
+[loadbang]
+ |
+[samplerate]
 `);
 registerHelp("[data-helptarget=ujs]",
     `

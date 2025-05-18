@@ -198,6 +198,12 @@ function addBlockType(id, data) {
     if (data.assetUser) {
         assetUserTypes.push(id);
     }
+    if (!data.assetUserKeys) {
+        data.assetUserKeys = [];
+        if (data.configs["Asset"]) {
+            data.assetUserKeys.push("Asset");
+        }
+    }
     data.async = data.functor.constructor.name === "AsyncFunction";
     if (data.wet_and_dry_knobs) {
         addWetDryKnobs(data);
@@ -293,6 +299,11 @@ function constructAbstractLayerMapsForLevel(nodes, usedLayers) {
     });
     return abstractLayerMaps;
 }
+function usesDirtyAssets(assetMap, serialisedNode) {
+    return serialisedNode.definition.assetUserKeys.map(x => !!assetMap[serialisedNode.conf[x]]).reduce((acc, v)=>{
+        return acc || v;
+    });
+}
 function constructRenderDataArray(data) {
     data.nodes.sort((a, b) => a.layer - b.layer);
     var usedEditorLayers = [...new Set(data.nodes.flatMap(x => { return x.editorLayer }))].sort((a, b) => { return a - b });
@@ -356,14 +367,16 @@ function constructRenderDataArray(data) {
                             (x.end > dirtyNode.start &&
                                 x.start < dirtyNode.end)
 
-                        ) && (x.layer > dirtyNode.layer)) || (assetUserTypes.includes(x.type) && assetMap[x.conf.Asset]))
+                        ) && (x.layer > dirtyNode.layer)) || (assetUserTypes.includes(x.type) && usesDirtyAssets(assetMap, x)))
                     ) {
                         x.dirty = true;
                         x.ref.setAttribute("data-dirty", "yes");
                         dirtyNodes.push(x);
                         if (x.type === "p_writeasset") {
-                            //console.log("Dirty asset found: ", x.conf.Asset);
                             assetMap[x.conf.Asset] = true;
+                        }
+                        if (assetUserTypes.includes(x.type)) {
+                            console.log("Asset user marked as dirty: ", x);
                         }
                         break;
                     }
