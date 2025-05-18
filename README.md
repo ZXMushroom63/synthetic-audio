@@ -3,6 +3,9 @@
 SYNTHETIC Audio is a DAW made from scratch, with no inspiration from other softwares. Almost everything is implemented in a different and unique way.\
 [Try it here](https://zxmushroom63.github.io/synthetic-audio/)
 
+<img alt="Editor Screenshot #1" src="public/screenshot-wide.png" width=512px>
+<img alt="Editor Screenshot #2" src="public/screenshot-wide-2.png" width=512px>
+
 ## Feature list:
 - Timeline
 - Use audio samples
@@ -26,3 +29,9 @@ You can load SYNTHETIC from a `file://` URL, and it will function. You won't be 
 Host as a static website (eg: github pages). You can use all features, including ffmpeg codecs. Bandwidth usage is heavily optimised through service workers, so you should stay under any quotas very easily.
 ### Multiplayer server
 Clone the repository, run `npm i` and then run `npm run host`. This will activate a server with multiplayer support. To use it, simply go to the website. You should automatically connect to the server. Note that the server will not save the project between restarts, you must manually save to a file and load it.
+
+## Demo project files
+You can find demo files in the [demos folder](/demos/).
+- synth_demo.sm - Song demonstrating how synths work in SYNTHETIC
+- guitar_demo.sm - Demo file showcasing playing instruments from soundfonts. Go on the plugins tab (inside the ...) and press 'Download FluidR3-GM Soundfonts' to hear the instruments. You will need to reload for the changes to take effect.
+- synth2_demo.sm - Longer song demonstrating how synths work in SYNTHETIC, along with heavy use of the filter stack.
