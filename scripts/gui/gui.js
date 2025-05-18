@@ -467,11 +467,28 @@ function addIgnoredBlock(type, start, duration, title, layer = 0, data = {}, edi
     multiplayer.isHooked = false;
     return loop;
 }
+var launchFile = null;
+if ('launchQueue' in window && 'files' in LaunchParams.prototype) {
+    launchQueue.setConsumer(async (launchParams) => {
+        if (!launchParams.files.length) {
+            return;
+        }
+        launchFile = await launchParams.files[0].getFile();
+    });
+}
 function loadAutosave() {
     if (multiplayer_support) {
         return;
     }
-    deserialise(localStorage.getItem("synthetic/save"));
+    if (launchFile) {
+        const fr = new FileReader();
+        fr.onload = () => {
+            deserialise(fr.result);
+        };
+        fr.readAsText(launchFile);
+    } else {
+        deserialise(localStorage.getItem("synthetic/save"));
+    }
 }
 function init() {
     customEvent("init");
