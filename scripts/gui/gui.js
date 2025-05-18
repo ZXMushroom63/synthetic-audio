@@ -468,12 +468,14 @@ function addIgnoredBlock(type, start, duration, title, layer = 0, data = {}, edi
     return loop;
 }
 var launchFile = null;
-if ('launchQueue' in window && 'files' in LaunchParams.prototype) {
+if ('launchQueue' in window && 'files' in LaunchParams.prototype && (new URLSearchParams(location.search)).has("openFileHandler")) {
     launchQueue.setConsumer(async (launchParams) => {
+        console.log(launchParams);
         if (!launchParams.files.length) {
             return;
         }
         launchFile = await launchParams.files[0].getFile();
+        history.replaceState(null, "", "/synthetic-audio");
     });
 }
 function loadAutosave() {
@@ -483,6 +485,8 @@ function loadAutosave() {
     if (launchFile) {
         const fr = new FileReader();
         fr.onload = () => {
+            globalThis.lastEditedFile = launchFile.name;
+            document.querySelector("title").innerText = launchFile.name;
             deserialise(fr.result);
         };
         fr.readAsText(launchFile);

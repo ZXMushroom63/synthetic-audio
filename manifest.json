@@ -33,7 +33,7 @@
   "display_override": ["standalone"],
   "file_handlers": [
     {
-      "action": "/",
+      "action": "/synthetic-audio?openFileHandler",
       "accept": {
         "application/vnd.synthetic.project": [".sm"]
       },

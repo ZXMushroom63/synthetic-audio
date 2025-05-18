@@ -106,6 +106,12 @@ addEventListener("init", () => {
                     fr.readAsText(file);
                 } else if (file.type.startsWith("audio/")) {
                     alert("Drag and drop audio not supported yet. Use the loop folder instead.")
+                } else if (file.name.endsWith(".sm")) {
+                    const fr = new FileReader();
+                    fr.onload = () => {
+                        deserialise(fr.result);
+                    };
+                    fr.readAsText(file);
                 }
             }
         }
