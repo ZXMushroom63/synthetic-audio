@@ -29,7 +29,7 @@ addBlockType("instrument", {
             return ["(none)", ...Object.keys(SFREGISTRY)];
         }
     },
-    updateMiddleware: (loop)=>{
+    updateMiddleware: (loop) => {
         updateInstrumentNoteDisplay(loop);
     },
     initMiddleware: (loop) => {
@@ -38,34 +38,36 @@ addBlockType("instrument", {
         txt.classList.add("noteDisplay");
         txt.innerText = "U0";
         internal.appendChild(txt);
-        setTimeout(() => {updateInstrumentNoteDisplay(loop)}, Math.random()*200);
+        setTimeout(() => { updateInstrumentNoteDisplay(loop) }, Math.random() * 200);
     },
     zscroll: (loop, value) => {
-        loop.conf.Note = ":" + frequencyToNote(_(loop.conf.Note)(0, new Float32Array(1)) * Math.pow(2, value/12)) + ":";
+        loop.conf.Note = ":" + frequencyToNote(_(loop.conf.Note)(0, new Float32Array(1)) * Math.pow(2, value / 12)) + ":";
         updateInstrumentNoteDisplay(loop);
-        if (globalThis.zscrollIsFirst) {
-            filters["instrument"].customGuiButtons.Preview.apply(loop, []);
-        }
+        //usually would check globalThis.zscrollIsFirst, but `instrument` can play multiple notes at once, so might as well.
+        filters["instrument"].customGuiButtons.Preview.apply(loop, []);
     },
     customGuiButtons: {
         "Preview": function () {
             if (!SFREGISTRY[this.conf.Instrument]) {
                 return;
             }
-            if (document.querySelector("audio#loopsample").src) {
-                URL.revokeObjectURL(document.querySelector("audio#loopsample").src);
-            }
+
             var note = _(this.conf.Note)(0, new Float32Array(1));
             note = frequencyToNote(note, true);
-            document.querySelector("#loopsample").src = SFREGISTRY[this.conf.Instrument][note];
-            document.querySelector("#loopsample").play();
+            var audio = new Audio(SFREGISTRY[this.conf.Instrument][note]);
+            audio.play();
+            audio.addEventListener("timeupdate", ()=>{
+                if (audio.currentTime > 1) {
+                    audio.src = "";
+                }
+            });
         },
     },
     functor: function (inPcm, channel, data) {
         if (!SFCACHE[this.conf.Instrument]) {
             return inPcm;
         }
-        
+
         var note = _(this.conf.Note)(0, new Float32Array(1));
         note = frequencyToNote(note, true);
         var currentData = SFCACHE[this.conf.Instrument][note];
@@ -76,7 +78,7 @@ addBlockType("instrument", {
         const FADETIME = this.conf.FadeTime * audio.samplerate;
         const FADESTART = inPcm.length - FADETIME;
         const tail = currentData.subarray(FADESTART);
-        tail.forEach((x, i)=>{
+        tail.forEach((x, i) => {
             tail[i] = x * (1 - i / FADETIME);
         });
         var duration = Math.floor(Math.round((((currentData.length / audio.samplerate) || 0) + 0.0) / data.loopInterval) * data.loopInterval * audio.samplerate);
@@ -84,7 +86,7 @@ addBlockType("instrument", {
             applySoundbiteToPcmSidechain(this.conf.Reverse, this.conf.Looping, currentData, inPcm, duration, this.conf.Speed, this.conf.Volume, 0, this.conf.SidechainPower, false);
         } else {
             applySoundbiteToPcm(this.conf.Reverse, this.conf.Looping, currentData, inPcm, duration, this.conf.Speed, this.conf.Volume, 0);
-        } 
+        }
         return inPcm;
     }
 });
