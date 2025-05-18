@@ -28,6 +28,10 @@
       "type": "image/png"
     }
   ],
+  "orientation": "landscape",
+  "background_color": "black",
+  "theme_color": "#cf0004",
+  "description": "SYNTHETIC Audio is a DAW made from scratch, with no inspiration from other softwares. Almost everything is implemented in a different and unique way.",
   "start_url": "/synthetic-audio",
   "display": "standalone",
   "display_override": ["standalone"],
@@ -65,6 +69,50 @@
         }
       ],
       "launch_type": "single-client"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "public/screenshot-wide.png",
+      "sizes": "3840x2160",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Example Song 1"
+    },
+    {
+      "src": "public/screenshot-wide-2.png",
+      "sizes": "1920x1080",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Waveform & LFO Editor"
+    },
+    {
+      "src": "public/screenshot-wide-3.png",
+      "sizes": "1920x1080",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Plugins Tab - supports plugdata, js soundfonts, and other generic plugins."
+    },
+    {
+      "src": "public/screenshot-wide-4.png",
+      "sizes": "1920x1080",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Example Song 2"
+    },
+    {
+      "src": "public/screenshot-wide-5.png",
+      "sizes": "1920x1080",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Live Tab - create filter stacks and run them on an audio interface"
+    },
+    {
+      "src": "public/screenshot-wide-6.png",
+      "sizes": "1920x1080",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Example Song 3"
     }
   ]
 }
