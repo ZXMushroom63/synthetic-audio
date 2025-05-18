@@ -5,6 +5,7 @@
 // https://gleitz.github.io/midi-js-soundfonts/FluidR3_GM/names.json
 // https://gleitz.github.io/midi-js-soundfonts/FluidR3_GM/{id}-ogg.js
 addEventListener("init", async () => {
+    const params = new URLSearchParams(location.search);
     const container = document.createElement("div");
     container.id = "pluginsUI";
     container.style.borderTop = "1px solid white";
@@ -274,7 +275,7 @@ addEventListener("init", async () => {
     loadFiltersAndPrims();
     globalThis.multiplayer_support = false;
     try {
-        globalThis.multiplayer_support = !(location.protocol === "file:") && ((await fetch("/multiplayer_check")).status === 200);
+        globalThis.multiplayer_support = (!(location.protocol === "file:") && ((await fetch("/multiplayer_check")).status === 200)) || params.has("multiplayer");
     } catch (error) {
         console.log("Multiplayer not supported on instance.")
     }
@@ -286,10 +287,10 @@ addEventListener("init", async () => {
     } else {
         document.querySelector("#renderProgress").innerText = `Initialising multiplayer system...`;
         const socketio = document.createElement("script");
-        socketio.src = "/socket.io/socket.io.js";
+        socketio.src = params.has("multiplayer") ? "https://cdn.jsdelivr.net/npm/socket.io-client@latest/dist/socket.io.min.js" : "/socket.io/socket.io.js";
         socketio.addEventListener("load", () => {
             document.querySelector("#renderProgress").innerText = `Multiplayer system initialised! Connecting to server...`;
-            const socket = globalThis.socket = io();
+            const socket = globalThis.socket = io(params.get("multiplayer"));
             multiplayer.enable(socket);
             socket.on('connect', () => {
                 document.querySelector("#renderProgress").innerText = `Welcome to SYNTHETIC Audio! Press the 'Help' button for the manual. (Connected as ${socket.id})`;

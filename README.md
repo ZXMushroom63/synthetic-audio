@@ -34,4 +34,5 @@ You can load SYNTHETIC from a `file://` URL, and it will function. You won't be 
 ### Static website
 Host as a static website (eg: github pages). You can use all features, including ffmpeg codecs. Bandwidth usage is heavily optimised through service workers, so you should stay under any quotas very easily.
 ### Multiplayer server
-Clone the repository, run `npm i` and then run `npm run host`. This will activate a server with multiplayer support. To use it, simply go to the website. You should automatically connect to the server. Note that the server will not save the project between restarts, you must manually save to a file and load it.
+Clone the repository, run `npm i` and then run `npm run host`. This will activate a server with multiplayer support. To use it, simply go to `http://localhost:80`. You should automatically connect to the server. Note that the server will not save the project between restarts, you must manually save to a file and load it.
+If you know your IP and how to port-forward, or create tunnels, you can connect to a server via IP using the `Remote Multiplayer` module in the `Misc` tab.

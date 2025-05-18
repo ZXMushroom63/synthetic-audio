@@ -1,4 +1,5 @@
 addEventListener("init", () => {
+    const params = new URLSearchParams(location.search);
     const container = document.createElement("div");
     container.id = "miscTools";
 
@@ -139,7 +140,7 @@ addEventListener("init", () => {
     <button id="midi_access">Grant MIDI Access</button><br>
     <label>Snapping: </label><input type="checkbox" id="midi_snapping">`;
     const grantMidiBtn = midiModule.querySelector("#midi_access");
-    midiModule.querySelector("#midi_snapping").addEventListener("input", (ev)=>{
+    midiModule.querySelector("#midi_snapping").addEventListener("input", (ev) => {
         snappingEnabled = ev.target.checked;
     });
     function animateMidiNote(note, node) {
@@ -272,6 +273,42 @@ addEventListener("init", () => {
         }
     });
     grantMidiBtn.addEventListener("click", allowMidi);
+
+
+    const remoteMultiplayerModule = mkModule("Remote Multiplayer");
+    const remoteMultiplayerConnect = document.createElement("button");
+    remoteMultiplayerConnect.innerText = "Connect";
+    
+    if (!params.has("multiplayer")) {
+        remoteMultiplayerConnect.addEventListener("click", () => {
+            var server = prompt("Specify the SYNTHETIC Audio server to connect to: ", "http://my-server.hosting-service.com");
+            if (!server) {
+                return;
+            }
+            var conf = confirm("Connect to " + server + "?");
+            if (!conf) {
+                return;
+            }
+            var s = new URLSearchParams(location.search);
+            s.set("multiplayer", server);
+            location.search = "?" + s.toString();
+            remoteMultiplayerConnect.innerText = "Connecting...";
+        });
+    } else {
+        remoteMultiplayerModule.innerText = params.get("multiplayer");
+        var s = new URLSearchParams(location.search);
+        s.delete("multiplayer");
+        history.replaceState(null, "", "/synthetic-audio?"+s.toString());
+
+        const remoteMultiplayerDisconnect = document.createElement("button");
+        remoteMultiplayerDisconnect.innerText = "Disconnect";
+        remoteMultiplayerDisconnect.addEventListener("click", ()=>{
+            location.search = "";
+        });
+        remoteMultiplayerModule.appendChild(document.createElement("br"));
+        remoteMultiplayerModule.appendChild(remoteMultiplayerDisconnect);
+    }
+    remoteMultiplayerModule.appendChild(remoteMultiplayerConnect);
 
     registerTab("Misc", container, false, () => {
         updateScales();

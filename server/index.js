@@ -1,9 +1,11 @@
 const express = require('express');
 const { createServer } = require("node:http");
 const { multiplayer_support } = require("./multiplayer.js");
+const cors = require('cors');
 const app = express();
 const server = createServer(app);
 app.use(express.static('.'));
+app.use(cors({origin: "*"}))
 const multiplayerEnabled = true;
 const port = 80;
 const logging = true;
@@ -30,5 +32,8 @@ if (multiplayerEnabled) {
 
 app.use(blacklistMiddleware);
 server.listen(port, () => {
-    console.log(`SYNTHETIC Audio running on port ${port}`)
+    console.log(`SYNTHETIC Audio running on port ${port}`);
+    console.log(`http://localhost:${port}`);
+    console.log(`Multiplayer: ${multiplayerEnabled}`);
+    console.log(`Logging: ${logging}`);
 });
