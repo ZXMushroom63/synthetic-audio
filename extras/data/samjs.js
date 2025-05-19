@@ -3584,10 +3584,10 @@ addBlockType("samjs", {
     isPlugin: true,
     configs: {
         "Text": ["hello world", "text"],
-        "Pitch": [64/255, "number"],
-        "Speed": [72/255, "number"],
-        "Mouth": [128/255, "number"],
-        "Throat": [128/255, "number"],
+        "Pitch": [0.25, "number"],
+        "Speed": [0.28, "number"],
+        "Mouth": [0.5, "number"],
+        "Throat": [0.5, "number"],
         "SingMode": [false, "checkbox"]
     },
     functor: function (inPcm, channel, data) {
@@ -3603,7 +3603,7 @@ addBlockType("samjs", {
             throat: Math.floor(this.conf.Throat*255),
             singmode: this.conf.SingMode
         });
-        var out = new Float32Array(resizeFactor * pre.length);
+        var out = new Float32Array(inPcm.length);
         out.forEach((x,i)=>{
             out[i] = pre[Math.floor(i/resizeFactor)] || 0;
         });
