@@ -1,4 +1,5 @@
 globalThis.sw = null;
+
 if ('serviceWorker' in navigator) {
     addEventListener('load', () => {
         navigator.serviceWorker.register('./worker.js').then(registration => {
@@ -6,13 +7,6 @@ if ('serviceWorker' in navigator) {
             console.log('ServiceWorker registration successful with scope: ', registration.scope);
         }, err => {
             console.log('ServiceWorker registration failed: ', err);
-        });
-
-        navigator.serviceWorker.register('./coi-serviceworker.min.js').then(registration => {
-            globalThis.sw = registration;
-            console.log('COOP-bypass worker registered with scope: ', registration.scope);
-        }, err => {
-            console.log('COOP-bypass worker registration failed: ', err);
         });
     });
 }

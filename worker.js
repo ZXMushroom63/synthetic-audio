@@ -11,7 +11,7 @@ self.addEventListener('fetch', event => {
                     return networkResponse;
                 }
 
-                if (!(new URLSearchParams(networkResponse.url)).get("plugin") === "true" && !networkResponse.url.endsWith("/check.txt") && !networkResponse.url.startsWith("chrome-extension://") && !networkResponse.url.startsWith("data:") && !networkResponse.url.startsWith("blob:") && !networkResponse.url.endsWith("/multiplayer_support") && !networkResponse.url.includes("socket.io")) {
+                if ((new URLSearchParams(networkResponse.url)).get("plugin") !== "true" && !networkResponse.url.endsWith("/check.txt") && !networkResponse.url.startsWith("chrome-extension://") && !networkResponse.url.startsWith("data:") && !networkResponse.url.startsWith("blob:") && !networkResponse.url.endsWith("/multiplayer_support") && !networkResponse.url.includes("socket.io")) {
                     const responseToCache = networkResponse.clone();
 
                     caches.open(CACHE_NAME).then(cache => {
@@ -26,6 +26,44 @@ self.addEventListener('fetch', event => {
                 return networkResponse;
             });
         })
+    );
+});
+
+//yoinked from https://github.com/gzuidhof/coi-serviceworker/blob/master/coi-serviceworker.js
+self.addEventListener("fetch", function (event) {
+    const r = event.request;
+    if (r.cache === "only-if-cached" && r.mode !== "same-origin") {
+        return;
+    }
+
+    const request = (coepCredentialless && r.mode === "no-cors")
+        ? new Request(r, {
+            credentials: "omit",
+        })
+        : r;
+    event.respondWith(
+        fetch(request)
+            .then((response) => {
+                if (response.status === 0) {
+                    return response;
+                }
+
+                const newHeaders = new Headers(response.headers);
+                newHeaders.set("Cross-Origin-Embedder-Policy",
+                    coepCredentialless ? "credentialless" : "require-corp"
+                );
+                if (!coepCredentialless) {
+                    newHeaders.set("Cross-Origin-Resource-Policy", "cross-origin");
+                }
+                newHeaders.set("Cross-Origin-Opener-Policy", "same-origin");
+
+                return new Response(response.body, {
+                    status: response.status,
+                    statusText: response.statusText,
+                    headers: newHeaders,
+                });
+            })
+            .catch((e) => console.error(e))
     );
 });
 
