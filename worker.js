@@ -1,10 +1,11 @@
+const coepCredentialless = false;
 const CACHE_NAME = 'synthetic-cache';
 
 self.addEventListener('fetch', event => {
     event.respondWith(
         caches.match(event.request).then(response => {
             if (response) {
-                return response;
+                return patchResponseHeaders(response);
             }
             return fetch(event.request).then(networkResponse => {
                 if (!networkResponse || networkResponse.status !== 200 || networkResponse.type !== 'basic') {
@@ -23,49 +24,33 @@ self.addEventListener('fetch', event => {
                     });
                 }
 
-                return networkResponse;
+                return patchResponseHeaders(networkResponse);
             });
         })
     );
 });
 
 //yoinked from https://github.com/gzuidhof/coi-serviceworker/blob/master/coi-serviceworker.js
-self.addEventListener("fetch", function (event) {
-    const r = event.request;
-    if (r.cache === "only-if-cached" && r.mode !== "same-origin") {
-        return;
+function patchResponseHeaders(response) {
+    if (response.status === 0 || response.type !== "basic") {
+        return response;
     }
 
-    const request = (coepCredentialless && r.mode === "no-cors")
-        ? new Request(r, {
-            credentials: "omit",
-        })
-        : r;
-    event.respondWith(
-        fetch(request)
-            .then((response) => {
-                if (response.status === 0) {
-                    return response;
-                }
-
-                const newHeaders = new Headers(response.headers);
-                newHeaders.set("Cross-Origin-Embedder-Policy",
-                    coepCredentialless ? "credentialless" : "require-corp"
-                );
-                if (!coepCredentialless) {
-                    newHeaders.set("Cross-Origin-Resource-Policy", "cross-origin");
-                }
-                newHeaders.set("Cross-Origin-Opener-Policy", "same-origin");
-
-                return new Response(response.body, {
-                    status: response.status,
-                    statusText: response.statusText,
-                    headers: newHeaders,
-                });
-            })
-            .catch((e) => console.error(e))
+    const newHeaders = new Headers(response.headers);
+    newHeaders.set("Cross-Origin-Embedder-Policy",
+        coepCredentialless ? "credentialless" : "require-corp"
     );
-});
+    if (!coepCredentialless) {
+        newHeaders.set("Cross-Origin-Resource-Policy", "cross-origin");
+    }
+    newHeaders.set("Cross-Origin-Opener-Policy", "same-origin");
+
+    return new Response(response.body, {
+        status: response.status,
+        statusText: response.statusText,
+        headers: newHeaders,
+    });
+}
 
 self.addEventListener('activate', event => {
     const cacheWhitelist = [CACHE_NAME];
@@ -95,4 +80,9 @@ self.addEventListener('message', event => {
         });
         console.log("Cleared cache!");
     }
+});
+
+self.addEventListener('install', (event) => {
+  console.log(`Service worker updated: ${self.registration.id}`);
+  self.skipWaiting();
 });
