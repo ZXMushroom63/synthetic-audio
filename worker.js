@@ -44,6 +44,10 @@ function patchResponseHeaders(response) {
         newHeaders.set("Cross-Origin-Resource-Policy", "cross-origin");
     }
     newHeaders.set("Cross-Origin-Opener-Policy", "same-origin");
+    newHeaders.set('Access-Control-Allow-Origin', '*');
+    newHeaders.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+    newHeaders.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    newHeaders.set('Access-Control-Allow-Credentials', 'true');
 
     return new Response(response.body, {
         status: response.status,
@@ -83,6 +87,6 @@ self.addEventListener('message', event => {
 });
 
 self.addEventListener('install', (event) => {
-  console.log(`Service worker updated: ${self.registration.id}`);
-  self.skipWaiting();
+    console.log(`Service worker updated: ${self.registration.id}`);
+    self.skipWaiting();
 });
