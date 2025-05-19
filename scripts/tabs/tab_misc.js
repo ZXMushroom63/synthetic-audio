@@ -278,7 +278,7 @@ addEventListener("init", () => {
     const remoteMultiplayerModule = mkModule("Remote Multiplayer");
     const remoteMultiplayerConnect = document.createElement("button");
     remoteMultiplayerConnect.innerText = "Connect";
-    
+
     if (!params.has("multiplayer")) {
         remoteMultiplayerConnect.addEventListener("click", () => {
             var server = prompt("Specify the SYNTHETIC Audio server to connect to: ", "http://my-server.hosting-service.com");
@@ -298,11 +298,11 @@ addEventListener("init", () => {
         remoteMultiplayerModule.innerText = params.get("multiplayer");
         var s = new URLSearchParams(location.search);
         s.delete("multiplayer");
-        history.replaceState(null, "", "/synthetic-audio?"+s.toString());
+        history.replaceState(null, "", location.pathname + "?" + s.toString());
 
         const remoteMultiplayerDisconnect = document.createElement("button");
         remoteMultiplayerDisconnect.innerText = "Disconnect";
-        remoteMultiplayerDisconnect.addEventListener("click", ()=>{
+        remoteMultiplayerDisconnect.addEventListener("click", () => {
             location.search = "";
         });
         remoteMultiplayerModule.appendChild(document.createElement("br"));

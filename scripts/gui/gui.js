@@ -475,7 +475,7 @@ if ('launchQueue' in window && 'files' in LaunchParams.prototype && (new URLSear
             return;
         }
         launchFile = await launchParams.files[0].getFile();
-        history.replaceState(null, "", "/synthetic-audio");
+        history.replaceState(null, "", location.pathname);
     });
 }
 function loadAutosave() {
