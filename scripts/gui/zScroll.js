@@ -1,7 +1,9 @@
 function execZScroll(loop, value) {
     var def = filters[loop.getAttribute("data-type")];
-    if (def.zscroll) {
+    if (def.zscroll && value) {
         def.zscroll(loop, value);
+    } else if (def.customGuiButtons.Preview && value === 0) {
+        def.customGuiButtons.Preview.apply(loop, []);
     }
 }
 var minZscrollDelta = 4;
