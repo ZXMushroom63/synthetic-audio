@@ -165,8 +165,8 @@ function addWetDryKnobs(data) {
 function addAmpSmoothKnob(data) {
     data.configs["AmplitudeSmoothing"] = [0.0, "number"];
     var oldFunctor = data.functor;
-    data.functor = async function (inPcm, channel, data) {
-        const out = await oldFunctor.apply(this, [inPcm, channel, data]);
+    data.functor = function (inPcm, channel, data) {
+        const out = oldFunctor.apply(this, [inPcm, channel, data]);
         const AmpSmoothingStart = Math.floor(audio.samplerate * this.conf.AmplitudeSmoothing);
         const AmpSmoothingEnd = inPcm.length - AmpSmoothingStart;
         function applyFn(data) {
