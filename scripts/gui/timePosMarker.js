@@ -23,7 +23,7 @@ addEventListener("init", () => {
     });
     renderOut.addEventListener("timeupdate", () => {
         if (!renderOut.currentTime) {
-            return;
+            return hydrateTimePosMarker();
         }
         gui.marker = renderOut.currentTime;
         hydrateTimePosMarker();
@@ -36,7 +36,7 @@ addEventListener("init", () => {
     });
     renderOut.addEventListener("seeking", () => {
         if (!renderOut.currentTime) {
-            return;
+            return hydrateTimePosMarker();
         }
         gui.marker = renderOut.currentTime;
         hydrateTimePosMarker();
