@@ -3,12 +3,13 @@ function hydrateTimePosMarker() {
 }
 addEventListener("hydrate", hydrateTimePosMarker);
 addEventListener("init", () => {
+    const renderOut = document.querySelector("#renderOut");
     document.querySelector(".timePosMarker").addEventListener("mousedown", () => {
         var bba = document.querySelector("#trackInternal").getBoundingClientRect();
         window.onmousemove = (e) => {
             document.querySelector(".timePosMarker").style.left = ((e.clientX - bba.left) / bba.width) * 100 + "%";
             gui.marker = ((e.clientX - bba.left) / bba.width) * audio.duration;
-            document.querySelector("#renderOut").currentTime = gui.marker;
+            renderOut.currentTime = gui.marker;
         }
         window.onmouseup = () => {
             window.onmousemove = () => { };
@@ -16,25 +17,36 @@ addEventListener("init", () => {
             hydrateTimePosMarker();
         }
     });
-    document.querySelector("#renderOut").addEventListener("focus", () => {
-        document.querySelector("#renderOut").blur();
+    renderOut.addEventListener("focus", () => {
+        renderOut.blur();
         document.body.focus();
     });
-    document.querySelector("#renderOut").addEventListener("timeupdate", () => {
-        gui.marker = document.querySelector("#renderOut").currentTime;
+    renderOut.addEventListener("timeupdate", () => {
+        if (!renderOut.currentTime) {
+            return;
+        }
+        gui.marker = renderOut.currentTime;
         hydrateTimePosMarker();
     });
-    document.querySelector("#renderOut").addEventListener("seeking", () => {
-        gui.marker = document.querySelector("#renderOut").currentTime;
+    renderOut.addEventListener("seeking", () => {
+        if (!renderOut.currentTime) {
+            return;
+        }
+        gui.marker = renderOut.currentTime;
         hydrateTimePosMarker();
     });
-    document.querySelector("#renderOut").addEventListener("loadedmetadata", () => {
+    renderOut.addEventListener("loadedmetadata", () => {
         document.querySelector('#renderOut').playbackRate = parseFloat(document.querySelector('#playbackRateSlider').value) || 0
-        document.querySelector("#renderOut").currentTime = gui.marker;
+        renderOut.currentTime = gui.marker;
         hydrateTimePosMarker();
     });
-    document.querySelector("#renderOut").addEventListener("loadstart", () => {
-        document.querySelector("#renderOut").currentTime = gui.marker;
+    renderOut.addEventListener("loadstart", () => {
+        document.querySelector("audio#loopsample").addEventListener("ended", (() => {
+            if (loopObjURL) {
+                URL.revokeObjectURL(loopObjURL);
+            }
+        }));
+        renderOut.currentTime = gui.marker;
         hydrateTimePosMarker();
     });
     addEventListener("keydown", (e) => {
