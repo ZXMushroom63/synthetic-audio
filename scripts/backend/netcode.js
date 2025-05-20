@@ -88,7 +88,7 @@ const multiplayer = {
             if (target.type === "checkbox") {
                 target.checked = res.value;
             } else if (target instanceof HTMLSelectElement) {
-                target.selectedIndex = [...target.selectedOptions].findIndex(x=>x.value === res.value);
+                target.selectedIndex = [...target.options].findIndex(x=>x.value === res.value);
             } else {
                 target.value = res.value;
             }
