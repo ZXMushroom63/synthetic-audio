@@ -557,6 +557,7 @@ function init() {
         keymap[e.key] = true;
         if (e.key === "ArrowLeft" && e.target && e.target.tagName === "BODY" && e.shiftKey) {
             e.preventDefault();
+            gui.marker = 0;
             document.querySelector("#renderOut").currentTime = 0;
             return;
         }
