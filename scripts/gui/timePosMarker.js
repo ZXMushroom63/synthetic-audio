@@ -28,6 +28,12 @@ addEventListener("init", () => {
         gui.marker = renderOut.currentTime;
         hydrateTimePosMarker();
     });
+    renderOut.addEventListener("play", () => {
+        document.querySelector("audio#loopsample").pause();
+        if (loopObjURL) {
+            URL.revokeObjectURL(loopObjURL);
+        }
+    });
     renderOut.addEventListener("seeking", () => {
         if (!renderOut.currentTime) {
             return;
