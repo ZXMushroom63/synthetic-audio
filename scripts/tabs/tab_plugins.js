@@ -162,7 +162,7 @@ addEventListener("init", async () => {
         const quotaEstimateData = await navigator.storage.estimate();
         quotaEstimate.innerText = `Storage Quota Usage: ${(quotaEstimateData.usage / quotaEstimateData.quota * 100).toFixed(1)}% (${(quotaEstimateData.usage / (Math.pow(1024, 2))).toFixed(1)}MB)`
         container.querySelectorAll("div").forEach(x => x.remove());
-        var modsArr = (await getMods()).map((x, i) => { var z = Object(/\..+/.exec(x)[0] || ""); z.__key = x; z.__idx = i; return z; }).sort();
+        var modsArr = (await getMods()).map((x, i) => { var z = Object(/\..+/.exec(x)?.[0] || ""); z.__key = x; z.__idx = i; return z; }).sort();
         var idxMap = modsArr.map(z => z.__idx);
         modsArr = modsArr.map(z => z.__key);
         modsArr.forEach((mod, i) => {
