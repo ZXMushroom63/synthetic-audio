@@ -1,7 +1,19 @@
 async function execZScroll(loop, value) {
     var def = filters[loop.getAttribute("data-type")];
     if (def.zscroll && value) {
-        def.zscroll(loop, value);
+        if (def.pitchZscroller && gui.autocorrect === "SNAP") {
+            globalThis.zscrollIsInternal = true;
+            def.zscroll(loop, value);
+            markLoopDirty(loop);
+            while (loop.hasAttribute("data-bad-note")) {
+                def.zscroll(loop, value);
+                markLoopDirty(loop);
+            }
+            globalThis.zscrollIsInternal = false;
+            def.zscroll(loop, 0);
+        } else {
+            def.zscroll(loop, value);
+        }
     } else if (def.customGuiButtons?.Preview && value === 0) {
         def.customGuiButtons.Preview.apply(loop, []);
     } else if (value === 0 && loop.cache) {

@@ -40,8 +40,8 @@ addEventListener("init", () => {
 
     const scaleGeneratorModule = mkModule("Scale Generator");
     scaleGeneratorModule.innerHTML += `
-    <input class="inputStyles" style="width:4rem" value=":C#:" type="text">
-    <select>
+    <input id="scaleNoteInput" class="inputStyles" style="width:4rem" value=":C#:" type="text">
+    <select id="scaleModeInput">
         <option value="2,2,1,2,2,2,1">Major/Ionian (Diatonic)</option>
         <option value="2,1,2,2,1,2,2">Minor/Aeolian (Diatonic)</option>
         <option value="2,1,2,2,2,1,2">Dorian (Diatonic)</option>
@@ -57,13 +57,19 @@ addEventListener("init", () => {
     </select><br>
     <span class="scaleout">(trigger a change)</span><br>
     <button id="scaleCopyNote">Copy (note)</button>
-    <button id="scaleCopyDemo">Copy (demo)</button>
+    <button id="scaleCopyDemo">Copy (demo)</button><br>
+    <label>Scale Autocorrect: </label><select id="scaleAutocorrect">
+        <option value="OFF">Off</option>
+        <option value="HIGHLIGHT">Highlight</option>
+        <option value="SNAP">Snap & Highlight</option>
+    </select>
     `;
-    const note = scaleGeneratorModule.querySelector("input");
-    const scales = scaleGeneratorModule.querySelector("select");
+    const note = scaleGeneratorModule.querySelector("#scaleNoteInput");
+    const scales = scaleGeneratorModule.querySelector("#scaleModeInput");
     const scaleDisp = scaleGeneratorModule.querySelector(".scaleout");
     const scaleBtn = scaleGeneratorModule.querySelector("#scaleCopyNote");
     const scaleCopyDemo = scaleGeneratorModule.querySelector("#scaleCopyDemo");
+    const scaleAutocorrect = scaleGeneratorModule.querySelector("#scaleAutocorrect");
     function updateScales() {
         var startingPitch = _(note.value || ":C#:")(0, new Float32Array(1)) || 440;
         var scale = scales.value.split(",").map(x => parseInt(x));
@@ -72,14 +78,19 @@ addEventListener("init", () => {
         var firstNote = frequencyToNote(startingPitch);
         notes.push(firstNote);
         firstNote = firstNote.substring(0, firstNote.length - 1);
+        gui.key = firstNote;
+        gui.mode = scales.value;
+        gui.autocorrect = scaleAutocorrect.value;
         var text = (scales.selectedOptions[0]?.textContent || "(error)").trim() + " scale; Key of " + firstNote + ": \n" + firstNote + ", ";
-        text += scale.map(x => {
+        const accepted = scale.map(x => {
             offset += x;
             var note = frequencyToNote(startingPitch * Math.pow(2, offset / 12));
             notes.push(note);
             note = note.substring(0, note.length - 1);
             return note;
-        }).join(", ");
+        });
+        text += accepted.join(", ");
+        gui._acceptedNotes = accepted;
 
         scaleDisp.innerText = text;
         var spp_text = "sp_loopdata::" + JSON.stringify([{
@@ -121,10 +132,46 @@ addEventListener("init", () => {
             );
             navigator.clipboard.writeText(spp_demoscale);
         }
+        findLoops(".loop:not([data-deleted])").forEach(updateLoopHighlight);
     }
-    scales.addEventListener("input", updateScales);
-    note.addEventListener("input", updateScales);
+    scales.addEventListener("input", () => {
+        if (!multiplayer.isHooked && multiplayer.on) {
+            multiplayer.modifyProperty("#scaleModeInput", "mode", scales.value);
+        }
+        updateScales();
+    });
+    scaleAutocorrect.addEventListener("input", updateScales);
+    note.addEventListener("input", () => {
+        if (!multiplayer.isHooked && multiplayer.on) {
+            multiplayer.modifyProperty("#scaleNoteInput", "key", note.value);
+        }
+        updateScales();
+    });
     updateScales();
+    addEventListener('deserialise', (e) => {
+        scales.selectedIndex = Math.max([...scales.options].findIndex(x => x.value === e.detail.data.mode), 0);
+        note.value = ":" + (e.detail.data.key || "C#") + ":";
+        scaleAutocorrect.selectedIndex = Math.max([...scaleAutocorrect.options].findIndex(x => x.value === e.detail.data.autocorrect), 0);
+        updateScales();
+    });
+    function updateLoopHighlight(loop) {
+        if (!loop._ignore && loop.__determinedFreq) {
+            if ((scaleAutocorrect.value === "OFF") || gui._acceptedNotes.includes(loop.__determinedFreq.substring(0, loop.__determinedFreq.length - 1))) {
+                loop.removeAttribute("data-bad-note");
+            } else {
+                loop.setAttribute("data-bad-note", "yes");
+            }
+        }
+    }
+    addEventListener('loopchanged', (e) => {
+        updateLoopHighlight(e.detail.loop);
+    });
+
+    addEventListener('serialise', (e) => {
+        e.detail.data.mode = scales.value;
+        e.detail.data.key = gui.key;
+        e.detail.data.autocorrect = scaleAutocorrect.value;
+    });
 
     var lastInsertionTime = -1;
     var insertionBasePos = 0;

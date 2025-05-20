@@ -100,8 +100,9 @@ addBlockType("p_waveform_plus", {
         txt.classList.add("noteDisplay");
         txt.innerText = "U0";
         internal.appendChild(txt);
-        setTimeout(() => {updateWaveformNoteDisplay(loop)}, Math.random()*200);
+        updateWaveformNoteDisplay(loop);
     },
+    pitchZscroller: true,
     zscroll: (loop, value) => {
         loop.conf.InternalSemiOffset += value;
         if (Number.isFinite(parseFloat(loop.conf.SemitonesOffset))) {
@@ -114,7 +115,7 @@ addBlockType("p_waveform_plus", {
         //     loop.conf.SemitonesOffset = 0;
         // }
         updateWaveformNoteDisplay(loop);
-        if (globalThis.zscrollIsFirst) {
+        if (globalThis.zscrollIsFirst && !globalThis.zscrollIsInternal) {
             filters["p_waveform_plus"].customGuiButtons.Preview.apply(loop, []);
         }
     },

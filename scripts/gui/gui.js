@@ -16,6 +16,8 @@ var gui = {
     layer: 0,
     noWvLOD: false,
     substepping: 2,
+    mode: "2,2,1,2,2,2,1",
+    key: "C"
 }
 var loopi = 0.001;
 var audio = {
@@ -159,7 +161,7 @@ function hydrateLoopPosition(elem) {
         + elem.getAttribute("data-layer")
         + ", Z: "
         + elem.getAttribute("data-editlayer")
-        }`);
+        }\nUUID: ${elem.conf.uuid || "(offline)"}`);
 
     var bg = loopInternal.querySelector(".backgroundSvg");
     if (bg && (nInternalWidth > (9.9 * (!gui.noWvLOD)))) {

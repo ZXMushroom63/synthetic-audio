@@ -38,13 +38,16 @@ addBlockType("instrument", {
         txt.classList.add("noteDisplay");
         txt.innerText = "U0";
         internal.appendChild(txt);
-        setTimeout(() => { updateInstrumentNoteDisplay(loop) }, Math.random() * 200);
+        updateInstrumentNoteDisplay(loop);
     },
+    pitchZscroller: true,
     zscroll: (loop, value) => {
         loop.conf.Note = ":" + frequencyToNote(_(loop.conf.Note)(0, new Float32Array(1)) * Math.pow(2, value / 12)) + ":";
         updateInstrumentNoteDisplay(loop);
         //usually would check globalThis.zscrollIsFirst, but `instrument` can play multiple notes at once, so might as well.
-        filters["instrument"].customGuiButtons.Preview.apply(loop, []);
+        if (!globalThis.zscrollIsInternal) {
+            filters["instrument"].customGuiButtons.Preview.apply(loop, []);
+        }
     },
     customGuiButtons: {
         "Preview": function () {
