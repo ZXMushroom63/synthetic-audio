@@ -3,9 +3,10 @@ function midi2freq(i) {
 }
 function processMidiImport(midiData) {
     var doQuantise = confirm("! MIDI IMPORT !\nQuantise timings?");
-    var speedMult = parseFloat(prompt("! MIDI IMPORT !\nChoose a speed multiplier:", 1)) || 0;
+    var speedMult = 4*parseFloat(prompt("! MIDI IMPORT !\nChoose a speed multiplier:", 1)) || 0;
     deserialise('{}');
     var layerbase = 0;
+    var longestDuration = 0;
     midiData.tracks.forEach((track, trackIdx) => {
         let trackName = "Midi";
         let currentTime = 0;
@@ -14,7 +15,7 @@ function processMidiImport(midiData) {
             return currentTime;
         };
         var tickLength = 1 / (0.5 * midiData.header.ticksPerBeat) / speedMult;
-        var quanitisePeriod = 0.5 / speedMult;
+        var quanitisePeriod = 1 / speedMult;
         const updateTPS = (µsPerBeat) => {
             quanitisePeriod = µsPerBeat / 1000000 / speedMult;
             tickLength = 1 / (µsPerBeat / 1000000 * midiData.header.ticksPerBeat) / speedMult;
@@ -35,7 +36,8 @@ function processMidiImport(midiData) {
                 NOTEMAP[event.noteNumber] = {
                     midi: event.noteNumber,
                     start: time,
-                    layer: concurrentNotes
+                    layer: concurrentNotes,
+                    velocity: event.velocity
                 }
                 lowestLayer = Math.max(lowestLayer, concurrentNotes);
                 if (doQuantise) {
@@ -50,6 +52,7 @@ function processMidiImport(midiData) {
                     const endTime = doQuantise ?
                         Math.round((time - note.start) / quanitisePeriod) * quanitisePeriod
                         : time - note.start;
+                    longestDuration = Math.max(longestDuration, Math.floor(time + 2));
                     addBlock(
                         "p_waveform_plus",
                         note.start,
@@ -57,7 +60,8 @@ function processMidiImport(midiData) {
                         trackName + " - " + freq.toFixed(1) + " Hz",
                         layerbase + note.layer,
                         {
-                            Frequency: Math.round(freq * 10) / 10
+                            Frequency: Math.round(freq * 10) / 10,
+                            Amplitude: (note.velocity/255).toFixed(2)
                         }
                     );
                     delete NOTEMAP[event.noteNumber];
@@ -67,6 +71,8 @@ function processMidiImport(midiData) {
         });
         layerbase += lowestLayer + 1;
     });
+    document.querySelector("#duration").value = longestDuration;
+    document.querySelector("#normalisebox").checked = audio.normalise = true;
     hydrate();
 }
 function openMidi(buffer) {
