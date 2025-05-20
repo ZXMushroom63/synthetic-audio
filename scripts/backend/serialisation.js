@@ -97,6 +97,9 @@ function deserialise(serialisedStr) {
     ser.bitRate ||= 320;
     ser.normalise ||= false;
     ser.encformat ||= "wav";
+
+    customEvent("predeserialise", { data: ser });
+
     document.querySelector("#duration").value = ser.duration;
     document.querySelector("#bpm").value = ser.bpm;
     document.querySelector("#editorlayer").value = ser.editorLayer;
@@ -125,6 +128,7 @@ function deserialise(serialisedStr) {
 
     audio.samplerate = ser.sampleRate;
     zoom = ser.zoom || 100;
+    
     ser.nodes.forEach((node) => {
         deserialiseNode(node);
     });
