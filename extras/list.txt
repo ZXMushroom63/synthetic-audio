@@ -1,3 +1,4 @@
 freqshift.pd.js
 colouriser.pd.js
 samjs.js
+colouriser2.pd.js
