@@ -108,11 +108,11 @@ function convertToWavData(float32Arrays, channels, sampleRate, bRate) {
     };
     return WavEncoder.encodeSync(audioInterface);
 }
-async function convertToFileBlob(float32Arrays, channels, sampleRate, bRate) {
+async function convertToFileBlob(float32Arrays, channels, sampleRate, bRate, forceWav) {
     startTiming("encode");
     var blob;
     
-    if (audio.format !== "wav") {
+    if (audio.format !== "wav" && !forceWav) {
         if (ffmpeg.isLoaded()) {
             ffmpeg.exit();
         }

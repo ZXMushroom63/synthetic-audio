@@ -20,7 +20,7 @@ addBlockType("p_waveform", {
                 URL.revokeObjectURL(document.querySelector("audio#loopsample").src);
             }
             var pcmData = filters["p_waveform"].functor.apply(this, [new Float32Array(audio.samplerate), 0, {}]);
-            var blob = await convertToFileBlob([pcmData], 1, audio.samplerate, audio.bitrate);
+            var blob = await convertToFileBlob([pcmData], 1, audio.samplerate, audio.bitrate, true);
             document.querySelector("#renderProgress").innerText = "Preview successful!";
             document.querySelector("#loopsample").src = URL.createObjectURL(blob);
             document.querySelector("#loopsample").play();
