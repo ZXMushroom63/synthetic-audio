@@ -3601,9 +3601,6 @@ addBlockType("samjs", {
     },
     functor: function (inPcm, channel, data) {
         const resizeFactor = audio.samplerate / 22050;
-        if (channel > 0) { //SAM is not stereo
-            return this.ref.cache[0].slice();
-        }
 
         var pre = SamJs.buf32(SamJs.convert(this.conf.Text), {
             pitch: Math.floor(this.conf.Pitch * 255),
