@@ -1,12 +1,3 @@
-function updateWaveformNoteDisplay(loop) {
-    var basic = new Float32Array(8);
-    var freq = _(loop.conf.Frequency)(4, basic);
-    var freqsemioffset = _(loop.conf.SemitonesOffset)(4, basic);
-    var internalSemiOffset = loop.conf.InternalSemiOffset;
-    var f = freq * Math.pow(2, (freqsemioffset + internalSemiOffset) / 12);
-    loop.__determinedFreq = frequencyToNote(f);
-    loop.querySelector(".noteDisplay").innerText = loop.__determinedFreq;
-}
 addBlockType("p_waveform_plus", {
     color: "rgba(255,0,0,0.3)",
     title: "Advanced Synth",
@@ -95,12 +86,7 @@ addBlockType("p_waveform_plus", {
         }
     },
     initMiddleware: (loop) => {
-        var internal = loop.querySelector(".loopInternal");
-        var txt = document.createElement("span");
-        txt.classList.add("noteDisplay");
-        txt.innerText = "U0";
-        internal.appendChild(txt);
-        updateWaveformNoteDisplay(loop);
+        initNoteDisplay(loop);
     },
     pitchZscroller: true,
     zscroll: (loop, value) => {
@@ -114,7 +100,7 @@ addBlockType("p_waveform_plus", {
         //     loop.conf.Frequency = ":" + frequencyToNote(_(loop.conf.Frequency)(0, new Float32Array(1)) * Math.pow(2, loop.conf.SemitonesOffset/12)) + ":";
         //     loop.conf.SemitonesOffset = 0;
         // }
-        updateWaveformNoteDisplay(loop);
+        updateNoteDisplay(loop);
         if (globalThis.zscrollIsFirst && !globalThis.zscrollIsInternal) {
             filters["p_waveform_plus"].customGuiButtons.Preview.apply(loop, []);
         }
@@ -136,7 +122,7 @@ addBlockType("p_waveform_plus", {
             loop.conf.Harmonics = false;
             loop.querySelector("[data-key=Harmonics]").checked = false;
         }
-        updateWaveformNoteDisplay(loop);
+        updateNoteDisplay(loop);
     },
     functor: function (inPcm, channel, data) {
         var keys = ["Sine", "Square", "Sawtooth", "Triangle"];

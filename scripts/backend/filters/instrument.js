@@ -1,14 +1,3 @@
-
-function updateInstrumentNoteDisplay(loop) {
-    var basic = new Float32Array(1);
-    var freq = _(loop.conf.Note)(0, basic);
-    var note = frequencyToNote(freq);
-    loop.__determinedFreq = note;
-    loop.querySelector(".noteDisplay").innerText = note;
-    var newTitle = loop.conf.Instrument + " - " + note;
-    loop.setAttribute("data-file", newTitle);
-    loop.querySelector(".loopInternal .name").innerText = newTitle;
-}
 addBlockType("instrument", {
     color: "rgba(0,255,255,0.3)",
     title: "Instrument",
@@ -30,20 +19,17 @@ addBlockType("instrument", {
         }
     },
     updateMiddleware: (loop) => {
-        updateInstrumentNoteDisplay(loop);
+        loop.setAttribute("data-file", loop.conf.Instrument);
+        loop.querySelector(".loopInternal .name").innerText = loop.conf.Instrument;
+        updateNoteDisplay(loop);
     },
     initMiddleware: (loop) => {
-        var internal = loop.querySelector(".loopInternal");
-        var txt = document.createElement("span");
-        txt.classList.add("noteDisplay");
-        txt.innerText = "U0";
-        internal.appendChild(txt);
-        updateInstrumentNoteDisplay(loop);
+        initNoteDisplay(loop);
     },
     pitchZscroller: true,
     zscroll: (loop, value) => {
         loop.conf.Note = ":" + frequencyToNote(_(loop.conf.Note)(0, new Float32Array(1)) * Math.pow(2, value / 12)) + ":";
-        updateInstrumentNoteDisplay(loop);
+        updateNoteDisplay(loop);
         //usually would check globalThis.zscrollIsFirst, but `instrument` can play multiple notes at once, so might as well.
         if (!globalThis.zscrollIsInternal) {
             filters["instrument"].customGuiButtons.Preview.apply(loop, []);
