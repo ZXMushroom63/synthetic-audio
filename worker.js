@@ -25,6 +25,9 @@ self.addEventListener('fetch', event => {
                 }
 
                 return patchResponseHeaders(networkResponse);
+            }).catch((reason)=>{
+                console.log("Failed to worker fetch: ", event.request);
+                console.error(reason);
             });
         })
     );
