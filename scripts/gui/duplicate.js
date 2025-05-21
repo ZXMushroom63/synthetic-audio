@@ -11,7 +11,7 @@ addEventListener("init", ()=>{
                 var x = document.elementsFromPoint(mouse.x, mouse.y).find(x => !x.classList.contains("deactivated"));
                 if (x && x.closest(".loop")) {
                     var y = deserialiseNode(structuredClone(serialiseNode(x.closest(".loop"))), true);
-                    hydrateZoom();
+                    hydrateLoopPosition(y);
                     pickupLoop(y);
                 }
             } else {
@@ -22,8 +22,8 @@ addEventListener("init", ()=>{
                     var loop = deserialiseNode(structuredClone(serialiseNode(target)), true);
                     dupedLoops.push(loop);
                 });
-                hydrateZoom();
                 dupedLoops.forEach(loop => {
+                    hydrateLoopPosition(loop);
                     pickupLoop(loop, true);
                 });
             }

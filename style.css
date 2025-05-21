@@ -478,6 +478,10 @@ button,
     background: linear-gradient(140deg, rgba(255, 0, 0, 0.3) 0%, rgba(255, 255, 255, 0.0) 34%, rgba(0, 255, 187, 0.2) 100%);
 }
 
+#trackInternal {
+    transform-origin: left;
+}
+
 button:disabled {
     cursor: not-allowed;
     background: black;

@@ -25,10 +25,9 @@ addEventListener("init", () => {
                 b.conf.StartOffset += b.start - a.start;
             }
 
-            deserialiseNode(a);
-            deserialiseNode(b);
+            hydrateLoopPosition(deserialiseNode(a));
+            hydrateLoopPosition(deserialiseNode(b));
         });
-        hydrateZoom();
     }, false);
 });
 registerHelp(".tool[data-tool=CUT]",

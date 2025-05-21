@@ -17,7 +17,9 @@ var gui = {
     noWvLOD: false,
     substepping: 2,
     mode: "2,2,1,2,2,2,1",
-    key: "C"
+    key: "C",
+    zoom: 200,
+    zoomConstant: 20,
 }
 var loopi = 0.001;
 var audio = {
@@ -67,7 +69,6 @@ function getDurationOfLoop(audioFile) {
 var loopObjURL = null;
 var mouse = {};
 var keymap = {};
-var zoom = 200;
 function updateLOD() {
     if (gui.noLOD) {
         gui.LOD = 1;
@@ -119,70 +120,83 @@ function hydrateBeatMarkers() {
         track.appendChild(marker);
     }
 }
-function hydrateLoopPosition(elem) {
-    if (elem.updateSuppression) {
+function hydrateLoopDecoration(loop) {
+    if (loop.updateSuppression) {
         return;
     }
-    hydrateLoopSpecificLayer(elem);
-    var elemType = elem.getAttribute("data-type");
-    var trueDuration = (parseFloat(loopDurationMap[elem.getAttribute("data-file")]) + 0.0) || ((elemType !== "distribute") * (proceduralAssets.get(elem.conf.Asset)?.[0]?.length / audio.samplerate)) || 0;
-    trueDuration = (Math.round(trueDuration / loopi) * loopi) / (elem.conf.Speed || 1);
-    var def = filters[elem.getAttribute("data-type")];
+    var bg = loop.querySelector(".backgroundSvg");
+    if (bg && ((loop._nInternalWidth || 0) > (9.9 * (!gui.noWvLOD)))) {
+        bg.style.width = loop._nInternalWidth + "vw";
+        bg.querySelector("path").style.strokeWidth = innerWidth / (loop._nInternalWidth || 0) * 0.0025 + "px";
+        bg.style.display = "block";
+    } else if (bg) {
+        bg.style.display = "none";
+    }
+    var elemType = loop.getAttribute("data-type");
+    var trueDuration = (parseFloat(loopDurationMap[loop.getAttribute("data-file")]) + 0.0) || ((elemType !== "distribute") * (proceduralAssets.get(loop.conf.Asset)?.[0]?.length / audio.samplerate)) || 0;
+    trueDuration = (Math.round(trueDuration / loopi) * loopi) / (loop.conf.Speed || 1);
+    var def = filters[loop.getAttribute("data-type")];
     if (def.findLoopMarker) {
-        const loopProvided = def.findLoopMarker(elem);
+        const loopProvided = def.findLoopMarker(loop);
         if (loopProvided) {
             trueDuration = loopProvided;
         }
     }
-    var startOffset = elem.conf.StartOffset || 0;
+    var startOffset = loop.conf.StartOffset || 0;
     if (def.findLoopMarkerOffset) {
-        const loopProvided = def.findLoopMarkerOffset(elem);
+        const loopProvided = def.findLoopMarkerOffset(loop);
         if (loopProvided) {
             startOffset = loopProvided;
         }
     }
+    var loopInternal = loop.querySelector(".loopInternal");
+
+    if (!trueDuration) {
+        return;
+    }
+    var trueWidth = trueDuration * gui.zoomConstant;
+    loopInternal.style.backgroundImage = `repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.0), rgba(255, 255, 255, 0.0) ${trueWidth - 0.15}vw, rgba(255, 255, 255, 1) ${trueWidth - 0.15}vw, rgba(255, 255, 255, 1) ${trueWidth + 0.0}vw)`;
+    loopInternal.style.backgroundPositionX = `-${startOffset * gui.zoomConstant}vw`;
+}
+function hydrateDecorations() {
+    findLoops(".loop").forEach(hydrateLoopDecoration);
+}
+function hydrateLoopPosition(elem, lean) {
+    if (elem.updateSuppression) {
+        return;
+    }
+    hydrateLoopSpecificLayer(elem);
 
     var duration = parseFloat(elem.getAttribute("data-duration"));
     var start = parseFloat(elem.getAttribute("data-start"));
     elem.style.left = (start / audio.duration * 100) + "%";
     elem.style.top = (parseFloat(elem.getAttribute("data-layer")) * 3) + "rem";
-    var zoomConstant = zoom / audio.duration;
-    var nInternalWidth = (duration * zoomConstant);
+    var nInternalWidth = (duration * gui.zoomConstant);
+    elem._nInternalWidth = nInternalWidth;
     var internalWidth = nInternalWidth + "vw";
     var loopInternal = elem.querySelector(".loopInternal");
+    if (!lean) {
+        loopInternal.setAttribute("title", `Type: ${elem.getAttribute("data-type")
+            }\nDuration: ${duration.toFixed(2)
+            }s\nPos: ${"X: "
+            + start.toFixed(2)
+            + "s, Y: "
+            + elem.getAttribute("data-layer")
+            + ", Z: "
+            + elem.getAttribute("data-editlayer")
+            }\nUUID: ${elem.conf.uuid || "(offline)"}`);
+    }
     loopInternal.style.width = internalWidth;
 
-    //Debug info
-    loopInternal.setAttribute("title", `Type: ${elem.getAttribute("data-type")
-        }\nDuration: ${duration.toFixed(2)
-        }s\nPos: ${"X: "
-        + start.toFixed(2)
-        + "s, Y: "
-        + elem.getAttribute("data-layer")
-        + ", Z: "
-        + elem.getAttribute("data-editlayer")
-        }\nUUID: ${elem.conf.uuid || "(offline)"}`);
-
-    var bg = loopInternal.querySelector(".backgroundSvg");
-    if (bg && (nInternalWidth > (9.9 * (!gui.noWvLOD)))) {
-        bg.style.width = internalWidth;
-        bg.querySelector("path").style.strokeWidth = innerWidth / (nInternalWidth) * 0.0025 + "px";
-        bg.style.display = "block";
-    } else if (bg) {
-        bg.style.display = "none";
-    }
     loopInternal.querySelector(".handleRight").style.right = "calc(-" + internalWidth + " - 1.5px)";
-    if (!trueDuration) {
-        return;
-    }
-    var trueWidth = trueDuration * zoomConstant;
-    loopInternal.style.backgroundImage = `repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.0), rgba(255, 255, 255, 0.0) ${trueWidth - 0.15}vw, rgba(255, 255, 255, 1) ${trueWidth - 0.15}vw, rgba(255, 255, 255, 1) ${trueWidth + 0.0}vw)`;
-    loopInternal.style.backgroundPositionX = `-${startOffset * zoomConstant}vw`;
 }
-function hydrateZoom() {
-    document.querySelector("#trackInternal").style.width = zoom + "vw";
+function hydrateZoom(lean) {
+    gui.lastHydratedZoom = gui.zoom;
+    gui.zoomConstant = gui.zoom / audio.duration;
+    document.querySelector("#trackInternal").style.transform = "";
+    document.querySelector("#trackInternal").style.width = gui.zoom + "vw";
     findLoops(".loop").forEach(elem => {
-        hydrateLoopPosition(elem);
+        hydrateLoopPosition(elem, lean);
     });
 }
 function hydrateLoopBackground(elem) {
@@ -244,6 +258,7 @@ function hydrate() {
     customEvent("hydrate");
     hydrateBeatMarkers();
     hydrateZoom();
+    hydrateDecorations();
     hydrateEditorLayer();
 }
 function addBlock(type, start, duration, title, layer = 0, data = {}, editorValue = Math.min(gui.layer, 9), noTimeline) {
@@ -277,7 +292,7 @@ function addBlock(type, start, duration, title, layer = 0, data = {}, editorValu
                 var endPos = Math.round((originalStart + newDuration) / bpmInterval) * bpmInterval;
 
                 newDuration = endPos - originalStart;
-                var internalWidth = newDuration * (zoom / audio.duration);
+                var internalWidth = newDuration * gui.zoomConstant;
                 internal.style.width = internalWidth + "vw";
                 backgroundSvg.style.width = internalWidth + "vw";
                 handleRight.style.right = `calc(-${internalWidth}vw - 1.5px)`;
@@ -299,7 +314,7 @@ function addBlock(type, start, duration, title, layer = 0, data = {}, editorValu
                 pos = Math.round(pos / 100 * audio.duration / bpmInterval) * bpmInterval;
                 loop.setAttribute("data-start", pos);
                 var newDuration = ((originalStart - pos) * 1) + originalDuration;
-                var internalWidth = newDuration * (zoom / audio.duration);
+                var internalWidth = newDuration * gui.zoomConstant;
                 internal.style.width = internalWidth + "vw";
                 backgroundSvg.style.width = internalWidth + "vw";
                 handleRight.style.right = `calc(-${internalWidth}vw - 1.5px)`;
@@ -429,7 +444,7 @@ function addBlock(type, start, duration, title, layer = 0, data = {}, editorValu
             loop.classList.remove("active");
             document.onmousemove = null;
             document.onmouseup = null;
-            hydrateZoom();
+            hydrateLoopPosition(loop);
         }
     });
 
@@ -520,7 +535,7 @@ function init() {
             multiplayer.modifyProperty("#bpm", "bpm", document.querySelector("#bpm").value);
         }
         hydrateBeatMarkers();
-        hydrateZoom();
+        hydrateDecorations();
     });
     document.querySelector("#loopi").addEventListener("input", () => {
         if (!multiplayer.isHooked && multiplayer.on) {
@@ -528,7 +543,7 @@ function init() {
         }
         findLoops(".loop[data-type=audio], .loop[data-type=p_readasset]").forEach(x => markLoopDirty(x));
         hydrateBeatMarkers();
-        hydrateZoom();
+        hydrateDecorations();
     });
     document.querySelector("#substepping").addEventListener("input", (e) => {
         gui.substepping = Math.min(4, Math.max(1, parseInt(e.target.value))) || 1;
@@ -576,14 +591,24 @@ function init() {
     addEventListener("blur", (e) => {
         keymap = {};
     });
+    var zoomActuatorDebouncer = null;
+    function actuateZoom() {
+        document.querySelector("#trackInternal").style.willChange = "";
+        hydrateZoom(true);
+    }
     addEventListener("wheel", (e) => {
         if (keymap["Control"]) {
             e.preventDefault();
             e.stopImmediatePropagation();
             e.stopPropagation();
-            zoom += e.deltaY * (keymap["Shift"] ? 0.05 : 1);
-            zoom = Math.max(100, zoom);
-            hydrateZoom();
+            gui.zoom += e.deltaY * (keymap["Shift"] ? 0.05 : 1);
+            gui.zoom = Math.max(100, gui.zoom);
+            document.querySelector("#trackInternal").style.willChange = "transform";
+            document.querySelector("#trackInternal").style.transform = `scaleX(${gui.zoom / gui.lastHydratedZoom})`;
+            if (zoomActuatorDebouncer) {
+                clearTimeout(zoomActuatorDebouncer);
+            }
+            zoomActuatorDebouncer = setTimeout(actuateZoom, 500);
         }
     }, { passive: false });
     document.querySelector("audio#loopsample").addEventListener("ended", (() => {
@@ -632,7 +657,7 @@ function init() {
         } else {
             gui.noWvLOD = false;
         }
-        hydrateZoom();
+        hydrateDecorations();
     });
 
     addEventListener("keydown", (e) => {

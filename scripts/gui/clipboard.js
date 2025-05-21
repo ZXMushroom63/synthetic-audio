@@ -63,7 +63,7 @@ addEventListener("init", () => {
         data.forEach(target => {
             pastedLoops.push(deserialiseNode(target, true));
         });
-        hydrateZoom();
+        pastedLoops.forEach(hydrateLoopPosition);
         if (!shiftKey) {
             pastedLoops.forEach(loop => {
                 if (loop) {
@@ -81,7 +81,7 @@ addEventListener("init", () => {
             resetDrophandlers(false);
             navigator.clipboard
                 .readText()
-                .then((text)=>{
+                .then((text) => {
                     pasteData(text, e.shiftKey);
                 });
         }

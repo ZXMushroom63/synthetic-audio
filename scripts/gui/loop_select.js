@@ -50,9 +50,6 @@ addEventListener("init", () => {
                 const file = fileList[a];
                 document.querySelector("#renderProgress").innerText = "Processing audio... (" + (a / fileList.length * 100).toFixed(1) + "%)";
                 await importAudioFile(file);
-                if (a % 50 === 0) {
-                    hydrateZoom();
-                }
             }
             Array.prototype.sort.apply(fileList, [((a, b) => {
                 return loopDurationMap[a.name] - loopDurationMap[b.name];
@@ -97,7 +94,7 @@ addEventListener("init", () => {
             }
             findLoops(".loop[data-type=audio]").forEach(x => markLoopDirty(x));
         }
-        hydrateZoom();
+        hydrateDecorations();
         document.querySelector("#renderProgress").innerText = "(no render task currently active)";
     });
 });

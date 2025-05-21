@@ -25,7 +25,7 @@ function serialise(forRender, forMultiplayer) {
         nodes: x,
         duration: audio.duration,
         bpm: audio.bpm,
-        zoom: zoom,
+        zoom: gui.zoom,
         loopInterval: loopi,
         stereo: audio.stereo,
         sampleRate: audio.samplerate,
@@ -127,7 +127,7 @@ function deserialise(serialisedStr) {
     }
 
     audio.samplerate = ser.sampleRate;
-    zoom = ser.zoom || 100;
+    gui.zoom = ser.zoom || 100;
     
     ser.nodes.forEach((node) => {
         deserialiseNode(node);
