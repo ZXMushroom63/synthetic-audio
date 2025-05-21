@@ -595,6 +595,7 @@ function init() {
     function actuateZoom() {
         document.querySelector("#trackInternal").style.willChange = "";
         hydrateZoom(true);
+        hydrateDecorations();
     }
     addEventListener("wheel", (e) => {
         if (keymap["Control"]) {
