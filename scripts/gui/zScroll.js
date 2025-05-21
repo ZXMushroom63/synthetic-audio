@@ -5,9 +5,14 @@ async function execZScroll(loop, value) {
             globalThis.zscrollIsInternal = true;
             def.zscroll(loop, value);
             markLoopDirty(loop);
+            var I = 0;
             while (loop.hasAttribute("data-bad-note")) {
                 def.zscroll(loop, value);
                 markLoopDirty(loop);
+                if (I >= 3) {
+                    break;
+                }
+                I++;
             }
             globalThis.zscrollIsInternal = false;
             def.zscroll(loop, 0);
