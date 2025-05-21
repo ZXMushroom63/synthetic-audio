@@ -3,7 +3,10 @@ function midi2freq(i) {
 }
 function processMidiImport(midiData) {
     var doQuantise = confirm("! MIDI IMPORT !\nQuantise timings?");
-    var speedMult = 4*parseFloat(prompt("! MIDI IMPORT !\nChoose a speed multiplier:", 1)) || 0;
+    var speedMult = 4*parseFloat(prompt("! MIDI IMPORT !\nChoose a speed multiplier:", 1));
+    if (!speedMult) {
+        return;
+    }
     deserialise('{}');
     var layerbase = 0;
     var longestDuration = 0;
