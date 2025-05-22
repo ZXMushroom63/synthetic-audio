@@ -12,6 +12,7 @@ addEventListener("init", ()=>{
                 if (x && x.closest(".loop")) {
                     var y = deserialiseNode(structuredClone(serialiseNode(x.closest(".loop"))), true);
                     hydrateLoopPosition(y);
+                    hydrateLoopDecoration(y);
                     pickupLoop(y);
                 }
             } else {
@@ -24,6 +25,7 @@ addEventListener("init", ()=>{
                 });
                 dupedLoops.forEach(loop => {
                     hydrateLoopPosition(loop);
+                    hydrateLoopDecoration(loop);
                     pickupLoop(loop, true);
                 });
             }

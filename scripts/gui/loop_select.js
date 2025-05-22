@@ -23,6 +23,7 @@ function loadFiltersAndPrims() {
                 activateTool("MOVE");
                 const loop = addBlock(k, 0, audio.beatSize, filters[k].title, 0, {});
                 hydrateLoopPosition(loop);
+                hydrateLoopDecoration(loop);
                 pickupLoop(loop);
             });
             span.appendChild(y);
@@ -86,6 +87,7 @@ addEventListener("init", () => {
                     activateTool("MOVE");
                     const loop = addBlock("audio", 0, audio.beatSize, file.name, 0, {});
                     hydrateLoopPosition(loop);
+                    hydrateLoopDecoration(loop);
                     pickupLoop(loop);
                 });
                 span.appendChild(y);

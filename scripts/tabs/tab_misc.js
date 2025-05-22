@@ -194,6 +194,7 @@ addEventListener("init", () => {
         noteAnimationMap[note] = setInterval(() => {
             node.setAttribute("data-duration", (Date.now() - noteTimeMap[note]) / 1000);
             hydrateLoopPosition(node);
+            hydrateLoopDecoration(node);
         }, 1000 / 15);
     }
     function tryPreviewMidi(node) {
@@ -231,6 +232,7 @@ addEventListener("init", () => {
 
             const node = deserialiseNode(ser, true);
             hydrateLoopPosition(node);
+            hydrateLoopDecoration(node);
             noteMap[note] = node;
             noteTimeMap[note] = Date.now();
             lastInsertionTime = Date.now();
@@ -248,6 +250,7 @@ addEventListener("init", () => {
             lastInsertionTime = Date.now();
             const node = deserialiseNode(ser, true);
             hydrateLoopPosition(node);
+            hydrateLoopDecoration(node);
             noteMap[note] = node;
             noteTimeMap[note] = Date.now();
             animateMidiNote(note, node);
@@ -269,6 +272,7 @@ addEventListener("init", () => {
         len = Math.round(len / bpmInterval) * bpmInterval;
         noteMap[note].setAttribute("data-duration", len);
         hydrateLoopPosition(noteMap[note]);
+        hydrateLoopDecoration(noteMap[note]);
         clearInterval(noteAnimationMap[note]);
         delete noteAnimationMap[note];
         delete noteMap[note];

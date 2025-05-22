@@ -42,6 +42,7 @@ addNodeDropdown.querySelector("ul").addEventListener("mousedown", (e) => {
         activateTool("MOVE");
         const loop = addBlock(e.target.getAttribute("data-type"), 0, 1, e.target.getAttribute("data-file"), 0, {});
         hydrateLoopPosition(loop);
+        hydrateLoopDecoration(loop);
         e.stopPropagation();
         e.preventDefault();
         var pickupHandler = (e) => {
@@ -64,6 +65,7 @@ addNodeDropdown.querySelector("input").addEventListener("keydown", (e) => {
         var opt = calcOptions(addNodeDropdown.querySelector("input").value.toLowerCase())[0];
         const loop = addBlock(opt[0], 0, audio.beatSize, opt[1], 0, {});
         hydrateLoopPosition(loop);
+        hydrateLoopDecoration(loop);
         pickupLoop(loop);
     }
 });

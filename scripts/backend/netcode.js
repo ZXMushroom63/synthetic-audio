@@ -31,6 +31,7 @@ const multiplayer = {
             filters[target.getAttribute("data-type")].updateMiddleware(target);
         }
         hydrateLoopPosition(target);
+        hydrateLoopDecoration(target);
     },
     enable: function (socket) {
         multiplayer.on = true;
@@ -53,6 +54,7 @@ const multiplayer = {
             multiplayer.isHooked = true;
             const loop = deserialiseNode(JSON.parse(data));
             hydrateLoopPosition(loop);
+            hydrateLoopDecoration(loop);
             multiplayer.isHooked = false;
         });
         socket.on('delete_loop', (data) => {

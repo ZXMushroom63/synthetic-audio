@@ -56,7 +56,7 @@ function createOptionsMenu(loop, definition) {
                 if (definition.updateMiddleware) {
                     definition.updateMiddleware(loop);
                 }
-                hydrateLoopPosition(loop);
+                hydrateLoopDecoration(loop);
                 markLoopDirty(loop);
                 if (!multiplayer.isHooked && multiplayer.on && !loop._ignore) {
                     multiplayer.patchLoop(loop);
@@ -89,7 +89,7 @@ function createOptionsMenu(loop, definition) {
                 if (definition.updateMiddleware) {
                     definition.updateMiddleware(loop);
                 }
-                hydrateLoopPosition(loop);
+                hydrateLoopDecoration(loop);
                 markLoopDirty(loop);
                 if (!multiplayer.isHooked && multiplayer.on && !loop._ignore) {
                     multiplayer.patchLoop(loop);
@@ -243,7 +243,7 @@ function getPropertySetter(editingTargets) {
             if (key in c) {
                 c[key] = value;
                 if (markDirty) {
-                    hydrateLoopPosition(targ.loop);
+                    hydrateLoopDecoration(targ.loop);
                     markLoopDirty(targ.loop);
                     if (!multiplayer.isHooked && multiplayer.on && !targ.loop._ignore) {
                         multiplayer.patchLoop(targ.loop);
