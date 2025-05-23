@@ -121,7 +121,8 @@ addEventListener("init", () => {
         custom_waveforms[newWaveformName] = {
             samples: smp,
             modifiers: [],
-            uuid: newWaveformName
+            uuid: newWaveformName,
+            calculated: smp
         };
         net_push_waveform(custom_waveforms[newWaveformName]);
         hydrateWaveformTab();

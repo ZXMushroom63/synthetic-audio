@@ -361,6 +361,71 @@ addEventListener("init", () => {
     }
     remoteMultiplayerModule.appendChild(remoteMultiplayerConnect);
 
+    const harmonics = new Float32Array(15);
+    harmonics[0] = 1;
+    const harmonicsWaveform = new Float32Array(WAVEFORM_RES);
+    var harmonicsWaveformLargest = 1;
+    const harmonicsTheming = ["red", "orange", "yellow", "lime", "blue", "purple", "white"];
+    const harmonicEditor = mkModule("Harmonics Editor");
+    const harmonicEditorCanvas = document.createElement("canvas");
+    harmonicEditorCanvas.width = 300;
+    harmonicEditorCanvas.height = 150;
+    harmonicEditorCanvas.style.display = "block";
+    const harmonicEditorButton = document.createElement("button");
+    harmonicEditorButton.innerText = "Copy as waveform samples";
+    const harmonicsCtx = harmonicEditorCanvas.getContext("2d");
+    function drawHarmonics() {
+        harmonicsWaveform.forEach((x, i)=>{
+            harmonicsWaveform[i] = 0;
+            harmonics.forEach((v, j)=>{
+                if (Math.abs(v)<0.05) {
+                    return;
+                }
+                harmonicsWaveform[i] += v * waveforms.sin((i / WAVEFORM_RES) * Math.pow(2, j));
+            });
+        });
+        harmonicsWaveformLargest = Math.max(...harmonicsWaveform.map(Math.abs));
+        harmonicsCtx.clearRect(0, 0, 300, 150);
+        const sliceSize = 300 / harmonics.length;
+        harmonics.forEach((v, i) => {
+            harmonicsCtx.fillStyle = harmonicsTheming[i % harmonicsTheming.length];
+            harmonicsCtx.fillRect(i * sliceSize, 75 - (75 * v), sliceSize, 75 * v);
+        });
+
+        harmonicsCtx.strokeStyle = "magenta";
+        harmonicsCtx.lineWidth = 1;
+
+        harmonicsCtx.moveTo(0, 150 * (harmonicsWaveform[0] + 1) / 2);
+
+        harmonicsCtx.beginPath();
+        for (let i = 0; i < harmonicsWaveform.length; i++) {
+            var v = harmonicsWaveform[i];
+            harmonicsCtx.lineTo(i / WAVEFORM_RES * 300, 150 * (v/harmonicsWaveformLargest + 1) / 2);
+        }
+        harmonicsCtx.stroke();
+    }
+    drawHarmonics();
+    var harmonicsDrawing = false;
+    harmonicEditorCanvas.addEventListener("mousedown", () => {
+        harmonicsDrawing = true;
+    });
+    addEventListener("mouseup", () => {
+        harmonicsDrawing = false;
+    });
+    harmonicEditorCanvas.addEventListener("mousemove", (e) => {
+        if (harmonicsDrawing) {
+            const idx = Math.floor(e.offsetX / 300 * harmonics.length);
+            const v = Math.min(1, Math.max(-1, (e.offsetY - 75) / -75));
+            harmonics[idx] = v;
+            drawHarmonics();
+        }
+    });
+    harmonicEditorButton.addEventListener("click", ()=>{
+        navigator.clipboard.writeText("sp_wvform::" + float32arrayToString(harmonicsWaveform.map(x => x / harmonicsWaveformLargest)));
+    });
+    harmonicEditor.appendChild(harmonicEditorCanvas);
+    harmonicEditor.appendChild(harmonicEditorButton);
+
     registerTab("Misc", container, false, () => {
         updateScales();
     });
