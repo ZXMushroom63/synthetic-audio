@@ -91,6 +91,7 @@ function updateLOD() {
 
 function markLoopDirty(loop, wasMoved) {
     if (!multiplayer.isHooked && multiplayer.on && !loop._ignore) {
+        customEvent("loopchangedcli", { loop: loop });
         return multiplayer.markLoopDirty(JSON.stringify({
             uuid: loop.getAttribute("data-uuid"),
             wasMoved: wasMoved
@@ -101,6 +102,7 @@ function markLoopDirty(loop, wasMoved) {
         loop.setAttribute("data-wasMovedSinceRender", "yes");
     }
     customEvent("loopchanged", { loop: loop });
+    customEvent("loopchangedcli", { loop: loop });
 }
 function hydrateBeatMarkers() {
     updateLOD();

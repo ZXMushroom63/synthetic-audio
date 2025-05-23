@@ -163,7 +163,7 @@ addEventListener("init", () => {
             }
         }
     }
-    addEventListener('loopchanged', (e) => {
+    addEventListener('loopchangedcli', (e) => {
         updateLoopHighlight(e.detail.loop);
     });
 
