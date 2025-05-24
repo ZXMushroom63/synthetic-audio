@@ -218,6 +218,12 @@ addEventListener("init", () => {
         if (ser.conf.Note) {
             ser.conf.Note = freq;
         }
+        if (ser.conf.Volume) {
+            ser.conf.Volume = (velocity / 255).toFixed(2);
+        }
+        if (ser.conf.Amplitude) {
+            ser.conf.Amplitude = (velocity / 255).toFixed(2);
+        }
         if ((Date.now() - lastInsertionTime) > 4000) {
             insertionBaseTime = Date.now();
             ser.start += ser.duration;
@@ -375,10 +381,10 @@ addEventListener("init", () => {
     harmonicEditorButton.innerText = "Copy as waveform samples";
     const harmonicsCtx = harmonicEditorCanvas.getContext("2d");
     function drawHarmonics() {
-        harmonicsWaveform.forEach((x, i)=>{
+        harmonicsWaveform.forEach((x, i) => {
             harmonicsWaveform[i] = 0;
-            harmonics.forEach((v, j)=>{
-                if (Math.abs(v)<0.05) {
+            harmonics.forEach((v, j) => {
+                if (Math.abs(v) < 0.05) {
                     return;
                 }
                 harmonicsWaveform[i] += v * waveforms.sin((i / WAVEFORM_RES) * Math.pow(2, j));
@@ -400,7 +406,7 @@ addEventListener("init", () => {
         harmonicsCtx.beginPath();
         for (let i = 0; i < harmonicsWaveform.length; i++) {
             var v = harmonicsWaveform[i];
-            harmonicsCtx.lineTo(i / WAVEFORM_RES * 300, 150 * (v/harmonicsWaveformLargest + 1) / 2);
+            harmonicsCtx.lineTo(i / WAVEFORM_RES * 300, 150 * (v / harmonicsWaveformLargest + 1) / 2);
         }
         harmonicsCtx.stroke();
     }
@@ -420,7 +426,7 @@ addEventListener("init", () => {
             drawHarmonics();
         }
     });
-    harmonicEditorButton.addEventListener("click", ()=>{
+    harmonicEditorButton.addEventListener("click", () => {
         navigator.clipboard.writeText("sp_wvform::" + float32arrayToString(harmonicsWaveform.map(x => x / harmonicsWaveformLargest)));
     });
     harmonicEditor.appendChild(harmonicEditorCanvas);
