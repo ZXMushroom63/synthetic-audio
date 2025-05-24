@@ -206,7 +206,7 @@ addEventListener("init", () => {
         if (noteMap[note]) {
             return;
         }
-        var caretNode = document.querySelector(".caret");
+        var caretNode = document.querySelector(".loop.caret:not([data-deleted])");
         if (!caretNode) {
             return;
         }
