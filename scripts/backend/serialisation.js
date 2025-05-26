@@ -17,6 +17,27 @@ function serialise(forRender, forMultiplayer) {
             ]
         )
     }
+    hNodes = Array.prototype.sort.apply(hNodes,
+        [
+            (a, b) => {
+                return parseFloat(a.getAttribute("data-duration")) - parseFloat(b.getAttribute("data-duration"));
+            }
+        ]
+    );
+    hNodes = Array.prototype.sort.apply(hNodes,
+        [
+            (a, b) => {
+                return parseInt(a.getAttribute("data-layer")) - parseInt(b.getAttribute("data-layer"));
+            }
+        ]
+    );
+    hNodes = Array.prototype.sort.apply(hNodes,
+        [
+            (a, b) => {
+                return parseInt(a.getAttribute("data-editlayer")) - parseInt(b.getAttribute("data-editlayer"));
+            }
+        ]
+    );
     var x = Array.prototype.flatMap.apply(hNodes, [(node => {
         return serialiseNode(node, forRender, forMultiplayer);
     })]);
@@ -128,7 +149,7 @@ function deserialise(serialisedStr) {
 
     audio.samplerate = ser.sampleRate;
     gui.zoom = ser.zoom || 100;
-    
+
     ser.nodes.forEach((node) => {
         deserialiseNode(node);
     });
