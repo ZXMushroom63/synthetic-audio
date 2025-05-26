@@ -12,7 +12,6 @@ addBlockType("p_waveform_plus", {
         "Triangle": [0, "number", 1],
         "Period": [1.0, "number", 1],
         "Exponent": [1, "number", 1],
-        "PhaseOffset": [0, "number"],
         "UseCustomWaveform": [false, "checkbox"],
         "WaveformAsset": ["(none)", ["(none)"]],
         "WaveformAsset2": ["(none)", ["(none)"]],
@@ -52,8 +51,7 @@ addBlockType("p_waveform_plus", {
             "Sawtooth",
             "Triangle",
             "Period",
-            "Exponent",
-            "PhaseOffset"
+            "Exponent"
         ],
         "Custom Waveforms": [
             "UseCustomWaveform",
@@ -202,20 +200,17 @@ addBlockType("p_waveform_plus", {
                 return [[k, x]];
             }));
             if (this.conf.BadSine && i % badsineinterval === 0) {
-                badsineamount = 2*(Math.random() - 0.5);
+                badsineamount = 2 * (Math.random() - 0.5);
             }
             var f = (
-                    freq(i, inPcm)
-                     + (
-                        badsineoffset(i, inPcm) * badsineamount
-                    )
+                freq(i, inPcm)
+                + (
+                    badsineoffset(i, inPcm) * badsineamount
                 )
+            )
                 * Math.pow(2, (freqsemioffset(i, inPcm) + this.conf.InternalSemiOffset) / 12);
             f *= Math.exp(-fdecay(i, inPcm) * absoluteTime);
             t += f * dt;
-            if (i === 0) {
-                t += this.conf.PhaseOffset;
-            }
             var y = 0;
             var waveCount = 1;
             if (this.conf.Harmonics) {
@@ -272,10 +267,10 @@ addBlockType("p_waveform_plus", {
                 if (this.conf.UseCustomWaveform) {
                     const wavetable_pos = wavetablePos(i, inPcm);
                     if (customWaveform) {
-                        y += -1*customWaveform[Math.floor((waveformTime + wavePhaseOffset) * WAVEFORM_RES) % WAVEFORM_RES] * volumeRatio * (1 - wavetable_pos);
+                        y += -1 * customWaveform[Math.floor((waveformTime + wavePhaseOffset) * WAVEFORM_RES) % WAVEFORM_RES] * volumeRatio * (1 - wavetable_pos);
                     }
                     if (customWaveform2) {
-                        y += -1*customWaveform2[Math.floor((waveformTime + wavePhaseOffset) * WAVEFORM_RES) % WAVEFORM_RES] * volumeRatio * wavetable_pos;
+                        y += -1 * customWaveform2[Math.floor((waveformTime + wavePhaseOffset) * WAVEFORM_RES) % WAVEFORM_RES] * volumeRatio * wavetable_pos;
                     }
                 } else {
                     y += waveforms.sin(waveformTime + wavePhaseOffset) * values.Sine * volumeRatio;
@@ -283,7 +278,7 @@ addBlockType("p_waveform_plus", {
                     y += waveforms.sawtooth(waveformTime + wavePhaseOffset) * values.Sawtooth * volumeRatio;
                     y += waveforms.triangle(waveformTime + wavePhaseOffset) * values.Triangle * volumeRatio;
                 }
-                
+
                 y /= total;
             }
 
@@ -292,7 +287,7 @@ addBlockType("p_waveform_plus", {
             y = (Math.pow(Math.abs(y), exp(i, inPcm)) * Math.sign(y)) * amp(i, inPcm);
 
             var decayValue = Math.exp(-decay(i, inPcm) * absoluteTime);
-            
+
             y *= decayValue;
 
             var ampSmoothingFactor = 1;
