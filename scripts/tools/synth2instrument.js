@@ -1,6 +1,6 @@
 
 addEventListener("init", () => {
-    registerTool("Synth Converter", (nodes) => {
+    registerTool("Synth Conv", (nodes) => {
         if (!nodes) { return };
 
         const valid_types = ["p_waveform_plus", "instrument"];
@@ -59,13 +59,10 @@ addEventListener("init", () => {
         }
     });
 });
-registerHelp(".tool[data-tool=SYNTH_CONVERTER]",
+registerHelp(".tool[data-tool=SYNTH_CONV]",
     `
 *********************
-*  THE RENAME TOOL  *
+*  SYNTH CONVERTER  *
 *********************
-If the rename tool is enabled, when a 
-    - loop is clicked, or
-    - a group of loops are selected using RMB
-a popup asking for new names for those loops appears, and if the user presses 'Ok', all selected loop's names are changed.
+Depending on user input, converts synths to instrument nodes, or instrument nodes to synths. Maintains frequency and volume across conversions. May run slow on large amounts of nodes.
 `);
