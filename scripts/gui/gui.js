@@ -26,7 +26,7 @@ var audio = {
     samplerate: 24000,
     bitrate: 320,
     bpm: 240,
-    bpmSize: 1 / 240 * 60,
+    beatSize: 1 / 240 * 60,
     duration: 10,
     length: 240000,
     stereo: false,
@@ -548,7 +548,7 @@ function init() {
         hydrateDecorations();
     });
     document.querySelector("#substepping").addEventListener("input", (e) => {
-        gui.substepping = Math.min(4, Math.max(1, parseInt(e.target.value))) || 1;
+        gui.substepping = Math.min(8, Math.max(1, parseInt(e.target.value))) || 1;
     });
     document.querySelector("#duration").addEventListener("input", () => {
         if (!multiplayer.isHooked && multiplayer.on) {

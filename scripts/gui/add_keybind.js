@@ -40,7 +40,7 @@ addNodeDropdown.querySelector("ul").addEventListener("mousedown", (e) => {
     if (e.target && e.target.tagName === "LI") {
         addNodeDropdown.style.display = "none";
         activateTool("MOVE");
-        const loop = addBlock(e.target.getAttribute("data-type"), 0, 1, e.target.getAttribute("data-file"), 0, {});
+        const loop = addBlock(e.target.getAttribute("data-type"), 0, audio.beatSize, e.target.getAttribute("data-file"), 0, {});
         hydrateLoopPosition(loop);
         hydrateLoopDecoration(loop);
         e.stopPropagation();
