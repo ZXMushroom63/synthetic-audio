@@ -1,10 +1,10 @@
 function updateNoteDisplay(loop) {
-    var basic = new Float32Array(8);
-    var freq = _(loop.conf.Frequency || loop.conf.Note)(4, basic);
+    var basic = new Float32Array(1);
+    var freq = _(loop.conf.Frequency || loop.conf.Note)(0, basic);
     var freqsemioffset = 0;
     var internalSemiOffset = loop.conf.InternalSemiOffset || 0;
     if (loop.conf.SemitonesOffset) {
-        freqsemioffset = _(loop.conf.SemitonesOffset)(4, basic)
+        freqsemioffset = _(loop.conf.SemitonesOffset)(0, basic)
     }
     var f = freq * Math.pow(2, (freqsemioffset + internalSemiOffset) / 12);
     loop.__determinedFreq = frequencyToNote(f);
