@@ -12,6 +12,7 @@ addBlockType("p_waveform_plus", {
         "Triangle": [0, "number", 1],
         "Period": [1.0, "number", 1],
         "Exponent": [1, "number", 1],
+        "PhaseOffset": [1, "number"],
         "UseCustomWaveform": [false, "checkbox"],
         "WaveformAsset": ["(none)", ["(none)"]],
         "WaveformAsset2": ["(none)", ["(none)"]],
@@ -51,7 +52,8 @@ addBlockType("p_waveform_plus", {
             "Sawtooth",
             "Triangle",
             "Period",
-            "Exponent"
+            "Exponent",
+            "PhaseOffset"
         ],
         "Custom Waveforms": [
             "UseCustomWaveform",
@@ -134,6 +136,25 @@ addBlockType("p_waveform_plus", {
         updateNoteDisplay(loop);
         slideNoteHandler(loop);
     },
+    guessEndPhase: function (duration) {
+        var examplePcm = new Float32Array(Math.floor(duration * audio.samplerate));
+        var fdecay = _(this.conf.FrequencyDecay);
+        var freq = _(this.conf.Frequency);
+        var freqsemioffset = _(this.conf.SemitonesOffset);
+
+        var dt = Math.pow(audio.samplerate, -1);
+        var t = this.conf.PhaseOffset;
+
+        examplePcm.forEach((x, i) => {
+            var absoluteTime = i / audio.samplerate;
+            var f =
+                freq(i, examplePcm)
+                * Math.pow(2, (freqsemioffset(i, examplePcm) + this.conf.InternalSemiOffset) / 12);
+            f *= Math.exp(-fdecay(i, examplePcm) * absoluteTime);
+            t += f * dt;
+        });
+        return t % 1;
+    },
     functor: function (inPcm, channel, data) {
         var keys = ["Sine", "Square", "Sawtooth", "Triangle"];
         var underscores = {};
@@ -142,7 +163,6 @@ addBlockType("p_waveform_plus", {
         });
         var freq = _(this.conf.Frequency);
         var freqsemioffset = _(this.conf.SemitonesOffset);
-        var freq = _(this.conf.Frequency);
         var decay = _(this.conf.Decay);
         var badsineoffset = _(this.conf.BadSineOffsetHz);
         var fdecay = _(this.conf.FrequencyDecay);
@@ -184,7 +204,7 @@ addBlockType("p_waveform_plus", {
         const AmpSmoothingStart = Math.floor(audio.samplerate * this.conf.AmplitudeSmoothTime);
         const AmpSmoothingEnd = inPcm.length - AmpSmoothingStart;
         var dt = Math.pow(audio.samplerate, -1);
-        var t = 0;
+        var t = this.conf.PhaseOffset;
         if (this.conf.BadSine) {
             Math.newRandom(this.conf.BadSineSeed);
         }
@@ -339,8 +359,10 @@ function slideNoteHandler(l) {
         mapper = "!" + l.conf.SlideWavetable;
     }
     l.conf.Frequency = `#:${l.__determinedFreq}:~:${slideTarget[0].__determinedFreq}:@${mapper}`;
-    if (oldFreq !== l.conf.Frequency) {
+    if (oldFreq !== l.conf.Frequency || l.hasAttribute("[data-dirty]")) {
         markLoopDirty(l);
+        slideTarget[0].conf.PhaseOffset = filters["p_waveform_plus"].guessEndPhase.apply(l, [parseFloat(l.getAttribute("data-duration"))]);
+        markLoopDirty(slideTarget[0]);
     }
 }
 addEventListener("preserialisenode", (e) => {
