@@ -53,11 +53,11 @@ function createOptionsMenu(loop, definition) {
             s.addEventListener("input", () => {
                 loop["conf"][key] = s.value;
                 value[0] = s.value;
+                hydrateLoopDecoration(loop);
+                markLoopDirty(loop);
                 if (definition.updateMiddleware) {
                     definition.updateMiddleware(loop);
                 }
-                hydrateLoopDecoration(loop);
-                markLoopDirty(loop);
                 if (!multiplayer.isHooked && multiplayer.on && !loop._ignore) {
                     multiplayer.patchLoop(loop);
                 }
@@ -86,11 +86,11 @@ function createOptionsMenu(loop, definition) {
                 } else {
                     loop["conf"][key] = input.value;
                 }
+                hydrateLoopDecoration(loop);
+                markLoopDirty(loop);
                 if (definition.updateMiddleware) {
                     definition.updateMiddleware(loop);
                 }
-                hydrateLoopDecoration(loop);
-                markLoopDirty(loop);
                 if (!multiplayer.isHooked && multiplayer.on && !loop._ignore) {
                     multiplayer.patchLoop(loop);
                 }

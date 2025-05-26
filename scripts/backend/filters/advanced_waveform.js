@@ -36,6 +36,9 @@ addBlockType("p_waveform_plus", {
         "uDetuneHz": [0, "number", 1],
         "uPan": [0.0, "number", 1],
         "uPhase": [0.0, "number", 1],
+        "IsSlide": [false, "checkbox"],
+        "SlideExponent": [3, "number"],
+        "SlideWavetable": ["(none)", ["(none)"]],
         "Absolute": [false, "checkbox"],
         "Multiply": [false, "checkbox"],
         "Sidechain": [false, "checkbox"],
@@ -78,10 +81,15 @@ addBlockType("p_waveform_plus", {
             "uDetuneHz",
             "uPan",
             "uPhase"
+        ],
+        "Slide": [
+            "IsSlide",
+            "SlideExponent",
+            "SlideWavetable",
         ]
     },
     selectMiddleware: (key) => {
-        if (key.startsWith("WaveformAsset")) {
+        if (key.startsWith("WaveformAsset") || key.endsWith("Wavetable")) {
             return ["(none)", ...Object.keys(custom_waveforms)];
         }
     },
@@ -118,11 +126,13 @@ addBlockType("p_waveform_plus", {
         },
     },
     updateMiddleware: (loop) => {
+        loop.setAttribute("data-slides", loop.conf.IsSlide);
         if (loop.conf.Unison) {
             loop.conf.Harmonics = false;
             loop.querySelector("[data-key=Harmonics]").checked = false;
         }
         updateNoteDisplay(loop);
+        slideNoteHandler(loop);
     },
     functor: function (inPcm, channel, data) {
         var keys = ["Sine", "Square", "Sawtooth", "Triangle"];
@@ -314,5 +324,23 @@ addBlockType("p_waveform_plus", {
             }
         });
         return inPcm;
+    }
+});
+function slideNoteHandler(l) {
+    const slideTarget = findLoops(`.loop:not(data-deleted)[data-editlayer="${l.getAttribute("data-editlayer")}"][data-layer="${l.getAttribute("data-layer")}"][data-start="${parseFloat(l.getAttribute("data-start")) + parseFloat(l.getAttribute("data-duration"))}"]`);
+    if (!slideTarget[0]) {
+        return;
+    }
+    l.conf.SemitonesOffset = "0";
+    l.conf.InternalSemiOffset = 0;
+    var mapper = l.conf.SlideExponent;
+    if (custom_waveforms[l.conf.SlideWavetable]) {
+        mapper = "!" + l.conf.SlideWavetable;
+    }
+    l.conf.Frequency = `#:${l.__determinedFreq}:~:${slideTarget[0].__determinedFreq}:@${mapper}`;
+}
+addEventListener("preserialisenode", (e) => {
+    if (e.detail.node.conf.IsSlide) {
+        slideNoteHandler(e.detail.node);
     }
 });
