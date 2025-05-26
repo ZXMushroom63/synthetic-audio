@@ -349,6 +349,13 @@ addBlockType("p_waveform_plus", {
 function slideNoteHandler(l) {
     const slideTarget = findLoops(`.loop:not(data-deleted)[data-editlayer="${l.getAttribute("data-editlayer")}"][data-layer="${l.getAttribute("data-layer")}"][data-start="${parseFloat(l.getAttribute("data-start")) + parseFloat(l.getAttribute("data-duration"))}"]`);
     if (!slideTarget[0]) {
+        const oldFreq = l.conf.Frequency;
+        l.conf.SemitonesOffset = "0";
+        l.conf.InternalSemiOffset = 0;
+        l.conf.Frequency = `:${l.__determinedFreq}:`;
+        if (oldFreq !== l.conf.Frequency) {
+            markLoopDirty(l);
+        }
         return;
     }
     const oldFreq = l.conf.Frequency;
@@ -359,7 +366,7 @@ function slideNoteHandler(l) {
         mapper = "!" + l.conf.SlideWavetable;
     }
     l.conf.Frequency = `#:${l.__determinedFreq}:~:${slideTarget[0].__determinedFreq}:@${mapper}`;
-    if (oldFreq !== l.conf.Frequency || l.hasAttribute("[data-dirty]")) {
+    if (oldFreq !== l.conf.Frequency || l.hasAttribute("data-dirty")) {
         markLoopDirty(l);
         slideTarget[0].conf.PhaseOffset = filters["p_waveform_plus"].guessEndPhase.apply(l, [parseFloat(l.getAttribute("data-duration"))]);
         markLoopDirty(slideTarget[0]);
