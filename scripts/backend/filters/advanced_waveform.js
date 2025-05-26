@@ -331,6 +331,7 @@ function slideNoteHandler(l) {
     if (!slideTarget[0]) {
         return;
     }
+    const oldFreq = l.conf.Frequency;
     l.conf.SemitonesOffset = "0";
     l.conf.InternalSemiOffset = 0;
     var mapper = l.conf.SlideExponent;
@@ -338,6 +339,9 @@ function slideNoteHandler(l) {
         mapper = "!" + l.conf.SlideWavetable;
     }
     l.conf.Frequency = `#:${l.__determinedFreq}:~:${slideTarget[0].__determinedFreq}:@${mapper}`;
+    if (oldFreq !== l.conf.Frequency) {
+        markLoopDirty(l);
+    }
 }
 addEventListener("preserialisenode", (e) => {
     if (e.detail.node.conf.IsSlide) {
