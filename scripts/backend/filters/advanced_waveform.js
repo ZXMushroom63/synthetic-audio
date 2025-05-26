@@ -12,6 +12,7 @@ addBlockType("p_waveform_plus", {
         "Triangle": [0, "number", 1],
         "Period": [1.0, "number", 1],
         "Exponent": [1, "number", 1],
+        "PhaseOffset": [0, "number"],
         "UseCustomWaveform": [false, "checkbox"],
         "WaveformAsset": ["(none)", ["(none)"]],
         "WaveformAsset2": ["(none)", ["(none)"]],
@@ -51,7 +52,8 @@ addBlockType("p_waveform_plus", {
             "Sawtooth",
             "Triangle",
             "Period",
-            "Exponent"
+            "Exponent",
+            "PhaseOffset"
         ],
         "Custom Waveforms": [
             "UseCustomWaveform",
@@ -211,6 +213,9 @@ addBlockType("p_waveform_plus", {
                 * Math.pow(2, (freqsemioffset(i, inPcm) + this.conf.InternalSemiOffset) / 12);
             f *= Math.exp(-fdecay(i, inPcm) * absoluteTime);
             t += f * dt;
+            if (i === 0) {
+                t += this.conf.PhaseOffset;
+            }
             var y = 0;
             var waveCount = 1;
             if (this.conf.Harmonics) {
