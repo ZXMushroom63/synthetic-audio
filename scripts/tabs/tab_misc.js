@@ -71,7 +71,7 @@ addEventListener("init", () => {
     const scaleCopyDemo = scaleGeneratorModule.querySelector("#scaleCopyDemo");
     const scaleAutocorrect = scaleGeneratorModule.querySelector("#scaleAutocorrect");
     function updateScales() {
-        var startingPitch = _(note.value || ":C#:")(0, new Float32Array(1)) || 440;
+        var startingPitch = _(note.value || ":C#:")(0, new Float32Array(2)) || 440;
         var scale = scales.value.split(",").map(x => parseInt(x));
         var notes = [];
         var offset = 0;

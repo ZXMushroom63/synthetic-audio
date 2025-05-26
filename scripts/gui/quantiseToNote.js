@@ -41,7 +41,7 @@ addEventListener("keydown", (e) => {
 });
 addEventListener("keydown", (e) => {
     if ((e.key === "'") && (e.target.tagName === "INPUT")) {
-        e.target.value = _(e.target.value)(0, new Float32Array(1)).toFixed(1);
+        e.target.value = _(e.target.value)(0, new Float32Array(2)).toFixed(1);
         e.preventDefault();
         e.target.dispatchEvent(new Event('input', { bubbles: true }));
     }

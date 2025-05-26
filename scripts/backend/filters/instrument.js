@@ -41,7 +41,7 @@ addBlockType("instrument", {
                 return;
             }
 
-            var note = _(this.conf.Note)(0, new Float32Array(1));
+            var note = _(this.conf.Note)(0, new Float32Array(2));
             note = frequencyToNote(note, true);
             var audio = new Audio(SFREGISTRY[this.conf.Instrument][note]);
             audio.play();
@@ -57,7 +57,7 @@ addBlockType("instrument", {
             return inPcm;
         }
 
-        var note = _(this.conf.Note)(0, new Float32Array(1));
+        var note = _(this.conf.Note)(0, new Float32Array(2));
         note = frequencyToNote(note, true);
         var currentData = SFCACHE[this.conf.Instrument][note];
         if (!currentData) {
