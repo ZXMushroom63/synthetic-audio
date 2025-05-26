@@ -342,7 +342,7 @@ function addBlock(type, start, duration, title, layer = 0, data = {}, editorValu
         loop.setAttribute("data-uuid", data.uuid);
         delete data.uuid;
     } else {
-        loop.setAttribute("data-uuid", crypto.randomUUID());
+        loop.setAttribute("data-uuid", Math.randomUUID());
     }
     loop.setAttribute("data-start", start);
     loop.setAttribute("data-duration", duration);
