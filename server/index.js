@@ -8,7 +8,7 @@ app.use(express.static('.'));
 app.use(cors({origin: "*"}))
 const multiplayerEnabled = true;
 const port = 80;
-const logging = true;
+const logging = false;
 const blacklistMiddleware = (req, res, next) => {
     const requestedPath = req.path;
     if (requestedPath.startsWith(`/server/`)) {
