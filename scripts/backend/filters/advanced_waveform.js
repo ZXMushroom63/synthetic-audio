@@ -134,7 +134,9 @@ addBlockType("p_waveform_plus", {
             loop.querySelector("[data-key=Harmonics]").checked = false;
         }
         updateNoteDisplay(loop);
-        slideNoteHandler(loop);
+        if (loop.conf.IsSlide) {
+            slideNoteHandler(loop);
+        }
     },
     guessEndPhase: function (duration) {
         var examplePcm = new Float32Array(Math.floor(duration * audio.samplerate));
@@ -347,6 +349,9 @@ addBlockType("p_waveform_plus", {
     }
 });
 function slideNoteHandler(l) {
+    if (l.getAttribute("data-slides") !== "true") {
+        return;
+    }
     const slideTarget = findLoops(`.loop:not(data-deleted)[data-editlayer="${l.getAttribute("data-editlayer")}"][data-layer="${l.getAttribute("data-layer")}"][data-start="${parseFloat(l.getAttribute("data-start")) + parseFloat(l.getAttribute("data-duration"))}"]`);
     if (!slideTarget[0]) {
         const oldFreq = l.conf.Frequency;
