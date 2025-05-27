@@ -367,7 +367,7 @@ addEventListener("init", () => {
     }
     remoteMultiplayerModule.appendChild(remoteMultiplayerConnect);
 
-    const harmonics = new Float32Array(15);
+    const harmonics = new Float32Array(50);
     harmonics[0] = 1;
     const harmonicsWaveform = new Float32Array(WAVEFORM_RES);
     var harmonicsWaveformLargest = 1;
@@ -384,10 +384,10 @@ addEventListener("init", () => {
         harmonicsWaveform.forEach((x, i) => {
             harmonicsWaveform[i] = 0;
             harmonics.forEach((v, j) => {
-                if (Math.abs(v) < 0.05) {
+                if (Math.abs(v) < 0.1) {
                     return;
                 }
-                harmonicsWaveform[i] += v * waveforms.sin((i / WAVEFORM_RES) * Math.pow(2, j));
+                harmonicsWaveform[i] += v * waveforms.sin((i / WAVEFORM_RES) * (j + 1));
             });
         });
         harmonicsWaveformLargest = Math.max(...harmonicsWaveform.map(Math.abs));
