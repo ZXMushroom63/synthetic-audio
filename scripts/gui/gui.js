@@ -631,7 +631,7 @@ function init() {
     });
     document.querySelector("#normalisebox").addEventListener("input", () => {
         if (!multiplayer.isHooked && multiplayer.on) {
-            multiplayer.modifyProperty("#normalisebox", "normalisebox", document.querySelector("#normalisebox").checked);
+            multiplayer.modifyProperty("#normalisebox", "normalise", document.querySelector("#normalisebox").checked);
         }
         if (document.querySelector("#normalisebox").checked) {
             audio.normalise = true;
