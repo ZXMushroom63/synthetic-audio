@@ -42,6 +42,9 @@ addEventListener("init", () => {
     };
     const inputSelect = container.querySelector("#liveTabInputOptions");
     const modifierStackMenu = container.querySelector("#liveTabModifierStack");
+    if (!navigator?.mediaDevices?.enumerateDevices) {
+        return;
+    }
     navigator.mediaDevices.enumerateDevices().then(x => {
         x.filter(
             (device) => device.kind === "audioinput"
