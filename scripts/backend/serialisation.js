@@ -20,7 +20,7 @@ function serialise(forRender, forMultiplayer) {
     hNodes = Array.prototype.sort.apply(hNodes,
         [
             (a, b) => {
-                return parseFloat(a.getAttribute("data-duration")) - parseFloat(b.getAttribute("data-duration"));
+                return parseFloat(a.getAttribute("data-start")) - parseFloat(b.getAttribute("data-start"));
             }
         ]
     );

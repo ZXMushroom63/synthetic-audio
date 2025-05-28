@@ -128,7 +128,6 @@ addBlockType("p_waveform_plus", {
         },
     },
     updateMiddleware: (loop) => {
-        loop.setAttribute("data-slides", loop.conf.IsSlide);
         if (loop.conf.Unison) {
             loop.conf.Harmonics = false;
             loop.querySelector("[data-key=Harmonics]").checked = false;
@@ -349,7 +348,7 @@ addBlockType("p_waveform_plus", {
     }
 });
 function slideNoteHandler(l) {
-    if (l.getAttribute("data-slides") !== "true") {
+    if (!l.conf.IsSlide) {
         return;
     }
     const slideTarget = findLoops(`.loop:not(data-deleted)[data-editlayer="${l.getAttribute("data-editlayer")}"][data-layer="${l.getAttribute("data-layer")}"][data-start="${parseFloat(l.getAttribute("data-start")) + parseFloat(l.getAttribute("data-duration"))}"]`);
