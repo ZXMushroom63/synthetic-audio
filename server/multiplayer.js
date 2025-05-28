@@ -93,7 +93,10 @@ function multiplayer_support(server, debugMode) {
                 const path = res.path.split(".");
                 var v = localState;
                 var last = path.pop();
-                path.forEach(k => {
+                path.forEach((k, i) => {
+                    if (!v[k]) {
+                        v[k] = {};
+                    }
                     v = v[k];
                 });
                 v[last] = res.data;
