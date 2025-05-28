@@ -106,7 +106,6 @@ addEventListener("init", () => {
                 return;
             };
             const notes = await fileToNotes(picker.files[0]);
-            console.log(notes);
             deleteLoop(templateNode);
             var startOffset = parseFloat(templateNode.getAttribute("data-start"));
             var layerOffset = parseInt(templateNode.getAttribute("data-layer"));

@@ -59,7 +59,6 @@ function getDurationOfLoop(audioFile) {
             res(d);
         };
         audioElement.onerror = () => {
-            console.log(audioFile.name);
             URL.revokeObjectURL(tempUrl);
             res(0);
         };
@@ -489,7 +488,6 @@ function addIgnoredBlock(type, start, duration, title, layer = 0, data = {}, edi
 var launchFile = null;
 if ('launchQueue' in window && 'files' in LaunchParams.prototype && (new URLSearchParams(location.search)).has("openFileHandler")) {
     launchQueue.setConsumer(async (launchParams) => {
-        console.log(launchParams);
         if (!launchParams.files.length) {
             return;
         }

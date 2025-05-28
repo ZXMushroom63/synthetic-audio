@@ -11,7 +11,6 @@ addEventListener("init", () => {
                 return null;
             }
         }).filter(x => !!x);
-        console.log(results);
         results.forEach(resultNode => {
             var a = structuredClone(resultNode);
             a.duration = cursorPosition - a.start;

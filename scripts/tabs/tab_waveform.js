@@ -382,6 +382,7 @@ addEventListener("init", () => {
             }
             if (x.startsWith("sp_wvform::") && (x.length === (WAVEFORM_RES + 11))) {
                 target.samples.set(stringToFloat32array(x.replace("sp_wvform::", "")));
+                net_push_samples(target);
                 drawWaveform(true);
             }
         });
