@@ -382,6 +382,7 @@ addEventListener("init", () => {
             }
             if (x.startsWith("sp_wvform::") && (x.length === (WAVEFORM_RES + 11))) {
                 target.samples.set(stringToFloat32array(x.replace("sp_wvform::", "")));
+                net_push_samples(target);
                 drawWaveform(true);
             }
         });
@@ -827,6 +828,7 @@ addEventListener("init", () => {
     addEventListener("preserialisenode", (e) => {
         if ((e.detail.node.getAttribute("data-type") === "p_waveform_plus") && e.detail.node.conf.UseCustomWaveform && (custom_waveforms[e.detail.node.conf.WaveformAsset]?.dirty || custom_waveforms[e.detail.node.conf.WaveformAsset2]?.dirty)) {
             markLoopDirty(e.detail.node);
+            console.log(e.detail.node);
             return;
         }
         Object.values(e.detail.node.conf).forEach(x => {
