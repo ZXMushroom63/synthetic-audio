@@ -194,6 +194,7 @@ function addAmpSmoothKnob(data) {
         return out;
     }
 }
+const directRefs = {};
 function addBlockType(id, data) {
     if (data.assetUser) {
         assetUserTypes.push(id);
@@ -211,6 +212,9 @@ function addBlockType(id, data) {
     if (data.amplitude_smoothing_knob) {
         addAmpSmoothKnob(data);
     }
+    (data.directRefs || []).forEach(x => {
+        directRefs[x] = id;
+    });
     filters[id] = data;
 }
 function wait(s) {

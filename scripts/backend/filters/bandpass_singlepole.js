@@ -39,6 +39,7 @@ async function applyBandpassFilter(pcmData, sampleRate, freq, falloff) {
 addBlockType("bandpass1", {
     color: "rgba(0,255,0,0.3)",
     title: "Bandpass Filter (single-pole)",
+    directRefs: ["bp"],
     wet_and_dry_knobs: true,
     amplitude_smoothing_knob: true,
     configs: {

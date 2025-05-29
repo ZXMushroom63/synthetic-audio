@@ -2,6 +2,7 @@ const proceduralAssets = new Map();
 addBlockType("p_readasset", {
     color: "rgba(255,0,255,0.3)",
     title: "Play Asset",
+    directRefs: ["read"],
     configs: {
         "Asset": ["(none)", ["(none)"]],
         "StartOffset": [0, "number"],
@@ -43,6 +44,7 @@ addBlockType("p_readasset", {
 addBlockType("p_writeasset", {
     color: "rgba(255,0,255,0.3)",
     title: "Save Asset",
+    directRefs: ["write"],
     configs: {
         "Asset": ["My Asset", "text"],
         "Transparent": [false, "checkbox"]

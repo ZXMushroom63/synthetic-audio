@@ -4,6 +4,7 @@ function processNoteText(txt) {
 addBlockType("note", {
     color: "rgba(255,255,0,0.3)",
     title: "Note",
+    directRefs: ["note"],
     configs: {
         "Text": ["Note text here...", "textarea"],
     },
