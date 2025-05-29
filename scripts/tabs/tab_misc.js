@@ -432,6 +432,12 @@ addEventListener("init", () => {
     harmonicEditor.appendChild(harmonicEditorCanvas);
     harmonicEditor.appendChild(harmonicEditorButton);
 
+    const settingsModule = mkModule("Settings");
+    const openSettingsBtn = document.createElement("button");
+    openSettingsBtn.innerText = "Open Settings";
+    openSettingsBtn.onclick = openSettings;
+    settingsModule.appendChild(openSettingsBtn);
+
     registerTab("Misc", container, false, () => {
         updateScales();
     });

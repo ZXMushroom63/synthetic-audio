@@ -602,7 +602,7 @@ function init() {
             e.preventDefault();
             e.stopImmediatePropagation();
             e.stopPropagation();
-            gui.zoom += e.deltaY * (keymap["Shift"] ? 0.05 : 1);
+            gui.zoom += e.deltaY * (keymap["Shift"] ? settings.ZoomScale*0.05 : settings.ZoomScale);
             gui.zoom = Math.max(100, gui.zoom);
             document.querySelector("#trackInternal").style.willChange = "transform";
             document.querySelector("#trackInternal").style.transform = `scaleX(${gui.zoom / gui.lastHydratedZoom})`;
@@ -612,6 +612,7 @@ function init() {
             zoomActuatorDebouncer = setTimeout(actuateZoom, 500);
         }
     }, { passive: false });
+    registerSetting("ZoomScale", 1);
     document.querySelector("audio#loopsample").addEventListener("ended", (() => {
         if (loopObjURL) {
             URL.revokeObjectURL(loopObjURL);

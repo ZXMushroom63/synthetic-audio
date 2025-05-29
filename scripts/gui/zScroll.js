@@ -1,3 +1,4 @@
+registerSetting("ZScrollSensitivity", 4);
 async function execZScroll(loop, value) {
     var def = filters[loop.getAttribute("data-type")];
     if (def.zscroll && value) {
@@ -31,7 +32,6 @@ async function execZScroll(loop, value) {
         document.querySelector("#loopsample").play();
     }
 }
-var minZscrollDelta = 4;
 var zScrollProgress = 0;
 function zscroll(e) {
     if (e.altKey) {
@@ -40,7 +40,7 @@ function zscroll(e) {
         e.stopPropagation();
         var delta = Math.min(1, Math.max(-1, Math.round(e.deltaY)));
         zScrollProgress += delta;
-        if (Math.abs(zScrollProgress) >= minZscrollDelta) {
+        if (Math.abs(zScrollProgress) >= settings.ZScrollSensitivity) {
             zScrollProgress = 0;
             var currentlyActiveLoops = findLoops(".loop.active")
                 .sort((a, b) => {
