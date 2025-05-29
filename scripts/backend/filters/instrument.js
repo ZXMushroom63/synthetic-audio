@@ -44,7 +44,7 @@ addBlockType("instrument", {
             var note = _(this.conf.Note)(0, new Float32Array(2));
             note = frequencyToNote(note, true);
             var audio = new Audio(SFREGISTRY[this.conf.Instrument][note]);
-            audio.volume = 2.5;
+            audio.volume = 1;
             audio.play();
             audio.addEventListener("timeupdate", ()=>{
                 if (audio.currentTime > 1) {
