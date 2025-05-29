@@ -1,6 +1,7 @@
 addBlockType("volume", {
     color: "rgba(0,255,0,0.3)",
     title: "Volume",
+    directRefs: ["vol"],
     configs: {
         "Volume": [1, "number", 1],
     },

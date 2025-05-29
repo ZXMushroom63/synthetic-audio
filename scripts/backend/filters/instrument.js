@@ -3,6 +3,7 @@ addBlockType("instrument", {
     title: "Instrument",
     amplitude_smoothing_knob: true,
     forcePrimitive: true,
+    directRefs: ["sf", "piano", "instrument", "sf2"],
     configs: {
         "Note": [":A4:", "number", 1],
         "Volume": [1, "number"],

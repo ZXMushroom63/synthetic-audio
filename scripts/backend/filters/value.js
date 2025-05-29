@@ -1,6 +1,7 @@
 addBlockType("p_value", {
     color: "rgba(0, 255, 225, 0.3)",
     title: "Value",
+    directRefs: ["val", "value"],
     configs: {
         "Value": [0, "number", 1],
         "Volume": [1, "number", 1],

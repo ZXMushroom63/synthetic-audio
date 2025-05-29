@@ -2,6 +2,7 @@ addBlockType("bitcrunch", {
     color: "rgba(0,255,0,0.3)",
     title: "Bitcrunch",
     wet_and_dry_knobs: true,
+    directRefs: ["bcr", "bitcrunch"],
     configs: {
         "Level": [1, "number", 1],
         "SmoothDownsample": [false, "checkbox"],

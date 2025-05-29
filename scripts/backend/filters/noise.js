@@ -1,6 +1,7 @@
 addBlockType("noise", {
     color: "rgba(0,255,0,0.3)",
     title: "Noise",
+    directRefs: ["noise", "rng", "rnd"],
     configs: {
         "Volume": [0.5, "number", 1],
         "SeedLeft": [1, "number", 1],

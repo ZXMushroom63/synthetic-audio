@@ -1,6 +1,7 @@
 addBlockType("p_waveform_plus", {
     color: "rgba(255,0,0,0.3)",
     title: "Advanced Synth",
+    directRefs: ["syn", "synth"],
     configs: {
         "Frequency": [440, "number", 1],
         "SemitonesOffset": [0, "number", 1],

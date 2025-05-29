@@ -2,6 +2,7 @@ addBlockType("delay", {
     color: "rgba(0,255,0,0.3)",
     title: "Delay Filter",
     wet_and_dry_knobs: true,
+    directRefs: ["del", "delay", "dl"],
     configs: {
         "Iterations": [6, "number"],
         "DelayTimes": ["1,1,1", "text", 0],

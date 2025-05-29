@@ -7,6 +7,10 @@ addNodeDropdown.innerHTML = `
 `;
 document.body.appendChild(addNodeDropdown);
 function calcOptions(search) {
+    const directSearch = search.toLowerCase().trim().substring(1);
+    if (search.startsWith(";") && directRefs[directSearch]) {
+        return [[directRefs[directSearch], filters[directRefs[directSearch]].title]];
+    }
     var opts = Object.entries(filters)
         .filter(x => !x[1].hidden)
         .filter(x => x[0] !== "audio").map(x => {
