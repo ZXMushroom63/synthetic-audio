@@ -102,6 +102,7 @@ function deserialise(serialisedStr) {
     if (!serialisedStr) {
         return hydrate();
     }
+    offload("#trackInternal");
     layerCache = {};
     var ser = JSON.parse(serialisedStr);
     findLoops(".loop").forEach(x => { x.remove() });
@@ -156,6 +157,7 @@ function deserialise(serialisedStr) {
     proceduralAssets.clear();
     customEvent("deserialise", { data: ser });
     hydrate();
+    reflow("#trackInternal");
 }
 globalThis.lastEditedFile = "mysong.sm";
 function load() {

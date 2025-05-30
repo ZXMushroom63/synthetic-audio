@@ -3,9 +3,11 @@ addEventListener("init", () => {
         if (!nodes) {
             return;
         }
+        offload("#trackInternal");
         nodes.forEach(node => {
             deleteLoop(node);
         });
+        reflow("#trackInternal");
     });
 });
 registerHelp(".tool[data-tool=DELETE]",

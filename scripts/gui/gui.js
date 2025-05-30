@@ -192,6 +192,7 @@ function hydrateLoopPosition(elem, lean) {
     loopInternal.querySelector(".handleRight").style.right = "calc(-" + internalWidth + " - 1.5px)";
 }
 function hydrateZoom(lean) {
+    offload("#trackInternal");
     gui.lastHydratedZoom = gui.zoom;
     gui.zoomConstant = gui.zoom / audio.duration;
     document.querySelector("#trackInternal").style.transform = "";
@@ -199,6 +200,7 @@ function hydrateZoom(lean) {
     findLoops(".loop").forEach(elem => {
         hydrateLoopPosition(elem, lean);
     });
+    reflow("#trackInternal");
 }
 function hydrateLoopBackground(elem) {
     var line = elem.querySelector(".backgroundSvg path");
@@ -240,6 +242,7 @@ function hydrateEditorLayer() {
     });
 }
 function hydrate() {
+    offload("#trackInternal");
     updateLOD();
     audio.duration = parseFloat(document.querySelector("#duration").value);
     audio.length = audio.duration * audio.samplerate;
@@ -261,6 +264,7 @@ function hydrate() {
     hydrateZoom();
     hydrateDecorations();
     hydrateEditorLayer();
+    reflow("#trackInternal");
 }
 function addBlock(type, start, duration, title, layer = 0, data = {}, editorValue = Math.min(gui.layer, 9), noTimeline) {
     var definition = window.filters[type];

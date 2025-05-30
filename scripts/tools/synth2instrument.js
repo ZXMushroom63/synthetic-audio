@@ -15,6 +15,8 @@ addEventListener("init", () => {
         if (!foundValidType) { return }
         const defaultInstrument = Object.keys(SFREGISTRY)[0];
 
+        offload("#trackInternal");
+
         var mode = parseInt(prompt("Select mode: \n1 - Synth to Instrument\n2 - Instrument to Synth", "1"));
         if (mode === 1) {
             nodes.map(node => {
@@ -57,6 +59,7 @@ addEventListener("init", () => {
                 );
             }).forEach(hydrateLoopPosition);
         }
+        reflow("#trackInternal");
     });
 });
 registerHelp(".tool[data-tool=SYNTH_CONV]",
