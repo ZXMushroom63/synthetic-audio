@@ -188,9 +188,11 @@ function createMultiEditMenu(initData, editingTargets, propDefs, dropDownDefs) {
             }
             s.innerHTML = opts.flatMap((a) => { return `<option${a === value[0] ? " selected" : ""}>${a}</option>` }).join("");
             s.addEventListener("input", () => {
+                offload("#trackInternal");
                 setProp(key, s.value, true);
                 value[0] = s.value;
                 updateMiddleware();
+                reflow("#trackInternal");
             });
             s.addEventListener("focus", () => {
                 s.innerHTML = (proxy(key) || value[1]).flatMap((a) => { return `<option${a === value[0] ? " selected" : ""}>${a}</option>` }).join("");
@@ -208,6 +210,7 @@ function createMultiEditMenu(initData, editingTargets, propDefs, dropDownDefs) {
             input.setAttribute("data-key", key);
             input.checked = value[0];
             input.addEventListener("input", () => {
+                offload("#trackInternal");
                 if (value[1] === "checkbox") {
                     setProp(key, input.checked, true);
                 } else if (value[1] === "number" && value[2] !== 1) {
@@ -216,6 +219,7 @@ function createMultiEditMenu(initData, editingTargets, propDefs, dropDownDefs) {
                     setProp(key, input.value, true);
                 }
                 updateMiddleware();
+                reflow("#trackInternal");
             });
             target.appendChild(input);
         }

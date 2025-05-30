@@ -111,7 +111,7 @@ function convertToWavData(float32Arrays, channels, sampleRate, bRate) {
 async function convertToFileBlob(float32Arrays, channels, sampleRate, bRate, forceWav) {
     startTiming("encode");
     var blob;
-    
+
     if (audio.format !== "wav" && !forceWav) {
         if (ffmpeg.isLoaded()) {
             ffmpeg.exit();
@@ -122,10 +122,10 @@ async function convertToFileBlob(float32Arrays, channels, sampleRate, bRate, for
         const fname = codec.codec().pop();
         await ffmpeg.run(...codec.codec());
         const data = ffmpeg.FS("readFile", fname);
-        blob = new Blob([data.buffer], {type: codec.mime});
+        blob = new Blob([data.buffer], { type: codec.mime });
         ffmpeg.exit();
     } else {
-       blob = new Blob([convertToWavData(float32Arrays, channels, sampleRate, bRate)], { type: "audio/wav" });
+        blob = new Blob([convertToWavData(float32Arrays, channels, sampleRate, bRate)], { type: "audio/wav" });
     }
     stopTiming("encode");
     return blob;
@@ -151,7 +151,7 @@ function addWetDryKnobs(data) {
             });
         }
         if (out instanceof Promise) {
-            return new Promise((res, rej)=>{
+            return new Promise((res, rej) => {
                 out.then(data => {
                     applyFn(data);
                     res(data);
@@ -183,7 +183,7 @@ function addAmpSmoothKnob(data) {
             });
         }
         if (out instanceof Promise) {
-            return new Promise((res, rej)=>{
+            return new Promise((res, rej) => {
                 out.then(data => {
                     applyFn(data);
                     res(data);
@@ -304,7 +304,7 @@ function constructAbstractLayerMapsForLevel(nodes, usedLayers) {
     return abstractLayerMaps;
 }
 function usesDirtyAssets(assetMap, serialisedNode) {
-    return serialisedNode.definition.assetUserKeys.map(x => !!assetMap[serialisedNode.conf[x]]).reduce((acc, v)=>{
+    return serialisedNode.definition.assetUserKeys.map(x => !!assetMap[serialisedNode.conf[x]]).reduce((acc, v) => {
         return acc || v;
     });
 }
@@ -430,13 +430,13 @@ async function render() {
                         const layer = abstractLayerMaps[l];
                         for (let n = 0; n < layer.length; n++) {
                             const node = layer[n];
-    
+
                             if (node.deleted) {
                                 continue;
                             }
-    
+
                             var newPcm;
-    
+
                             if (node.dirty || (!node.ref.cache)) {
                                 node.dirty = false;
                                 node.ref.removeAttribute("data-dirty");
@@ -447,10 +447,10 @@ async function render() {
                                 node.ref.endOld = node.end;
                                 proccessedNodeCount++;
                             }
-    
+
                             var startTime = Math.floor(node.start * audio.samplerate);
                             var endTime = Math.floor((node.start + node.duration) * audio.samplerate);
-    
+
                             if (!node.ref.cache[c]) {
                                 newPcm = await filters[node.type].functor.apply(node, [initialPcm.slice(startTime, endTime), c, data]);
                                 node.ref.cache[c] = newPcm;
@@ -460,7 +460,7 @@ async function render() {
                             } else {
                                 newPcm = node.ref.cache[c];
                             }
-    
+
                             initialPcm.set(newPcm, startTime);
                             await wait(1 / 240);
                         }
@@ -487,7 +487,7 @@ async function render() {
         console.log(error);
         success = false;
     }
-    document.querySelector("#renderProgress").innerText = success ? "Render successful! (" + proccessedNodeCount + " in "+renderTime.toFixed(1)+"s)" : "Render failed.";
+    document.querySelector("#renderProgress").innerText = success ? "Render successful! (" + proccessedNodeCount + " in " + renderTime.toFixed(1) + "s)" : "Render failed.";
     if (success) {
         document.querySelector("#renderOut").src = URL.createObjectURL(blob);
     }
