@@ -480,6 +480,7 @@ function addBlock(type, start, duration, title, layer = 0, data = {}, editorValu
     if (!multiplayer.isHooked && multiplayer.on && !loop._ignore) {
         multiplayer.addBlock(JSON.stringify(serialiseNode(loop, false, true)));
     }
+    hydrateLoopDecoration(loop);
     return loop;
 }
 function addIgnoredBlock(type, start, duration, title, layer = 0, data = {}, editorValue = Math.min(gui.layer, 9)) {
