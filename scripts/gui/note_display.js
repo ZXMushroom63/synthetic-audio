@@ -8,6 +8,7 @@ function updateNoteDisplay(loop) {
     }
     var f = freq * Math.pow(2, (freqsemioffset + internalSemiOffset) / 12);
     loop.theoryNote = frequencyToNote(f);
+    loop.hitFrequency = f;
     loop.querySelector(".noteDisplay").innerText = loop.theoryNote;
 }
 function initNoteDisplay(loop) {
