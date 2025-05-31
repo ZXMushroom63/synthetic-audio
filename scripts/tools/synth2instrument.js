@@ -30,7 +30,7 @@ addEventListener("init", () => {
                     node.getAttribute("data-file"),
                     parseInt(node.getAttribute("data-layer")),
                     {
-                        Note: ":" + node.__determinedFreq + ":",
+                        Note: ":" + node.theoryNote + ":",
                         Volume: parseFloat(node.conf.Amplitude) || 1,
                         AmplitudeSmoothing: parseFloat(node.conf.AmplitudeSmoothing) || 0,
                         Instrument: defaultInstrument || "(none)",
@@ -51,7 +51,7 @@ addEventListener("init", () => {
                     node.getAttribute("data-file"),
                     parseInt(node.getAttribute("data-layer")),
                     {
-                        Frequency: ":" + node.__determinedFreq + ":",
+                        Frequency: ":" + node.theoryNote + ":",
                         Amplitude: parseFloat(node.conf.Volume) || 1,
                         AmplitudeSmoothing: parseFloat(node.conf.AmplitudeSmoothing) || 0
                     },
