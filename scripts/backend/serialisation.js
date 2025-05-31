@@ -146,6 +146,9 @@ function deserialise(serialisedStr) {
 
     if (audio.samplerate !== ser.sampleRate) {
         decodedPcmCache = {};
+        SFCACHE = {};
+        proceduralAssets.clear();
+        layerCache = {};
     }
 
     audio.samplerate = ser.sampleRate;
