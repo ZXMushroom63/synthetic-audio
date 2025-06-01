@@ -12,6 +12,14 @@ addEventListener("init", async () => {
     var typeSymbols = {
         ".sf.js": "[🎸]",
         ".pd.js": "[🎛️]",
+        ".arp.js": "[𝄂𝄚]",
+        ".aiff": "[🔊]",
+        ".wav": "[🔊]",
+        ".mp3": "[🔊]",
+        ".ogg": "[🔊]",
+        ".flac": "[🔊]",
+        ".m4a": "[🔊]",
+        "tool.js": "[🔨]",
         ".js": "[🇯‌🇸‌]",
     }
     function getTypeSymbol(fileName) {
