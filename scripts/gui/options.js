@@ -58,7 +58,7 @@ function createOptionsMenu(loop, definition) {
                 if (definition.updateMiddleware) {
                     definition.updateMiddleware(loop);
                 }
-                if (!multiplayer.isHooked && multiplayer.on && !loop._ignore) {
+                if (!multiplayer.isHooked && multiplayer.on && !loop._netIngore) {
                     multiplayer.patchLoop(loop);
                 }
             });
@@ -91,7 +91,7 @@ function createOptionsMenu(loop, definition) {
                 if (definition.updateMiddleware) {
                     definition.updateMiddleware(loop);
                 }
-                if (!multiplayer.isHooked && multiplayer.on && !loop._ignore) {
+                if (!multiplayer.isHooked && multiplayer.on && !loop._netIngore) {
                     multiplayer.patchLoop(loop);
                 }
             });

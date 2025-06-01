@@ -1,5 +1,11 @@
 addEventListener("init", () => {
-    var arpeggiatorPattern = "";
+    var arpeggiatorPattern = "3/1 1 3 2";
+    var chord = [];
+    var rawChord = [];
+    var template = null;
+    var arpNotes = [];
+    var lowestLayer = 0;
+    var arpSpeed = 1;
     const arpeggiatorStyles = new ModMenuStyle();
     arpeggiatorStyles.setBackgroundColor("rgb(10,10,10)");
     arpeggiatorStyles.setHeaderBackgroundColor("rgb(20,20,20)");
@@ -15,19 +21,177 @@ addEventListener("init", () => {
     var tabs = new ModMenuTabList();
 
     tabs.addTab("Config", `
-        <label>Arpeggiator Pattern: </label><select></select>
+        <label>Arpeggiator Pattern: </label><select id="arpPattern"></select><br>
+        <label>Speed Multiplier: </label><select class="inputStyles" id="arpSpeed">
+            <option value="8">8x Speed</option>
+            <option value="6">6x Speed</option>
+            <option value="4">4x Speed</option>
+            <option value="3">3x Speed</option>
+            <option value="2">2x Speed</option>
+            <option value="1" selected>1x Speed</option>
+            <option value="0.5">0.5x Speed</option>
+            <option value="0.5">0.333x Speed</option>
+            <option value="0.25">0.25x Speed</option>
+        </select>
+
+        <div id="arpScoreInfo"></div>
+        <button id="arpConfirm">Looks good!</button>
     `);
 
     const arpeggiatorGui = new ModMenu("SYNTHETIC Arpeggiator", tabs, "arpeggiator", arpeggiatorStyles);
     arpeggiatorGui.oninit = function (menu) {
-        const sel = menu.querySelector("select");
+        const sel = menu.querySelector("#arpPattern");
+        const confirm = menu.querySelector("#arpConfirm");
+
         sel.innerHTML = Object.keys(ARPEGGIATOR_SCORES).map(x => `<option value="${x}" ${arpeggiatorPattern === x ? "selected" : ""}>${x}</option>`);
-        sel.addEventListener("input", ()=>{
+        arpeggiatorPattern = sel.value;
+        sel.addEventListener("input", () => {
             arpeggiatorPattern = sel.value;
+            updateArpeggiatorGui(menu);
+            updateArpeggiatorNotes();
         });
+
+        const speed = menu.querySelector("#arpSpeed");
+        speed.selectedIndex = [...speed.options].findIndex(x => x.value == arpSpeed);
+        speed.addEventListener("input", () => {
+            arpSpeed = parseFloat(speed.value);
+            updateArpeggiatorNotes();
+        });
+
+        updateArpeggiatorGui(menu);
+        updateArpeggiatorNotes();
+        confirm.addEventListener("click", () => {
+            rawChord.forEach(deleteLoop);
+            arpeggiatorGui.closeModMenu();
+
+            //remember to remove .noSync from all loop confs at some point before broadcasting them. or just serialise->deserialise to efficiency
+        });
+    }
+    function arpeggiate() {
+        const preset = ARPEGGIATOR_SCORES[arpeggiatorPattern];
+        const numFullLoops = Math.floor((template.duration / audio.beatSize) / (preset.beatsDuration / arpSpeed));
+        const remainingBeats = (template.duration / audio.beatSize) % (preset.beatsDuration / arpSpeed);
+        const loopedNotes = [];
+        const originalNotes = preset.notes;
+        const scaledOriginalPatternDuration = preset.beatsDuration / arpSpeed;
+
+        for (let i = 0; i < numFullLoops; i++) {
+            const currentLoopOffset = i * scaledOriginalPatternDuration;
+            for (const note of originalNotes) {
+                loopedNotes.push({
+                    ...note,
+                    beatsStart: (note.beatsStart / arpSpeed) + currentLoopOffset,
+                    beatsDuration: note.beatsDuration / arpSpeed
+                });
+            }
+        }
+
+        if (remainingBeats > 0) {
+            const currentLoopOffset = numFullLoops * scaledOriginalPatternDuration;
+            for (const note of originalNotes) {
+                const scaledNoteStartInOriginalPattern = note.beatsStart / arpSpeed;
+                const scaledNoteDuration = note.beatsDuration / arpSpeed;
+                const noteAbsoluteStart = currentLoopOffset + scaledNoteStartInOriginalPattern;
+                const noteAbsoluteEnd = noteAbsoluteStart + scaledNoteDuration;
+
+                if (noteAbsoluteStart < (template.duration / audio.beatSize)) {
+                    const newBeatsDuration = Math.min(noteAbsoluteEnd, (template.duration / audio.beatSize)) - noteAbsoluteStart;
+
+                    if (newBeatsDuration > 0) {
+                        loopedNotes.push({
+                            ...note,
+                            beatsStart: noteAbsoluteStart,
+                            beatsDuration: newBeatsDuration
+                        });
+                    }
+                }
+            }
+        }
+
+        if (chord.length === preset.diversity) {
+            return loopedNotes.map(scoreNote => {
+                const conf = structuredClone(template.conf);
+                const note = chord[scoreNote.identifier].theoryNote;
+                if (conf.Frequency) {
+                    conf.Frequency = ":" + note + ":";
+                }
+                if (conf.SemitonesOffset) {
+                    conf.SemitonesOffset = "0";
+                }
+                if (conf.InternalSemiOffset) {
+                    conf.InternalSemiOffset = 0;
+                }
+                if (conf.Note) {
+                    conf.Note = ":" + note + ":";
+                }
+                conf.noSync = true;
+                const b = addBlock(template.type, scoreNote.beatsStart * audio.beatSize, scoreNote.beatsDuration * audio.beatSize, note + " - " + arpeggiatorPattern, lowestLayer + scoreNote.concurrentNotes, conf, chord[0].editorLayer, false);
+                hydrateLoopPosition(b);
+                return b;
+            });
+        } else {
+            return loopedNotes.map(scoreNote => {
+                const conf = structuredClone(template.conf);
+                const note = frequencyToNote(chord[0].hitFrequency * Math.pow(2, scoreNote.semis / 12));
+                if (conf.Frequency) {
+                    conf.Frequency = ":" + note + ":";
+                }
+                if (conf.SemitonesOffset) {
+                    conf.SemitonesOffset = "0";
+                }
+                if (conf.InternalSemiOffset) {
+                    conf.InternalSemiOffset = 0;
+                }
+                if (conf.Note) {
+                    conf.Note = ":" + note + ":";
+                }
+                conf.noSync = true;
+                const b = addBlock(template.type, scoreNote.beatsStart * audio.beatSize, scoreNote.beatsDuration * audio.beatSize, note + " - " + arpeggiatorPattern, lowestLayer + scoreNote.concurrentNotes, conf, chord[0].editorLayer, false);
+                hydrateLoopPosition(b);
+                return b;
+            });
+        }
+    }
+    function updateArpeggiatorNotes() {
+        offload("#trackInternal");
+        arpNotes.forEach((n) => {
+            deleteLoop(n);
+        });
+        arpNotes = arpeggiate();
+
+        reflow("#trackInternal");
+    }
+    function updateArpeggiatorGui(menu) {
+        const arp = ARPEGGIATOR_SCORES[arpeggiatorPattern];
+        menu.querySelector("#arpScoreInfo").innerText = `
+        Name: ${arpeggiatorPattern}
+        Unique note count: ${arp.diversity}
+        Duration (beats): ${arp.beatsDuration}
+
+        Identified Chord: ${chord.map(x => x.theoryNote).join(", ")}
+        Chord note count: ${chord.length}
+        `;
     }
     registerTool("Arp [BETA]", (nodes) => {
         if (!nodes) { return };
+        const loop = nodes[0];
+        template = serialiseNode(loop);
+        chord = [...findLoops(`.loop:not([data-deleted]):has(.noteDisplay)[data-start="${loop.getAttribute("data-start")}"][data-duration="${loop.getAttribute("data-duration")}"][data-editlayer="${loop.getAttribute("data-editlayer")}"]`)];
+        chord.sort((a, b) => a.hitFrequency - b.hitFrequency);
+        rawChord = chord;
+        chord = chord.map(loop => {
+            const ser = serialiseNode(loop);
+            ser.theoryNote = loop.theoryNote;
+            ser.hitFrequency = loop.hitFrequency;
+            return ser;
+        });
+        lowestLayer = Math.min(...chord.map(c => c.layer));
+        rawChord.forEach(x => {
+            x._ignore = true;
+            markLoopDirty(x);
+            x.style.display = "none";
+        });
+
         //todo: identify chord by finding first playable loop, then using findLoops with params (check for .noteDisplay), sort in order by .hitFrequency
         // WHEN ARPEGGIATING:
         // if the selected pattern uses the same number of different notes as the selected chord, simply map them in order from lowest to highest pitch
@@ -35,8 +199,18 @@ addEventListener("init", () => {
 
         //logic: have a time scaling variable
         //use as much of the arp preset until the chord ends (clip overlapping notes)
-        if (nodes.length !== 1) {return;}
-        arpeggiatorGui.init();
+
+        arpeggiatorGui.init({
+            onclose: () => {
+                rawChord.forEach(x => {
+                    x._ignore = false;
+                    x.style.display = "";
+                });
+                arpNotes.forEach((n) => {
+                    deleteLoop(n);
+                });
+            }
+        });
 
         resetDrophandlers(false);
         activateTool("MOVE");
@@ -47,7 +221,7 @@ addEventListener("init", () => {
     }, false);
 });
 registerHelp(".tool[data-tool=ARP]",
-`
+    `
 *********************
 *  THE ARPEGGIATOR  *
 *********************

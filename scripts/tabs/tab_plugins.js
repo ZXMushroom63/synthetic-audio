@@ -14,11 +14,20 @@ addEventListener("init", async () => {
 
             for (let j = 0; j < notes.length; j++) {
                 const otherNote = notes[j];
+
                 if (i === j) {
                     continue;
                 }
+
                 const otherNoteEndTime = otherNote.beatsStart + otherNote.beatsDuration;
-                if (otherNote.beatsStart <= currentNote.beatsStart && otherNoteEndTime > currentNote.beatsStart) {
+
+                const startedBeforeAndActive =
+                    otherNote.beatsStart < currentNote.beatsStart && otherNoteEndTime > currentNote.beatsStart;
+
+                const startedSimultaneouslyAndLowerPitch =
+                    otherNote.beatsStart === currentNote.beatsStart && otherNote.semis < currentNote.semis;
+
+                if (startedBeforeAndActive || startedSimultaneouslyAndLowerPitch) {
                     currentConcurrency++;
                 }
             }
@@ -347,15 +356,20 @@ addEventListener("init", async () => {
     for (pattern in ARPEGGIATOR_SCORES) {
         const offsetsSet = new Set();
         const score = ARPEGGIATOR_SCORES[pattern];
-        score.length = Math.max(...score.notes.map(x => x.beatsStart + x.beatsDuration));
+        score.beatsDuration = Math.max(...score.notes.map(x => x.beatsStart + x.beatsDuration));
         score.notes.sort((a, b) => a.semis - b.semis);
         score.notes.sort((a, b) => a.beatsStart - b.beatsStart);
         const concurrencyData = calculateConcurrentNotes(score.notes);
-        score.notes.forEach((x,i)=>{
+        score.notes.forEach((x, i) => {
             offsetsSet.add(x.semis);
             x.concurrentNotes = concurrencyData[i];
         });
-        score.size = offsetsSet.size;
+        score.diversity = offsetsSet.size;
+        const map = [...offsetsSet];
+        map.sort((a, b) => a - b);
+        score.notes.forEach((x, i) => {
+            x.identifier = map.indexOf(x.semis);
+        });
     }
 
     // load autosave

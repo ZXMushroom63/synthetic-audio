@@ -49,7 +49,7 @@ function pickupLoop(loop, natural = false) {
         hydrateLoopPosition(loop);
         document.removeEventListener("mouseup", mouseUp);
         document.removeEventListener("mousemove", mouseMove);
-        if (!multiplayer.isHooked && multiplayer.on && !loop._ignore) {
+        if (!multiplayer.isHooked && multiplayer.on && !loop._netIngore) {
             multiplayer.patchLoop(loop);
         }
     }

@@ -38,7 +38,7 @@ var loopMap = {
 };
 var loopDurationMap = {};
 function deleteLoop(loop) {
-    if (!multiplayer.isHooked && multiplayer.on && !loop._ignore) {
+    if (!multiplayer.isHooked && multiplayer.on && !loop._netIngore) {
         return multiplayer.deleteLoop(loop.getAttribute("data-uuid"));
     }
     if (loop.forceDelete) {
@@ -89,7 +89,7 @@ function updateLOD() {
 }
 
 function markLoopDirty(loop, wasMoved) {
-    if (!multiplayer.isHooked && multiplayer.on && !loop._ignore) {
+    if (!multiplayer.isHooked && multiplayer.on && !loop._netIngore) {
         customEvent("loopchangedcli", { loop: loop });
         return multiplayer.markLoopDirty(JSON.stringify({
             uuid: loop.getAttribute("data-uuid"),
@@ -302,7 +302,7 @@ function addBlock(type, start, duration, title, layer = 0, data = {}, editorValu
                 backgroundSvg.style.width = internalWidth + "vw";
                 handleRight.style.right = `calc(-${internalWidth}vw - 1.5px)`;
                 loop.setAttribute("data-duration", newDuration);
-                if (!multiplayer.isHooked && multiplayer.on && !loop._ignore) {
+                if (!multiplayer.isHooked && multiplayer.on && !loop._netIngore) {
                     multiplayer.patchLoop(loop);
                 }
             }
@@ -324,7 +324,7 @@ function addBlock(type, start, duration, title, layer = 0, data = {}, editorValu
                 backgroundSvg.style.width = internalWidth + "vw";
                 handleRight.style.right = `calc(-${internalWidth}vw - 1.5px)`;
                 loop.setAttribute("data-duration", newDuration);
-                if (!multiplayer.isHooked && multiplayer.on && !loop._ignore) {
+                if (!multiplayer.isHooked && multiplayer.on && !loop._netIngore) {
                     multiplayer.patchLoop(loop);
                 }
             }
@@ -347,6 +347,12 @@ function addBlock(type, start, duration, title, layer = 0, data = {}, editorValu
     } else {
         loop.setAttribute("data-uuid", Math.randomUUID());
     }
+
+    if (data.noSync) {
+        loop._netIngore = true;
+        //loop._ignore = true;
+    }
+
     loop.setAttribute("data-start", start);
     loop.setAttribute("data-duration", duration);
     loop.setAttribute("data-layer", layer);
@@ -438,7 +444,7 @@ function addBlock(type, start, duration, title, layer = 0, data = {}, editorValu
                     loop.setAttribute("data-layer", layer);
                 }
                 customEvent("loopmoved", { loop: loop });
-                if (!multiplayer.isHooked && multiplayer.on && !loop._ignore) {
+                if (!multiplayer.isHooked && multiplayer.on && !loop._netIngore) {
                     multiplayer.patchLoop(loop);
                 }
             }
@@ -477,7 +483,7 @@ function addBlock(type, start, duration, title, layer = 0, data = {}, editorValu
             document.querySelector("#time")
         ).after(loop);
     }
-    if (!multiplayer.isHooked && multiplayer.on && !loop._ignore) {
+    if (!multiplayer.isHooked && multiplayer.on && !loop._netIngore) {
         multiplayer.addBlock(JSON.stringify(serialiseNode(loop, false, true)));
     }
     hydrateLoopDecoration(loop);
@@ -487,6 +493,7 @@ function addIgnoredBlock(type, start, duration, title, layer = 0, data = {}, edi
     multiplayer.isHooked = true;
     var loop = addBlock(type, start, duration, title, layer, data, editorValue, true);
     loop._ignore = true;
+    loop._netIgnore = true;
     multiplayer.isHooked = false;
     return loop;
 }

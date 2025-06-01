@@ -155,7 +155,7 @@ addEventListener("init", () => {
         updateScales();
     });
     function updateLoopHighlight(loop) {
-        if (!loop._ignore && loop.theoryNote) {
+        if (!loop._netIngore && loop.theoryNote) {
             if ((scaleAutocorrect.value === "OFF") || gui._acceptedNotes.includes(loop.theoryNote.substring(0, loop.theoryNote.length - 1))) {
                 loop.removeAttribute("data-bad-note");
             } else {

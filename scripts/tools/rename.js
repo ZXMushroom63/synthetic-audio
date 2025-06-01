@@ -12,7 +12,7 @@ addEventListener("init", ()=>{
             }
             node.setAttribute("data-file", newName);
             node.querySelector(".loopInternal .name").innerText = newName;
-            if (!multiplayer.isHooked && multiplayer.on && !loop._ignore) {
+            if (!multiplayer.isHooked && multiplayer.on && !loop._netIngore) {
                 multiplayer.patchLoop(loop);
             }
         });
