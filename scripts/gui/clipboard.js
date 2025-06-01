@@ -50,13 +50,15 @@ addEventListener("init", () => {
             }
         }
     });
-    function pasteData(clipText, shiftKey) {
+    function pasteData(clipText, shiftKey, accountForBeatSize) {
         if (!clipText.startsWith("sp_loopdata::")) {
             return;
         }
         var data = JSON.parse(clipText.replace("sp_loopdata::", ""));
         data.forEach(entry => {
             entry.editorLayer = Math.min(gui.layer, 9);
+            entry.start *= audio.beatSize;
+            entry.duration *= audio.beatSize;
         });
         minimisePosition(data);
         var pastedLoops = [];
@@ -101,7 +103,7 @@ addEventListener("init", () => {
                     const fr = new FileReader();
                     fr.onload = () => {
                         resetDrophandlers(false);
-                        pasteData(fr.result, e.shiftKey);
+                        pasteData(fr.result, e.shiftKey, true);
                     };
                     fr.readAsText(file);
                 } else if (file.type.startsWith("audio/")) {

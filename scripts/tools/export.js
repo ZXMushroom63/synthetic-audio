@@ -7,6 +7,10 @@ addEventListener("init", () => {
         nodes.forEach(node => {
             dupedLoops.push(serialiseNode(node));
         });
+        dupedLoops.forEach(x=>{
+            x.start /= audio.beatSize;
+            x.duration /= audio.beatSize;
+        });
         var text = "sp_loopdata::" + JSON.stringify(dupedLoops);
         saveAs(new Blob([text], { type: "application/vnd.synthetic.loops" }), "bundle.loops");
     });
