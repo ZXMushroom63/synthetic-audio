@@ -558,7 +558,8 @@ select option {
     align-content: center;
     background-color: rgba(0, 0, 0, 0.5);
     transform: translateX(calc(-4rem - 4px));
-    overflow-y: auto;
+    overflow-y: scroll;
+    overflow-x: hidden;
 }
 
 #toolboxExpander {
@@ -576,7 +577,12 @@ select option {
     top: calc(50% - 1rem);
     position: absolute;
     text-align: center;
-    transform: translateX(calc(4rem + 4px));
+    transform: translateX(calc(4rem + 5.5px));
+    z-index: 989;
+}
+
+#toolboxExpander.closed {
+    transform: translateX(calc(0rem + 4px));
 }
 
 .toolbox * {

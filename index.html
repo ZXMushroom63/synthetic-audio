@@ -1,29 +1,41 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>SYNTHETIC</title>
-    <link rel="stylesheet" href="style.css">
-    <link rel="icon" type="image/x-icon" href="public/logo_small.png">
+    <link rel="stylesheet" href="style.css" />
+    <link rel="icon" type="image/x-icon" href="public/logo_small.png" />
     <link rel="manifest" href="manifest.json" />
 
-    <meta name="description" content="SYNTHETIC Audio is a web-based DAW with a multitude of features, such as powerful synths, a powerful LFO engine, and multiplayer - all in your browser.">
-    <link rel="canonical" href="https://zxmushroom63.github.io/synthetic-audio/">
-    <meta property="og:type" content="website">
-    <meta property="og:locale" content="en_US">
-    <meta property="og:title" content="SYNTHETIC Audio">
-    <meta property="og:url" content="https://zxmushroom63.github.io/synthetic-audio/">
-    <meta property="og:site_name" content="SYNTHETIC Audio - web-based DAW">
+    <meta
+      name="description"
+      content="SYNTHETIC Audio is a web-based DAW with a multitude of features, such as powerful synths, a powerful LFO engine, and multiplayer - all in your browser."
+    />
+    <link
+      rel="canonical"
+      href="https://zxmushroom63.github.io/synthetic-audio/"
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:title" content="SYNTHETIC Audio" />
+    <meta
+      property="og:url"
+      content="https://zxmushroom63.github.io/synthetic-audio/"
+    />
+    <meta property="og:site_name" content="SYNTHETIC Audio - web-based DAW" />
 
-    <meta property="og:image" content="http://zxmushroom63.github.io/synthetic-audio/public/repository-open-graph.png">
-    <meta property="og:image:width" content="1280">
-    <meta property="og:image:height" content="640">
-    <meta property="og:image:type" content="image/png">
+    <meta
+      property="og:image"
+      content="http://zxmushroom63.github.io/synthetic-audio/public/repository-open-graph.png"
+    />
+    <meta property="og:image:width" content="1280" />
+    <meta property="og:image:height" content="640" />
+    <meta property="og:image:type" content="image/png" />
 
-    <meta name="author" content="ZXMushroom63">
-</head>
-<body>
+    <meta name="author" content="ZXMushroom63" />
+  </head>
+  <body>
     <!-- SERVICE WORKER LOADER -->
     <script src="scripts/sw/sw_loader.js"></script>
 
@@ -40,6 +52,7 @@
     <script src="lib/allorigins_fetch.js"></script>
     <script src="lib/libsettings.js"></script>
     <script src="lib/lib_offloader.js"></script>
+    <script src="lib/modmenuapi.js"></script>
 
     <!-- GUI MODULES -->
     <script src="scripts/gui/help.js"></script>
@@ -70,6 +83,7 @@
     <script src="scripts/tools/multiedit.js"></script>
     <script src="scripts/tools/Rec2Note.js"></script>
     <script src="scripts/tools/synth2instrument.js"></script>
+    <script src="scripts/tools/arpeggiator.js"></script>
 
     <!-- TABS -->
     <script src="scripts/tabs/tab_waveform.js"></script>
@@ -151,149 +165,186 @@
     <script src="lib/init_ffmpeg.js"></script>
 
     <div class="toolbox">
-        <button id="toolboxRunButton">Run</button><br>
-        <span id="toolboxExpander">
-            >
-        </span>
+        <button id="toolboxRunButton">Run</button>
+        <br />
     </div>
+    <span id="toolboxExpander" class="closed">&gt;</span>
     <table class="main">
-        <tr>
-            <td style="height: 10rem;">
-                <h4>
-                    <img id="logo" style="display:none;" src="public/logo.png">
-                    <canvas width="450" height="225" id="viz"></canvas>
-                    <button id="renderBtn" onclick="if(this.disabled){return};render()">Render Audio</button>
-                    <audio id="renderOut" controls></audio>
-                    <div style="display: inline-block;">
-                        <span>Playback Rate: </span><br>
-                        <input id="playbackRateSlider" type="range" min="0.075" step="0.01" max="1" value="1" oninput="document.querySelector('#renderOut').playbackRate = parseFloat(this.value)">
-                    </div>
-                </h4>
-                <div id="loopSelector">
-                    <label>Select loop folder: </label><input type="file" multiple>
-                </div>
-                <div id="renderProgress">
-                    (no render task currently active)
-                </div>
-                <div id="controlsAndStuff">
-                    <button onclick="save()">
-                        Save
-                    </button>
-                    <button onclick="load()">
-                        Load
-                    </button>
-                    <button onclick="deserialise('{}')">
-                        Clear
-                    </button>
-                    <button onclick="viewHelp()">
-                        Help
-                    </button>
-                    <button onclick="updateApp()">
-                        Update App
-                    </button>
-                    <button onclick="writeAutosave()">
-                        Backup
-                    </button>
-                    <button data-convert-to-sync onclick="loadAutosave()">
-                        Revert
-                    </button>
-                    <a target="_blank" href="https://github.com/ZXMushroom63/synthetic-audio"><button>GitHub</button></a>
-                    <ins></ins>
-                </div>
-            </td>
-        </tr>
-        <tr>
-            <td id="tabContent">
-                <div id="track">
-                    <div id="trackInternal">
-                        <div id="time">
-                        </div>
-                        <span class="timePosMarker" style="left: 0%;"></span>
-                    </div>
-                </div>
-            </td>
-        </tr>
-        <tr>
-            <td style="align-content: flex-end; white-space: nowrap; overflow-x: auto;">
-                <div id="tray">
-                    <span class="trayElem">
-                        Editor Layer: <input step="1" min="-10" max="10" type="number" id="editorlayer" value="0">
-                    </span>
-                    <span class="trayElem">
-                        BPM: <input step="1" min="20" max="480" type="number" id="bpm" value="240">
-                    </span>
-                    <span class="trayElem">
-                        Loop Interval: <input step="1" min="0.1" max="16" type="number" id="loopi" value="0.001">
-                    </span>
-                    <span class="trayElem">
-                        Duration: <input step="1" min="1" max="360" type="number" id="duration" value="10">s
-                    </span>
-                    <span class="trayElem">
-                        Stereo: <input checked type="checkbox" id="stereobox">
-                    </span>
-                    <span class="trayElem">
-                        Normalised: <input checked type="checkbox" id="normalisebox">
-                    </span>
-                    <span class="trayElem">
-                        Quality: <select id="samplerate" style="width:7.5rem">
-                            <option value="8000">Trash (8k)</option>
-                            <option value="16000">Low (16k)</option>
-                            <option value="24000" selected>Medium (24k)</option>
-                            <option value="48000">High (48k)</option>
-                            <option value="88200">Extreme (88.2k)</option>
-                        </select>
-                        <select id="bitrate" style="width:4.5rem">
-                            <option value="64">64kbps</option>
-                            <option value="96">96kbps</option>
-                            <option value="128">128kbps</option>
-                            <option value="256">256kbps</option>
-                            <option value="320" selected>320kbps</option>
-                        </select>
-                    </span>
-                    <span class="trayElem">
-                        NoLOD: <input checked type="checkbox" id="nolod">
-                    </span>
-                    <span class="trayElem">
-                        ForceWaveform: <input type="checkbox" id="forceWv">
-                    </span>
-                    <span class="trayElem">
-                        Format: <select id="encformat">
-                        </select>
-                    </span>
-                    <span class="trayElem">
-                        Substepping: <input step="1" min="1" max="8" type="number" id="substepping" value="1">
-                    </span>
-                    <span class="trayElem">
-                        Isolate Layer: <input type="checkbox" id="isolate">
-                    </span>
-                </div>
-            </td>
-        </tr>
+      <tr>
+        <td style="height: 10rem">
+          <h4>
+            <img id="logo" style="display: none" src="public/logo.png" />
+            <canvas width="450" height="225" id="viz"></canvas>
+            <button id="renderBtn" onclick="if(this.disabled){return};render()">
+              Render Audio
+            </button>
+            <audio id="renderOut" controls></audio>
+            <div style="display: inline-block">
+              <span>Playback Rate: </span><br />
+              <input
+                id="playbackRateSlider"
+                type="range"
+                min="0.075"
+                step="0.01"
+                max="1"
+                value="1"
+                oninput="document.querySelector('#renderOut').playbackRate = parseFloat(this.value)"
+              />
+            </div>
+          </h4>
+          <div id="loopSelector">
+            <label>Select loop folder: </label><input type="file" multiple />
+          </div>
+          <div id="renderProgress">(no render task currently active)</div>
+          <div id="controlsAndStuff">
+            <button onclick="save()">Save</button>
+            <button onclick="load()">Load</button>
+            <button onclick="deserialise('{}')">Clear</button>
+            <button onclick="viewHelp()">Help</button>
+            <button onclick="updateApp()">Update App</button>
+            <button onclick="writeAutosave()">Backup</button>
+            <button data-convert-to-sync onclick="loadAutosave()">
+              Revert
+            </button>
+            <a
+              target="_blank"
+              href="https://github.com/ZXMushroom63/synthetic-audio"
+              ><button>GitHub</button></a
+            >
+            <ins></ins>
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td id="tabContent">
+          <div id="track">
+            <div id="trackInternal">
+              <div id="time"></div>
+              <span class="timePosMarker" style="left: 0%"></span>
+            </div>
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td
+          style="align-content: flex-end; white-space: nowrap; overflow-x: auto"
+        >
+          <div id="tray">
+            <span class="trayElem">
+              Editor Layer:
+              <input
+                step="1"
+                min="-10"
+                max="10"
+                type="number"
+                id="editorlayer"
+                value="0"
+              />
+            </span>
+            <span class="trayElem">
+              BPM:
+              <input
+                step="1"
+                min="20"
+                max="480"
+                type="number"
+                id="bpm"
+                value="240"
+              />
+            </span>
+            <span class="trayElem">
+              Loop Interval:
+              <input
+                step="1"
+                min="0.1"
+                max="16"
+                type="number"
+                id="loopi"
+                value="0.001"
+              />
+            </span>
+            <span class="trayElem">
+              Duration:
+              <input
+                step="1"
+                min="1"
+                max="360"
+                type="number"
+                id="duration"
+                value="10"
+              />s
+            </span>
+            <span class="trayElem">
+              Stereo: <input checked type="checkbox" id="stereobox" />
+            </span>
+            <span class="trayElem">
+              Normalised: <input checked type="checkbox" id="normalisebox" />
+            </span>
+            <span class="trayElem">
+              Quality:
+              <select id="samplerate" style="width: 7.5rem">
+                <option value="8000">Trash (8k)</option>
+                <option value="16000">Low (16k)</option>
+                <option value="24000" selected>Medium (24k)</option>
+                <option value="48000">High (48k)</option>
+                <option value="88200">Extreme (88.2k)</option>
+              </select>
+              <select id="bitrate" style="width: 4.5rem">
+                <option value="64">64kbps</option>
+                <option value="96">96kbps</option>
+                <option value="128">128kbps</option>
+                <option value="256">256kbps</option>
+                <option value="320" selected>320kbps</option>
+              </select>
+            </span>
+            <span class="trayElem">
+              NoLOD: <input checked type="checkbox" id="nolod" />
+            </span>
+            <span class="trayElem">
+              ForceWaveform: <input type="checkbox" id="forceWv" />
+            </span>
+            <span class="trayElem">
+              Format:
+              <select id="encformat"></select>
+            </span>
+            <span class="trayElem">
+              Substepping:
+              <input
+                step="1"
+                min="1"
+                max="8"
+                type="number"
+                id="substepping"
+                value="1"
+              />
+            </span>
+            <span class="trayElem">
+              Isolate Layer: <input type="checkbox" id="isolate" />
+            </span>
+          </div>
+        </td>
+      </tr>
     </table>
     <div id="addstuff">
-        <h4>Add Tracks</h4>
-        <details>
-            <summary>Loops</summary>
-            <div id="addloops">
-            </div>
-        </details>
-        <details>
-            <summary>Filters</summary>
-            <div id="addfilters">
-            </div>
-        </details>
-        <details>
-            <summary>Primitives</summary>
-            <div id="addprims">
-            </div>
-        </details>
-        <details>
-            <summary>Plugins</summary>
-            <div id="addplugs">
-            </div>
-        </details>
+      <h4>Add Tracks</h4>
+      <details>
+        <summary>Loops</summary>
+        <div id="addloops"></div>
+      </details>
+      <details>
+        <summary>Filters</summary>
+        <div id="addfilters"></div>
+      </details>
+      <details>
+        <summary>Primitives</summary>
+        <div id="addprims"></div>
+      </details>
+      <details>
+        <summary>Plugins</summary>
+        <div id="addplugs"></div>
+      </details>
     </div>
     <audio id="loopsample"></audio>
     <audio id="loopmeta"></audio>
-</body>
+  </body>
 </html>

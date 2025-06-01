@@ -5,6 +5,28 @@
 // https://gleitz.github.io/midi-js-soundfonts/FluidR3_GM/names.json
 // https://gleitz.github.io/midi-js-soundfonts/FluidR3_GM/{id}-ogg.js
 addEventListener("init", async () => {
+    function calculateConcurrentNotes(notes) {
+        const concurrentCounts = [];
+
+        for (let i = 0; i < notes.length; i++) {
+            const currentNote = notes[i];
+            let currentConcurrency = 0;
+
+            for (let j = 0; j < notes.length; j++) {
+                const otherNote = notes[j];
+                if (i === j) {
+                    continue;
+                }
+                const otherNoteEndTime = otherNote.beatsStart + otherNote.beatsDuration;
+                if (otherNote.beatsStart <= currentNote.beatsStart && otherNoteEndTime > currentNote.beatsStart) {
+                    currentConcurrency++;
+                }
+            }
+            concurrentCounts.push(currentConcurrency);
+        }
+
+        return concurrentCounts;
+    }
     const readFile = (file, operation) => new Promise((res, rej) => {
         // [text, arraybuffer, dataURI]
         operation ||= "text";
@@ -14,10 +36,10 @@ addEventListener("init", async () => {
             dataURI: "readAsDataURL"
         }
         const fr = new FileReader();
-        fr.addEventListener("load", ()=>{
+        fr.addEventListener("load", () => {
             res(fr.result);
         });
-        fr.addEventListener("error", (e)=>{
+        fr.addEventListener("error", (e) => {
             rej(e);
         });
         fr[methodMap[operation]](file);
@@ -320,6 +342,20 @@ addEventListener("init", async () => {
                 }
             },
         });
+    }
+
+    for (pattern in ARPEGGIATOR_SCORES) {
+        const offsetsSet = new Set();
+        const score = ARPEGGIATOR_SCORES[pattern];
+        score.length = Math.max(...score.notes.map(x => x.beatsStart + x.beatsDuration));
+        score.notes.sort((a, b) => a.semis - b.semis);
+        score.notes.sort((a, b) => a.beatsStart - b.beatsStart);
+        const concurrencyData = calculateConcurrentNotes(score.notes);
+        score.notes.forEach((x,i)=>{
+            offsetsSet.add(x.semis);
+            x.concurrentNotes = concurrencyData[i];
+        });
+        score.size = offsetsSet.size;
     }
 
     // load autosave

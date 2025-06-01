@@ -10,9 +10,11 @@ addEventListener("init", () => {
         if (toolbox.classList.contains("open")) {
             toolbox.classList.remove("open");
             toolboxExpander.innerHTML = ">";
+            toolboxExpander.classList.add("closed");
         } else {
             toolbox.classList.add("open");
             toolboxExpander.innerHTML = "<";
+            toolboxExpander.classList.remove("closed");
         }
     });
 
