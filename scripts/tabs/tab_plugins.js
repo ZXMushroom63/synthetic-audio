@@ -5,6 +5,23 @@
 // https://gleitz.github.io/midi-js-soundfonts/FluidR3_GM/names.json
 // https://gleitz.github.io/midi-js-soundfonts/FluidR3_GM/{id}-ogg.js
 addEventListener("init", async () => {
+    const readFile = (file, operation) => new Promise((res, rej) => {
+        // [text, arraybuffer, dataURI]
+        operation ||= "text";
+        const methodMap = {
+            text: "readAsText",
+            arraybuffer: "readAsArrayBuffer",
+            dataURI: "readAsDataURL"
+        }
+        const fr = new FileReader();
+        fr.addEventListener("load", ()=>{
+            res(fr.result);
+        });
+        fr.addEventListener("error", (e)=>{
+            rej(e);
+        });
+        fr[methodMap[operation]](file);
+    });
     const params = new URLSearchParams(location.search);
     const container = document.createElement("div");
     container.id = "pluginsUI";
@@ -91,16 +108,13 @@ addEventListener("init", async () => {
         f.type = "file";
         f.accept = ".js";
         f.multiple = true;
-        f.addEventListener("input", () => {
+        f.addEventListener("input", async () => {
             var files = [...f.files].filter(x => x.name.endsWith(".js"));
-            files.forEach(x => {
-                var fr = new FileReader();
-                fr.readAsText(x);
-                fr.addEventListener("load", async () => {
-                    await addFileMod(x.name, fr.result);
-                    await drawModArray();
-                });
-            });
+            for (file of files) {
+                const text = await readFile(file, "text");
+                await addFileMod(file.name, text);
+                await drawModArray();
+            }
         });
         f.click();
     }, "ujs");
@@ -109,16 +123,13 @@ addEventListener("init", async () => {
         f.type = "file";
         f.accept = ".js";
         f.multiple = true;
-        f.addEventListener("input", () => {
+        f.addEventListener("input", async () => {
             var files = [...f.files].filter(x => x.name.endsWith(".js"));
-            files.forEach(async x => {
-                var fr = new FileReader();
-                fr.readAsText(x);
-                fr.addEventListener("load", async () => {
-                    await addFileMod(x.name, patchSoundFont(fr.result));
-                    await drawModArray();
-                });
-            });
+            for (file of files) {
+                const text = await readFile(file, "text");
+                await addFileMod(file.name.replace(".js", ".sf.js"), patchSoundFont(text));
+                await drawModArray();
+            }
         });
         f.click();
     }, "usf");
@@ -129,7 +140,7 @@ addEventListener("init", async () => {
         f.addEventListener("input", async () => {
             var files = [...f.files];
             for (x of files) {
-                await addSample(x.webkitRelativePath, x); 
+                await addSample(x.webkitRelativePath, x);
                 await drawModArray();
             }
         });
