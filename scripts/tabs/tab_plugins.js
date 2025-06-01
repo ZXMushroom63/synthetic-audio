@@ -140,6 +140,19 @@ addEventListener("init", async () => {
         }
         document.querySelector("#renderProgress").innerText = `Downloaded SYNTHETIC Extras.`;
     }, "dlsn");
+    mkBtn("Download Devtools", async () => {
+        var modList = (await (await fetch("https://zxmushroom63.github.io/synthetic-audio/extras/developer.txt?plugin=true")).text()).split("\n").filter(x => !!x);
+        for (let i = 0; i < modList.length; i++) {
+            const mod = modList[i];
+            if (!mod.endsWith(".js")) {
+                continue;
+            }
+            document.querySelector("#renderProgress").innerText = `Downloading devtools (${(i / (modList.length) * 100).toFixed(1)}%)`;
+            await addFileMod(mod, await (await fetch("https://zxmushroom63.github.io/synthetic-audio/extras/devtools/" + mod + "?plugin=true")).text())
+            await drawModArray();
+        }
+        document.querySelector("#renderProgress").innerText = `Downloaded SYNTHETIC Extras.`;
+    }, "dldev");
     mkBtn("Download FluidR3-GM fonts (148MB)", async () => {
         var fontList = await (await fetch("https://gleitz.github.io/midi-js-soundfonts/FluidR3_GM/names.json?plugin=true")).json();
         for (let i = 0; i < fontList.length; i++) {

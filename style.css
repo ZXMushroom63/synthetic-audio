@@ -558,6 +558,7 @@ select option {
     align-content: center;
     background-color: rgba(0, 0, 0, 0.5);
     transform: translateX(calc(-4rem - 4px));
+    overflow-y: auto;
 }
 
 #toolboxExpander {
