@@ -114,6 +114,19 @@ addEventListener("init", async () => {
         });
         f.click();
     }, "usf");
+    mkBtn("Upload samples (beta)", () => {
+        var f = document.createElement("input");
+        f.type = "file";
+        f.webkitdirectory = true;
+        f.addEventListener("input", async () => {
+            var files = [...f.files];
+            for (x of files) {
+                await addSample(x.webkitRelativePath, x); 
+                await drawModArray();
+            }
+        });
+        f.click();
+    }, "usamples");
     mkBtn("Download SYNTHETIC Extras", async () => {
         var modList = (await (await fetch("https://zxmushroom63.github.io/synthetic-audio/extras/list.txt?plugin=true")).text()).split("\n").filter(x => !!x);
         for (let i = 0; i < modList.length; i++) {
@@ -203,11 +216,16 @@ addEventListener("init", async () => {
     var modList = await getMods();
     for (let i = 0; i < modList.length; i++) {
         document.querySelector("#renderProgress").innerText = `Loading plugins (${(i / (modList.length) * 100).toFixed(1)}%)`;
-        const mod = await getMod(modList[i]);
-        try {
-            (new Function(await mod)).apply(globalThis, []);
-        } catch (error) {
-            console.error("Failed to load " + modList[i]);
+        if (modList[i].endsWith(".js")) {
+            const mod = await getMod(modList[i]);
+            try {
+                (new Function(await mod)).apply(globalThis, []);
+            } catch (error) {
+                console.error("Failed to load " + modList[i]);
+            }
+        } else {
+            const sample = await getSample(modList[i]);
+            importAudioFile(sample);
         }
     }
 
