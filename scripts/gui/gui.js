@@ -683,12 +683,5 @@ function init() {
             ACTIVE_TOOL_FN([...findLoops(".loop")].filter(x => !x.classList.contains("deactivated")));
         }
     });
-
-    addEventListener("keydown", (e) => {
-        if (["backspace", "delete"].includes(e.key.toLowerCase())) {
-            var targets = document.querySelectorAll(".loop.active");
-            targets.forEach(t => { deleteLoop(t); });
-        }
-    });
 }
 addEventListener("load", init);
