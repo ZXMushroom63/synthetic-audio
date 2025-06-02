@@ -257,6 +257,15 @@ registerHelp(".tool[data-tool=ARP]",
 *  THE ARPEGGIATOR  *
 *********************
 (ALT+A)
-Todo. if you don't know how to use it and want there to be help text here, please make an issue on github
+
+Fairly self explanatory and easy to use, converts a chord into an arpeggio using provided patterns.
+- Arpeggio Pattern setting: Load a pattern. You can add patterns from the plugins tab. (Press download arpeggio pattern)
+- Speed Multiplier: Multiplier for how fast the generated arpeggio is.
+- Sort: When the number of unique notes in the arp pattern and the selected chord is the same, this controls which notes are substituted into the pattern.
+
+
+To create your own arp presets, download the developer tools in the plugins tab, and use the [DEV] 2score tool to generate arp files from a short, repeatable melody.
+The reference note is C5, so if you want a pattern going up one semitone and back, try putting C5 and C#5 alternating. Durations are relative to BPM once exported.
+Chords are substituted into the preset notes by order of pitch (or otherwise depending on user settings)
 `
 );
