@@ -365,6 +365,10 @@ function addBlock(type, start, duration, title, layer = 0, data = {}, editorValu
 
     const span = document.createElement("span");
     span.innerText = title;
+    if (type === "audio") {
+        const titleSegments = title.split("/");
+        span.innerText = titleSegments[titleSegments.length - 1] + "   |||||   " + title;
+    }
     span.classList.add("name");
     internal.appendChild(span)
 
