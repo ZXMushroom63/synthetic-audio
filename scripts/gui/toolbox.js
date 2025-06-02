@@ -3,6 +3,7 @@ var ACTIVE_TOOL = null;
 var ACTIVE_TOOL_FN = null;
 var TOOL_ACTIVE = false;
 const TOOL_DATABASE = {};
+const TOOL_KEYBIND_DATABASE = {};
 addEventListener("init", () => {
     var toolboxExpander = document.querySelector("#toolboxExpander");
     var toolbox = document.querySelector(".toolbox");
@@ -31,7 +32,7 @@ addEventListener("init", () => {
         ACTIVE_TOOL_FN(null);
     });
 });
-function registerTool(name, fn, selected = false) {
+function registerTool(name, fn, selected = false, bindChecker) {
     var tool = document.createElement("div");
     var namespacedId = name.toUpperCase().trim().replaceAll(" ", "_");
     tool.innerText = name;
@@ -43,6 +44,7 @@ function registerTool(name, fn, selected = false) {
         }
         fn.apply(this, args);
     };
+    TOOL_KEYBIND_DATABASE[namespacedId] = bindChecker || (() => false);
     tool.addEventListener("click", () => {
         if (TOOL_ACTIVE) {
             return;
@@ -65,3 +67,18 @@ function activateTool(namespacedId) {
     ACTIVE_TOOL_FN = TOOL_DATABASE[namespacedId];
     document.querySelector(`.tool[data-tool="${namespacedId}"]`).click();
 }
+addEventListener("keydown", (e) => {
+    const activeLoops = findLoops(".loop.active");
+    if (activeLoops.length < 1) {
+        return;
+    }
+    if ((e.target.tagName !== "INPUT") && (e.target.contentEditable !== "true") && (CURRENT_TAB === "TIMELINE")) {
+        for (const key in TOOL_KEYBIND_DATABASE) {
+            const tool = TOOL_DATABASE[key];
+            const checkKb = TOOL_KEYBIND_DATABASE[key];
+            if (checkKb(e)) {
+                tool([...activeLoops]);
+            }
+        }
+    }
+});
