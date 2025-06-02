@@ -173,11 +173,11 @@ function addAmpSmoothKnob(data) {
             data.forEach((x, i) => {
                 var ampSmoothingFactor = 1;
                 if (i < AmpSmoothingStart) {
-                    ampSmoothingFactor = i / AmpSmoothingStart;
+                    ampSmoothingFactor *= i / AmpSmoothingStart;
                 }
 
                 if (i > AmpSmoothingEnd) {
-                    ampSmoothingFactor = 1 - ((i - AmpSmoothingEnd) / AmpSmoothingStart);
+                    ampSmoothingFactor *= 1 - ((i - AmpSmoothingEnd) / AmpSmoothingStart);
                 }
                 data[i] *= ampSmoothingFactor;
             });
