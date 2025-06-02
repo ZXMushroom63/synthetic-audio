@@ -56,6 +56,7 @@ addEventListener("init", async () => {
     const params = new URLSearchParams(location.search);
     const container = document.createElement("div");
     container.id = "pluginsUI";
+    container.style.whiteSpace = "normal";
     container.style.borderTop = "1px solid white";
     var typeSymbols = {
         ".sf.js": "[🎸]",
@@ -83,7 +84,7 @@ addEventListener("init", async () => {
         button.innerText = name;
         button.setAttribute("data-helptarget", flag);
         button.addEventListener("click", cb);
-        button.classList.add("smallBtn");
+        //button.classList.add("smallBtn"); turns out some people have horrendous vision
         container.appendChild(button);
         return button;
     }
