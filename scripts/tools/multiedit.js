@@ -2,6 +2,7 @@ addEventListener("init", () => {
     registerTool("Multi-edit", (nodes) => {
         if (!nodes) { return };
         if (nodes.length < 2) { return; }
+        resetDrophandlers(false);
         const definitionSet = new Set();
         const dropdownAmalgam = {};
         const initData = {};

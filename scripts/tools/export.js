@@ -3,6 +3,7 @@ addEventListener("init", () => {
         if (!nodes) {
             return;
         }
+        resetDrophandlers(false);
         var dupedLoops = [];
         nodes.forEach(node => {
             dupedLoops.push(serialiseNode(node));
