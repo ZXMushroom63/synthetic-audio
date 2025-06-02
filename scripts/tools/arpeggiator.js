@@ -6,6 +6,7 @@ addEventListener("init", () => {
     var arpNotes = [];
     var lowestLayer = 0;
     var arpSpeed = 1;
+    var arpSortMode = "ASC";
     const arpeggiatorStyles = new ModMenuStyle();
     arpeggiatorStyles.setBackgroundColor("rgb(10,10,10)");
     arpeggiatorStyles.setHeaderBackgroundColor("rgb(20,20,20)");
@@ -33,6 +34,18 @@ addEventListener("init", () => {
             <option value="0.5">0.333x Speed</option>
             <option value="0.25">0.25x Speed</option>
         </select>
+        <label>Sort: </label><select class="inputStyles" id="arpSort">
+            <option value="NONE">None</option>
+            <option value="ASC">PitchAscending</option>
+            <option value="DESC">PitchDescending</option>
+            <option value="R0">Random0</option>
+            <option value="R1">Random1</option>
+            <option value="R2">Random2</option>
+            <option value="R3">Random3</option>
+            <option value="R4">Random4</option>
+            <option value="R5">Random5</option>
+            <option value="R6">Random6</option>
+        </select>
 
         <div id="arpScoreInfo"></div>
         <button id="arpConfirm">Looks good!</button>
@@ -58,16 +71,36 @@ addEventListener("init", () => {
             updateArpeggiatorNotes();
         });
 
+        const sort = menu.querySelector("#arpSort");
+        sort.selectedIndex = [...sort.options].findIndex(x => x.value == arpSortMode);
+        sort.addEventListener("input", () => {
+            arpSortMode = sort.value;
+            updateArpeggiatorNotes();
+        });
+
         updateArpeggiatorGui(menu);
         updateArpeggiatorNotes();
         confirm.addEventListener("click", () => {
+            offload("#trackInternal");
             rawChord.forEach(deleteLoop);
             arpeggiatorGui.closeModMenu();
-
-            //remember to remove .noSync from all loop confs at some point before broadcasting them. or just serialise->deserialise to efficiency
+            arpeggiate(false);
+            reflow("#trackInternal");
         });
     }
-    function arpeggiate() {
+    function arpeggiate(nosync) {
+        var moddedChord = chord;
+        if (arpSortMode === "ASC") {
+            moddedChord.sort((a, b)=>a.hitFrequency - b.hitFrequency);
+        }
+        if (arpSortMode === "DESC") {
+            moddedChord.sort((a, b)=>b.hitFrequency - a.hitFrequency);
+        }
+        if (arpSortMode.startsWith("R")) {
+            const seed = parseInt(arpSortMode.replace("R", ""));
+            Math.newRandom(seed);
+            moddedChord.shuffle();
+        }
         const preset = ARPEGGIATOR_SCORES[arpeggiatorPattern];
         const numFullLoops = Math.floor((template.duration / audio.beatSize) / (preset.beatsDuration / arpSpeed));
         const remainingBeats = (template.duration / audio.beatSize) % (preset.beatsDuration / arpSpeed);
@@ -108,10 +141,10 @@ addEventListener("init", () => {
             }
         }
 
-        if (chord.length === preset.diversity) {
+        if (moddedChord.length === preset.diversity) {
             return loopedNotes.map(scoreNote => {
                 const conf = structuredClone(template.conf);
-                const note = chord[scoreNote.identifier].theoryNote;
+                const note = moddedChord[scoreNote.identifier].theoryNote;
                 if (conf.Frequency) {
                     conf.Frequency = ":" + note + ":";
                 }
@@ -124,15 +157,15 @@ addEventListener("init", () => {
                 if (conf.Note) {
                     conf.Note = ":" + note + ":";
                 }
-                conf.noSync = true;
-                const b = addBlock(template.type, scoreNote.beatsStart * audio.beatSize, scoreNote.beatsDuration * audio.beatSize, note + " - " + arpeggiatorPattern, lowestLayer + scoreNote.concurrentNotes, conf, chord[0].editorLayer, false);
+                conf.noSync = nosync;
+                const b = addBlock(template.type, moddedChord[0].start + scoreNote.beatsStart * audio.beatSize, scoreNote.beatsDuration * audio.beatSize, note + " - " + arpeggiatorPattern, lowestLayer + scoreNote.concurrentNotes, conf, chord[0].editorLayer, false);
                 hydrateLoopPosition(b);
                 return b;
             });
         } else {
             return loopedNotes.map(scoreNote => {
                 const conf = structuredClone(template.conf);
-                const note = frequencyToNote(chord[0].hitFrequency * Math.pow(2, scoreNote.semis / 12));
+                const note = frequencyToNote(moddedChord[0].hitFrequency * Math.pow(2, scoreNote.semis / 12));
                 if (conf.Frequency) {
                     conf.Frequency = ":" + note + ":";
                 }
@@ -145,8 +178,8 @@ addEventListener("init", () => {
                 if (conf.Note) {
                     conf.Note = ":" + note + ":";
                 }
-                conf.noSync = true;
-                const b = addBlock(template.type, scoreNote.beatsStart * audio.beatSize, scoreNote.beatsDuration * audio.beatSize, note + " - " + arpeggiatorPattern, lowestLayer + scoreNote.concurrentNotes, conf, chord[0].editorLayer, false);
+                conf.noSync = nosync;
+                const b = addBlock(template.type, moddedChord[0].start + scoreNote.beatsStart * audio.beatSize, scoreNote.beatsDuration * audio.beatSize, note + " - " + arpeggiatorPattern, lowestLayer + scoreNote.concurrentNotes, conf, chord[0].editorLayer, false);
                 hydrateLoopPosition(b);
                 return b;
             });
@@ -157,7 +190,7 @@ addEventListener("init", () => {
         arpNotes.forEach((n) => {
             deleteLoop(n);
         });
-        arpNotes = arpeggiate();
+        arpNotes = arpeggiate(true);
 
         reflow("#trackInternal");
     }
@@ -177,7 +210,6 @@ addEventListener("init", () => {
         const loop = nodes[0];
         template = serialiseNode(loop);
         chord = [...findLoops(`.loop:not([data-deleted]):has(.noteDisplay)[data-start="${loop.getAttribute("data-start")}"][data-duration="${loop.getAttribute("data-duration")}"][data-editlayer="${loop.getAttribute("data-editlayer")}"]`)];
-        chord.sort((a, b) => a.hitFrequency - b.hitFrequency);
         rawChord = chord;
         chord = chord.map(loop => {
             const ser = serialiseNode(loop);
@@ -213,18 +245,14 @@ addEventListener("init", () => {
         });
 
         resetDrophandlers(false);
-        activateTool("MOVE");
-
-        nodes.forEach(node => {
-            pickupLoop(node, true);
-        });
-    }, false);
+    }, false, (e)=>e.altKey && e.key === "a");
 });
 registerHelp(".tool[data-tool=ARP]",
     `
 *********************
 *  THE ARPEGGIATOR  *
 *********************
+(ALT+A)
 Todo. if you don't know how to use it and want there to be help text here, please make an issue on github
 `
 );
