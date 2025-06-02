@@ -1,13 +1,14 @@
 addBlockType("repeat", {
     color: "rgba(0,255,0,0.3)",
     title: "Repeat",
+    amplitude_smoothing_knob: true,
     wet_and_dry_knobs: true,
     configs: {
         "RepeatDuration": [0.1, "number", 1],
         "FromEnd": [false, "checkbox"],
         "WrapExcessDataSize": [0, "number"],
-        "AmpSmoothingStart": [0, "number"],
-        "AmpSmoothingEnd": [0, "number"]
+        "SegmentSmoothingStart": [0, "number"],
+        "SegmentSmoothingEnd": [0, "number"]
     },
     functor: function (inPcm, channel, data) {
         inPcm = inPcm.slice();
@@ -21,8 +22,8 @@ addBlockType("repeat", {
         for (let i = 0; i < out.length; i += repeatAmount.length) {
             var startSample = Math.floor(repeatDuration(0, inPcm) * audio.samplerate) || 1;
             repeatAmount = inPcm.slice(0, startSample);
-            var AmpSmoothingStart = Math.floor(audio.samplerate * this.conf.AmpSmoothingStart);
-            var AmpSmoothingEnd = repeatAmount.length - Math.floor(audio.samplerate * this.conf.AmpSmoothingEnd);
+            var AmpSmoothingStart = Math.floor(audio.samplerate * this.conf.SegmentSmoothingStart);
+            var AmpSmoothingEnd = repeatAmount.length - Math.floor(audio.samplerate * this.conf.SegmentSmoothingEnd);
             repeatAmount.forEach((x, j) => {
                 var ampSmoothingFactor = 1;
                 if (j < AmpSmoothingStart) {
@@ -30,7 +31,7 @@ addBlockType("repeat", {
                 }
 
                 if (j > AmpSmoothingEnd) {
-                    ampSmoothingFactor *= 1 - ((j - AmpSmoothingEnd) / Math.floor(audio.samplerate * this.conf.AmpSmoothingEnd));
+                    ampSmoothingFactor *= 1 - ((j - AmpSmoothingEnd) / Math.floor(audio.samplerate * this.conf.SegmentSmoothingStart));
                 }
                 repeatAmount[j] *= ampSmoothingFactor;
             });
