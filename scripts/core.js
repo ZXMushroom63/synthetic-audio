@@ -510,6 +510,7 @@ addBlockType("audio", {
         "Reverse": [false, "checkbox"],
         "Speed": [1, "number", 1]
     },
+    amplitude_smoothing_knob: true,
     functor: function (inPcm, channel, data) {
         var obj = decodedPcmCache[this.file];
         var currentData = obj ? obj.getChannelData(Math.min(channel, obj.numberOfChannels - 1)) : [];
