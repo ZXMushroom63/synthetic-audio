@@ -1,3 +1,4 @@
+// Inspired by FL Studio Arpeggiator
 addEventListener("init", () => {
     var arpeggiatorPattern = "3/1 1 3 2";
     var chord = [];
