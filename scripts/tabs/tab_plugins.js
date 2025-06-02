@@ -5,16 +5,54 @@
 // https://gleitz.github.io/midi-js-soundfonts/FluidR3_GM/names.json
 // https://gleitz.github.io/midi-js-soundfonts/FluidR3_GM/{id}-ogg.js
 addEventListener("init", async () => {
+    function getRootFolders(zip) {
+        let paths = [];
+        for (const relativePath in zip.files) {
+            const file = zip.files[relativePath];
+            if (file.dir) {
+                const pathParts = relativePath.split('/');
+                if (pathParts.length === 2 && pathParts[1] === '') {
+                    paths.push(relativePath);
+                }
+            }
+        }
+        return paths;
+    }
+    const postInitQueue = [];
+    const allowedAudioFormats = [".ogg", ".mp3", ".flac", ".m4a", ".mp4", ".aiff", ".wav"];
+    const isAudio = (fname) => !!allowedAudioFormats.find(x => fname.endsWith(x));
+    async function loadSamplePack(pack, packName) {
+        const name = packName.replace(".zip", "");
+        const prefix = name + "/";
+        SAMPLEPACK_NAMES.push(prefix);
+        const zip = new JSZip();
+        await zip.loadAsync(pack);
+        const rootFolders = getRootFolders(zip);
+        if (zip.file("Cover.png")) {
+            const blob = new Blob([await zip.file("Cover.png").async("uint8array")], { type: "image/png" });
+            SAMPLEPACK_LOGOMAP[name] = URL.createObjectURL(blob);
+        } else {
+            SAMPLEPACK_LOGOMAP[name] = "public/cover" + (Math.hash(name, 8) + 1) + ".png";
+        }
+        for (const path in zip.files) {
+            const file = zip.files[path];
+            if (!file.dir && isAudio(path)) {
+                var filename = path;
+                if (rootFolders.length === 1) {
+                    filename = filename.replace(rootFolders[0], "");
+                }
+                const out = new File([await file.async("uint8array")], prefix + filename);
+                await importAudioFile(out, true);
+            }
+        }
+    }
     function calculateConcurrentNotes(notes) {
         const concurrentCounts = [];
-
         for (let i = 0; i < notes.length; i++) {
             const currentNote = notes[i];
             let currentConcurrency = 0;
-
             for (let j = 0; j < notes.length; j++) {
                 const otherNote = notes[j];
-
                 if (i === j) {
                     continue;
                 }
@@ -58,8 +96,7 @@ addEventListener("init", async () => {
     container.id = "pluginsUI";
     container.style.whiteSpace = "normal";
     container.style.borderTop = "1px solid white";
-    const allowedAudioFormats = [".ogg", ".mp3", ".flac", ".m4a", ".mp4", ".aiff", ".wav"];
-    const isAudio = (fname)=>!!allowedAudioFormats.find(x => fname.endsWith(x));
+
     var typeSymbols = {
         ".sf.js": ["[🎸]", "[🎻]", "[🎺]", "[🪕]", "[🎷]", "[📯]", "[🪗]"],
         ".pd.js": "[🎛️]",
@@ -307,13 +344,17 @@ addEventListener("init", async () => {
                 console.error("Failed to load " + modList[i]);
             }
         } else if (modList[i].endsWith(".zip")) { //sample pack
-            
+            postInitQueue.push({
+                type: "samplepack",
+                name: modList[i],
+                data: await getSample(modList[i])
+            });
         } else if (isAudio(modList[i])) {
-            const sample = await getSample(modList[i]);
-            if (!sample) {
-                continue;
-            }
-            importAudioFile(sample);
+            postInitQueue.push({
+                type: "sample",
+                name: modList[i],
+                data: await getSample(modList[i])
+            });
         }
     }
 
@@ -425,6 +466,17 @@ addEventListener("init", async () => {
             });
         });
         document.body.appendChild(socketio);
+    }
+    for (item of postInitQueue) {
+        if (item.type === "samplepack") {
+            await loadSamplePack(item.data, item.name);
+        }
+        if (item.type === "sample") {
+            if (!item.data) {
+                continue;
+            }
+            importAudioFile(item.data);
+        }
     }
 });
 registerHelp("[data-helptarget=uhvcc]",

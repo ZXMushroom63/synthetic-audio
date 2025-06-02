@@ -516,5 +516,21 @@ addBlockType("audio", {
         var duration = Math.floor(Math.round(((loopDurationMap[this.file] || 0) + 0.0) / data.loopInterval) * data.loopInterval * audio.samplerate);
         applySoundbiteToPcm(this.conf.Reverse, this.conf.Looping, currentData, inPcm, duration, _(this.conf.Speed), this.conf.Volume, this.conf.StartOffset);
         return inPcm;
+    },
+    customGuiButtons: {
+        "Preview": function () {
+            if (!loopMap[this.getAttribute("data-file")]) {
+                return;
+            }
+
+            var audio = new Audio(loopMap[this.getAttribute("data-file")]);
+            audio.volume = 1;
+            audio.play();
+            audio.addEventListener("timeupdate", () => {
+                if (audio.currentTime > 1) {
+                    audio.src = "";
+                }
+            });
+        },
     }
 });

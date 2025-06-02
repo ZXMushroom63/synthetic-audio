@@ -45,9 +45,13 @@ function loadFiltersAndPrims() {
             }
         });
 }
-async function importAudioFile(file) {
+async function importAudioFile(file, hidden) {
     loopMap[file.name] = file;
     loopDurationMap[file.name] = await getDurationOfLoop(file);
+
+    if (hidden) {
+        return;
+    }
 
     var loopsDiv = document.querySelector("#addloops");
     var dur = loopDurationMap[file.name];
