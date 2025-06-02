@@ -241,6 +241,7 @@ addEventListener("init", () => {
             onclose: () => {
                 rawChord.forEach(x => {
                     x._ignore = false;
+                    x._netIgnore = false;
                     x.style.display = "";
                 });
                 arpNotes.forEach((n) => {

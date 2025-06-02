@@ -52,7 +52,8 @@ const multiplayer = {
         });
         socket.on('add_loop', (data) => {
             multiplayer.isHooked = true;
-            const loop = deserialiseNode(JSON.parse(data));
+            const res = JSON.parse(data);
+            const loop = deserialiseNode(res);
             hydrateLoopPosition(loop);
             hydrateLoopDecoration(loop);
             multiplayer.isHooked = false;
