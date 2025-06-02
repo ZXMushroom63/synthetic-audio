@@ -319,14 +319,17 @@ addEventListener("init", async () => {
                 await drawModArray();
             });
 
-            var download = document.createElement("a");
-            download.innerText = "💾";
+            if (mod.endsWith(".js")) {
+                var download = document.createElement("a");
+                download.innerText = "💾";
 
-            download.addEventListener("click", async () => {
-                saveAs(new Blob([await getMod(mod)], { type: "text/javascript" }), mod);
-            });
+                download.addEventListener("click", async () => {
+                    saveAs(new Blob([await getMod(mod)], { type: "text/javascript" }), mod);
+                });
 
-            entry.insertAdjacentElement("afterbegin", download);
+                entry.insertAdjacentElement("afterbegin", download);
+            }
+            
             entry.insertAdjacentElement("afterbegin", remove);
 
             container.appendChild(entry);
