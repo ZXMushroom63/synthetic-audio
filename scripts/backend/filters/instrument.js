@@ -52,6 +52,9 @@ addBlockType("instrument", {
                     audio.src = "";
                 }
             });
+            audio.addEventListener("ended", () => {
+                audio.src = "";
+            });
         },
     },
     functor: function (inPcm, channel, data) {

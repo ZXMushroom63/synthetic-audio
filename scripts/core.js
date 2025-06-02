@@ -522,15 +522,13 @@ addBlockType("audio", {
             if (!loopMap[this.getAttribute("data-file")]) {
                 return;
             }
-
-            var audio = new Audio(loopMap[this.getAttribute("data-file")]);
-            audio.volume = 1;
-            audio.play();
-            audio.addEventListener("timeupdate", () => {
-                if (audio.currentTime > 1) {
-                    audio.src = "";
-                }
-            });
+            const url = URL.createObjectURL(loopMap[this.getAttribute("data-file")]);
+            if (document.querySelector("audio#loopsample").src) {
+                URL.revokeObjectURL(document.querySelector("audio#loopsample").src);
+            }
+            document.querySelector("audio#loopsample").src = url;
+            document.querySelector("audio#loopsample").currentTime = 0;
+            document.querySelector("audio#loopsample").play();
         },
     }
 });

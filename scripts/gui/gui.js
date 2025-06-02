@@ -611,7 +611,7 @@ function init() {
             e.preventDefault();
             e.stopImmediatePropagation();
             e.stopPropagation();
-            gui.zoom += e.deltaY * (keymap["Shift"] ? settings.ZoomScale*0.05 : settings.ZoomScale);
+            gui.zoom += e.deltaY * (keymap["Shift"] ? settings.ZoomScale * 0.05 : settings.ZoomScale);
             gui.zoom = Math.max(100, gui.zoom);
             document.querySelector("#trackInternal").style.willChange = "transform";
             document.querySelector("#trackInternal").style.transform = `scaleX(${gui.zoom / gui.lastHydratedZoom})`;
@@ -679,6 +679,17 @@ function init() {
             e.preventDefault();
             ACTIVE_TOOL_FN([...findLoops(".loop")].filter(x => !x.classList.contains("deactivated")));
         }
+    });
+
+    document.querySelector("audio#loopsample").addEventListener("timeupdate", (e) => {
+        if (e.target.currentTime > 4) {
+            URL.revokeObjectURL(e.target.src);
+            e.target.src = "";
+        }
+    });
+    document.querySelector("audio#loopsample").addEventListener("ended", (e) => {
+        URL.revokeObjectURL(e.target.src);
+            e.target.src = "";
     });
 }
 addEventListener("load", init);

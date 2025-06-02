@@ -32,7 +32,7 @@ addEventListener("init", async () => {
             const blob = new Blob([await zip.file("Cover.png").async("uint8array")], { type: "image/png" });
             SAMPLEPACK_LOGOMAP[name] = URL.createObjectURL(blob);
         } else {
-            SAMPLEPACK_LOGOMAP[name] = "public/cover" + (Math.hash(name, 8) + 1) + ".png";
+            SAMPLEPACK_LOGOMAP[name] = "public/covers/cover" + (Math.hash(name, 8) + 1) + ".png";
         }
         for (const path in zip.files) {
             const file = zip.files[path];
@@ -43,6 +43,12 @@ addEventListener("init", async () => {
                 }
                 const out = new File([await file.async("uint8array")], prefix + filename);
                 await importAudioFile(out, true);
+            } else if (file.dir) {
+                var pathname = path;
+                if (rootFolders.length === 1) {
+                    pathname = pathname.replace(rootFolders[0], "");
+                }
+                SAMPLEPACK_DIRECTORIES.push(prefix + pathname);
             }
         }
     }
