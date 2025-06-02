@@ -66,7 +66,7 @@ addBlockType("instrument", {
             return inPcm;
         }
         currentData = currentData.getChannelData(Math.max(channel, currentData.numberOfChannels - 1)).slice();
-        const FADETIME = this.conf.FadeTime * audio.samplerate;
+        const FADETIME = Math.min(this.conf.FadeTime * audio.samplerate, inPcm.length);
         const FADESTART = inPcm.length - FADETIME;
         const tail = currentData.subarray(FADESTART);
         tail.forEach((x, i) => {
