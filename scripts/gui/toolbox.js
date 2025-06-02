@@ -26,7 +26,7 @@ addEventListener("init", () => {
     });
 
     document.querySelector("#toolboxRunButton").addEventListener("click", () => {
-        if (!TOOL_ACTIVE) {
+        if (TOOL_ACTIVE) {
             return;
         }
         ACTIVE_TOOL_FN(null);
