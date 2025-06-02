@@ -299,6 +299,9 @@ addEventListener("init", async () => {
             }
         } else {
             const sample = await getSample(modList[i]);
+            if (!sample) {
+                continue;
+            }
             importAudioFile(sample);
         }
     }
