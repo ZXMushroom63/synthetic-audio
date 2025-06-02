@@ -95,7 +95,7 @@ addEventListener("init", () => {
         if (nodes.length !== 1) { return };
         const templateNode = nodes[0];
         const nodeType = templateNode.getAttribute("data-type");
-        if (!('Frequency' in templateNode.conf) || (typeof templateNode.conf.Frequency !== "string")) {
+        if (nodeType !== "p_waveform_plus") {
             return;
         }
         const picker = document.createElement("input");
