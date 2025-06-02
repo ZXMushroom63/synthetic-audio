@@ -206,11 +206,11 @@ function addBlockType(id, data) {
         }
     }
     data.async = data.functor.constructor.name === "AsyncFunction";
-    if (data.wet_and_dry_knobs) {
-        addWetDryKnobs(data);
-    }
     if (data.amplitude_smoothing_knob) {
         addAmpSmoothKnob(data);
+    }
+    if (data.wet_and_dry_knobs) {
+        addWetDryKnobs(data);
     }
     (data.directRefs || []).forEach(x => {
         directRefs[x] = id;
