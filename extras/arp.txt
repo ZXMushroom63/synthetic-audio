@@ -16,7 +16,6 @@
 4-chemichloe.arp.js
 5-chemichloe 2.arp.js
 5-chemichloe.arp.js
-arp.txt
 riff machine-A.arp.js
 riff machine-B.arp.js
 riff machine-C.arp.js
