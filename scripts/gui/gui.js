@@ -182,7 +182,7 @@ function hydrateLoopPosition(elem, lean) {
             + elem.getAttribute("data-layer")
             + ", Z: "
             + elem.getAttribute("data-editlayer")
-            }\nUUID: ${elem.conf.uuid || "(offline)"}`);
+            }\nUUID: ${elem.getAttribute("data-uuid") || "(offline)"}`);
     }
     loopInternal.style.width = internalWidth;
 
