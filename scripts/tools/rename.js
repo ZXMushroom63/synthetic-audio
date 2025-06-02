@@ -16,13 +16,14 @@ addEventListener("init", ()=>{
                 multiplayer.patchLoop(loop);
             }
         });
-    });
+    }, false, (e)=>e.key === "F2");
 });
 registerHelp(".tool[data-tool=RENAME]",
 `
 *********************
 *  THE RENAME TOOL  *
 *********************
+(F2)
 If the rename tool is enabled, when a 
     - loop is clicked, or
     - a group of loops are selected using RMB

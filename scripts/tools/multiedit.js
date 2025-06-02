@@ -34,13 +34,14 @@ addEventListener("init", () => {
         }
         addEventListener("mousedown", mouseRelease);
         document.body.appendChild(menu);
-    }, false);
+    }, false, (e)=>e.key==="q");
 });
 registerHelp(".tool[data-tool=MULTI-EDIT]",
 `
 *************************
 *  THE MULTI-EDIT TOOL  *
 *************************
+(Q)
 If the multi-edit tool is enabled, when a group of loops are selected using RMB, a properties menu for all of the selected loops.
 By default, the values for the properties are picked from a combination of all the loops. Editing one property edits all of the loops.
 `);

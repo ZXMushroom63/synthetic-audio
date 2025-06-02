@@ -54,6 +54,10 @@ ALT + SCROLL = modify target value on respective loop (usually the note), and pl
 ALT + CLICK = play loop preview if applicable
 CTRL + S = write to autosave slot
 CTRL + SHIFT + S = save as file
+CTRL + E = Export selected loops
+CTRL + Q = Multi-edit selected loops
+ALT + A = Arpeggiate selected loops
+F2 = Rename selected loops
 
 
 *******************
