@@ -95,7 +95,7 @@ addEventListener("init", () => {
             e.preventDefault();
         }
     });
-    addEventListener("drop", (e) => {
+    addEventListener("drop", async (e) => {
         if (CURRENT_TAB === "TIMELINE") {
             e.preventDefault();
             const item = [...e.dataTransfer.items].find(x => x.kind === "file");
@@ -109,7 +109,11 @@ addEventListener("init", () => {
                     };
                     fr.readAsText(file);
                 } else if (file.type.startsWith("audio/")) {
-                    alert("Drag and drop audio not supported yet. Use the loop folder instead.")
+                    const newFile = new File([file], "User/" + file.name, { type: file.type });
+
+                    await addSample(newFile.name, newFile);
+                    await importAudioFile(newFile);
+                    addAudioSampleBlock(newFile.name);
                 } else if (file.name.endsWith(".sm")) {
                     const fr = new FileReader();
                     fr.onload = () => {

@@ -33,10 +33,7 @@ var audio = {
     normalise: true,
     format: "wav"
 }
-var loopMap = {
 
-};
-var loopDurationMap = {};
 function deleteLoop(loop) {
     if (!multiplayer.isHooked && multiplayer.on && !loop._netIngore) {
         return multiplayer.deleteLoop(loop.getAttribute("data-uuid"));

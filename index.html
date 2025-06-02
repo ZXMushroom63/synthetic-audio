@@ -59,7 +59,7 @@
     <script src="scripts/gui/help.js"></script>
     <script src="scripts/gui/tabs.js"></script>
     <script src="scripts/gui/pickupLoop.js"></script>
-    <script src="scripts/gui/loop_select.js"></script>
+    <script src="scripts/gui/add_stuff_menu.js"></script>
     <script src="scripts/gui/timePosMarker.js"></script>
     <script src="scripts/gui/selectbox.js"></script>
     <script src="scripts/gui/duplicate.js"></script>
@@ -193,9 +193,6 @@
               />
             </div>
           </h4>
-          <div id="loopSelector">
-            <label>Select loop folder: </label><input type="file" multiple />
-          </div>
           <div id="renderProgress">(no render task currently active)</div>
           <div id="controlsAndStuff">
             <button onclick="save()">Save</button>
@@ -329,7 +326,7 @@
     <div id="addstuff">
       <h4>Add Tracks</h4>
       <details>
-        <summary>Loops</summary>
+        <summary>Samples</summary>
         <div id="addloops"></div>
       </details>
       <details>

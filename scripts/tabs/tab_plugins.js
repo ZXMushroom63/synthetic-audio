@@ -58,6 +58,8 @@ addEventListener("init", async () => {
     container.id = "pluginsUI";
     container.style.whiteSpace = "normal";
     container.style.borderTop = "1px solid white";
+    const allowedAudioFormats = [".ogg", ".mp3", ".flac", ".m4a", ".mp4", ".aiff", ".wav"];
+    const isAudio = (fname)=>!!allowedAudioFormats.find(x => fname.endsWith(x));
     var typeSymbols = {
         ".sf.js": "[🎸]",
         ".pd.js": "[🎛️]",
@@ -68,6 +70,7 @@ addEventListener("init", async () => {
         ".ogg": "[🔊]",
         ".flac": "[🔊]",
         ".m4a": "[🔊]",
+        ".mp4": "[🎞️]",
         "tool.js": "[🔨]",
         ".js": "[🇯‌🇸‌]",
     }
@@ -165,14 +168,15 @@ addEventListener("init", async () => {
         });
         f.click();
     }, "usf");
-    mkBtn("Upload samples (beta)", () => {
+    mkBtn("Upload sample pack (.zip)", () => {
         var f = document.createElement("input");
         f.type = "file";
-        f.webkitdirectory = true;
+        f.multiple = "false";
+        f.accept = ".zip";
         f.addEventListener("input", async () => {
-            var files = [...f.files];
+            var files = [...f.files].filter(x => x.name.endsWith(".js"));
             for (x of files) {
-                await addSample(x.webkitRelativePath, x);
+                await addSample(x.name, x);
                 await drawModArray();
             }
         });
@@ -297,7 +301,9 @@ addEventListener("init", async () => {
             } catch (error) {
                 console.error("Failed to load " + modList[i]);
             }
-        } else {
+        } else if (modList[i].endsWith(".zip")) { //sample pack
+            
+        } else if (isAudio(modList[i])) {
             const sample = await getSample(modList[i]);
             if (!sample) {
                 continue;
