@@ -61,7 +61,7 @@ addEventListener("init", async () => {
     const allowedAudioFormats = [".ogg", ".mp3", ".flac", ".m4a", ".mp4", ".aiff", ".wav"];
     const isAudio = (fname)=>!!allowedAudioFormats.find(x => fname.endsWith(x));
     var typeSymbols = {
-        ".sf.js": "[🎸]",
+        ".sf.js": ["[🎸]", "[🎻]", "[🎺]", "[🪕]", "[🎷]", "[📯]", "[🪗]"],
         ".pd.js": "[🎛️]",
         ".arp.js": "[𝄂𝄚]",
         ".aiff": "[🔊]",
@@ -73,11 +73,16 @@ addEventListener("init", async () => {
         ".mp4": "[🎞️]",
         "tool.js": "[🔨]",
         ".js": "[🇯‌🇸‌]",
+        ".zip": "[📦]"
     }
     function getTypeSymbol(fileName) {
         for (ent of Object.entries(typeSymbols)) {
             if (fileName.endsWith(ent[0])) {
-                return ent[1];
+                if (Array.isArray(ent[1])) {
+                    return ent[1][Math.hash(fileName, ent[1].length)];
+                } else {
+                    return ent[1];
+                }
             }
         }
         return "[❔]"
@@ -174,7 +179,7 @@ addEventListener("init", async () => {
         f.multiple = "false";
         f.accept = ".zip";
         f.addEventListener("input", async () => {
-            var files = [...f.files].filter(x => x.name.endsWith(".js"));
+            var files = [...f.files].filter(x => x.name.endsWith(".zip"));
             for (x of files) {
                 await addSample(x.name, x);
                 await drawModArray();
