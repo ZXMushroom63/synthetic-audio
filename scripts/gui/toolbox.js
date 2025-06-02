@@ -77,6 +77,7 @@ addEventListener("keydown", (e) => {
             const tool = TOOL_DATABASE[key];
             const checkKb = TOOL_KEYBIND_DATABASE[key];
             if (checkKb(e)) {
+                e.preventDefault();
                 tool([...activeLoops]);
             }
         }
