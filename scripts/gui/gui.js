@@ -681,7 +681,7 @@ function init() {
                 return;
             }
             e.preventDefault();
-            ACTIVE_TOOL_FN([...findLoops(".loop")].filter(x => !x.classList.contains("deactivated")));
+            ACTIVE_TOOL_FN([...findLoops(".loop:not([data-deleted])")].filter(x => !x.classList.contains("deactivated")));
         }
     });
 
