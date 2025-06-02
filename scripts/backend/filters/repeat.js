@@ -18,28 +18,27 @@ addBlockType("repeat", {
         var out = new Float32Array(inPcm.length);
 
         var repeatDuration = _(this.conf.RepeatDuration);
-        var startSample = Math.floor(repeatDuration(0, inPcm) * audio.samplerate) || 1;
-        var repeatAmount = inPcm.slice(0, startSample);
-        repeatAmount.forEach((x, i) => {
-            const AmpSmoothingStart = Math.floor(audio.samplerate * this.conf.AmpSmoothingStart);
-            const AmpSmoothingEnd = inPcm.length - Math.floor(audio.samplerate * this.conf.AmpSmoothingEnd);
-
-            var ampSmoothingFactor = 1;
-            if (i < AmpSmoothingStart) {
-                ampSmoothingFactor *= i / AmpSmoothingStart;
-            }
-
-            if (i > AmpSmoothingEnd) {
-                ampSmoothingFactor *= 1 - ((i - AmpSmoothingEnd) / AmpSmoothingStart);
-            }
-            data[i] *= ampSmoothingFactor;
-        })
-        const excess = inPcm.subarray(startSample, startSample + Math.floor(this.conf.WrapExcessDataSize * audio.samplerate));
-        excess.forEach((x, i) => {
-            repeatAmount[i % startSample] += x;
-        });
         for (let i = 0; i < out.length; i += repeatAmount.length) {
-            repeatAmount = inPcm.slice(0, Math.floor(repeatDuration(i, inPcm) * audio.samplerate) || 1);
+            var startSample = Math.floor(repeatDuration(0, inPcm) * audio.samplerate) || 1;
+            repeatAmount = inPcm.slice(0, startSample);
+            var AmpSmoothingStart = Math.floor(audio.samplerate * this.conf.AmpSmoothingStart);
+            var AmpSmoothingEnd = repeatAmount.length - Math.floor(audio.samplerate * this.conf.AmpSmoothingEnd);
+            repeatAmount.forEach((x, j) => {
+                var ampSmoothingFactor = 1;
+                if (j < AmpSmoothingStart) {
+                    ampSmoothingFactor *= j / AmpSmoothingStart;
+                }
+
+                if (j > AmpSmoothingEnd) {
+                    ampSmoothingFactor *= 1 - ((j - AmpSmoothingEnd) / Math.floor(audio.samplerate * this.conf.AmpSmoothingEnd));
+                }
+                repeatAmount[j] *= ampSmoothingFactor;
+            });
+            const excess = inPcm.subarray(startSample, startSample + Math.floor(this.conf.WrapExcessDataSize * audio.samplerate));
+            excess.forEach((x, j) => {
+                repeatAmount[j % startSample] += x;
+            });
+
             for (let j = 0; j < repeatAmount.length; j++) {
                 out[i + j] = repeatAmount[j];
             }
