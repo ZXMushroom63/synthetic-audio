@@ -1,0 +1,3 @@
+
+    ARPEGGIATOR_SCORES["5/chemichloe 2"] = {"notes":[{"semis":3,"beatsStart":1,"beatsDuration":1},{"semis":4,"beatsStart":3,"beatsDuration":1},{"semis":2,"beatsStart":0,"beatsDuration":1},{"semis":3,"beatsStart":6,"beatsDuration":1},{"semis":2,"beatsStart":5,"beatsDuration":1},{"semis":-2,"beatsStart":0,"beatsDuration":16},{"semis":3,"beatsStart":9,"beatsDuration":1},{"semis":2,"beatsStart":8,"beatsDuration":1},{"semis":4,"beatsStart":11,"beatsDuration":1},{"semis":1,"beatsStart":13,"beatsDuration":1},{"semis":3,"beatsStart":14,"beatsDuration":1},{"semis":0,"beatsStart":0,"beatsDuration":16}]};
+    

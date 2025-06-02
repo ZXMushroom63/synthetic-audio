@@ -1,0 +1,3 @@
+
+    ARPEGGIATOR_SCORES["riff machine/L"] = {"notes":[{"semis":0,"beatsStart":0,"beatsDuration":1},{"semis":2,"beatsStart":1,"beatsDuration":1},{"semis":3,"beatsStart":2,"beatsDuration":1},{"semis":5,"beatsStart":3,"beatsDuration":1},{"semis":7,"beatsStart":4,"beatsDuration":1},{"semis":8,"beatsStart":5,"beatsDuration":1},{"semis":10,"beatsStart":6,"beatsDuration":1},{"semis":11,"beatsStart":7,"beatsDuration":1}]};
+    

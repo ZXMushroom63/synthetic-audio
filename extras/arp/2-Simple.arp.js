@@ -1,0 +1,3 @@
+
+    ARPEGGIATOR_SCORES["2/Simple"] = {"notes":[{"semis":0,"beatsStart":0,"beatsDuration":4},{"semis":1,"beatsStart":4,"beatsDuration":2},{"semis":0,"beatsStart":6,"beatsDuration":4},{"semis":1,"beatsStart":10,"beatsDuration":4},{"semis":0,"beatsStart":14,"beatsDuration":1},{"semis":0,"beatsStart":16,"beatsDuration":4},{"semis":1,"beatsStart":20,"beatsDuration":2},{"semis":0,"beatsStart":22,"beatsDuration":4},{"semis":1,"beatsStart":26,"beatsDuration":4},{"semis":1,"beatsStart":30,"beatsDuration":2}]};
+    

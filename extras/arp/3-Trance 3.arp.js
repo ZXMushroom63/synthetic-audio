@@ -1,0 +1,3 @@
+
+    ARPEGGIATOR_SCORES["3/Trance 3"] = {"notes":[{"semis":1,"beatsStart":5,"beatsDuration":1},{"semis":2,"beatsStart":0,"beatsDuration":1},{"semis":0,"beatsStart":4,"beatsDuration":1},{"semis":3,"beatsStart":1,"beatsDuration":1},{"semis":2,"beatsStart":2,"beatsDuration":1},{"semis":2,"beatsStart":3,"beatsDuration":1},{"semis":0,"beatsStart":6.0280000000000005,"beatsDuration":1},{"semis":0,"beatsStart":7,"beatsDuration":1}]};
+    

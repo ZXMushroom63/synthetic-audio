@@ -201,7 +201,7 @@ addEventListener("init", async () => {
             await addFileMod(mod, await (await fetch("https://zxmushroom63.github.io/synthetic-audio/extras/devtools/" + mod + "?plugin=true")).text())
             await drawModArray();
         }
-        document.querySelector("#renderProgress").innerText = `Downloaded SYNTHETIC Extras.`;
+        document.querySelector("#renderProgress").innerText = `Downloaded SYNTHETIC Devtools.`;
     }, "dldev");
     mkBtn("Download FluidR3-GM fonts (148MB)", async () => {
         var fontList = await (await fetch("https://gleitz.github.io/midi-js-soundfonts/FluidR3_GM/names.json?plugin=true")).json();
@@ -226,6 +226,16 @@ addEventListener("init", async () => {
         }
         document.querySelector("#renderProgress").innerText = `Downloaded MusyngKite sound fonts.`;
     }, "dl_musyng");
+    mkBtn("Download FL Studio Arpeggio Presets (90KB)", async () => {
+        var modList = (await (await fetch("https://zxmushroom63.github.io/synthetic-audio/extras/arp.txt?plugin=true")).text()).split("\n").filter(x => !!x);
+        for (let i = 0; i < modList.length; i++) {
+            const mod = modList[i];
+            document.querySelector("#renderProgress").innerText = `Downloading arpeggios: (${(i / (modList.length) * 100).toFixed(1)}%); current: ${mod}`;
+            await addFileMod(mod, await (await fetch("https://zxmushroom63.github.io/synthetic-audio/extras/arp/" + encodeURIComponent(mod) + "?plugin=true")).text());
+            await drawModArray();
+        }
+        document.querySelector("#renderProgress").innerText = `Downloaded FL Studio Arpeggios.`;
+    }, "dl_arp");
     mkBtn("Clear plugins", async () => { await resetMods(); drawModArray(); }, "clmods");
     container.appendChild(document.createElement("br"));
     const quotaEstimate = document.createElement("span");
