@@ -951,7 +951,7 @@ div:has(#samplepacks_tree) {
 }
 div:has(#samplepacks_tree) code {
     display: inline-block;
-    margin-bottom: 0.5rem;
+    margin: 0.5rem;
 }
 
 #samplepacks_tree a {
