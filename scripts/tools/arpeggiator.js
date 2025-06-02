@@ -90,11 +90,14 @@ addEventListener("init", () => {
     }
     function arpeggiate(nosync) {
         var moddedChord = chord;
+        if (arpSortMode === "NONE") {
+            moddedChord = moddedChord.sort((a, b) => a.layer - b.layer);
+        }
         if (arpSortMode === "ASC") {
-            moddedChord.sort((a, b)=>a.hitFrequency - b.hitFrequency);
+            moddedChord.sort((a, b) => a.hitFrequency - b.hitFrequency);
         }
         if (arpSortMode === "DESC") {
-            moddedChord.sort((a, b)=>b.hitFrequency - a.hitFrequency);
+            moddedChord.sort((a, b) => b.hitFrequency - a.hitFrequency);
         }
         if (arpSortMode.startsWith("R")) {
             const seed = parseInt(arpSortMode.replace("R", ""));
@@ -217,6 +220,7 @@ addEventListener("init", () => {
             ser.hitFrequency = loop.hitFrequency;
             return ser;
         });
+
         lowestLayer = Math.min(...chord.map(c => c.layer));
         rawChord.forEach(x => {
             x._ignore = true;
@@ -245,7 +249,7 @@ addEventListener("init", () => {
         });
 
         resetDrophandlers(false);
-    }, false, (e)=>e.altKey && e.key === "a");
+    }, false, (e) => e.altKey && e.key === "a");
 });
 registerHelp(".tool[data-tool=ARP]",
     `
