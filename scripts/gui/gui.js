@@ -686,7 +686,7 @@ function init() {
     });
 
     document.querySelector("audio#loopsample").addEventListener("timeupdate", (e) => {
-        if (e.target.currentTime > 4) {
+        if (e.target.currentTime > 32) {
             URL.revokeObjectURL(e.target.src);
             e.target.src = "";
         }
