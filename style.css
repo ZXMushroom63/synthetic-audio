@@ -889,7 +889,7 @@ code:hover {
   height: 7rem;
   overflow: hidden;
   text-align: center;
-  margin-right: 1rem;
+  margin-right: calc(1rem + 4px);
   border-radius: 1rem;
   align-content: center;
   cursor: pointer;
@@ -975,4 +975,12 @@ div:has(#samplepacks_tree) code {
 
 li {
   padding: 3px;
+}
+
+#samplepacks .modmenutabcontent {
+  padding: 1rem 0rem 0rem 1rem;
+}
+
+.modmenutabcontent:has(#samplepacks_tree) {
+  overflow-x: hidden;
 }
