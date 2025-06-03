@@ -125,7 +125,7 @@ addEventListener("init", () => {
         resetDrophandlers(true);
         activateTool("MOVE");
         samplepackMenu.init();
-    }, false, (e) => e.shiftKey && e.key === "s");
+    }, false, (e) => e.shiftKey && e.key === "S");
 
     document.querySelector("#samplepacksBtn").addEventListener("click", () => { TOOL_DATABASE["SAMPLES"](null); });
 });
