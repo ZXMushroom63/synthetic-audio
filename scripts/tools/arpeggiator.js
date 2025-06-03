@@ -30,9 +30,10 @@ addEventListener("init", () => {
             <option value="4">4x Speed</option>
             <option value="3">3x Speed</option>
             <option value="2">2x Speed</option>
+            <option value="1.5">1.5x Speed</option>
             <option value="1" selected>1x Speed</option>
             <option value="0.5">0.5x Speed</option>
-            <option value="0.5">0.333x Speed</option>
+            <option value="0.333333">0.333x Speed</option>
             <option value="0.25">0.25x Speed</option>
         </select>
         <label>Sort: </label><select class="inputStyles" id="arpSort">
