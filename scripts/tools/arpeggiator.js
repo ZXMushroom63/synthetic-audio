@@ -193,8 +193,10 @@ addEventListener("init", () => {
     function updateArpeggiatorNotes() {
         offload("#trackInternal");
         arpNotes.forEach((n) => {
+            n.forceDelete = true;
             deleteLoop(n);
         });
+        rawChord.forEach(markLoopDirty);
         arpNotes = arpeggiate(true);
 
         reflow("#trackInternal");
@@ -244,8 +246,10 @@ addEventListener("init", () => {
                     x._ignore = false;
                     x._netIgnore = false;
                     x.style.display = "";
+                    markLoopDirty(x);
                 });
                 arpNotes.forEach((n) => {
+                    n.forceDelete = true;
                     deleteLoop(n);
                 });
             }
