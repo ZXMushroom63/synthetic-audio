@@ -561,7 +561,7 @@ select option {
   width: calc(4rem + 4px);
   pointer-events: none;
   align-content: center;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: rgba(0, 0, 0, 0.7);
   transform: translateX(calc(-4rem - 4px));
   overflow-y: scroll;
   overflow-x: hidden;
