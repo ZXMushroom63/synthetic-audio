@@ -31,7 +31,7 @@ addBlockType("repeat", {
                 }
 
                 if (j > AmpSmoothingEnd) {
-                    ampSmoothingFactor *= 1 - ((j - AmpSmoothingEnd) / Math.floor(audio.samplerate * this.conf.SegmentSmoothingStart));
+                    ampSmoothingFactor *= 1 - ((j - AmpSmoothingEnd) / Math.floor(audio.samplerate * this.conf.SegmentSmoothingEnd));
                 }
                 repeatAmount[j] *= ampSmoothingFactor;
             });
