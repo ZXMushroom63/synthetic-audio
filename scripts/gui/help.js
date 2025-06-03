@@ -122,6 +122,7 @@ helpContent.addTab("Plugins", "(coming soon)");
 helpContent.addTab("Samplepacks", "(coming soon)");
 helpContent.addTab("Live Mode", "(coming soon)");
 helpContent.addTab("Misc Tab", "(coming soon)");
+helpContent.addTab("Multiplayer", "(coming soon)");
 
 
 
