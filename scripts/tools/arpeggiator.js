@@ -8,17 +8,6 @@ addEventListener("init", () => {
     var lowestLayer = 0;
     var arpSpeed = 1;
     var arpSortMode = "ASC";
-    const arpeggiatorStyles = new ModMenuStyle();
-    arpeggiatorStyles.setBackgroundColor("rgb(10,10,10)");
-    arpeggiatorStyles.setHeaderBackgroundColor("rgb(20,20,20)");
-    arpeggiatorStyles.setHeaderTextColor("white");
-    arpeggiatorStyles.setHeight("50vh");
-    arpeggiatorStyles.setWidth("50vw");
-
-    arpeggiatorStyles.setTabBarBackgroundColor("rgb(10,10,10)");
-    arpeggiatorStyles.setTabHoverColor("rgb(20,20,20)");
-    arpeggiatorStyles.setTabactiveColor("rgb(35,35,35)");
-    arpeggiatorStyles.setTextColor("white");
 
     var tabs = new ModMenuTabList();
 
@@ -53,7 +42,7 @@ addEventListener("init", () => {
         <button id="arpConfirm">Looks good!</button>
     `);
 
-    const arpeggiatorGui = new ModMenu("SYNTHETIC Arpeggiator", tabs, "arpeggiator", arpeggiatorStyles);
+    const arpeggiatorGui = new ModMenu("SYNTHETIC Arpeggiator", tabs, "arpeggiator", syntheticMenuStyles);
     arpeggiatorGui.oninit = function (menu) {
         const sel = menu.querySelector("#arpPattern");
         const confirm = menu.querySelector("#arpConfirm");

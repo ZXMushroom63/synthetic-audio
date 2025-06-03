@@ -19,18 +19,6 @@ addEventListener("init", () => {
     }
     var path = "User/";
 
-    const menuStyles = new ModMenuStyle();
-    menuStyles.setBackgroundColor("rgb(10,10,10)");
-    menuStyles.setHeaderBackgroundColor("rgb(20,20,20)");
-    menuStyles.setHeaderTextColor("white");
-    menuStyles.setHeight("50vh");
-    menuStyles.setWidth("50vw");
-
-    menuStyles.setTabBarBackgroundColor("rgb(10,10,10)");
-    menuStyles.setTabHoverColor("rgb(20,20,20)");
-    menuStyles.setTabactiveColor("rgb(35,35,35)");
-    menuStyles.setTextColor("white");
-
     var tabs = new ModMenuTabList();
 
     tabs.addTab("Explorer", `
@@ -43,7 +31,7 @@ addEventListener("init", () => {
         </div>
     `);
 
-    const samplepackMenu = new ModMenu("Samplepacks", tabs, "samplepacks", menuStyles);
+    const samplepackMenu = new ModMenu("Samplepacks", tabs, "samplepacks", syntheticMenuStyles);
 
     function updateTreeView() {
         const pathDisplay = document.querySelector("#samplepacks_path");

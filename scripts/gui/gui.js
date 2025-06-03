@@ -693,7 +693,7 @@ function init() {
     });
     document.querySelector("audio#loopsample").addEventListener("ended", (e) => {
         URL.revokeObjectURL(e.target.src);
-            e.target.src = "";
+        e.target.src = "";
     });
 }
 addEventListener("load", init);
