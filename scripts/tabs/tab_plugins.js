@@ -484,8 +484,11 @@ addEventListener("init", async () => {
             if (!item.data) {
                 continue;
             }
-            importAudioFile(item.data);
+            await importAudioFile(item.data);
         }
+    }
+    if (performance.measureUserAgentSpecificMemory) {
+        console.log("Startup completed, using ", (await performance.measureUserAgentSpecificMemory()).bytes / (1024**2), "MB of memory.");
     }
 });
 registerHelp("[data-helptarget=uhvcc]",
