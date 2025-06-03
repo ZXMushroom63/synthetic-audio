@@ -74,7 +74,7 @@ addEventListener("init", () => {
         });
 
         Object.keys(loopMap).filter(x => x.startsWith(path)).forEach(x => {
-            const display = `${x.replace(path, "")} [${loopDurationMap[path].toFixed(2)}s]`;
+            const display = `${x.replace(path, "")} [${loopDurationMap[x].toFixed(2)}s]`;
             if (display.includes("/")) {
                 return;
             }
