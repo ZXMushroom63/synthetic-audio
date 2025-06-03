@@ -508,14 +508,21 @@ addBlockType("audio", {
         "Volume": [1, "number"],
         "Looping": [true, "checkbox"],
         "Reverse": [false, "checkbox"],
-        "Speed": [1, "number", 1]
+        "Speed": [1, "number", 1],
+        "Sidechain": [false, "checkbox"],
+        "SidechainPower": [2, "number"],
+        "Silent": [false, "checkbox"],
     },
     amplitude_smoothing_knob: true,
     functor: function (inPcm, channel, data) {
         var obj = decodedPcmCache[this.file];
         var currentData = obj ? obj.getChannelData(Math.min(channel, obj.numberOfChannels - 1)) : [];
         var duration = Math.floor(Math.round(((loopDurationMap[this.file] || 0) + 0.0) / data.loopInterval) * data.loopInterval * audio.samplerate);
-        applySoundbiteToPcm(this.conf.Reverse, this.conf.Looping, currentData, inPcm, duration, _(this.conf.Speed), this.conf.Volume, this.conf.StartOffset);
+        if (this.conf.Sidechain) {
+            applySoundbiteToPcmSidechain(this.conf.Reverse, this.conf.Looping, currentData, inPcm, duration, _(this.conf.Speed), this.conf.Volume, this.conf.StartOffset, this.conf.SidechainPower, this.conf.Silent);
+        } else {
+            applySoundbiteToPcm(this.conf.Reverse, this.conf.Looping, currentData, inPcm, duration, _(this.conf.Speed), this.conf.Volume, this.conf.StartOffset);
+        }
         return inPcm;
     },
     customGuiButtons: {
