@@ -968,3 +968,11 @@ div:has(#samplepacks_tree) code {
 #samplepacks_tree a:first-of-type {
     border-top: 1px solid white;
 }
+
+#mod_help * {
+  white-space: normal;
+}
+
+li {
+  padding: 3px;
+}
