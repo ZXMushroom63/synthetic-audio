@@ -19,7 +19,7 @@ function calcOptions(search) {
             return ret
         }).sort().sort((a, b)=>{return (b.toLowerCase() === search) - (a.toLowerCase() === search)}).map(x => x._key)
         .map(x => [x[0], x[1].title])
-        .concat(Object.keys(loopMap).sort().map(y => ["audio", y]))
+        .concat(Object.keys(loopMap).filter(x=>x.startsWith("User/")).sort().map(y => ["audio", y]))
         .filter(x => x[1].toLowerCase().includes(search) || x[0].toLowerCase().includes(search));
     return opts;
 }
