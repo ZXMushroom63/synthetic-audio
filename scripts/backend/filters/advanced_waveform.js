@@ -352,8 +352,8 @@ function slideNoteHandler(l) {
     if (!l.conf.IsSlide) {
         return;
     }
-    const slideTarget = findLoops(`.loop:not(data-deleted)[data-editlayer="${l.getAttribute("data-editlayer")}"][data-layer="${l.getAttribute("data-layer")}"][data-start="${parseFloat(l.getAttribute("data-start")) + parseFloat(l.getAttribute("data-duration"))}"]`);
-    if (!slideTarget[0]) {
+    const slideTarget = findLoops(`.loop:not(data-deleted)[data-editlayer="${l.getAttribute("data-editlayer")}"][data-layer="${l.getAttribute("data-layer")}"][data-start="${parseFloat(l.getAttribute("data-start")) + parseFloat(l.getAttribute("data-duration"))}"]:has(.noteDisplay)`);
+    if (!slideTarget[0] || !slideTarget[0].theoryNote) {
         const oldFreq = l.conf.Frequency;
         l.conf.SemitonesOffset = "0";
         l.conf.InternalSemiOffset = 0;
