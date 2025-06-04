@@ -42,7 +42,43 @@ const chordFormulas = {
     "maj13": [0, 4, 7, 11, 14, 17, 21],  // Major 13th (C, E, G, B, D, F, A)
     "min13": [0, 3, 7, 10, 14, 17, 21],  // Minor 13th (C, Eb, G, Bb, D, F, A)
     "add11": [0, 4, 7, 17],        // Add11 chord (C, E, G, F)
-    "add13": [0, 4, 7, 21]         // Add13 chord (C, E, G, A)
+    "add13": [0, 4, 7, 21],         // Add13 chord (C, E, G, A)
+
+    // Augmented/Diminished 6ths
+    "6aug": [0, 4, 7, 10],    // Major 6th with an augmented 6 (C, E, G, A#)
+    "6dim": [0, 4, 7, 8],     // Major 6th with a diminished 6 (C, E, G, Ab)
+    "min6aug": [0, 3, 7, 10],    // Minor 6th with an augmented 6 (C, Eb, G, A#)
+    "min6dim": [0, 3, 7, 8],     // Minor 6th with a diminished 6 (C, Eb, G, Ab)
+
+    // Augmented/Diminished 9ths
+    "9aug": [0, 4, 7, 10, 15],   // Dominant 9th with an augmented 9 (C, E, G, Bb, D#)
+    "9dim": [0, 4, 7, 10, 13],   // Dominant 9th with a diminished 9 (C, E, G, Bb, Db)
+    "maj9aug": [0, 4, 7, 11, 15],   // Major 9th with an augmented 9 (C, E, G, B, D#)
+    "maj9dim": [0, 4, 7, 11, 13],   // Major 9th with a diminished 9 (C, E, G, B, Db)
+    "min9aug": [0, 3, 7, 10, 15],   // Minor 9th with an augmented 9 (C, Eb, G, Bb, D#)
+    "min9dim": [0, 3, 7, 10, 13],   // Minor 9th with a diminished 9 (C, Eb, G, Bb, Db)
+    "add9aug": [0, 4, 7, 15],       // Add9 with an augmented 9 (C, E, G, D#)
+    "add9dim": [0, 4, 7, 13],       // Add9 with a diminished 9 (C, E, G, Db)
+
+    // Augmented/Diminished 11ths
+    "11aug": [0, 4, 7, 10, 14, 18],    // Dominant 11th with an augmented 11 (C, E, G, Bb, D, F#)
+    "11dim": [0, 4, 7, 10, 14, 16],    // Dominant 11th with a diminished 11 (C, E, G, Bb, D, [F diminished])
+    "maj11aug": [0, 4, 7, 11, 14, 18],    // Major 11th with an augmented 11 (C, E, G, B, D, F#)
+    "maj11dim": [0, 4, 7, 11, 14, 16],    // Major 11th with a diminished 11 (C, E, G, B, D, [F diminished])
+    "min11aug": [0, 3, 7, 10, 14, 18],    // Minor 11th with an augmented 11 (C, Eb, G, Bb, D, F#)
+    "min11dim": [0, 3, 7, 10, 14, 16],    // Minor 11th with a diminished 11 (C, Eb, G, Bb, D, [F diminished])
+    "add11aug": [0, 4, 7, 18],            // Add11 with an augmented 11 (C, E, G, F#)
+    "add11dim": [0, 4, 7, 16],            // Add11 with a diminished 11 (C, E, G, [F diminished])
+
+    // Augmented/Diminished 13ths
+    "13aug": [0, 4, 7, 10, 14, 17, 22],  // Dominant 13th with an augmented 13 (C, E, G, Bb, D, F, A#)
+    "13dim": [0, 4, 7, 10, 14, 17, 20],  // Dominant 13th with a diminished 13 (C, E, G, Bb, D, F, [A diminished])
+    "maj13aug": [0, 4, 7, 11, 14, 17, 22],  // Major 13th with an augmented 13 (C, E, G, B, D, F, A#)
+    "maj13dim": [0, 4, 7, 11, 14, 17, 20],  // Major 13th with a diminished 13 (C, E, G, B, D, F, [A diminished])
+    "min13aug": [0, 3, 7, 10, 14, 17, 22],  // Minor 13th with an augmented 13 (C, Eb, G, Bb, D, F, A#)
+    "min13dim": [0, 3, 7, 10, 14, 17, 20],  // Minor 13th with a diminished 13 (C, Eb, G, Bb, D, F, [A diminished])
+    "add13aug": [0, 4, 7, 22],            // Add13 with an augmented 13 (C, E, G, A#)
+    "add13dim": [0, 4, 7, 20]             // Add13 with a diminished 13 (C, E, G, [A diminished])
 };
 const inversionNames = ["", " (1st inv)", " (2nd inv)", " (3rd inv)"];
 function getInversionNotes(rootIndex, formula, inversion) {
@@ -89,8 +125,9 @@ function getChordTypeFromStack(loops) {
 }
 
 function chordProcess(loop, chordArray) {
+    console.log("recaculating chord for", loop);
     if (!chordArray) {
-        const loops = [...findLoops(`.loop:has(.noteDisplay)[data-start="${loop.getAttribute("data-start")
+        const loops = [...findLoops(`.loop:has(.noteDisplay):not([data-deleted])[data-start="${loop.getAttribute("data-start")
             }"][data-duration="${loop.getAttribute("data-duration")
             }"][data-editlayer="${loop.getAttribute("data-editlayer")
             }"]`)];
@@ -124,18 +161,27 @@ function addChordDisplay(loop) {
 }
 
 function chordComponentEdited(loop) {
-    if (!loop.querySelector(".chordDisplay")) {
+    if (!loop.querySelector(".chordDisplay") || loop.chordHandler) {
         return;
     };
-
-    loop.relatedChord.forEach(loop => {
+    if (!loop.relatedChord) {
         chordProcess(loop);
-    });
+    }
+    loop.chordHandler = new Promise(async (res, rej) => {
+        await wait(1 / 30);
+        loop.relatedChord.forEach(loop => {
+            chordProcess(loop);
+        });
 
-    chordProcess(loop);
+        chordProcess(loop);
 
-    loop.relatedChord.forEach(loop => {
-        chordProcess(loop, loop.relatedChord);
+        loop.relatedChord.forEach(loop => {
+            chordProcess(loop, loop.relatedChord);
+        });
+
+        loop.chordHandler = null;
+
+        res();
     });
 }
 
@@ -143,5 +189,8 @@ addEventListener("loopchangedcli", (e) => {
     chordComponentEdited(e.detail.loop);
 });
 addEventListener("loopmoved", (e) => {
+    chordComponentEdited(e.detail.loop);
+});
+addEventListener("loopdeleted", (e) => {
     chordComponentEdited(e.detail.loop);
 });

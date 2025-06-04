@@ -2,7 +2,6 @@ function pickupLoop(loop, natural = false) {
     if (loop.classList.contains("deactivated")) {
         return;
     }
-    markLoopDirty(loop, true);
     loop.classList.add("active");
     loop.setAttribute("data-new-layer", loop.getAttribute("data-layer"));
     loop.setAttribute("data-new-start", loop.getAttribute("data-start"));
@@ -37,6 +36,8 @@ function pickupLoop(loop, natural = false) {
     function mouseUp(unused, cancel) {
         dropHandlers.splice(dropHandlers.indexOf(mouseUp), 1);
         if (!cancel) {
+            console.log("marked loop as dirty");
+            markLoopDirty(loop, true);
             if (!loop.getAttribute("data-new-start")) {
                 debugger;
             }
