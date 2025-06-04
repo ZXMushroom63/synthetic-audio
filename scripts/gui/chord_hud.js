@@ -181,7 +181,7 @@ function addChordDisplay(loop) {
     }
     loop._hasChordDisplay = true;
     const chordDisplay = document.createElement("span");
-    chordDisplay.innerText = "test";
+    chordDisplay.innerText = "";
     chordDisplay.classList.add("chordDisplay");
     loop.appendChild(chordDisplay);
 
