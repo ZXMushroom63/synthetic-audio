@@ -15,8 +15,12 @@ const chordFormulas = {
     "sus2": [0, 2, 7],    // Suspended 2nd (C, D, G)
     "sus4": [0, 5, 7],    // Suspended 4th (C, F, G)
 
-    //power
-    "power": [0, 7],
+    // Power chords & similar
+    "5": [0, 7],
+    "m3": [0, 3],
+    "M3": [0, 4],
+    "dim5": [0, 6],
+    "aug5": [0, 8],
 
     // Seventh chords
     "7": [0, 4, 7, 10],   // Dominant 7th (C, E, G, Bb)
