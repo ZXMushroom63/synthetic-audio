@@ -32,6 +32,14 @@ const chordFormulas = {
     "augMaj7": [0, 4, 8, 11],   // Augmented major 7th (C, E, G#, B)
     "7b5": [0, 4, 6, 10],   // Dominant 7♭5 (C, E, Gb, Bb)
 
+
+    // Seventh, no fifth
+    "dim7(no5)": [0, 3, 9],
+    "min7(no5)": [0, 3, 10],
+    "7(no5)": [0, 4, 10],
+    "minMaj7(no5)": [0, 3, 11],
+    "maj7(no5)": [0, 4, 11],
+
     // Extended chords
     "6": [0, 4, 7, 9],         // Major 6th (C, E, G, A)
     "min6": [0, 3, 7, 9],         // Minor 6th (C, Eb, G, A)
