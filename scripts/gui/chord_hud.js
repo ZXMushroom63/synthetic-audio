@@ -2,6 +2,10 @@ const chromaticScale = [
     "C", "C#", "D", "D#", "E", "F",
     "F#", "G", "G#", "A", "A#", "B"
 ];
+const chromaticScaleShifted = [
+    "A", "A#", "B", "C", "C#", "D", "D#", "E", "F",
+    "F#", "G", "G#",
+];
 const chordFormulas = {
     // Triads
     "maj": [0, 4, 7],    // Major triad (C, E, G)
@@ -74,7 +78,14 @@ const chordDictionary = generateChordTable();
 
 function getChordTypeFromStack(loops) {
     const key = loops.sort((a, b) => a.hitFrequency - b.hitFrequency).map(x => x.theoryNoteNormalised).join(",");
-    return chordDictionary[key];
+    if (chordDictionary[key]) {
+        return chordDictionary[key];
+    }
+    const backupKey = loops.sort((a, b) =>
+        chromaticScaleShifted.indexOf(a.theoryNoteNormalised) - chromaticScaleShifted.indexOf(b.theoryNoteNormalised)
+    ).map(x => x.theoryNoteNormalised).join(",");
+
+    return chordDictionary[backupKey];
 }
 
 function chordProcess(loop, chordArray) {
@@ -83,13 +94,13 @@ function chordProcess(loop, chordArray) {
             }"][data-duration="${loop.getAttribute("data-duration")
             }"][data-editlayer="${loop.getAttribute("data-editlayer")
             }"]`)];
-        loops.sort((a, b) => parseInt(a.getAttribute("data-layer")) - parseInt(b.getAttribute("data-layer"))); 
+        loops.sort((a, b) => parseInt(a.getAttribute("data-layer")) - parseInt(b.getAttribute("data-layer")));
         loop.relatedChord = loops;
     } else if (Array.isArray(chordArray)) {
         loop.relatedChord = chordArray;
     }
 
-    
+
     if (loop.relatedChord[loop.relatedChord.length - 1] === loop) {
         loop.querySelector(".chordDisplay").innerText = getChordTypeFromStack(loop.relatedChord) || "";
     } else {
