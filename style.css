@@ -994,3 +994,6 @@ li {
   opacity: 0.5;
   border-radius: 4px;
 }
+.loop.deactivated .chordDisplay {
+  display: none;
+}
