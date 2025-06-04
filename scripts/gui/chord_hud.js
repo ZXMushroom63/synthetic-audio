@@ -129,13 +129,31 @@ function getChordTypeFromStack(loops) {
 }
 
 function chordProcess(loop, chordArray) {
-    console.log("recaculating chord for", loop);
+    var startingRange = parseInt(loop.getAttribute("data-layer"));
+    var endingRange = startingRange;
     if (!chordArray) {
-        const loops = [...findLoops(`.loop:has(.noteDisplay):not([data-deleted])[data-start="${loop.getAttribute("data-start")
+        var loops = [...findLoops(`.loop:has(.noteDisplay):not([data-deleted])[data-start="${loop.getAttribute("data-start")
             }"][data-duration="${loop.getAttribute("data-duration")
             }"][data-editlayer="${loop.getAttribute("data-editlayer")
-            }"]`)];
-        loops.sort((a, b) => parseInt(a.getAttribute("data-layer")) - parseInt(b.getAttribute("data-layer")));
+            }"]`)]
+            .sort((a, b) => parseInt(a.getAttribute("data-layer")) - parseInt(b.getAttribute("data-layer")));
+        loops.forEach(x => {
+            if (endingRange === parseInt(x.getAttribute("data-layer")) - 1) {
+                endingRange++;
+            }
+        })
+
+        loops.reverse()
+        loops.forEach(x => {
+            if (startingRange === parseInt(x.getAttribute("data-layer")) + 1) {
+                startingRange--;
+            }
+        })
+        loops.reverse()
+        loops = loops.filter(x => {
+            const pos = parseInt(x.getAttribute("data-layer"));
+            return pos >= startingRange && pos <= endingRange;
+        });
         loop.relatedChord = loops;
     } else if (Array.isArray(chordArray)) {
         loop.relatedChord = chordArray;
