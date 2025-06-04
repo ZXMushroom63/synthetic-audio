@@ -993,6 +993,7 @@ li {
   margin-left: 6px;
   opacity: 0.5;
   border-radius: 4px;
+  pointer-events: none;
 }
 .loop.deactivated .chordDisplay {
   display: none;
