@@ -327,6 +327,7 @@ function addBlock(type, start, duration, title, layer = 0, data = {}, editorValu
             }
         }
         document.onmouseup = function (q) {
+            markLoopDirty(loop, true);
             loop.classList.remove("active");
             document.onmousemove = null;
             hydrateLoopPosition(loop);
