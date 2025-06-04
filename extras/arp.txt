@@ -37,3 +37,5 @@ riff machine-Q.arp.js
 riff machine-R.arp.js
 riff machine-S.arp.js
 riff machine-T.arp.js
+bonus-ic0n.arp.js
+bonus-lavender-town.arp.js
