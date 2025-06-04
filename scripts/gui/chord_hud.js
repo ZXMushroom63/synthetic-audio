@@ -106,7 +106,7 @@ function generateChordTable() {
             for (let inversion = 0; inversion < formula.length; inversion++) {
                 const chordNotes = getInversionNotes(rootIndex, formula, inversion);
                 const key = chordNotes.join(",");
-                const chordName = root + chordType + inversionNames[inversion];
+                const chordName = root + chordType + inversionNames[inversion] || ` (${inversion + 1}th inv)`;
                 chordTable[key] = chordName;
             }
         }
