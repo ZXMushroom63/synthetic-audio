@@ -51,7 +51,7 @@ helpContent.addTab("Keybinds", `
 - ~SHIFT + LMB on timeline~ = select multiple nodes (select box)
 - ~ALT + RMB on timeline~ = select multiple nodes, temporarily switch tool to Multi-Edit
 - ~RMB on the visualiser~ = switch between waveform <-> EQ
-- ~SHIFT + A~ = add a new loop via search (hint: in search bar, try using shortcuts like ';lop' for a lowpass filter)
+- ~SHIFT + A~ = add a new loop via search (hint: in search bar, try using shortcuts like ~;lop~ for a lowpass filter)
 - ~ALT + SCROLL~ = modify target value on respective loop (usually the note), and play preview if applicable
 - ~ALT + CLICK~ = play loop preview if applicable
 - ~CTRL + S ~= write to autosave slot

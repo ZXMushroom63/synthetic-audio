@@ -47,7 +47,7 @@ addEventListener("init", () => {
         const sel = menu.querySelector("#arpPattern");
         const confirm = menu.querySelector("#arpConfirm");
 
-        sel.innerHTML = Object.keys(ARPEGGIATOR_SCORES).map(x => `<option value="${x}" ${arpeggiatorPattern === x ? "selected" : ""}>${x}</option>`);
+        sel.innerHTML = Object.keys(ARPEGGIATOR_SCORES).map(x => `<option value="${x}" ${arpeggiatorPattern === x ? "selected" : ""}>${x} [${ARPEGGIATOR_SCORES[x].diversity === chord.length ? "✔️" : ""}${ARPEGGIATOR_SCORES[x].diversity}]</option>`);
         arpeggiatorPattern = sel.value;
         sel.addEventListener("input", () => {
             arpeggiatorPattern = sel.value;
