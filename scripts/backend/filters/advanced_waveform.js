@@ -98,6 +98,7 @@ addBlockType("p_waveform_plus", {
     },
     initMiddleware: (loop) => {
         initNoteDisplay(loop);
+        addChordDisplay(loop);
     },
     pitchZscroller: true,
     zscroll: (loop, value) => {

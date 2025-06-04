@@ -984,3 +984,13 @@ li {
 .modmenutabcontent:has(#samplepacks_tree) {
   overflow-x: hidden;
 }
+
+.loop .chordDisplay {
+  display: inline-block;
+  position: relative;
+  z-index: 444443;
+  user-select: none;
+  margin-left: 6px;
+  opacity: 0.5;
+  border-radius: 4px;
+}

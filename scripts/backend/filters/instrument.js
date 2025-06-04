@@ -26,6 +26,7 @@ addBlockType("instrument", {
     },
     initMiddleware: (loop) => {
         initNoteDisplay(loop);
+        addChordDisplay(loop);
     },
     pitchZscroller: true,
     zscroll: (loop, value) => {
