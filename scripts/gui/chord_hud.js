@@ -174,8 +174,11 @@ function chordProcess(loop, chordArray) {
         loop.querySelector(".chordDisplay").innerText = "";
     }
 }
-
+registerSetting("ChordDisplays", true);
 function addChordDisplay(loop) {
+    if (!settings.ChordDisplays) {
+        return;
+    }
     if (loop._hasChordDisplay) {
         return;
     }
@@ -191,6 +194,9 @@ function addChordDisplay(loop) {
 }
 
 function chordComponentEdited(loop) {
+    if (!settings.ChordDisplays) {
+        return;
+    }
     if (!loop.querySelector(".chordDisplay") || loop.chordHandler) {
         return;
     };

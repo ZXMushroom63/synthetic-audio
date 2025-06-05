@@ -118,12 +118,13 @@ function hydrateBeatMarkers() {
         track.appendChild(marker);
     }
 }
+registerSetting("LoopWaveformDisplays", true);
 function hydrateLoopDecoration(loop) {
     if (loop.updateSuppression) {
         return;
     }
     var bg = loop.querySelector(".backgroundSvg");
-    if (bg && ((loop._nInternalWidth || 0) > (9.9 * (!gui.noWvLOD)))) {
+    if (settings.LoopWaveformDisplays && bg && ((loop._nInternalWidth || 0) > (9.9 * (!gui.noWvLOD)))) {
         bg.style.width = loop._nInternalWidth + "vw";
         bg.querySelector("path").style.strokeWidth = innerWidth / (loop._nInternalWidth || 0) * 0.0025 + "px";
         bg.style.display = "block";
@@ -199,13 +200,17 @@ function hydrateZoom(lean) {
     });
     reflow("#trackInternal");
 }
+registerSetting("LoopWaveformDisplayDownsampling", 256);
 function hydrateLoopBackground(elem) {
+    if (!settings.LoopWaveformDisplays) {
+        return;
+    }
     var line = elem.querySelector(".backgroundSvg path");
     if (!line) {
         return;
     }
     var d = "M0 50";
-    var downsample = 256;
+    var downsample = Math.min(Math.max(64, settings.LoopWaveformDisplayDownsampling || 256), 1024);
     prevY = 0;
     elem.cache[0].forEach((v, i) => {
         var isFinalSample = i === (elem.cache[0].length - 1);
