@@ -279,6 +279,7 @@ addEventListener("init", () => {
         noteMap[note].setAttribute("data-duration", len);
         hydrateLoopPosition(noteMap[note]);
         hydrateLoopDecoration(noteMap[note]);
+        markLoopDirty(noteMap[note]); //trigger update to any handlers.
         clearInterval(noteAnimationMap[note]);
         delete noteAnimationMap[note];
         delete noteMap[note];
