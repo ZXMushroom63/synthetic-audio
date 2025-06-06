@@ -209,14 +209,20 @@ function chordComponentEdited(loop) {
     }
     loop.chordHandler = new Promise(async (res, rej) => {
         await wait(1 / 30);
-        loop.relatedChord.forEach(loop => {
-            chordProcess(loop);
+        loop.relatedChord.forEach(l => {
+            if (l === loop) {
+                return;
+            }
+            chordProcess(l);
         });
 
         chordProcess(loop);
 
-        loop.relatedChord.forEach(loop => {
-            chordProcess(loop, loop.relatedChord);
+        loop.relatedChord.forEach(l => {
+            if (l === loop) {
+                return;
+            }
+            chordProcess(l, loop.relatedChord);
         });
 
         loop.chordHandler = null;
