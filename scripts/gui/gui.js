@@ -1,3 +1,4 @@
+let webpageUsesTouch = false;
 function customEvent(ev, data = {}) {
     window.dispatchEvent(new CustomEvent(ev, { detail: data }));
 }

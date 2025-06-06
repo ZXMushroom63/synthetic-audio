@@ -19,6 +19,8 @@ function fireTouchRmb() {
     }));
 }
 document.addEventListener("touchstart", (e) => {
+    keymap["Control"] = e.touches.length === 2;
+    webpageUsesTouch = true;
     isTouching = true;
     const touch = e.changedTouches[0];
     const mouseEvent = new MouseEvent("mousedown", {
@@ -39,30 +41,43 @@ document.addEventListener("touchstart", (e) => {
 
 let lastTouchMove = lastTouchStart;
 document.addEventListener("touchmove", (e) => {
-    if (Math.sqrt(Math.pow(lastTouchStart.x - e.x, 2) + Math.pow(lastTouchStart.y - e.y, 2)) < 2) {
+    keymap["Control"] = e.touches.length === 2;
+    const distanceMoved = Math.sqrt(Math.pow(lastTouchStart.x - e.x, 2) + Math.pow(lastTouchStart.y - e.y, 2));
+    if (distanceMoved < 2) {
         return;
     } else {
         clearTimeout(touchRmbTimer);
     }
 
     if (!isTouching) return;
-    const touch = e.changedTouches[0];
-    const mouseEvent = new MouseEvent("mousemove", {
-        bubbles: true,
-        clientX: touch.clientX,
-        clientY: touch.clientY,
-    });
 
-    touch.target.dispatchEvent(mouseEvent);
 
-    if (mouseEvent.defaultPrevented || rmbPressed) {
+    if (keymap["Control"]) {
         e.preventDefault();
+        touch.target.dispatchEvent(new WheelEvent("wheel", {
+            bubbles: true,
+            deltaY: distanceMoved,
+            deltaMode: 0x00
+        }));
+    } else {
+        const touch = e.changedTouches[0];
+        const mouseEvent = new MouseEvent("mousemove", {
+            bubbles: true,
+            clientX: touch.clientX,
+            clientY: touch.clientY,
+        });
+        touch.target.dispatchEvent(mouseEvent);
+        if (mouseEvent.defaultPrevented || rmbPressed) {
+            e.preventDefault();
+        }
     }
+    
     lastTouchMove = Object.assign(e, { stamp: Date.now(), x: e.targetTouches[0].clientX, y: e.targetTouches[0].clientY });
 }, { passive: false });
 
 let lastTouchEnd = lastTouchStart;
 document.addEventListener("touchend", (e) => {
+    keymap["Control"] = e.touches.length === 2;
     if (rmbPressed) {
         lastTouchStart.target.dispatchEvent(new MouseEvent("mouseup", {
             bubbles: false,
