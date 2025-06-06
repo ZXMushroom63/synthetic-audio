@@ -499,6 +499,8 @@ async function render() {
 
     processRendering = false;
     document.querySelector("#renderBtn").disabled = false;
+
+    findLoops(".loop").forEach(hydrateLoopDecoration);
 }
 
 addBlockType("audio", {
