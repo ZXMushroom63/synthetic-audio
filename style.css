@@ -684,6 +684,14 @@ select option {
   display: none !important;
 }
 
+.loop, .loopInternal {
+  touch-action: none;
+}
+
+canvas {
+  touch-action: none;
+}
+
 #addNodeDropdown {
   position: fixed;
   z-index: 999;
