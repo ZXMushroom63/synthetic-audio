@@ -1,13 +1,14 @@
 function selectText(node) {
-    if (document.selection) {
-        var range = document.body.createTextRange();
-        range.moveToElementText(node);
-        range.select();
-    } else if (window.getSelection) {
+    if (window.getSelection) {
         var range = document.createRange();
         range.selectNodeContents(node);
         window.getSelection().removeAllRanges();
         window.getSelection().addRange(range);
+    }
+}
+function deselectText() {
+    if (window.getSelection) {
+        window.getSelection().removeAllRanges();
     }
 }
 
@@ -65,6 +66,19 @@ const chordFormulas = new Map(Object.entries({
     "augMaj7": [0, 4, 8, 11],   // Augmented major 7th (C, E, G#, B)
     "7b5": [0, 4, 6, 10],   // Dominant 7♭5 (C, E, Gb, Bb)
 
+    // Other similar chords
+    "6": [0, 4, 7, 9],         // Major 6th (C, E, G, A)
+    "min6": [0, 3, 7, 9],         // Minor 6th (C, Eb, G, A)
+    "9": [0, 4, 7, 10, 14],    // Dominant 9th (C, E, G, Bb, D)
+    "maj9": [0, 4, 7, 11, 14],    // Major 9th (C, E, G, B, D)
+    "min9": [0, 3, 7, 10, 14],    // Minor 9th (C, Eb, G, Bb, D)
+
+    "11": [0, 4, 7, 10, 14, 17],   // Dominant 11th (C, E, G, Bb, D, F)
+    "maj11": [0, 4, 7, 11, 14, 17],   // Major 11th (C, E, G, B, D, F)
+    "min11": [0, 3, 7, 10, 14, 17],   // Minor 11th (C, Eb, G, Bb, D, F)
+    "13": [0, 4, 7, 10, 14, 17, 21],  // Dominant 13th (C, E, G, Bb, D, F, A)
+    "maj13": [0, 4, 7, 11, 14, 17, 21],  // Major 13th (C, E, G, B, D, F, A)
+    "min13": [0, 3, 7, 10, 14, 17, 21],  // Minor 13th (C, Eb, G, Bb, D, F, A)
 
     // Seventh, no fifth
     "dim7(no5)": [0, 3, 9],
@@ -72,20 +86,10 @@ const chordFormulas = new Map(Object.entries({
     "7(no5)": [0, 4, 10],
     "minMaj7(no5)": [0, 3, 11],
     "maj7(no5)": [0, 4, 11],
-
-    // Extended chords
-    "6": [0, 4, 7, 9],         // Major 6th (C, E, G, A)
-    "min6": [0, 3, 7, 9],         // Minor 6th (C, Eb, G, A)
-    "9": [0, 4, 7, 10, 14],    // Dominant 9th (C, E, G, Bb, D)
-    "maj9": [0, 4, 7, 11, 14],    // Major 9th (C, E, G, B, D)
-    "min9": [0, 3, 7, 10, 14],    // Minor 9th (C, Eb, G, Bb, D)
+    
     "add9": [0, 4, 7, 14],        // Add9 chord (C, E, G, D)
-    "11": [0, 4, 7, 10, 14, 17],   // Dominant 11th (C, E, G, Bb, D, F)
-    "maj11": [0, 4, 7, 11, 14, 17],   // Major 11th (C, E, G, B, D, F)
-    "min11": [0, 3, 7, 10, 14, 17],   // Minor 11th (C, Eb, G, Bb, D, F)
-    "13": [0, 4, 7, 10, 14, 17, 21],  // Dominant 13th (C, E, G, Bb, D, F, A)
-    "maj13": [0, 4, 7, 11, 14, 17, 21],  // Major 13th (C, E, G, B, D, F, A)
-    "min13": [0, 3, 7, 10, 14, 17, 21],  // Minor 13th (C, Eb, G, Bb, D, F, A)
+    
+    
     "add11": [0, 4, 7, 17],        // Add11 chord (C, E, G, F)
     "add13": [0, 4, 7, 21],         // Add13 chord (C, E, G, A)
 
@@ -144,6 +148,7 @@ function getInversionNotes(rootIndex, formula, inversion) {
 }
 function generateChordTable() {
     const chordTable = {};
+    const reverseChordLookup = {};
 
     for (let rootIndex = 0; rootIndex < chromaticScale.length; rootIndex++) {
         const root = chromaticScale[rootIndex];
@@ -161,14 +166,14 @@ function generateChordTable() {
                     notes: chordNotes.notes,
                     values: chordNotes.values
                 };
+                reverseChordLookup[chordName.trim()] = chordTable[key];
             }
         }
     }
-    return chordTable;
+    return { chordDictionary: chordTable, reverseChordLookup: reverseChordLookup };
 }
 
-const chordDictionary = generateChordTable();
-const reverseChordLookup = Object.fromEntries(Object.entries(chordDictionary).map(x => [x[1].display.trim(), x[1]]));
+const { chordDictionary, reverseChordLookup } = generateChordTable();
 
 function getChordTypeFromStack(loops) {
     loops = [...loops]; //shallow clone
@@ -240,6 +245,7 @@ function chordDisplayEdit(display, e, loop) {
     }
     if (e.key === "Escape") {
         e.preventDefault();
+        deselectText();
         display.blur();
     }
     var lookupValue = display.innerText.replace(/[\r\n\t]/gm, "").trim();
@@ -252,6 +258,7 @@ function chordDisplayEdit(display, e, loop) {
         const octaveOffset = 12 * (Math.min(...loop.relatedChord.map(x => getChromaticOctave(x.theoryNote))));
         e.preventDefault();
         display.blur();
+        deselectText();
         display.innerText = "";
         const template = serialiseNode(loop.relatedChord[0]);
         loop.relatedChord.forEach(deleteLoop);
@@ -295,6 +302,10 @@ function addChordDisplay(loop) {
 
     chordDisplay.addEventListener("keydown", (e) => {
         chordDisplayEdit(chordDisplay, e, loop);
+    });
+
+    chordDisplay.addEventListener("blur", (e) => {
+        deselectText();
     });
 
     loop.appendChild(chordDisplay);
