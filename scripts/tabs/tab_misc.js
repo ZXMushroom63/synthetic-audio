@@ -166,6 +166,9 @@ addEventListener("init", () => {
     addEventListener('loopchangedcli', (e) => {
         updateLoopHighlight(e.detail.loop);
     });
+    addEventListener('deserialisenode', (e) => {
+        updateLoopHighlight(e.detail.node);
+    });
 
     addEventListener('serialise', (e) => {
         e.detail.data.mode = scales.value;
