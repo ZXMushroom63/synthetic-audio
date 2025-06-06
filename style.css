@@ -1,7 +1,9 @@
 body {
   font-family: sans-serif;
   color: white;
-  touch-action: pan-x pan-y cross-slide-x cross-slide-y manipulation;
+}
+:root {
+  touch-action: manipulation;
 }
 #track {
   min-height: 16rem;
