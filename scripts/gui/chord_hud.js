@@ -39,6 +39,17 @@ function getChromaticOctave(note) {
 
 const chordFormulas = new Map();
 
+// Quartal & Quintal harmonies
+chordFormulas.set("qr2", [0, 5]);
+chordFormulas.set("qr3", [0, 5, 10]);
+chordFormulas.set("qr4", [0, 5, 10, 15]);
+chordFormulas.set("qr5", [0, 5, 10, 15, 20]);
+chordFormulas.set("qix2", [0, 7]);
+chordFormulas.set("qix3", [0, 7, 14]);
+chordFormulas.set("qix3", [0, 7, 14, 21]);
+chordFormulas.set("qix3", [0, 7, 14, 21, 28]);
+
+
 // Augmented/Diminished 13ths
 chordFormulas.set("add13dim", [0, 4, 7, 20]);          // Add13 with a diminished 13 (C, E, G, [A diminished])
 chordFormulas.set("add13aug", [0, 4, 7, 22]);          // Add13 with an augmented 13 (C, E, G, A#)
