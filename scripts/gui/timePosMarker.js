@@ -4,9 +4,11 @@ function hydrateTimePosMarker() {
 addEventListener("hydrate", hydrateTimePosMarker);
 addEventListener("init", () => {
     const renderOut = document.querySelector("#renderOut");
-    document.querySelector(".timePosMarker").addEventListener("mousedown", () => {
+    document.querySelector(".timePosMarker").addEventListener("mousedown", (e) => {
+        e.preventDefault();
         var bba = document.querySelector("#trackInternal").getBoundingClientRect();
         window.onmousemove = (e) => {
+            e.preventDefault();
             document.querySelector(".timePosMarker").style.left = ((e.clientX - bba.left) / bba.width) * 100 + "%";
             gui.marker = ((e.clientX - bba.left) / bba.width) * audio.duration;
             renderOut.currentTime = gui.marker;
