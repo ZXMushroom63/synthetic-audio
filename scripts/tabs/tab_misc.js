@@ -413,7 +413,8 @@ addEventListener("init", () => {
     }
     drawHarmonics();
     var harmonicsDrawing = false;
-    harmonicEditorCanvas.addEventListener("mousedown", () => {
+    harmonicEditorCanvas.addEventListener("mousedown", (e) => {
+        e.preventDefault();
         harmonicsDrawing = true;
     });
     addEventListener("mouseup", () => {

@@ -75,9 +75,10 @@ function zscroll(e) {
     }
 }
 addEventListener("wheel", zscroll, { passive: false });
-addEventListener("mousedown", () => {
+addEventListener("mousedown", (e) => {
     var targetLoop = document.elementsFromPoint(mouse.x, mouse.y).find(x => !x.classList.contains("deactivated"))?.closest(".loop");
     if (targetLoop && keymap["Alt"]) {
+        e.preventDefault();
         globalThis.zscrollMulti = false;
         globalThis.zscrollIsFirst = true;
         execZScroll(targetLoop, 0);

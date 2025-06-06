@@ -271,6 +271,7 @@ function hydrate() {
 function addBlock(type, start, duration, title, layer = 0, data = {}, editorValue = Math.min(gui.layer, 9), noTimeline) {
     var definition = window.filters[type];
     function resizeBlock(e) {
+        e.preventDefault();
         if (e.button !== 0) {
             return;
         }
@@ -417,7 +418,8 @@ function addBlock(type, start, duration, title, layer = 0, data = {}, editorValu
 
         internal.classList.add("selected");
 
-        document.onmousedown = () => {
+        document.onmousedown = (e) => {
+            e.preventDefault();
             document.querySelectorAll(".loopInternal.selected").forEach(a => { a.classList.remove("selected") });
         }
     });
@@ -429,6 +431,7 @@ function addBlock(type, start, duration, title, layer = 0, data = {}, editorValu
         if (e.button !== 0) {
             return;
         }
+        e.preventDefault();
         var trackBB = loop.referenceBB || document.querySelector("#trackInternal").getBoundingClientRect();
         var originalBB = internal.getBoundingClientRect();
         if (ACTIVE_TOOL === "MOVE") {

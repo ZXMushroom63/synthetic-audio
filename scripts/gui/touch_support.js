@@ -29,6 +29,9 @@ document.addEventListener("touchstart", (e) => {
     });
 
     touch.target.dispatchEvent(mouseEvent);
+    if (mouseEvent.defaultPrevented) {
+        e.preventDefault();
+    }
     lastTouchStart = Object.assign(e, { stamp: Date.now(), x: e.targetTouches[0].clientX, y: e.targetTouches[0].clientY });
 
     touchRmbTimer = setTimeout(fireTouchRmb, longPressDuration);
