@@ -114,8 +114,13 @@ function generateChordTable() {
             for (let inversion = 0; inversion < formula.length; inversion++) {
                 const chordNotes = getInversionNotes(rootIndex, formula, inversion);
                 const key = chordNotes.join(",");
-                const chordName = root + chordType + inversionNames[inversion] || ` (${inversion + 1}th inv)`;
-                chordTable[key] = chordName;
+                const chordName = root + chordType + (inversionNames[inversion] || ` (${inversion + 1}th inv)`);
+                chordTable[key] = {
+                    display: chordName,
+                    root: root,
+                    type: chordType,
+                    inversion: inversion
+                };
             }
         }
     }
@@ -125,15 +130,16 @@ function generateChordTable() {
 const chordDictionary = generateChordTable();
 
 function getChordTypeFromStack(loops) {
+    loops = [...loops]; //shallow clone
     const key = loops.sort((a, b) => a.hitFrequency - b.hitFrequency).map(x => x.theoryNoteNormalised).join(",");
     if (chordDictionary[key]) {
-        return chordDictionary[key];
+        return chordDictionary[key]?.display;
     }
     const backupKey = loops.sort((a, b) =>
         chromaticScaleShifted.indexOf(a.theoryNoteNormalised) - chromaticScaleShifted.indexOf(b.theoryNoteNormalised)
     ).map(x => x.theoryNoteNormalised).join(",");
 
-    return chordDictionary[backupKey];
+    return chordDictionary[backupKey]?.display;
 }
 
 function getChordStack(loop) {
@@ -159,6 +165,10 @@ function getChordStack(loop) {
     loops = loops.filter(x => {
         const pos = parseInt(x.getAttribute("data-layer"));
         return pos >= startingRange && pos <= endingRange;
+    });
+    loops.sort((a, b)=>{
+        return parseInt(a.getAttribute("data-layer"))
+         - parseInt(b.getAttribute("data-layer"));;
     });
     return loops;
 }
@@ -188,8 +198,10 @@ function addChordDisplay(loop) {
     }
     loop._hasChordDisplay = true;
     const chordDisplay = document.createElement("span");
-    chordDisplay.innerText = "";
+    chordDisplay.contentEditable = "true";
+    chordDisplay.tabIndex = -1;
     chordDisplay.classList.add("chordDisplay");
+
     loop.appendChild(chordDisplay);
 
     setTimeout(() => {
@@ -201,12 +213,13 @@ function chordComponentEdited(loop) {
     if (!settings.ChordDisplays) {
         return;
     }
-    if (!loop.querySelector(".chordDisplay") || loop.chordHandler) {
+    if (loop.chordHandler || !loop.querySelector(".chordDisplay")) {
         return;
     };
     if (!loop.relatedChord) {
         chordProcess(loop);
     }
+
     loop.chordHandler = new Promise(async (res, rej) => {
         await wait(1 / 30);
         loop.relatedChord.forEach(l => {
