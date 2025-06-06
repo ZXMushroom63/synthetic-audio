@@ -35,6 +35,7 @@ document.addEventListener("touchstart", (e) => {
         e.preventDefault();
     }
     lastTouchStart = Object.assign(e, { stamp: Date.now(), x: e.targetTouches[0].clientX, y: e.targetTouches[0].clientY });
+    lastTouchMove = Object.assign(e, { stamp: Date.now(), x: e.targetTouches[0].clientX, y: e.targetTouches[0].clientY });
 
     touchRmbTimer = setTimeout(fireTouchRmb, longPressDuration);
 });
@@ -42,7 +43,7 @@ document.addEventListener("touchstart", (e) => {
 let lastTouchMove = lastTouchStart;
 document.addEventListener("touchmove", (e) => {
     keymap["Control"] = e.touches.length === 2;
-    const distanceMoved = Math.sqrt(Math.pow(lastTouchStart.x - e.x, 2) + Math.pow(lastTouchStart.y - e.y, 2));
+    const distanceMoved = Math.sqrt(Math.pow(lastTouchStart.x - e.targetTouches[0].clientX, 2) + Math.pow(lastTouchStart.y - e.targetTouches[0].clientY, 2));
     if (distanceMoved < 2) {
         return;
     } else {
@@ -51,16 +52,17 @@ document.addEventListener("touchmove", (e) => {
 
     if (!isTouching) return;
 
+    const touch = e.changedTouches[0];
 
     if (keymap["Control"]) {
         e.preventDefault();
         touch.target.dispatchEvent(new WheelEvent("wheel", {
             bubbles: true,
-            deltaY: distanceMoved,
+            deltaY: (lastTouchMove.y - e.targetTouches[0].clientY),
             deltaMode: 0x00
         }));
     } else {
-        const touch = e.changedTouches[0];
+
         const mouseEvent = new MouseEvent("mousemove", {
             bubbles: true,
             clientX: touch.clientX,
