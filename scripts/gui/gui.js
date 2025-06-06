@@ -63,7 +63,7 @@ function getDurationOfLoop(audioFile) {
     });
 }
 var loopObjURL = null;
-var mouse = {};
+var mouse = {x: 0, y: 0};
 var keymap = {};
 function updateLOD() {
     if (gui.noLOD) {
@@ -288,6 +288,7 @@ function addBlock(type, start, duration, title, layer = 0, data = {}, editorValu
         loop.classList.add("active");
         if (isRight) {
             document.onmousemove = function (j) {
+                j.preventDefault();
                 keymap["Control"] = j.ctrlKey;
                 var pos = ((originalBB.left - trackBB.left - (e.clientX - j.clientX)) / trackBB.width) * 100;
                 var bpmInterval = 60 / (audio.bpm * (keymap["Control"] ? 1 : gui.substepping));
@@ -310,6 +311,7 @@ function addBlock(type, start, duration, title, layer = 0, data = {}, editorValu
             }
         } else {
             document.onmousemove = function (j) {
+                j.preventDefault();
                 keymap["Control"] = j.ctrlKey;
                 var pos = ((originalBB.left - trackBB.left - (e.clientX - j.clientX)) / trackBB.width) * 100;
                 var bpmInterval = 60 / (audio.bpm * (keymap["Control"] ? 1 : gui.substepping));
@@ -433,6 +435,7 @@ function addBlock(type, start, duration, title, layer = 0, data = {}, editorValu
             loop.classList.add("active");
             markLoopDirty(loop, true);
             document.onmousemove = function (j) {
+                j.preventDefault();
                 keymap["Control"] = j.ctrlKey;
                 var pos = Math.max(0, ((originalBB.left - trackBB.left - (e.clientX - j.clientX)) / trackBB.width) * 100);
                 var bpmInterval = 60 / (audio.bpm * (keymap["Control"] ? 1 : gui.substepping));

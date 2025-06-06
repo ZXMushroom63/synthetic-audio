@@ -420,6 +420,7 @@ addEventListener("init", () => {
         harmonicsDrawing = false;
     });
     harmonicEditorCanvas.addEventListener("mousemove", (e) => {
+        e.preventDefault();
         if (harmonicsDrawing) {
             const idx = Math.floor(e.offsetX / 300 * harmonics.length);
             const v = Math.min(1, Math.max(-1, (e.offsetY - 75) / -75));

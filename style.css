@@ -542,8 +542,14 @@ button:hover {
   display: none;
   visibility: hidden;
 }
+
+#miscTools {
+  white-space: normal;
+}
+
 * {
   white-space: nowrap;
+  -webkit-tap-highlight-color: transparent;
 }
 
 select option {

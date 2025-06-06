@@ -1,5 +1,23 @@
 let isTouching = false;
-
+let lastTouchStart = { stamp: Date.now(), x: 0, y: 0 };
+let touchRmbTimer = -1;
+let longPressDuration = 350;
+let rmbPressed = false;
+function fireTouchRmb() {
+    rmbPressed = true;
+    lastTouchStart.target.dispatchEvent(new MouseEvent("mouseup", {
+        bubbles: true,
+        clientX: lastTouchStart.x,
+        clientY: lastTouchStart.y,
+        button: 0
+    }));
+    lastTouchStart.target.dispatchEvent(new MouseEvent("mousedown", {
+        bubbles: true,
+        clientX: lastTouchStart.x,
+        clientY: lastTouchStart.y,
+        button: 2
+    }));
+}
 document.addEventListener("touchstart", (e) => {
     isTouching = true;
     const touch = e.changedTouches[0];
@@ -7,12 +25,23 @@ document.addEventListener("touchstart", (e) => {
         bubbles: true,
         clientX: touch.clientX,
         clientY: touch.clientY,
-        button: e.touches.length === 1 ? 0 : 2
+        button: 0
     });
+
     touch.target.dispatchEvent(mouseEvent);
+    lastTouchStart = Object.assign(e, { stamp: Date.now(), x: e.targetTouches[0].clientX, y: e.targetTouches[0].clientY });
+
+    touchRmbTimer = setTimeout(fireTouchRmb, longPressDuration);
 });
 
+let lastTouchMove = lastTouchStart;
 document.addEventListener("touchmove", (e) => {
+    if (Math.sqrt(Math.pow(lastTouchStart.x - e.x, 2) + Math.pow(lastTouchStart.y - e.y, 2)) < 2) {
+        return;
+    } else {
+        clearTimeout(touchRmbTimer);
+    }
+
     if (!isTouching) return;
     const touch = e.changedTouches[0];
     const mouseEvent = new MouseEvent("mousemove", {
@@ -20,10 +49,27 @@ document.addEventListener("touchmove", (e) => {
         clientX: touch.clientX,
         clientY: touch.clientY,
     });
-    touch.target.dispatchEvent(mouseEvent);
-});
 
+    touch.target.dispatchEvent(mouseEvent);
+
+    if (mouseEvent.defaultPrevented || rmbPressed) {
+        e.preventDefault();
+    }
+    lastTouchMove = Object.assign(e, { stamp: Date.now(), x: e.targetTouches[0].clientX, y: e.targetTouches[0].clientY });
+}, { passive: false });
+
+let lastTouchEnd = lastTouchStart;
 document.addEventListener("touchend", (e) => {
+    if (rmbPressed) {
+        lastTouchStart.target.dispatchEvent(new MouseEvent("mouseup", {
+            bubbles: false,
+            clientX: lastTouchStart.x,
+            clientY: lastTouchStart.y,
+            button: 2
+        }));
+        rmbPressed = false;
+    }
+    clearTimeout(touchRmbTimer);
     isTouching = false;
     const touch = e.changedTouches[0];
     const mouseEvent = new MouseEvent("mouseup", {
@@ -32,4 +78,5 @@ document.addEventListener("touchend", (e) => {
         clientY: touch.clientY,
     });
     touch.target.dispatchEvent(mouseEvent);
+    lastTouchEnd = Object.assign(e, { stamp: Date.now() });
 });

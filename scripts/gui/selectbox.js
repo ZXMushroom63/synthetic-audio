@@ -34,9 +34,12 @@ addEventListener("init", () => {
         selectBox.style.left = a.x + "px";
         selectBox.style.bottom = b.y + "px";
         selectBox.style.right = b.x + "px";
+        console.log(a);
+        console.log(b);
         document.querySelector("#trackInternal").appendChild(selectBox);
         window.oncontextmenu = (e) => { e.preventDefault() };
         window.onmousemove = function (e) {
+            e.preventDefault();
             selectBox.style.display = "block";
             window.lastScrollEvent = e;
             e.preventDefault();
@@ -54,6 +57,7 @@ addEventListener("init", () => {
                 x: Math.max(a.x - scrollDx, b.x),
                 y: Math.max(a.y - scrollDy, b.y)
             }
+            
             selectBox.style.top = pos1.y + "px";
             selectBox.style.left = pos1.x + "px";
             selectBox.style.bottom = (window.innerHeight - pos2.y) + "px";
