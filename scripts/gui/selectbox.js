@@ -34,8 +34,7 @@ addEventListener("init", () => {
         selectBox.style.left = a.x + "px";
         selectBox.style.bottom = b.y + "px";
         selectBox.style.right = b.x + "px";
-        console.log(a);
-        console.log(b);
+        
         document.querySelector("#trackInternal").appendChild(selectBox);
         window.oncontextmenu = (e) => { e.preventDefault() };
         window.onmousemove = function (e) {
