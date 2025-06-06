@@ -279,7 +279,7 @@ function chordDisplayEdit(display, e, loop) {
             if (dt.conf.Frequency) {
                 dt.conf.Frequency = freq;
             }
-            const newLoop = deserialiseNode(dt);
+            const newLoop = deserialiseNode(dt, true);
             hydrateLoopPosition(newLoop);
         });
     }
