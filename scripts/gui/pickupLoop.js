@@ -36,7 +36,6 @@ function pickupLoop(loop, natural = false) {
     function mouseUp(unused, cancel) {
         dropHandlers.splice(dropHandlers.indexOf(mouseUp), 1);
         if (!cancel) {
-            console.log("marked loop as dirty");
             markLoopDirty(loop, true);
             if (!loop.getAttribute("data-new-start")) {
                 debugger;

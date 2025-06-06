@@ -1,3 +1,16 @@
+function selectText(node) {
+    if (document.selection) {
+        var range = document.body.createTextRange();
+        range.moveToElementText(node);
+        range.select();
+    } else if (window.getSelection) {
+        var range = document.createRange();
+        range.selectNodeContents(node);
+        window.getSelection().removeAllRanges();
+        window.getSelection().addRange(range);
+    }
+}
+
 const chromaticScale = [
     "C", "C#", "D", "D#", "E", "F",
     "F#", "G", "G#", "A", "A#", "B"
@@ -6,7 +19,27 @@ const chromaticScaleShifted = [
     "A", "A#", "B", "C", "C#", "D", "D#", "E", "F",
     "F#", "G", "G#",
 ];
-const chordFormulas = {
+
+function chromaticToIndex(note) { // A4, C#5 (no flats allowed here tho)
+    const octave = parseInt(note[note.length - 1]);
+    const offset = chromaticScale.indexOf(note.substring(0, note.length - 1).toUpperCase());
+    return octave * 12 + offset;
+}
+
+function indexToChromatic(idx) {
+    const octave = Math.floor(idx / 12);
+    const offset = idx % 12;
+    return chromaticScale[offset] + octave;
+}
+
+function getChromaticOctave(note) {
+    return parseInt(note[note.length - 1]);
+}
+
+const chordFormulas = new Map(Object.entries({
+    // Single note
+    "": [0],
+
     // Triads
     "maj": [0, 4, 7],    // Major triad (C, E, G)
     "min": [0, 3, 7],    // Minor triad (C, Eb, G)
@@ -91,35 +124,42 @@ const chordFormulas = {
     "min13dim": [0, 3, 7, 10, 14, 17, 20],  // Minor 13th with a diminished 13 (C, Eb, G, Bb, D, F, [A diminished])
     "add13aug": [0, 4, 7, 22],            // Add13 with an augmented 13 (C, E, G, A#)
     "add13dim": [0, 4, 7, 20]             // Add13 with a diminished 13 (C, E, G, [A diminished])
-};
+}).reverse());
 const inversionNames = ["", " (1st inv)", " (2nd inv)", " (3rd inv)"];
 function getInversionNotes(rootIndex, formula, inversion) {
     const n = formula.length;
     let notes = [];
+    let values = [];
     for (let j = 0; j < n; j++) {
         const octaveShift = (j < (n - inversion)) ? 0 : 12;
         const interval = formula[(j + inversion) % n] + octaveShift;
         const noteValue = rootIndex + interval;
         notes.push(chromaticScale[noteValue % 12]);
+        values.push(noteValue);
     }
-    return notes;
+    return {
+        notes,
+        values
+    };
 }
 function generateChordTable() {
     const chordTable = {};
 
     for (let rootIndex = 0; rootIndex < chromaticScale.length; rootIndex++) {
         const root = chromaticScale[rootIndex];
-        for (const chordType in chordFormulas) {
-            const formula = chordFormulas[chordType];
+        for (const chordType of chordFormulas.keys()) {
+            const formula = chordFormulas.get(chordType);
             for (let inversion = 0; inversion < formula.length; inversion++) {
                 const chordNotes = getInversionNotes(rootIndex, formula, inversion);
-                const key = chordNotes.join(",");
-                const chordName = root + chordType + (inversionNames[inversion] || ` (${inversion + 1}th inv)`);
+                const key = chordNotes.notes.join(",");
+                const chordName = root + chordType + (inversionNames[inversion] ?? ` (${inversion + 1}th inv)`);
                 chordTable[key] = {
                     display: chordName,
                     root: root,
                     type: chordType,
-                    inversion: inversion
+                    inversion: inversion,
+                    notes: chordNotes.notes,
+                    values: chordNotes.values
                 };
             }
         }
@@ -128,6 +168,7 @@ function generateChordTable() {
 }
 
 const chordDictionary = generateChordTable();
+const reverseChordLookup = Object.fromEntries(Object.entries(chordDictionary).map(x => [x[1].display.trim(), x[1]]));
 
 function getChordTypeFromStack(loops) {
     loops = [...loops]; //shallow clone
@@ -166,9 +207,9 @@ function getChordStack(loop) {
         const pos = parseInt(x.getAttribute("data-layer"));
         return pos >= startingRange && pos <= endingRange;
     });
-    loops.sort((a, b)=>{
+    loops.sort((a, b) => {
         return parseInt(a.getAttribute("data-layer"))
-         - parseInt(b.getAttribute("data-layer"));;
+            - parseInt(b.getAttribute("data-layer"));;
     });
     return loops;
 }
@@ -183,11 +224,57 @@ function chordProcess(loop, chordArray) {
 
 
     if (loop.relatedChord[loop.relatedChord.length - 1] === loop) {
+        loop.querySelector(".chordDisplay").style.display = "";
         loop.querySelector(".chordDisplay").innerText = getChordTypeFromStack(loop.relatedChord) || "";
     } else {
-        loop.querySelector(".chordDisplay").innerText = "";
+        loop.querySelector(".chordDisplay").style.display = "none";
     }
 }
+
+function chordDisplayEdit(display, e, loop) {
+    if (e.ctrlKey || e.metaKey || e.altKey || e.repeat) {
+        return e.preventDefault();
+    }
+    if (e.key === "Enter") {
+        e.preventDefault();
+    }
+    if (e.key === "Escape") {
+        e.preventDefault();
+        display.blur();
+    }
+    var lookupValue = display.innerText.replace(/[\r\n\t]/gm, "").trim();
+    lookupValue[0] = lookupValue[0].toUpperCase();
+    console.log(lookupValue);
+    if (e.key === "Enter" && loop.relatedChord && reverseChordLookup[lookupValue]) {
+        const chord = reverseChordLookup[lookupValue];
+        const octaveOffset = 12 * (Math.min(...loop.relatedChord.map(x => getChromaticOctave(x.theoryNote))));
+        e.preventDefault();
+        display.blur();
+        display.innerText = "";
+        const template = serialiseNode(loop.relatedChord[0]);
+        loop.relatedChord.forEach(deleteLoop);
+        chord.values.forEach((v, i) => {
+            const dt = structuredClone(template);
+            var freq = `:${indexToChromatic(octaveOffset + v)}:`;
+            dt.layer += i;
+            if (dt.conf.SemitonesOffset) {
+                dt.conf.SemitonesOffset = 0;
+            }
+            if (dt.conf.InternalSemiOffset) {
+                dt.conf.InternalSemiOffset = 0;
+            }
+            if (dt.conf.Note) {
+                dt.conf.Note = freq;
+            }
+            if (dt.conf.Frequency) {
+                dt.conf.Frequency = freq;
+            }
+            const newLoop = deserialiseNode(dt);
+            hydrateLoopPosition(newLoop);
+        });
+    }
+}
+
 registerSetting("ChordDisplays", true);
 function addChordDisplay(loop) {
     if (!settings.ChordDisplays) {
@@ -200,7 +287,13 @@ function addChordDisplay(loop) {
     const chordDisplay = document.createElement("span");
     chordDisplay.contentEditable = "true";
     chordDisplay.tabIndex = -1;
+    chordDisplay.autocapitalize = false;
+    chordDisplay.spellcheck = false;
     chordDisplay.classList.add("chordDisplay");
+
+    chordDisplay.addEventListener("keydown", (e) => {
+        chordDisplayEdit(chordDisplay, e, loop);
+    });
 
     loop.appendChild(chordDisplay);
 
@@ -208,6 +301,19 @@ function addChordDisplay(loop) {
         chordProcess(loop);
     }, 50);
 }
+
+addEventListener("keydown", (e) => {
+    if (e.key !== "Tab") {
+        return;
+    }
+    const loop = document.elementFromPoint(mouse.x, mouse.y)?.closest(".loopInternal:not(.selected):not(.active)")?.parentElement;
+    if (loop && loop._hasChordDisplay) {
+        e.preventDefault();
+        loop.querySelector(".chordDisplay").focus();
+        selectText(loop.querySelector(".chordDisplay"));
+    }
+});
+
 
 function chordComponentEdited(loop) {
     if (!settings.ChordDisplays) {

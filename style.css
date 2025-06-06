@@ -994,7 +994,14 @@ li {
   opacity: 0.5;
   border-radius: 4px;
   pointer-events: none;
+  outline: 0;
 }
 .loop.deactivated .chordDisplay {
   display: none;
+}
+
+.loop .chordDisplay:focus-within {
+  opacity: 1;
+  pointer-events: all;
+  user-select: contain;
 }
