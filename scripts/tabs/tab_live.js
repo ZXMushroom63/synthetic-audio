@@ -299,7 +299,7 @@ addEventListener("init", () => {
 
     registerTab("Live", container, false, () => { setTimeout(drawModifierStack, 150); });
 
-    addEventListener('deserialise', (e) => {
+    addEventListener('projinit', (e) => {
         liveSetModifiers = e.detail.data.liveSet || [];
         drawModifierStack();
     });

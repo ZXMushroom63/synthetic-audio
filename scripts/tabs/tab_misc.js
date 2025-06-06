@@ -148,7 +148,7 @@ addEventListener("init", () => {
         updateScales();
     });
     updateScales();
-    addEventListener('deserialise', (e) => {
+    addEventListener('projinit', (e) => {
         scales.selectedIndex = Math.max([...scales.options].findIndex(x => x.value === e.detail.data.mode), 0);
         note.value = ":" + (e.detail.data.key || "C#") + ":";
         scaleAutocorrect.selectedIndex = Math.max([...scaleAutocorrect.options].findIndex(x => x.value === e.detail.data.autocorrect), 0);
@@ -163,9 +163,11 @@ addEventListener("init", () => {
             }
         }
     }
+
     addEventListener('loopchangedcli', (e) => {
         updateLoopHighlight(e.detail.loop);
     });
+
     addEventListener('deserialisenode', (e) => {
         updateLoopHighlight(e.detail.node);
     });

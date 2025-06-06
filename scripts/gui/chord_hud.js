@@ -172,9 +172,7 @@ function generateChordTable() {
                 const chordNotes = getInversionNotes(rootIndex, formula, inversion);
                 const key = chordNotes.notes.join(",");
                 const chordName = root + chordType + (inversionNames[inversion] ?? ` (${inversion + 1}th inv)`);
-                if (key === "A,C#,E,G,B,D,F#") {
-                    console.log(chordType);
-                }
+                
                 chordTable[key] = {
                     display: chordName,
                     root: root,

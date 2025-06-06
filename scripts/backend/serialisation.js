@@ -154,6 +154,8 @@ function deserialise(serialisedStr) {
     audio.samplerate = ser.sampleRate;
     gui.zoom = ser.zoom || 100;
 
+    customEvent("projinit", { data: ser });
+
     ser.nodes.forEach((node) => {
         deserialiseNode(node);
     });

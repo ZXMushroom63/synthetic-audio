@@ -20,7 +20,5 @@ function initNoteDisplay(loop) {
     txt.classList.add("noteDisplay");
     txt.innerText = "U0";
     internal.appendChild(txt);
-    setTimeout(()=>{
-        updateNoteDisplay(loop);
-    }, 50);
+    updateNoteDisplay(loop);
 }

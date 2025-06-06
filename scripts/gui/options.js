@@ -54,10 +54,10 @@ function createOptionsMenu(loop, definition) {
                 loop["conf"][key] = s.value;
                 value[0] = s.value;
                 hydrateLoopDecoration(loop);
-                markLoopDirty(loop);
                 if (definition.updateMiddleware) {
                     definition.updateMiddleware(loop);
                 }
+                markLoopDirty(loop);
                 if (!multiplayer.isHooked && multiplayer.on && !loop._netIngore) {
                     multiplayer.patchLoop(loop);
                 }
@@ -87,10 +87,10 @@ function createOptionsMenu(loop, definition) {
                     loop["conf"][key] = input.value;
                 }
                 hydrateLoopDecoration(loop);
-                markLoopDirty(loop);
                 if (definition.updateMiddleware) {
                     definition.updateMiddleware(loop);
                 }
+                markLoopDirty(loop);
                 if (!multiplayer.isHooked && multiplayer.on && !loop._netIngore) {
                     multiplayer.patchLoop(loop);
                 }

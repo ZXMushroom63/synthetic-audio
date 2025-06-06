@@ -797,7 +797,7 @@ addEventListener("init", () => {
         calculateWaveform(wv, true);
         return wv;
     }
-    addEventListener('deserialise', (e) => {
+    addEventListener('projinit', (e) => {
         custom_waveforms = e.detail.data.waveforms || {};
         target = null;
         for (let id in custom_waveforms) {
