@@ -51,6 +51,7 @@ const chordFormulas = new Map(Object.entries({
 
     // Power chords & similar
     "5": [0, 7],
+    "power": [0, 7],
     "m3": [0, 3],
     "M3": [0, 4],
     "dim5": [0, 6],
