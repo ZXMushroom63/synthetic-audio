@@ -420,7 +420,6 @@ function addBlock(type, start, duration, title, layer = 0, data = {}, editorValu
         internal.classList.add("selected");
 
         document.onmousedown = (e) => {
-            e.preventDefault();
             document.querySelectorAll(".loopInternal.selected").forEach(a => { a.classList.remove("selected") });
         }
     });
