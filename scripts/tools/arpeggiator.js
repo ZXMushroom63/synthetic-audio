@@ -206,7 +206,7 @@ addEventListener("init", () => {
         if (!nodes) { return };
         const loop = nodes[0];
         template = serialiseNode(loop);
-        chord = [...findLoops(`.loop:not([data-deleted]):has(.noteDisplay)[data-start="${loop.getAttribute("data-start")}"][data-duration="${loop.getAttribute("data-duration")}"][data-editlayer="${loop.getAttribute("data-editlayer")}"]`)];
+        chord = getChordStack(loop);
         rawChord = chord;
         chord = chord.map(loop => {
             const ser = serialiseNode(loop);

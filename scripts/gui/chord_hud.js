@@ -136,32 +136,36 @@ function getChordTypeFromStack(loops) {
     return chordDictionary[backupKey];
 }
 
-function chordProcess(loop, chordArray) {
+function getChordStack(loop) {
     var startingRange = parseInt(loop.getAttribute("data-layer"));
     var endingRange = startingRange;
-    if (!chordArray) {
-        var loops = [...findLoops(`.loop:has(.noteDisplay):not([data-deleted])[data-start="${loop.getAttribute("data-start")
-            }"][data-duration="${loop.getAttribute("data-duration")
-            }"][data-editlayer="${loop.getAttribute("data-editlayer")
-            }"]`)]
-            .sort((a, b) => parseInt(a.getAttribute("data-layer")) - parseInt(b.getAttribute("data-layer")));
-        loops.forEach(x => {
-            if (endingRange === parseInt(x.getAttribute("data-layer")) - 1) {
-                endingRange++;
-            }
-        })
+    var loops = [...findLoops(`.loop:has(.noteDisplay):not([data-deleted])[data-start="${loop.getAttribute("data-start")
+        }"][data-duration="${loop.getAttribute("data-duration")
+        }"][data-editlayer="${loop.getAttribute("data-editlayer")
+        }"]`)]
+        .sort((a, b) => parseInt(a.getAttribute("data-layer")) - parseInt(b.getAttribute("data-layer")));
+    loops.forEach(x => {
+        if (endingRange === parseInt(x.getAttribute("data-layer")) - 1) {
+            endingRange++;
+        }
+    })
+    loops.reverse()
+    loops.forEach(x => {
+        if (startingRange === parseInt(x.getAttribute("data-layer")) + 1) {
+            startingRange--;
+        }
+    })
+    loops.reverse()
+    loops = loops.filter(x => {
+        const pos = parseInt(x.getAttribute("data-layer"));
+        return pos >= startingRange && pos <= endingRange;
+    });
+    return loops;
+}
 
-        loops.reverse()
-        loops.forEach(x => {
-            if (startingRange === parseInt(x.getAttribute("data-layer")) + 1) {
-                startingRange--;
-            }
-        })
-        loops.reverse()
-        loops = loops.filter(x => {
-            const pos = parseInt(x.getAttribute("data-layer"));
-            return pos >= startingRange && pos <= endingRange;
-        });
+function chordProcess(loop, chordArray) {
+    if (!chordArray) {
+        var loops = getChordStack(loop);
         loop.relatedChord = loops;
     } else if (Array.isArray(chordArray)) {
         loop.relatedChord = chordArray;
