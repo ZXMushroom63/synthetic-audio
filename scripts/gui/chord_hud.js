@@ -190,6 +190,9 @@ function getChordTypeFromStack(loops) {
 }
 
 function getChordStack(loop) {
+    if (loop.hasAttribute("data-deleted")) {
+        return [];
+    }
     var startingRange = parseInt(loop.getAttribute("data-layer"));
     var endingRange = startingRange;
     var loops = [...findLoops(`.loop:has(.noteDisplay):not([data-deleted])[data-start="${loop.getAttribute("data-start")
@@ -371,5 +374,6 @@ addEventListener("loopmoved", (e) => {
     chordComponentEdited(e.detail.loop);
 });
 addEventListener("loopdeleted", (e) => {
+    delete e.detail.loop.chordHandler;
     chordComponentEdited(e.detail.loop);
 });
