@@ -1,11 +1,3 @@
-function selectText(node) {
-    if (window.getSelection) {
-        var range = document.createRange();
-        range.selectNodeContents(node);
-        window.getSelection().removeAllRanges();
-        window.getSelection().addRange(range);
-    }
-}
 function deselectText() {
     if (window.getSelection) {
         window.getSelection().removeAllRanges();
@@ -112,6 +104,10 @@ chordFormulas.set("9", [0, 4, 7, 10, 14]);         // Dominant 9th (C, E, G, Bb,
 chordFormulas.set("min6", [0, 3, 7, 9]);             // Minor 6th (C, Eb, G, A)
 chordFormulas.set("6", [0, 4, 7, 9]);               // Major 6th (C, E, G, A)
 
+// Suspended 7ths
+chordFormulas.set("7sus4", [0, 2, 7, 10]);      // Dominant 7th w/ Suspended 4th 
+chordFormulas.set("7sus4", [0, 5, 7, 10]);      // Dominant 7th w/ Suspended 2nd
+
 // Seventh chords
 chordFormulas.set("7b5", [0, 4, 6, 10]);       // Dominant 7♭5 (C, E, Gb, Bb)
 chordFormulas.set("augMaj7", [0, 4, 8, 11]);   // Augmented major 7th (C, E, G#, B)
@@ -161,7 +157,6 @@ function generateChordTable() {
     const chordTable = {};
     const reverseChordLookup = {};
 
-
     for (const chordType of chordFormulas.keys()) {
         const formula = chordFormulas.get(chordType);
         for (let rootIndex = 0; rootIndex < chromaticScale.length; rootIndex++) {
@@ -188,6 +183,21 @@ function generateChordTable() {
 }
 
 const { chordDictionary, reverseChordLookup } = generateChordTable();
+
+function createDatalist() {
+    const datalist = document.createElement("datalist");
+    datalist.id = "chordDatalist";
+    const possibilities = Object.keys(reverseChordLookup);
+    possibilities.sort((a, b)=>a.length - b.length);
+    for (const chordType of possibilities) {
+        const opt = document.createElement("option");
+        opt.value = chordType;
+        datalist.appendChild(opt);
+    }
+    document.head.appendChild(datalist);
+}
+
+createDatalist();
 
 function getChordTypeFromStack(loops) {
     loops = [...loops]; //shallow clone
@@ -247,13 +257,16 @@ function chordProcess(loop, chordArray) {
 
     if (loop.relatedChord[loop.relatedChord.length - 1] === loop) {
         loop.querySelector(".chordDisplay").style.display = "";
-        loop.querySelector(".chordDisplay").innerText = getChordTypeFromStack(loop.relatedChord) || "";
+        loop.querySelector(".chordDisplay").value = getChordTypeFromStack(loop.relatedChord) || "";
     } else {
         loop.querySelector(".chordDisplay").style.display = "none";
     }
 }
 
 function chordDisplayEdit(display, e, loop) {
+    if (!e.key) {
+        return e.stopPropagation();
+    }
     if (e.ctrlKey || e.metaKey || e.altKey || e.repeat) {
         return e.preventDefault();
     }
@@ -265,7 +278,7 @@ function chordDisplayEdit(display, e, loop) {
         deselectText();
         display.blur();
     }
-    var lookupValue = display.innerText.replace(/[\r\n\t]/gm, "")
+    var lookupValue = display.value.replace(/[\r\n\t]/gm, "")
         .replaceAll("major", "maj")
         .replaceAll("minor", "min")
         .replaceAll("power", "5")
@@ -281,7 +294,7 @@ function chordDisplayEdit(display, e, loop) {
         e.preventDefault();
         display.blur();
         deselectText();
-        display.innerText = "";
+        display.value = "";
         const template = serialiseNode(loop.relatedChord[0]);
         loop.relatedChord.forEach(deleteLoop);
         chord.values.forEach((v, i) => {
@@ -315,15 +328,20 @@ function addChordDisplay(loop) {
         return;
     }
     loop._hasChordDisplay = true;
-    const chordDisplay = document.createElement("span");
-    chordDisplay.contentEditable = "true";
+    const chordDisplay = document.createElement("input");
+    chordDisplay.type = "text";
     chordDisplay.tabIndex = -1;
     chordDisplay.autocapitalize = false;
     chordDisplay.spellcheck = false;
     chordDisplay.classList.add("chordDisplay");
+    chordDisplay.setAttribute("list", "chordDatalist");
 
     chordDisplay.addEventListener("keydown", (e) => {
         chordDisplayEdit(chordDisplay, e, loop);
+    });
+
+    chordDisplay.addEventListener("keyup", (e) => {
+        e.stopPropagation();
     });
 
     chordDisplay.addEventListener("blur", (e) => {
@@ -345,7 +363,7 @@ addEventListener("keydown", (e) => {
     if (loop && loop._hasChordDisplay) {
         e.preventDefault();
         loop.querySelector(".chordDisplay").focus();
-        selectText(loop.querySelector(".chordDisplay"));
+        loop.querySelector(".chordDisplay").select();
     }
 });
 
