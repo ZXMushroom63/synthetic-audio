@@ -14,9 +14,9 @@ body {
   overflow-y: auto;
 }
 
-#tabContent>div,
-#tabContent>table,
-#tabContent>table>tr>td {
+#tabContent > div,
+#tabContent > table,
+#tabContent > table > tr > td {
   width: 100vw;
   height: calc(100vh - 15rem);
   border-collapse: collapse;
@@ -328,7 +328,7 @@ select:focus {
   list-style-type: "+ ";
 }
 
-#addstuff details[open]>summary {
+#addstuff details[open] > summary {
   list-style-type: "- ";
 }
 
@@ -341,11 +341,11 @@ select:focus {
   color: white;
 }
 
-#addstuff>details>div span {
+#addstuff > details > div span {
   display: block;
 }
 
-#addstuff>details>div span a {
+#addstuff > details > div span a {
   color: lightblue;
   text-decoration: underline;
   cursor: pointer;
@@ -353,7 +353,7 @@ select:focus {
   transition: color 0.3s;
 }
 
-#addstuff>details>div span a:hover {
+#addstuff > details > div span a:hover {
   color: white;
 }
 
@@ -482,10 +482,12 @@ button {
 #track,
 button,
 .themeGradient {
-  background: linear-gradient(140deg,
-      rgba(255, 0, 0, 0.3) 0%,
-      rgba(255, 255, 255, 0) 34%,
-      rgba(0, 255, 187, 0.2) 100%);
+  background: linear-gradient(
+    140deg,
+    rgba(255, 0, 0, 0.3) 0%,
+    rgba(255, 255, 255, 0) 34%,
+    rgba(0, 255, 187, 0.2) 100%
+  );
 }
 
 #trackInternal {
@@ -758,11 +760,11 @@ input[type="number"]::-webkit-inner-spin-button {
   cursor: pointer;
 }
 
-.loopOptionsMenu.multiEditMenu details+br+details {
+.loopOptionsMenu.multiEditMenu details + br + details {
   margin-top: 0.75rem;
 }
 
-.loopOptionsMenu.multiEditMenu details+br {
+.loopOptionsMenu.multiEditMenu details + br {
   display: none;
 }
 
@@ -845,19 +847,19 @@ code:hover {
   overflow-x: hidden;
 }
 
-#pluginsUI>div {
+#pluginsUI > div {
   border-bottom: 1px solid white;
   color: white;
   font-family: sans-serif;
   padding: 4px 2px;
 }
 
-#pluginsUI>div:first-of-type {
+#pluginsUI > div:first-of-type {
   margin-top: 1rem;
   border-top: 1px solid white;
 }
 
-#pluginsUI>div a {
+#pluginsUI > div a {
   text-decoration-color: red;
   cursor: pointer;
   user-select: none;
@@ -1028,6 +1030,9 @@ li {
 }
 
 .loop .chordDisplay {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
   display: inline-block;
   position: relative;
   z-index: 444443;
@@ -1040,6 +1045,7 @@ li {
   border: 0;
   background: transparent;
   color: white;
+  overflow: hidden;
 }
 
 .loop.deactivated .chordDisplay {
@@ -1050,4 +1056,8 @@ li {
   opacity: 1;
   pointer-events: all;
   user-select: contain;
+
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
 }
