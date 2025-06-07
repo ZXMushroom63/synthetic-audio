@@ -1,3 +1,4 @@
+var timePosMarkerAnimator = -1;
 function hydrateTimePosMarker() {
     document.querySelector(".timePosMarker").style.left = gui.marker / audio.duration * 100 + "%";
 }
@@ -25,10 +26,15 @@ addEventListener("init", () => {
     });
     renderOut.addEventListener("timeupdate", () => {
         if (!renderOut.currentTime) {
+            clearInterval(timePosMarkerAnimator);
             return hydrateTimePosMarker();
         }
         gui.marker = renderOut.currentTime;
-        hydrateTimePosMarker();
+        clearInterval(timePosMarkerAnimator);
+        timePosMarkerAnimator = setInterval(()=>{
+            gui.marker = renderOut.currentTime;
+            hydrateTimePosMarker();
+        }, 1000/30);
     });
     renderOut.addEventListener("play", () => {
         document.querySelector("audio#loopsample").pause();
@@ -37,6 +43,7 @@ addEventListener("init", () => {
         }
     });
     renderOut.addEventListener("seeking", () => {
+        clearInterval(timePosMarkerAnimator);
         if (!renderOut.currentTime) {
             return hydrateTimePosMarker();
         }
@@ -44,11 +51,13 @@ addEventListener("init", () => {
         hydrateTimePosMarker();
     });
     renderOut.addEventListener("loadedmetadata", () => {
+        clearInterval(timePosMarkerAnimator);
         document.querySelector('#renderOut').playbackRate = parseFloat(document.querySelector('#playbackRateSlider').value) || 0
         renderOut.currentTime = gui.marker;
         hydrateTimePosMarker();
     });
     renderOut.addEventListener("loadstart", () => {
+        clearInterval(timePosMarkerAnimator);
         document.querySelector("audio#loopsample").addEventListener("ended", (() => {
             if (loopObjURL) {
                 URL.revokeObjectURL(loopObjURL);
