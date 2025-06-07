@@ -127,7 +127,6 @@ chordFormulas.set("aug5", [0, 8]);
 chordFormulas.set("dim5", [0, 6]);
 chordFormulas.set("M3", [0, 4]);
 chordFormulas.set("m3", [0, 3]);
-chordFormulas.set("power", [0, 7]);
 chordFormulas.set("5", [0, 7]);
 
 // Triads
@@ -266,7 +265,12 @@ function chordDisplayEdit(display, e, loop) {
         deselectText();
         display.blur();
     }
-    var lookupValue = display.innerText.replace(/[\r\n\t]/gm, "").trim();
+    var lookupValue = display.innerText.replace(/[\r\n\t]/gm, "")
+        .replaceAll("major", "maj")
+        .replaceAll("minor", "min")
+        .replaceAll("power", "5")
+        .replaceAll("pwr", "5")
+        .trim();
     if (!lookupValue) {
         return;
     }
