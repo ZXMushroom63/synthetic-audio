@@ -186,18 +186,33 @@ addEventListener("init", () => {
     var noteMap = {};
     var noteTimeMap = {};
     var noteAnimationMap = {};
-    var snappingEnabled = false;
+    var midiSnappingEnabled = false;
+    var midiCooldownSize = 2000;
+    var midiTimescale = 1;
     const midiModule = mkModule("MIDI Insertion");
     midiModule.innerHTML += `
     <button id="midi_access">Grant MIDI Access</button><br>
-    <label>Snapping: </label><input type="checkbox" id="midi_snapping">`;
+    <label>Snapping: </label><input type="checkbox" id="midi_snapping"><br>
+    <label>Time scale: </label><input type="number" class="inputStyles" id="midi_timescale" value=1 max=4 min=0.125 step=0.1>`;
     const grantMidiBtn = midiModule.querySelector("#midi_access");
     midiModule.querySelector("#midi_snapping").addEventListener("input", (ev) => {
-        snappingEnabled = ev.target.checked;
+        midiSnappingEnabled = ev.target.checked;
+    });
+    midiModule.querySelector("#midi_timescale").addEventListener("input", (ev) => {
+        midiTimescale = Math.min(Math.max(0.125, ev.target.value), 4) || 1;
+        lastInsertionTime = -1;
+        noteMap = {};
+        noteTimeMap = {};
+        Object.values(noteAnimationMap).forEach(clearInterval);
+        noteAnimationMap = {};
+        concurrentNotes = 0;
+        insertionBasePos = 0;
+        insertionBaseTime = 0;
+        insertionBaseLayer = 0;
     });
     function animateMidiNote(note, node) {
         noteAnimationMap[note] = setInterval(() => {
-            node.setAttribute("data-duration", (Date.now() - noteTimeMap[note]) / 1000);
+            node.setAttribute("data-duration", (Date.now()*midiTimescale - noteTimeMap[note]) / 1000);
             hydrateLoopPosition(node);
             hydrateLoopDecoration(node);
         }, 1000 / 15);
@@ -216,7 +231,7 @@ addEventListener("init", () => {
             return;
         }
         const ser = structuredClone(serialiseNode(caretNode));
-        const freq = ":" + frequencyToNote(midi2freq(note)) + ":";
+        const freq = ":" + frequencyToNote(midi2freq(note + 12)) + ":"; //my notes are one octave off
         if (ser.conf.Frequency) {
             ser.conf.Frequency = freq;
         }
@@ -229,12 +244,12 @@ addEventListener("init", () => {
         if (ser.conf.Amplitude) {
             ser.conf.Amplitude = (velocity / 255).toFixed(2);
         }
-        if ((Date.now() - lastInsertionTime) > 4000) {
-            insertionBaseTime = Date.now();
+        if ((Date.now()*midiTimescale - lastInsertionTime) > midiCooldownSize*midiTimescale) {
+            insertionBaseTime = Date.now()*midiTimescale;
             ser.start += ser.duration;
             insertionBasePos = ser.start;
             var bpmInterval = 1 / ((audio.bpm / 60) * gui.substepping);
-            if (!snappingEnabled) {
+            if (!midiSnappingEnabled) {
                 bpmInterval = 0.01;
             }
             ser.start = Math.round(ser.start / bpmInterval) * bpmInterval;
@@ -245,14 +260,14 @@ addEventListener("init", () => {
             hydrateLoopPosition(node);
             hydrateLoopDecoration(node);
             noteMap[note] = node;
-            noteTimeMap[note] = Date.now();
-            lastInsertionTime = Date.now();
+            noteTimeMap[note] = Date.now()*midiTimescale;
+            lastInsertionTime = Date.now()*midiTimescale;
             animateMidiNote(note, node);
             tryPreviewMidi(node);
         } else {
-            ser.start = insertionBasePos + ((Date.now() - insertionBaseTime) / 1000);
+            ser.start = insertionBasePos + ((Date.now()*midiTimescale - insertionBaseTime) / 1000);
             var bpmInterval = 1 / ((audio.bpm / 60) * gui.substepping);
-            if (!snappingEnabled) {
+            if (!midiSnappingEnabled) {
                 bpmInterval = 0.01;
             }
             ser.start = Math.round(ser.start / bpmInterval) * bpmInterval;
@@ -263,7 +278,7 @@ addEventListener("init", () => {
             hydrateLoopPosition(node);
             hydrateLoopDecoration(node);
             noteMap[note] = node;
-            noteTimeMap[note] = Date.now();
+            noteTimeMap[note] = Date.now()*midiTimescale;
             animateMidiNote(note, node);
             tryPreviewMidi(node);
         }
@@ -275,12 +290,12 @@ addEventListener("init", () => {
             return;
         }
         concurrentNotes--;
-        var len = (Date.now() - noteTimeMap[note]) / 1000;
+        var len = (Date.now()*midiTimescale - noteTimeMap[note]) / 1000;
         var bpmInterval = 1 / ((audio.bpm / 60) * gui.substepping);
-        if (!snappingEnabled) {
+        if (!midiSnappingEnabled) {
             bpmInterval = 0.01;
         }
-        len = Math.round(len / bpmInterval) * bpmInterval;
+        len = (Math.round(len / bpmInterval) * bpmInterval) || (audio.beatSize / gui.substepping);
         noteMap[note].setAttribute("data-duration", len);
         hydrateLoopPosition(noteMap[note]);
         hydrateLoopDecoration(noteMap[note]);
@@ -290,7 +305,7 @@ addEventListener("init", () => {
         delete noteMap[note];
         delete noteTimeMap[note];
         console.log(`Note OFF: ${note}`);
-        lastInsertionTime = Date.now();
+        lastInsertionTime = Date.now()*midiTimescale;
     }
     function midiDataHandler(event) {
         const [status, note, velocity] = event.data;
