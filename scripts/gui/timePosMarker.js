@@ -66,6 +66,11 @@ addEventListener("init", () => {
         if (loopObjURL) {
             URL.revokeObjectURL(loopObjURL);
         }
+        clearInterval(timePosMarkerAnimator);
+        timePosMarkerAnimator = setInterval(() => {
+            gui.marker = renderOut.currentTime;
+            hydrateTimePosMarker(null, true);
+        }, 1000 / 30);
     });
     renderOut.addEventListener("pause", () => {
         clearInterval(timePosMarkerAnimator);
