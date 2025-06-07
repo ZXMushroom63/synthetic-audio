@@ -188,6 +188,10 @@ function hydrateLoopPosition(elem, lean) {
     }
     loopInternal.style.width = internalWidth;
 
+    if (elem.querySelector(".chordDisplay")) {
+        elem.querySelector(".chordDisplay").style.width = "calc(" + internalWidth + " - 6px)";
+    }
+
     loopInternal.querySelector(".handleRight").style.right = "calc(-" + internalWidth + " - 1.5px)";
 }
 function hydrateZoom(lean) {
