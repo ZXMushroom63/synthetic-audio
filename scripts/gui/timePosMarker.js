@@ -1,6 +1,30 @@
 var timePosMarkerAnimator = -1;
-function hydrateTimePosMarker() {
+var timePosMarkerMidiActuator = {};
+var timePosMarkerLoopPlayback = {};
+// MIDI_NOTE : [RAISE_TIME, [loopArray]]
+registerSetting("MidiOutput", false);
+function hydrateTimePosMarker(unused, isAnimated) {
     document.querySelector(".timePosMarker").style.left = gui.marker / audio.duration * 100 + "%";
+    if (isAnimated && settings.MidiOutput) {
+        Object.entries(timePosMarkerMidiActuator).forEach(ent => {
+            if (gui.marker > ent[1][0]) {
+                sendMidiMessage(MIDI_NOTE_OFF, parseInt(ent[0]), 0);
+                delete timePosMarkerMidiActuator[ent[0]];
+            }
+        });
+        findLoops(gui.isolate ? `.loop:not(.deactivated):not([data-deleted])` : ".loop:not([data-deleted])").forEach(loop => {
+            if (
+                loop.theoryNote &&
+                !timePosMarkerLoopPlayback[loop.getAttribute("data-uuid")] &&
+                gui.marker > parseFloat(loop.getAttribute("data-start"))
+            ) {
+                const midiId = chromaticToIndex(loop.theoryNote) + 12;
+                timePosMarkerLoopPlayback[loop.getAttribute("data-uuid")] = true;
+                timePosMarkerMidiActuator[midiId] = [parseFloat(loop.getAttribute("data-start")) + parseFloat(loop.getAttribute("data-duration"))];
+                sendMidiMessage(MIDI_NOTE_ON, midiId, Math.floor(127 * (loop.conf.Amplitude || loop.conf.Volume)));
+            }
+        });
+    }
 }
 addEventListener("hydrate", hydrateTimePosMarker);
 addEventListener("init", () => {
@@ -31,10 +55,10 @@ addEventListener("init", () => {
         }
         gui.marker = renderOut.currentTime;
         clearInterval(timePosMarkerAnimator);
-        timePosMarkerAnimator = setInterval(()=>{
+        timePosMarkerAnimator = setInterval(() => {
             gui.marker = renderOut.currentTime;
-            hydrateTimePosMarker();
-        }, 1000/30);
+            hydrateTimePosMarker(null, true);
+        }, 1000 / 30);
     });
     renderOut.addEventListener("play", () => {
         document.querySelector("audio#loopsample").pause();
@@ -42,7 +66,12 @@ addEventListener("init", () => {
             URL.revokeObjectURL(loopObjURL);
         }
     });
+    renderOut.addEventListener("pause", () => {
+        timePosMarkerLoopPlayback = {};
+        clearInterval(timePosMarkerAnimator);
+    });
     renderOut.addEventListener("seeking", () => {
+        timePosMarkerLoopPlayback = {};
         clearInterval(timePosMarkerAnimator);
         if (!renderOut.currentTime) {
             return hydrateTimePosMarker();
@@ -51,12 +80,14 @@ addEventListener("init", () => {
         hydrateTimePosMarker();
     });
     renderOut.addEventListener("loadedmetadata", () => {
+        timePosMarkerLoopPlayback = {};
         clearInterval(timePosMarkerAnimator);
         document.querySelector('#renderOut').playbackRate = parseFloat(document.querySelector('#playbackRateSlider').value) || 0
         renderOut.currentTime = gui.marker;
         hydrateTimePosMarker();
     });
     renderOut.addEventListener("loadstart", () => {
+        timePosMarkerLoopPlayback = {};
         clearInterval(timePosMarkerAnimator);
         document.querySelector("audio#loopsample").addEventListener("ended", (() => {
             if (loopObjURL) {

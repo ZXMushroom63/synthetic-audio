@@ -330,6 +330,7 @@ addEventListener("init", () => {
     var outputPorts = {};
     globalThis.sendMidiMessage = function sendMidiMessage(status, midiNote, vel) {
         const data = [status, midiNote, vel];
+        console.log(data);
         Object.entries(outputPorts).forEach(ent => {
             if (ent[1].state === "disconnected") {
                 delete outputPorts[ent[0]];
