@@ -1,3 +1,5 @@
+const MIDI_NOTE_ON = 144;
+const MIDI_NOTE_OFF = 128;
 addEventListener("init", () => {
     const params = new URLSearchParams(location.search);
     const container = document.createElement("div");
@@ -212,7 +214,7 @@ addEventListener("init", () => {
     });
     function animateMidiNote(note, node) {
         noteAnimationMap[note] = setInterval(() => {
-            node.setAttribute("data-duration", (Date.now()*midiTimescale - noteTimeMap[note]) / 1000);
+            node.setAttribute("data-duration", (Date.now() * midiTimescale - noteTimeMap[note]) / 1000);
             hydrateLoopPosition(node);
             hydrateLoopDecoration(node);
         }, 1000 / 15);
@@ -244,8 +246,8 @@ addEventListener("init", () => {
         if (ser.conf.Amplitude) {
             ser.conf.Amplitude = (velocity / 255).toFixed(2);
         }
-        if ((Date.now()*midiTimescale - lastInsertionTime) > midiCooldownSize*midiTimescale) {
-            insertionBaseTime = Date.now()*midiTimescale;
+        if ((Date.now() * midiTimescale - lastInsertionTime) > midiCooldownSize * midiTimescale) {
+            insertionBaseTime = Date.now() * midiTimescale;
             ser.start += ser.duration;
             insertionBasePos = ser.start;
             var bpmInterval = 1 / ((audio.bpm / 60) * gui.substepping);
@@ -260,12 +262,12 @@ addEventListener("init", () => {
             hydrateLoopPosition(node);
             hydrateLoopDecoration(node);
             noteMap[note] = node;
-            noteTimeMap[note] = Date.now()*midiTimescale;
-            lastInsertionTime = Date.now()*midiTimescale;
+            noteTimeMap[note] = Date.now() * midiTimescale;
+            lastInsertionTime = Date.now() * midiTimescale;
             animateMidiNote(note, node);
             tryPreviewMidi(node);
         } else {
-            ser.start = insertionBasePos + ((Date.now()*midiTimescale - insertionBaseTime) / 1000);
+            ser.start = insertionBasePos + ((Date.now() * midiTimescale - insertionBaseTime) / 1000);
             var bpmInterval = 1 / ((audio.bpm / 60) * gui.substepping);
             if (!midiSnappingEnabled) {
                 bpmInterval = 0.01;
@@ -278,7 +280,7 @@ addEventListener("init", () => {
             hydrateLoopPosition(node);
             hydrateLoopDecoration(node);
             noteMap[note] = node;
-            noteTimeMap[note] = Date.now()*midiTimescale;
+            noteTimeMap[note] = Date.now() * midiTimescale;
             animateMidiNote(note, node);
             tryPreviewMidi(node);
         }
@@ -290,7 +292,7 @@ addEventListener("init", () => {
             return;
         }
         concurrentNotes--;
-        var len = (Date.now()*midiTimescale - noteTimeMap[note]) / 1000;
+        var len = (Date.now() * midiTimescale - noteTimeMap[note]) / 1000;
         var bpmInterval = 1 / ((audio.bpm / 60) * gui.substepping);
         if (!midiSnappingEnabled) {
             bpmInterval = 0.01;
@@ -305,13 +307,14 @@ addEventListener("init", () => {
         delete noteMap[note];
         delete noteTimeMap[note];
         console.log(`Note OFF: ${note}`);
-        lastInsertionTime = Date.now()*midiTimescale;
+        lastInsertionTime = Date.now() * midiTimescale;
     }
     function midiDataHandler(event) {
         const [status, note, velocity] = event.data;
-        if (status === 144 && velocity > 0) {
+        console.log(event.data);
+        if (status === MIDI_NOTE_ON && velocity > 0) {
             midiNoteOn(note, velocity);
-        } else if (status === 128 || (status === 144 && velocity === 0)) {
+        } else if (status === MIDI_NOTE_OFF || (status === MIDI_NOTE_ON && velocity === 0)) {
             midiNoteOff(note, velocity);
         }
         console.log(JSON.stringify([status, note, velocity]));
@@ -324,6 +327,17 @@ addEventListener("init", () => {
         ev.detail.loop.classList.add("caret");
     });
     var midiHookmapper = {};
+    var outputPorts = {};
+    globalThis.sendMidiMessage = function sendMidiMessage(status, midiNote, vel) {
+        const data = [status, midiNote, vel];
+        Object.entries(outputPorts).forEach(ent => {
+            if (ent[1].state === "disconnected") {
+                delete outputPorts[ent[0]];
+            } else {
+                ent[1].send(data);
+            }
+        });
+    }
     function allowMidi() {
         navigator.requestMIDIAccess().then((midiAccess) => {
             var inputs = midiAccess.inputs.values();
@@ -342,6 +356,9 @@ addEventListener("init", () => {
                     input.onmidimessage = midiDataHandler;
                     midiHookmapper[input.name] = true;
                 }
+            }
+            for (let port of midiAccess.outputs.values()) {
+                outputPorts[port.name] = port;
             }
         });
     }
