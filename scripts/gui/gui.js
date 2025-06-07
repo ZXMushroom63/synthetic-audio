@@ -597,6 +597,7 @@ function init() {
         if (e.key === "ArrowLeft" && e.target && e.target.tagName === "BODY" && e.shiftKey) {
             e.preventDefault();
             gui.marker = 0;
+            timePosMarkerLoopPlayback = {};
             document.querySelector("#renderOut").currentTime = 0;
             return;
         }

@@ -30,6 +30,7 @@ addEventListener("hydrate", hydrateTimePosMarker);
 addEventListener("init", () => {
     const renderOut = document.querySelector("#renderOut");
     document.querySelector(".timePosMarker").addEventListener("mousedown", (e) => {
+        timePosMarkerLoopPlayback = {};
         e.preventDefault();
         var bba = document.querySelector("#trackInternal").getBoundingClientRect();
         window.onmousemove = (e) => {
@@ -67,11 +68,9 @@ addEventListener("init", () => {
         }
     });
     renderOut.addEventListener("pause", () => {
-        timePosMarkerLoopPlayback = {};
         clearInterval(timePosMarkerAnimator);
     });
     renderOut.addEventListener("seeking", () => {
-        timePosMarkerLoopPlayback = {};
         clearInterval(timePosMarkerAnimator);
         if (!renderOut.currentTime) {
             return hydrateTimePosMarker();

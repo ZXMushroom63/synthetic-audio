@@ -284,7 +284,6 @@ addEventListener("init", () => {
             animateMidiNote(note, node);
             tryPreviewMidi(node);
         }
-        console.log(`Note ON: ${note}`);
         concurrentNotes++;
     }
     function midiNoteOff(note, velocity) {
@@ -306,18 +305,17 @@ addEventListener("init", () => {
         delete noteAnimationMap[note];
         delete noteMap[note];
         delete noteTimeMap[note];
-        console.log(`Note OFF: ${note}`);
+
         lastInsertionTime = Date.now() * midiTimescale;
     }
     function midiDataHandler(event) {
         const [status, note, velocity] = event.data;
-        console.log(event.data);
+
         if (status === MIDI_NOTE_ON && velocity > 0) {
             midiNoteOn(note, velocity);
         } else if (status === MIDI_NOTE_OFF || (status === MIDI_NOTE_ON && velocity === 0)) {
             midiNoteOff(note, velocity);
         }
-        console.log(JSON.stringify([status, note, velocity]));
     }
     addEventListener("loopchanged", (ev) => {
         if (ev.detail.loop._ignore) {
@@ -330,7 +328,7 @@ addEventListener("init", () => {
     var outputPorts = {};
     globalThis.sendMidiMessage = function sendMidiMessage(status, midiNote, vel) {
         const data = [status, midiNote, vel];
-        console.log(data);
+
         Object.entries(outputPorts).forEach(ent => {
             if (ent[1].state === "disconnected") {
                 delete outputPorts[ent[0]];
