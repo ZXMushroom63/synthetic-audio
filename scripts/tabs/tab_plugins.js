@@ -32,7 +32,7 @@ addEventListener("init", async () => {
             const blob = new Blob([await zip.file("Cover.png").async("uint8array")], { type: "image/png" });
             SAMPLEPACK_LOGOMAP[name] = URL.createObjectURL(blob);
         } else {
-            SAMPLEPACK_LOGOMAP[name] = "public/covers/cover" + (Math.hash(name, 15) + 1) + ".png";
+            SAMPLEPACK_LOGOMAP[name] = "public/covers/cover" + (Math.hash(name, 19) + 1) + ".png";
         }
         for (const path in zip.files) {
             const file = zip.files[path];
