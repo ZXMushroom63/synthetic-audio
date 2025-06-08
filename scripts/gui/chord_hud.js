@@ -283,6 +283,7 @@ function chordDisplayEdit(display, e, loop) {
         .replaceAll("minor", "min")
         .replaceAll("power", "5")
         .replaceAll("pwr", "5")
+        .replaceAll("aug7", "augMaj7")
         .trim();
     if (!lookupValue) {
         return;
