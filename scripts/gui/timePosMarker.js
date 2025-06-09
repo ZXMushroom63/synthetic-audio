@@ -76,6 +76,9 @@ addEventListener("init", () => {
     renderOut.addEventListener("pause", () => {
         clearInterval(timePosMarkerAnimator);
     });
+    renderOut.addEventListener("ended", () => {
+        clearInterval(timePosMarkerAnimator);
+    });
     renderOut.addEventListener("seeking", () => {
         clearInterval(timePosMarkerAnimator);
         if (!renderOut.currentTime) {
