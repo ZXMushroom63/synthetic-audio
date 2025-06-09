@@ -117,8 +117,88 @@ You can create waveforms using the ~New~ button.
   - For example, a smooth modifier gets rid of sharp edges.
 `
 );
-helpContent.addTab("Soundfonts", "(coming soon)");
-helpContent.addTab("Plugins", "(coming soon)");
+helpContent.addTab("Plugins", `
+This tab is where external resources are managed. This includes:
+ - Plugins that add nodes
+ - Pure-data patches compiled with ~hvcc~
+ - Soundfonts  
+ - Arp Patterns
+ - Sample Packs
+ - Individual samples (usually inserted via drag-and-drop)
+ - Extra tools in editor
+
+The type of an installed plugin is indicated by the emoji on the filename's left.
+ - ~[🇯‌🇸‌]~ indicates a generic plugin
+ - ~[🎛️]~ indicates a pure-data patch
+ - ~[🎸]~ indicates a soundfont
+ - ~[🔊]~ or ~[🎞️]~ indicates a sample
+ - ~[🔨]~ indicates a tool
+ - ~[📦]~ indicates a samplepack
+
+
+### Compiling and created patches with pure-data/plugdata
+> Prerequisites: Install emsdk (https://emscripten.org/docs/getting_started/downloads.html)
+
+Synthetic Audio supports using pure data/plugdata patches compiled with the heavy compiler collection (maintained by Wasted Audio, https://github.com/Wasted-Audio/hvcc).
+Specifically, until further notice, you must use my fork which adds various features and fixes for the web compile target: https://github.com/ZXMushroom63/hvcc
+Clone the repository, move into the \`hvcc/\` directory, and run \`pip3 install -e .\`
+
+Make a patch (I recommend plugdata for the editor), and save it to a file. While creating your patch, I'd recommend enabling 'compiled mode' to disable features that are not supported by hvcc.
+When you are done, go to the folder containing the patch, and run \`hvcc mypatch.pd -g js\`
+
+Open SYNTHETIC's plugins tab, and press ~Upload hvcc (.js)~ . Go to the folder containing your patches, open the \`js/\` directory, and select BOTH .js files. SYNTHETIC will patch them to add offline support as well as editor integration. On reloading SYNTHETIC you will be able to find the patch available as a filter when using the ~Shift + A~ shortcut or in the Plugins category in the add menu.
+
+
+Making different types of input:
+SYNTHETIC offers an extension to the default ~@hv_param~ inputs. Providing a default value of ~440~ in a receive object will make the parameter apepar as ~:A4:~ in the editor.
+~[r NoteInput @hv_param 0 1000 440]~
+Note that receivers will all be updated at once, so try only triggering updates from one receiver.
+
+You can also create dropdowns, that return the index of the selected element, using a double underscore ( ~__~ ) to seperate the name and options of the dropdown, and a single underscore ( ~_~ ) to seperate the options.
+~[r MyDropdown__firstoption_secondoption_thirdoption @hv_param 0 2 0]~
+
+You can load audio samples into by creating a table or an array with a ~@hv_table~ suffix. This will let users select any procedural audio assets from a dropdown.
+~[table mysamples 100 @hv_table]~
+When a table is filled, you can get it's size using ~[r tlen_mysamples @hv_param 0 99999999 0]~
+
+As always, samplerate can be found using:\\
+~[loadbang]~ \\
+  ~|~ \\
+~[samplerate]~
+
+
+### JavaScript API
+<pre>
+${`
+addBlockType("node_type_id", {
+  title: "My Cool Node",
+  color: "rgba(0, 255, 0, 0.3)", //background color
+  wet_and_dry_knobs: false, //add builtin wet and dry knobs
+  amplitude_smoothing_knob: false, //add amplitude smoothing knob
+  isPlugin: true, //should it be in the plugins category (usually keep as true)
+  configs: {
+    "Text": ["hello world", "text"],
+    "RegularNumber": [0.25, "number"],
+    "ProgrammableNumber": [0.28, "number", 1],
+    "Bool": [false, "checkbox"],
+    "Dropdown": ["Default", ["Default", "Opt1", "Opt2", "Opt3"]]
+  },
+  functor: function(inPcm, channel, data) { //lambdas not supported. processes pcm signal data in the form of Float32Arrays
+    return inPcm.map(x => x*0.5);
+  }
+});
+`.replaceAll(" ", "&nbsp").replaceAll("\n", "<br>")}
+</pre>
+
+`);
+helpContent.addTab("Soundfonts", `
+To use instruments such as piano, guitar, etc, you need to install Soundfonts in the plugins tab.
+SYNTHETIC uses the MIDI.js soundfont format.
+
+In the plugins tab, SYNTHETIC by default has buttons to download the FluidR3-GM and MusyngKite soundfonts, converted to MIDI.js by [@gleitz on GitHub](http://github.com/gleitz).
+Once the soundfonts have finished downloading, restart the editor. You can access the soundfonts in editor using an ~Instrument~ node.
+In the ~Instrument~'s options menu, you can select your desired instrument.
+`);
 helpContent.addTab("Samplepacks", "(coming soon)");
 helpContent.addTab("Live Mode", "(coming soon)");
 helpContent.addTab("Misc Tab", "(coming soon)");
