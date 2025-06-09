@@ -7,6 +7,7 @@ addBlockType("power", {
         "OffsetNegatives": [false, "checkbox"]
     },
     functor: function (inPcm, channel, data) {
+        inPcm = inPcm.slice();
         var exp = _(this.conf.Exponent);
         inPcm.forEach((x, i) => {
             if (this.conf.OffsetNegatives) {
