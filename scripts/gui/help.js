@@ -70,9 +70,9 @@ Scripts are denoted with a ~#~ at the start of the input.
 - For a exponential interpolation (squared), try inputting:   ~#0~24@2~
 - For interpolating using a custom waveform, use ~#100~500@!custom_waveform_name~
   - You can cycle through the waveform at a frequency (eg: 2Hz) using ~#100~500@!custom_waveform_name!2~
-- For writing arithmetic, do: ~#1*4~
+- For writing arithmetic, do: ~#1*4~ (requires untrusted scripts enabled in settings, in the misc tab)
 
-For writing an arbitrary script, do: ~#(()=>{/*/code/*/ return 1;})()~
+For writing an arbitrary script, do: ~#(()=>{/*/code/*/ return 1;})()~ (requires untrusted scripts enabled in settings, in the misc tab)
 These scripts have access to the following variables:
 - ~x~ - The percentage through the node
 - ~rt~ - The total runtime of the node
