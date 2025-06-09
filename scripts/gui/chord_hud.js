@@ -148,6 +148,8 @@ function getInversionNotes(rootIndex, formula, inversion) {
         notes.push(chromaticScale[noteValue % 12]);
         values.push(noteValue);
     }
+    const shiftLowest = Math.floor(Math.min(...values)/12);
+    values = values.map(x => x - shiftLowest*12);
     return {
         notes,
         values
