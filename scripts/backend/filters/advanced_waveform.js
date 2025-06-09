@@ -103,11 +103,12 @@ addBlockType("p_waveform_plus", {
     pitchZscroller: true,
     zscroll: (loop, value) => {
         loop.conf.InternalSemiOffset += value;
-        if (Number.isFinite(parseFloat(loop.conf.SemitonesOffset))) {
-            loop.conf.SemitonesOffset = parseFloat(loop.conf.SemitonesOffset) + loop.conf.InternalSemiOffset;
-            loop.conf.InternalSemiOffset = 0;
-        }
-        // I like preserving the frequency. Idk, just do.
+
+        //lets try to keep things seperate
+        // if (Number.isFinite(parseFloat(loop.conf.SemitonesOffset))) {
+        //     loop.conf.SemitonesOffset = parseFloat(loop.conf.SemitonesOffset) + loop.conf.InternalSemiOffset;
+        //     loop.conf.InternalSemiOffset = 0;
+        // }
         // if (loop.conf.InternalSemiOffset === 0 && !(("" + loop.conf.Frequency).startsWith("#")) && (typeof loop.conf.SemitonesOffset === "number")) {
         //     loop.conf.Frequency = ":" + frequencyToNote(_(loop.conf.Frequency)(0, new Float32Array(1)) * Math.pow(2, loop.conf.SemitonesOffset/12)) + ":";
         //     loop.conf.SemitonesOffset = 0;
