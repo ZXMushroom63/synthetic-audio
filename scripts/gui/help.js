@@ -6,15 +6,17 @@ Once the program has started, you can load projects using the 'Load' button. Sup
   -  .mid (midi file, converted to .sm)
 
 You can add nodes (tracks, loops, assets and filters) using the 'Add Tracks' menu in the top right, or using the Shift+A add menu.
-  |- Click to expand or shrink categories in the 'Add Tracks' menu
-- Press the ~Render Audio~ button to update the audio.
+  - Click to expand or shrink categories in the 'Add Tracks' menu
+  - Press the ~Render Audio~ button to update the audio.
 
 
 You can move tracks using the LEFT MOUSE BUTTON.
-Holding 'Ctrl' while doing this ignores the 'Substepping' option, and snaps to the nearest beat.
-Holding 'Shift' ignores all snapping and moves directly to the mouse's location.
+  - Holding 'Ctrl' while doing this ignores the 'Substepping' option, and snaps to the nearest beat.
+  - Holding 'Shift' ignores all snapping and moves directly to the mouse's location.
 
 Dragging the handles on the left and right of nodes allows you to change it's duration.
+  - 'Ctrl' and 'Shift' have the same effect
+  - 'Alt' will resize the whole chord / node stack
 
 You can right click on a node to edit its properties.
 

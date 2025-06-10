@@ -64,7 +64,7 @@ function getDurationOfLoop(audioFile) {
     });
 }
 var loopObjURL = null;
-var mouse = {x: 0, y: 0};
+var mouse = { x: 0, y: 0 };
 var keymap = {};
 function updateLOD() {
     if (gui.noLOD) {
@@ -280,20 +280,43 @@ function addBlock(type, start, duration, title, layer = 0, data = {}, editorValu
         if (e.button !== 0) {
             return;
         }
-        markLoopDirty(loop, true);
+        var isRight = e.target.classList.contains("handleRight");
         if (!loop.noEditorLayer && (parseInt(loop.getAttribute("data-editlayer")) !== gui.layer)) {
             return;
         }
-        var isRight = e.target.classList.contains("handleRight");
+
         e.stopImmediatePropagation();
         e.stopPropagation();
+
+        if (e.altKey) {
+            Object.defineProperty(e, "altKey", { value: false });
+            getChordStack(loop).forEach(l => {
+                const ev = new MouseEvent("mousedown", {
+                    bubbles: true,
+                    clientX: mouse.x,
+                    clientY: mouse.y,
+                    button: 0,
+                    altKey: false,
+                    ctrlKey: keymap["Control"],
+                    shiftKey: keymap["Shift"]
+                });
+                if (isRight) {
+                    l.querySelector(".handleRight").dispatchEvent(ev);
+                } else {
+                    l.querySelector(".handleLeft").dispatchEvent(ev);
+                }
+            });
+            return;
+        };
+        markLoopDirty(loop, true);
+
         var trackBB = document.querySelector("#trackInternal").getBoundingClientRect();
         var originalBB = internal.getBoundingClientRect();
         var originalDuration = parseFloat(loop.getAttribute("data-duration"));
         var originalStart = parseFloat(loop.getAttribute("data-start"));
         loop.classList.add("active");
         if (isRight) {
-            document.onmousemove = function (j) {
+            function rightHandler(j) {
                 j.preventDefault();
                 keymap["Control"] = j.ctrlKey;
                 var pos = ((originalBB.left - trackBB.left - (e.clientX - j.clientX)) / trackBB.width) * 100;
@@ -315,8 +338,9 @@ function addBlock(type, start, duration, title, layer = 0, data = {}, editorValu
                     multiplayer.patchLoop(loop);
                 }
             }
+            document.addEventListener("mousemove", rightHandler);
         } else {
-            document.onmousemove = function (j) {
+            function leftHandler(j) {
                 j.preventDefault();
                 keymap["Control"] = j.ctrlKey;
                 var pos = ((originalBB.left - trackBB.left - (e.clientX - j.clientX)) / trackBB.width) * 100;
@@ -338,14 +362,16 @@ function addBlock(type, start, duration, title, layer = 0, data = {}, editorValu
                     multiplayer.patchLoop(loop);
                 }
             }
+            document.addEventListener("mousemove", leftHandler);
         }
-        document.onmouseup = function (q) {
+        function mouseUpHandler(e) {
             markLoopDirty(loop, true);
             loop.classList.remove("active");
-            document.onmousemove = null;
-            document.onmouseup = null;
+            document.removeEventListener("mousemove", isRight ? rightHandler : leftHandler);;
+            document.removeEventListener("mouseup", mouseUpHandler);
             hydrateLoopPosition(loop);
         }
+        document.addEventListener("mouseup", mouseUpHandler);
     }
     const loop = document.createElement("div");
     if (!noTimeline) {
