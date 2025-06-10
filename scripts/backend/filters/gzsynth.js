@@ -109,7 +109,8 @@
             ret = s;
         }
         if (time <= a[0]) {
-            ret *= (Math.pow(time / a[0], a[1]) || 1);
+            const val = Math.pow(time / a[0], a[1]);
+            ret *= isNaN(val) ? 1 : val;
         }
         if (time > a[0] && time <= (d[0] + a[0])) {
             ret = lerp(1, s, Math.pow((time - a[0]) / d[0], 1/d[1])) || s;
