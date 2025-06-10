@@ -212,13 +212,13 @@ addEventListener("theoryscaleupdated", updateChordHudDatalist);
 
 function getChordTypeFromStack(loops) {
     loops = [...loops]; //shallow clone
-    const key = loops.sort((a, b) => a.hitFrequency - b.hitFrequency).map(x => x.theoryNoteNormalised).join(",");
+    const key = [...new Set(loops.sort((a, b) => a.hitFrequency - b.hitFrequency).map(x => x.theoryNoteNormalised))].join(",");
     if (chordDictionary[key]) {
         return chordDictionary[key]?.display;
     }
-    const backupKey = loops.sort((a, b) =>
+    const backupKey = [...new Set(loops.sort((a, b) =>
         chromaticScaleShifted.indexOf(a.theoryNoteNormalised) - chromaticScaleShifted.indexOf(b.theoryNoteNormalised)
-    ).map(x => x.theoryNoteNormalised).join(",");
+    ).map(x => x.theoryNoteNormalised))].join(",");
 
     return chordDictionary[backupKey]?.display;
 }
