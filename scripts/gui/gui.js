@@ -350,11 +350,11 @@ function addBlock(type, start, duration, title, layer = 0, data = {}, editorValu
                 if (keymap["Shift"]) {
                     bpmInterval = 0.001;
                 }
-                pos = (Math.round(pos / 100 * audio.duration / bpmInterval) * bpmInterval) / audio.duration * 100;
+                pos = (Math.round(Math.min(pos / 100 * audio.duration, originalStart + originalDuration) / bpmInterval) * bpmInterval) / audio.duration * 100;
                 loop.style.left = pos + "%";
                 pos = Math.round(pos / 100 * audio.duration / bpmInterval) * bpmInterval;
                 loop.setAttribute("data-start", pos);
-                var newDuration = ((originalStart - pos) * 1) + originalDuration;
+                var newDuration = Math.max(((originalStart - pos) * 1) + originalDuration, 0);
                 var internalWidth = newDuration * gui.zoomConstant;
                 internal.style.width = internalWidth + "vw";
                 backgroundSvg.style.width = internalWidth + "vw";
@@ -624,10 +624,10 @@ function init() {
         }
 
     });
-    
+
     addEventListener("keydown", (e) => {
         if (e.key === "Shift" && !delayedShiftPress && !e.repeat) {
-            delayedShiftPress = setTimeout(()=>{
+            delayedShiftPress = setTimeout(() => {
                 keymap["Shift"] = true;
             }, SHIFT_KEY_DELAY);
             return;
