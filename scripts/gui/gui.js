@@ -8,6 +8,8 @@ function resetDrophandlers(cancel) {
         dropHandlers[0](null, cancel);
     }
 }
+const SHIFT_KEY_DELAY = 150;
+var delayedShiftPress = null;
 var gui = {
     noLOD: true,
     isolate: false,
@@ -622,7 +624,14 @@ function init() {
         }
 
     });
+    
     addEventListener("keydown", (e) => {
+        if (e.key === "Shift" && !delayedShiftPress && !e.repeat) {
+            delayedShiftPress = setTimeout(()=>{
+                keymap["Shift"] = true;
+            }, SHIFT_KEY_DELAY);
+            return;
+        }
         keymap[e.key] = true;
         if (e.key === "ArrowLeft" && e.target && e.target.tagName === "BODY" && e.shiftKey) {
             e.preventDefault();
@@ -639,6 +648,10 @@ function init() {
         }
     });
     addEventListener("keyup", (e) => {
+        if (e.shiftKey) {
+            clearTimeout(delayedShiftPress);
+            keymap["Shift"] = false;
+        }
         keymap[e.key] = false;
     });
     addEventListener("blur", (e) => {
