@@ -18,10 +18,44 @@ addEventListener("init", async () => {
         }
         return paths;
     }
+    const loadingScreenTabs = new ModMenuTabList();
+    loadingScreenTabs.addTab("Loader", `<pre style="width:100%;height:35vh;margin-top:0;margin:0;overflow-x:hidden;overflow-y:scroll;" id="loader_logs"></pre>`);
+    const loadingScreenModMenu = new ModMenu("SYNTHETIC Bootloader", loadingScreenTabs, "bootloader", syntheticMenuStyles);
+    function logToLoader(txt) {
+        if (!document.querySelector("#loader_logs")) {
+            return;
+        }
+        document.querySelector("#loader_logs").innerHTML += txt.replaceAll(" ", "&nbsp").replaceAll("<", "").replaceAll(">", "").replaceAll("\n", "<br>") + "<br>";
+        document.querySelector("#loader_logs").scrollTop = document.querySelector("#loader_logs").scrollHeight;
+    }
+    function isMobile() {
+        const regex = /Mobi|Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i;
+        return regex.test(navigator.userAgent);
+    }
+    function logDiagnostics() {
+        logToLoader(
+            String.raw`
+  _____   ___  _ _____ _  _ ___ _____ ___ ___ 
+ / __\ \ / / \| |_   _| || | __|_   _|_ _/ __|
+ \__ \\ V /| .\ | | | | __ | _|  | |  | | (__ 
+ |___/ |_| |_|\_| |_| |_||_|___| |_| |___\___|
+`
+        );
+        logToLoader(`Server                  -   ${location.host}`);
+        logToLoader(`User Agent              -   ${navigator.userAgent}`);
+        logToLoader(`Is Mobile               -   ${isMobile() ? "YES" : "NO"}`);
+        if (isMobile()) {
+            logToLoader("Warning: Mobile support is quite patchy. Expect bugs.")
+        }
+        logToLoader(`randomUUID() support    -   ${crypto.randomUUID ? "YES" : "NO"}`);
+        logToLoader(`Microphone support      -   ${navigator?.mediaDevices?.enumerateDevices ? "YES" : "NO"}`);
+        logToLoader(`Storage size queries    -   ${navigator?.storage?.estimate ? "YES" : "NO"}`);
+    }
     const postInitQueue = [];
     const allowedAudioFormats = [".ogg", ".mp3", ".flac", ".m4a", ".mp4", ".aiff", ".wav"];
     const isAudio = (fname) => !!allowedAudioFormats.find(x => fname.endsWith(x));
     async function loadSamplePack(pack, packName) {
+        logToLoader(`Loading sample pack: ${packName}`);
         const name = packName.replace(".zip", "");
         const prefix = name + "/";
         SAMPLEPACK_NAMES.push(prefix);
@@ -330,7 +364,7 @@ addEventListener("init", async () => {
 
                 entry.insertAdjacentElement("afterbegin", download);
             }
-            
+
             entry.insertAdjacentElement("afterbegin", remove);
 
             container.appendChild(entry);
@@ -343,10 +377,13 @@ addEventListener("init", async () => {
     document.body.style.pointerEvents = "none";
 
     // load the mods
+    loadingScreenModMenu.init();
+    logDiagnostics();
     var modList = await getMods();
     for (let i = 0; i < modList.length; i++) {
         document.querySelector("#renderProgress").innerText = `Loading plugins (${(i / (modList.length) * 100).toFixed(1)}%)`;
         if (modList[i].endsWith(".js")) {
+            logToLoader(`Loading mod: ${modList[i]}`);
             const mod = await getMod(modList[i]);
             try {
                 (new Function(await mod)).apply(globalThis, []);
@@ -354,12 +391,14 @@ addEventListener("init", async () => {
                 console.error("Failed to load " + modList[i]);
             }
         } else if (modList[i].endsWith(".zip")) { //sample pack
+            logToLoader(`Queuing sample pack: ${modList[i]}`);
             postInitQueue.push({
                 type: "samplepack",
                 name: modList[i],
                 data: await getSample(modList[i])
             });
         } else if (isAudio(modList[i])) {
+            logToLoader(`Queueing sample: ${modList[i]}`);
             postInitQueue.push({
                 type: "sample",
                 name: modList[i],
@@ -370,6 +409,7 @@ addEventListener("init", async () => {
 
     // compile HVCC patches and add nodes for them
     for (patch in HVCC_MODULES) {
+        logToLoader(`Compiling hvcc patch: ${patch}`);
         document.querySelector("#renderProgress").innerText = `Compiling HVCC patch... (${patch})`;
 
         HVCC_MODULES[patch] = await HVCC_MODULES[patch]();
@@ -430,6 +470,7 @@ addEventListener("init", async () => {
     }
 
     for (pattern in ARPEGGIATOR_SCORES) {
+        logToLoader(`Realising arp pattern: ${pattern}`);
         const offsetsSet = new Set();
         const score = ARPEGGIATOR_SCORES[pattern];
         score.beatsDuration = Math.max(...score.notes.map(x => x.beatsStart + x.beatsDuration));
@@ -452,27 +493,34 @@ addEventListener("init", async () => {
     document.querySelector("#renderProgress").innerText = `Welcome to SYNTHETIC Audio! Press the 'Help' button for the manual.`;
     loadFiltersAndPrims();
     globalThis.multiplayer_support = false;
+    logToLoader(`Checking multiplayer support...`);
     try {
         globalThis.multiplayer_support = (!(location.protocol === "file:") && ((await fetch("/multiplayer_check")).status === 200)) || params.has("multiplayer");
     } catch (error) {
         console.log("Multiplayer not supported on instance.")
     }
     if (!multiplayer_support) {
+        logToLoader(`Multiplayer not supported.`);
         setTimeout(() => {
             loadAutosave();
             document.body.style.pointerEvents = "all";
+            loadingScreenModMenu.closeModMenu();
         }, 100);
     } else {
+        logToLoader(`Multiplayer supported! Loading multiplayer system...`);
         document.querySelector("#renderProgress").innerText = `Initialising multiplayer system...`;
         const socketio = document.createElement("script");
         socketio.src = params.has("multiplayer") ? "https://cdn.jsdelivr.net/npm/socket.io-client@latest/dist/socket.io.min.js" : "/socket.io/socket.io.js";
         socketio.addEventListener("load", () => {
+            logToLoader(`Socket.IO loaded...`);
             document.querySelector("#renderProgress").innerText = `Multiplayer system initialised! Connecting to server...`;
             const socket = globalThis.socket = io(params.get("multiplayer"));
             multiplayer.enable(socket);
             socket.on('connect', () => {
+                logToLoader(`Connected to server.`);
                 document.querySelector("#renderProgress").innerText = `Welcome to SYNTHETIC Audio! Press the 'Help' button for the manual. (Connected as ${socket.id})`;
                 document.body.style.pointerEvents = "all";
+                loadingScreenModMenu.closeModMenu();
             });
         });
         document.body.appendChild(socketio);
@@ -485,11 +533,12 @@ addEventListener("init", async () => {
             if (!item.data) {
                 continue;
             }
+            logToLoader(`Loading sample: ${item.name}`);
             await importAudioFile(item.data);
         }
     }
     if (performance.measureUserAgentSpecificMemory) {
-        console.log("Startup completed, using ", (await performance.measureUserAgentSpecificMemory()).bytes / (1024**2), "MB of memory.");
+        console.log("Startup completed, using ", (await performance.measureUserAgentSpecificMemory()).bytes / (1024 ** 2), "MB of memory.");
     }
 });
 registerHelp("[data-helptarget=uhvcc]",
