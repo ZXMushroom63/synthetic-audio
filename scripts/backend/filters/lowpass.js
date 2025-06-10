@@ -1,4 +1,4 @@
-async function applyLowpassFilter(pcmData, sampleRate, threshold, falloff) {
+async function applyLowpassFilter(pcmData, sampleRate, threshold, falloff, overrideType) {
     falloff ||= ()=>1;
     const offlineContext = new OfflineAudioContext(1, pcmData.length, sampleRate);
 
@@ -11,7 +11,7 @@ async function applyLowpassFilter(pcmData, sampleRate, threshold, falloff) {
     var thresholdValue = threshold(0, pcmData);
 
     const bandpassFilter = offlineContext.createBiquadFilter();
-    bandpassFilter.type = 'lowpass';
+    bandpassFilter.type = overrideType || 'lowpass';
     bandpassFilter.frequency.value = thresholdValue;
     bandpassFilter.Q.value = falloff(0, pcmData);
 
