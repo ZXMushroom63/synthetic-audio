@@ -91,8 +91,9 @@ addEventListener("init", () => {
             note = note.substring(0, note.length - 1);
             return note;
         });
+
         text += accepted.join(", ");
-        gui._acceptedNotes = accepted;
+        gui.acceptedNotes = new Set(accepted);
 
         scaleDisp.innerText = text;
         var spp_text = "sp_loopdata::" + JSON.stringify([{
@@ -135,6 +136,7 @@ addEventListener("init", () => {
             navigator.clipboard.writeText(spp_demoscale);
         }
         findLoops(".loop:not([data-deleted])").forEach(updateLoopHighlight);
+        customEvent("theoryscaleupdated");
     }
     scales.addEventListener("input", () => {
         if (!multiplayer.isHooked && multiplayer.on) {
@@ -158,7 +160,7 @@ addEventListener("init", () => {
     });
     function updateLoopHighlight(loop) {
         if (!loop._netIngore && loop.theoryNote) {
-            if ((scaleAutocorrect.value === "OFF") || gui._acceptedNotes.includes(loop.theoryNote.substring(0, loop.theoryNote.length - 1))) {
+            if ((scaleAutocorrect.value === "OFF") || gui.acceptedNotes.has(loop.theoryNote.substring(0, loop.theoryNote.length - 1))) {
                 loop.removeAttribute("data-bad-note");
             } else {
                 loop.setAttribute("data-bad-note", "yes");

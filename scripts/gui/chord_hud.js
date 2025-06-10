@@ -174,7 +174,7 @@ function generateChordTable() {
                     root: root,
                     type: chordType,
                     inversion: inversion,
-                    notes: chordNotes.notes,
+                    notes: new Set(chordNotes.notes),
                     values: chordNotes.values
                 };
                 reverseChordLookup[chordName.trim()] = chordTable[key];
@@ -186,12 +186,21 @@ function generateChordTable() {
 
 const { chordDictionary, reverseChordLookup } = generateChordTable();
 
-function createDatalist() {
+Set.prototype.isSubsetOf ||= ()=>false; //quick polyfill
+
+function updateChordHudDatalist() {
+    if (document.querySelector("#chordDatalist")) {
+        document.querySelector("#chordDatalist").remove();
+    }
     const datalist = document.createElement("datalist");
     datalist.id = "chordDatalist";
     const possibilities = Object.keys(reverseChordLookup);
     possibilities.sort((a, b)=>a.length - b.length);
     for (const chordType of possibilities) {
+        if (gui.acceptedNotes && gui.autocorrect !== "OFF" && !reverseChordLookup[chordType].notes.isSubsetOf(gui.acceptedNotes)) {
+            continue;
+        }
+
         const opt = document.createElement("option");
         opt.value = chordType;
         datalist.appendChild(opt);
@@ -199,7 +208,7 @@ function createDatalist() {
     document.head.appendChild(datalist);
 }
 
-createDatalist();
+addEventListener("theoryscaleupdated", updateChordHudDatalist);
 
 function getChordTypeFromStack(loops) {
     loops = [...loops]; //shallow clone
