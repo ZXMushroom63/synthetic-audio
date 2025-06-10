@@ -326,9 +326,9 @@ function addBlock(type, start, duration, title, layer = 0, data = {}, editorValu
                 if (keymap["Shift"]) {
                     bpmInterval = 0.001;
                 }
-                pos = (Math.round((pos / 100 * audio.duration) / bpmInterval) * bpmInterval);
+                pos = quantise(pos / 100 * audio.duration, bpmInterval);
                 var newDuration = ((pos - originalStart) * 1) + originalDuration;
-                var endPos = Math.round((originalStart + newDuration) / bpmInterval) * bpmInterval;
+                var endPos = quantise(originalStart + newDuration, bpmInterval);
 
                 newDuration = endPos - originalStart;
                 var internalWidth = newDuration * gui.zoomConstant;
@@ -350,9 +350,17 @@ function addBlock(type, start, duration, title, layer = 0, data = {}, editorValu
                 if (keymap["Shift"]) {
                     bpmInterval = 0.001;
                 }
-                pos = (Math.round(Math.min(pos / 100 * audio.duration, originalStart + originalDuration) / bpmInterval) * bpmInterval) / audio.duration * 100;
+
+                pos = quantise(
+                    Math.min(
+                        pos / 100 * audio.duration,
+                        originalStart + originalDuration
+                    ),
+                    bpmInterval
+                ) / audio.duration * 100;
+
                 loop.style.left = pos + "%";
-                pos = Math.round(pos / 100 * audio.duration / bpmInterval) * bpmInterval;
+                pos = quantise(pos / 100 * audio.duration, bpmInterval);
                 loop.setAttribute("data-start", pos);
                 var newDuration = Math.max(((originalStart - pos) * 1) + originalDuration, 0);
                 var internalWidth = newDuration * gui.zoomConstant;
@@ -474,9 +482,9 @@ function addBlock(type, start, duration, title, layer = 0, data = {}, editorValu
                     bpmInterval = 0.001;
                 }
                 if (!loop.horizontalBlocked) {
-                    pos = (Math.round(pos / 100 * audio.duration / bpmInterval) * bpmInterval) / audio.duration * 100;
+                    pos = quantise(pos / 100 * audio.duration, bpmInterval) / audio.duration * 100;
                     loop.style.left = pos + "%";
-                    pos = Math.round(pos / 100 * audio.duration / bpmInterval) * bpmInterval;
+                    pos = quantise(pos / 100 * audio.duration, bpmInterval);
                     loop.setAttribute("data-start", pos);
                 }
                 if (!loop.verticalBlocked) {

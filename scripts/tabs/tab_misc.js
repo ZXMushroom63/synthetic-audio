@@ -256,7 +256,7 @@ addEventListener("init", () => {
             if (!midiSnappingEnabled) {
                 bpmInterval = 0.01;
             }
-            ser.start = Math.round(ser.start / bpmInterval) * bpmInterval;
+            ser.start = quantise(ser.start, bpmInterval);
             ser.duration = 0.01;
             insertionBaseLayer = ser.layer;
 
@@ -274,7 +274,7 @@ addEventListener("init", () => {
             if (!midiSnappingEnabled) {
                 bpmInterval = 0.01;
             }
-            ser.start = Math.round(ser.start / bpmInterval) * bpmInterval;
+            ser.start = quantise(ser.start, bpmInterval);
             ser.layer = insertionBaseLayer + concurrentNotes;
             ser.duration = 0.01;
             lastInsertionTime = Date.now();
@@ -298,7 +298,7 @@ addEventListener("init", () => {
         if (!midiSnappingEnabled) {
             bpmInterval = 0.01;
         }
-        len = (Math.round(len / bpmInterval) * bpmInterval) || (audio.beatSize / gui.substepping);
+        len = quantise(len, bpmInterval) || (audio.beatSize / gui.substepping);
         noteMap[note].setAttribute("data-duration", len);
         hydrateLoopPosition(noteMap[note]);
         hydrateLoopDecoration(noteMap[note]);
