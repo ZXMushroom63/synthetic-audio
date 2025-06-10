@@ -279,6 +279,9 @@ function chordDisplayEdit(display, e, loop) {
         return e.stopPropagation();
     }
     if (e.ctrlKey || e.metaKey || e.altKey || e.repeat) {
+        if (e.ctrlKey && e.key === "a") {
+            return; //Ctrl + A is a G
+        }
         return e.preventDefault();
     }
     if (e.key === "Enter") {
