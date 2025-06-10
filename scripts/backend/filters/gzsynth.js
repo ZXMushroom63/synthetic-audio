@@ -7,6 +7,7 @@
         directRefs: ["gz"],
         configs: {
             "Note": [":A4:", "number", 1],
+            "Clipping": [true, "checkbox"],
         },
         dropdowns: {},
         functor: async function (inPcm, channel, data) {
@@ -41,17 +42,20 @@
             const self = this;
             function getThreshold(i, inPcm) {
                 return self.conf.FilterFrequency
-                 * findADSR(
+                 * Math.log2(1+findADSR(
                     [self.conf.FilterAttackSeconds, self.conf.FilterAttackExp],
                     [self.conf.FilterDecaySeconds, self.conf.FilterDecayExp],
                     self.conf.FilterSustainLevel,
                     [self.conf.FilterReleaseSeconds, self.conf.FilterReleaseExp],
                     i / audio.samplerate,
                     inPcm.length / audio.samplerate
-                );
+                ));
             }
             const lop = await applyLowpassFilter(out, audio.samplerate, getThreshold, _(this.conf.FilterResonance), this.conf.FilterType);
             lop.map((x, i) => {
+                if (this.conf.Clipping) {
+                    lop[i] = Math.max(Math.min(x, 1), -1);
+                }
                 lop[i] += inPcm[i];
             });
             return lop;
@@ -95,18 +99,27 @@
         gzsynth.dropdowns[`${prefix}ADSR`] =
             ["AttackSeconds", "AttackExp", "DecaySeconds", "DecayExp", "SustainLevel", "ReleaseSeconds", "ReleaseExp"].map(x => prefix + x);
     }
+    
     function findADSR(a, d, s, r, time, len) {
+        a[0] = Math.min(a[0], len);
+        d[0] = Math.min(d[0], len);
+        r[0] = Math.min(r[0], len);
+        var ret = 1;
+        if (time > (d[0] + a[0]) && time <= (len - r[0])) {
+            ret = s;
+        }
         if (time <= a[0]) {
-            return Math.pow(time / a[0], a[1]);
+            ret *= (Math.pow(time / a[0], a[1]) || 1);
         }
         if (time > a[0] && time <= (d[0] + a[0])) {
-            return lerp(1, s, Math.pow((time - a[0]) / d[0], d[1]));
+            ret = lerp(1, s, Math.pow((time - a[0]) / d[0], 1/d[1])) || s;
         }
         if (time > (len - r[0])) {
-            return Math.pow(((len - time) / r[0]), r[1]) * s;
+            ret *= Math.pow(((len - time) / r[0]), r[1]) * s || 0;
         }
-        return s;
+        return ret;
     }
+
     createADSR("");
     for (let i = 0; i < gz_synth_voicecount; i++) {
         gzsynth.configs[`Voice${i + 1}Drive`] = [i === 0 ? 1 : 0, "number", 1];
