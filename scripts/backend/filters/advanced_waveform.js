@@ -101,6 +101,11 @@ addBlockType("p_waveform_plus", {
         addChordDisplay(loop);
     },
     pitchZscroller: true,
+    midiMappings: {
+        note: "Frequency",
+        velocity: "Amplitude",
+        zero: ["InternalSemiOffset", "SemitonesOffset"]
+    },
     zscroll: (loop, value) => {
         loop.conf.InternalSemiOffset += value;
 

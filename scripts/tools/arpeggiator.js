@@ -138,19 +138,8 @@ addEventListener("init", () => {
         if (moddedChord.length === preset.diversity) {
             return loopedNotes.map(scoreNote => {
                 const conf = structuredClone(template.conf);
-                const note = moddedChord[scoreNote.identifier].theoryNote;
-                if (conf.Frequency) {
-                    conf.Frequency = ":" + note + ":";
-                }
-                if (conf.SemitonesOffset) {
-                    conf.SemitonesOffset = "0";
-                }
-                if (conf.InternalSemiOffset) {
-                    conf.InternalSemiOffset = 0;
-                }
-                if (conf.Note) {
-                    conf.Note = ":" + note + ":";
-                }
+                const note = ":" + moddedChord[scoreNote.identifier].theoryNote + ":";
+                filters[template.type].applyMidi({ conf: conf }, note);
                 conf.noSync = nosync;
                 const b = addBlock(template.type, moddedChord[0].start + scoreNote.beatsStart * audio.beatSize, scoreNote.beatsDuration * audio.beatSize, note + " | " + arpeggiatorPattern, lowestLayer + scoreNote.concurrentNotes, conf, chord[0].editorLayer, false);
                 hydrateLoopPosition(b);
@@ -159,19 +148,8 @@ addEventListener("init", () => {
         } else {
             return loopedNotes.map(scoreNote => {
                 const conf = structuredClone(template.conf);
-                const note = frequencyToNote(moddedChord[0].hitFrequency * Math.pow(2, scoreNote.semis / 12));
-                if (conf.Frequency) {
-                    conf.Frequency = ":" + note + ":";
-                }
-                if (conf.SemitonesOffset) {
-                    conf.SemitonesOffset = "0";
-                }
-                if (conf.InternalSemiOffset) {
-                    conf.InternalSemiOffset = 0;
-                }
-                if (conf.Note) {
-                    conf.Note = ":" + note + ":";
-                }
+                const note = ":" + frequencyToNote(moddedChord[0].hitFrequency * Math.pow(2, scoreNote.semis / 12)) + ":";
+                filters[template.type].applyMidi({ conf: conf }, note);
                 conf.noSync = nosync;
                 const b = addBlock(template.type, moddedChord[0].start + scoreNote.beatsStart * audio.beatSize, scoreNote.beatsDuration * audio.beatSize, note + " | " + arpeggiatorPattern, lowestLayer + scoreNote.concurrentNotes, conf, chord[0].editorLayer, false);
                 hydrateLoopPosition(b);

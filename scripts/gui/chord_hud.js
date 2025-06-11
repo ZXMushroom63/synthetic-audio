@@ -316,18 +316,7 @@ function chordDisplayEdit(display, e, loop) {
             const dt = structuredClone(template);
             var freq = `:${indexToChromatic(octaveOffset + v)}:`;
             dt.layer += i;
-            if (dt.conf.SemitonesOffset) {
-                dt.conf.SemitonesOffset = 0;
-            }
-            if (dt.conf.InternalSemiOffset) {
-                dt.conf.InternalSemiOffset = 0;
-            }
-            if (dt.conf.Note) {
-                dt.conf.Note = freq;
-            }
-            if (dt.conf.Frequency) {
-                dt.conf.Frequency = freq;
-            }
+            filters[template.type].applyMidi(dt, freq);
             const newLoop = deserialiseNode(dt, true);
             hydrateLoopPosition(newLoop);
         });

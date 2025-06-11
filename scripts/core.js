@@ -215,6 +215,21 @@ function addBlockType(id, data) {
     (data.directRefs || []).forEach(x => {
         directRefs[x] = id;
     });
+    if (data.midiMappings) {
+        data.applyMidi = function (loop, note, vel) {
+            let calculatedNote = note;
+            if (typeof calculatedNote === "number") {
+                note = ":" + indexToChromatic(note - 12) + ":";
+            }
+            loop.conf[data.midiMappings.note] = calculatedNote;
+            if (typeof vel === "number") {
+                loop.conf[data.midiMappings.velocity] = vel;
+            }
+            data.midiMappings.zero.forEach(zeroedProp => {
+                loop.conf[zeroedProp] = 0;
+            });
+        }
+    }
     filters[id] = data;
 }
 function wait(s) {

@@ -44,22 +44,22 @@
             const self = this;
             function getThreshold(i, inPcm) {
                 return self.conf.FilterFrequency
-                 * Math.log2(1+findADSR(
-                    [self.conf.FilterAttackSeconds, self.conf.FilterAttackExp],
-                    [self.conf.FilterDecaySeconds, self.conf.FilterDecayExp],
-                    self.conf.FilterSustainLevel,
-                    [self.conf.FilterReleaseSeconds, self.conf.FilterReleaseExp],
-                    i / audio.samplerate,
-                    inPcm.length / audio.samplerate
-                ));
+                    * Math.log2(1 + findADSR(
+                        [self.conf.FilterAttackSeconds, self.conf.FilterAttackExp],
+                        [self.conf.FilterDecaySeconds, self.conf.FilterDecayExp],
+                        self.conf.FilterSustainLevel,
+                        [self.conf.FilterReleaseSeconds, self.conf.FilterReleaseExp],
+                        i / audio.samplerate,
+                        inPcm.length / audio.samplerate
+                    ));
             }
             let res = null;
             if (this.conf.Filter) {
                 res = await applyLowpassFilter(out, audio.samplerate, getThreshold, _(this.conf.FilterResonance), this.conf.FilterType);
-            } else{
+            } else {
                 res = out;
             }
-            
+
             res.map((x, i) => {
                 if (this.conf.Clipping) {
                     res[i] = Math.max(Math.min(x, 1), -1);
@@ -76,6 +76,12 @@
         updateMiddleware: (loop) => {
             updateNoteDisplay(loop);
         },
+        midiMappings: {
+            note: "Note",
+            velocity: "Volume",
+            zero: []
+        },
+        pitchZscroller: true,
         zscroll: (loop, value) => {
             loop.conf.Note = ":" + frequencyToNote(_(loop.conf.Note)(0, new Float32Array(1)) * Math.pow(2, value / 12)) + ":";
             updateNoteDisplay(loop);
@@ -108,7 +114,7 @@
         gzsynth.dropdowns[`${prefix}ADSR`] =
             ["AttackSeconds", "AttackExp", "DecaySeconds", "DecayExp", "SustainLevel", "ReleaseSeconds", "ReleaseExp"].map(x => prefix + x);
     }
-    
+
     function findADSR(a, d, s, r, time, len) {
         a[0] = Math.min(a[0], len);
         d[0] = Math.min(d[0], len);
@@ -122,7 +128,7 @@
             ret *= isNaN(val) ? 1 : val;
         }
         if (time > a[0] && time <= (d[0] + a[0])) {
-            ret = lerp(1, s, Math.pow((time - a[0]) / d[0], 1/d[1])) || s;
+            ret = lerp(1, s, Math.pow((time - a[0]) / d[0], 1 / d[1])) || s;
         }
         if (time > (len - r[0])) {
             ret *= Math.pow(((len - time) / r[0]), r[1]) * s || 0;

@@ -29,6 +29,11 @@ addBlockType("instrument", {
         addChordDisplay(loop);
     },
     pitchZscroller: true,
+    midiMappings: {
+        note: "Note",
+        velocity: "Volume",
+        zero: []
+    },
     zscroll: (loop, value) => {
         loop.conf.Note = ":" + frequencyToNote(_(loop.conf.Note)(0, new Float32Array(1)) * Math.pow(2, value / 12)) + ":";
         updateNoteDisplay(loop);
@@ -48,7 +53,7 @@ addBlockType("instrument", {
             var audio = new Audio(SFREGISTRY[this.conf.Instrument][note]);
             audio.volume = 1;
             audio.play();
-            audio.addEventListener("timeupdate", ()=>{
+            audio.addEventListener("timeupdate", () => {
                 if (audio.currentTime > 1) {
                     audio.src = "";
                 }
