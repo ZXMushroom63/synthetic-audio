@@ -27,6 +27,10 @@ function hydrateTimePosMarker(unused, isAnimated) {
     }
 }
 addEventListener("hydrate", hydrateTimePosMarker);
+addEventListener("deserialise", ()=>{
+    gui.marker = 0;
+    hydrateTimePosMarker();
+});
 addEventListener("init", () => {
     const renderOut = document.querySelector("#renderOut");
     document.querySelector(".timePosMarker").addEventListener("mousedown", (e) => {
