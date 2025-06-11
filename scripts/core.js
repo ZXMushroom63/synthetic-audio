@@ -323,6 +323,16 @@ function usesDirtyAssets(assetMap, serialisedNode) {
         return acc || v;
     });
 }
+function doNodesIntersect(x, dirtyNode) {
+    return (x.start >= dirtyNode.start &&
+        x.start < dirtyNode.end) ||
+
+        (x.end > dirtyNode.start &&
+            x.end <= dirtyNode.end) ||
+
+        (x.end > dirtyNode.start &&
+            x.start < dirtyNode.end)
+}
 function constructRenderDataArray(data) {
     data.nodes.sort((a, b) => a.layer - b.layer);
     var usedEditorLayers = [...new Set(data.nodes.flatMap(x => { return x.editorLayer }))].sort((a, b) => { return a - b });
@@ -339,11 +349,12 @@ function constructRenderDataArray(data) {
         const abstractLayerMap = constructAbstractLayerMapsForLevel(nodesForLevel, usedLayers);
         abstractLayerMap.editorOnly = editorOnlyFlag;
         abstractLayerMap.layerId = editorLayer;
+        abstractLayerMap.needsUpdating = false;
         renderDataArray.push(abstractLayerMap);
     });
     var assetMap = {};
     renderDataArray.forEach(editorLayer => {
-        var dirtyNodes = editorLayer.flat().filter(x => x.dirty);
+        var dirtyNodes = editorLayer.flat().filter(x => x.dirty)
         dirtyNodes.forEach(x => {
             if (x.type === "p_writeasset") {
                 assetMap[x.conf.Asset] = true;
@@ -362,8 +373,10 @@ function constructRenderDataArray(data) {
             end: -2,
             layer: 9999
         });
+
         for (let layer = 0; layer < editorLayer.length; layer++) {
             const nodes = editorLayer[layer];
+
             nodes.forEach(x => {
                 if (x.dirty) {
                     if (x.type === "p_writeasset") {
@@ -377,15 +390,7 @@ function constructRenderDataArray(data) {
                     if (
                         (!dirtyNodes.includes(x)) &&
                         (((
-                            (x.start >= dirtyNode.start &&
-                                x.start < dirtyNode.end) ||
-
-                            (x.end > dirtyNode.start &&
-                                x.end <= dirtyNode.end) ||
-
-                            (x.end > dirtyNode.start &&
-                                x.start < dirtyNode.end)
-
+                            doNodesIntersect(x, dirtyNode)
                         ) && (x.layer > dirtyNode.layer)) || (assetUserTypes.includes(x.type) && usesDirtyAssets(assetMap, x)))
                     ) {
                         x.dirty = true;
@@ -401,10 +406,35 @@ function constructRenderDataArray(data) {
                     }
                 }
             });
-            dirtyNodes.forEach((x) => {
-                delete layerCache[x.editorLayer];
-            });
         }
+
+        editorLayer.forEach((layer, i) => editorLayer[i] = layer.filter(node => { //only process nodes that have horizontal intersection with a dirty node
+            for (let j = 0; j < dirtyNodes.length; j++) {
+                const dirtyNode = dirtyNodes[j];
+                if (doNodesIntersect(node, dirtyNode)) {
+                    return true;
+                }
+            }
+            return false;
+        }));
+
+        dirtyNodes.forEach((x) => {
+            if (!("editorLayer" in x)) { //ghost node
+                return;
+            }
+            editorLayer.needsUpdating = true;
+            if (layerCache[editorLayer.layerId]) {
+                // clear segments with content that needs to be updated
+                layerCache[editorLayer.layerId].forEach(pcm => {
+                    if (!pcm) {
+                        return;
+                    }
+                    pcm.set(
+                        new Float32Array(Math.floor(x.duration * audio.samplerate)), Math.floor(x.start * audio.samplerate)
+                    );
+                });
+            }
+        });
     });
     return renderDataArray;
 }
@@ -429,22 +459,27 @@ async function render() {
     await decodeUsedAudioFiles(ax);
     await decodeUsedSoundFonts(ax);
 
+    startTiming("data_construction");
     var renderDataArray = constructRenderDataArray(data);
+    stopTiming("data_construction");
+
     document.querySelector("#renderProgress").innerText = "Processing layers...";
     var success = true;
-    var proccessedNodeCount = 0;
+    var calculatedNodeCount = 0;
+    var processedNodeCount = 0;
     try {
         for (let c = 0; c < channels; c++) {
             var channelPcms = [];
             for (let q = 0; q < renderDataArray.length; q++) {
-                var initialPcm = new Float32Array(audio.length).fill(0);
                 const abstractLayerMaps = renderDataArray[q];
-                if (!layerCache[abstractLayerMaps.layerId] || !layerCache[abstractLayerMaps.layerId][c] || layerCache[abstractLayerMaps.layerId][c].length !== audio.length) {
-                    console.log(`Recalculating layer ${abstractLayerMaps.layerId}`);
+                var initialPcm = layerCache[abstractLayerMaps.layerId]?.[c] || new Float32Array(audio.length);
+
+                if (abstractLayerMaps.needsUpdating || !layerCache[abstractLayerMaps.layerId] || !layerCache[abstractLayerMaps.layerId][c] || layerCache[abstractLayerMaps.layerId][c].length !== audio.length) {
                     for (let l = 0; l < abstractLayerMaps.length; l++) {
                         const layer = abstractLayerMaps[l];
                         for (let n = 0; n < layer.length; n++) {
                             const node = layer[n];
+                            processedNodeCount++;
 
                             if (node.deleted) {
                                 continue;
@@ -460,7 +495,7 @@ async function render() {
                                 node.ref.startOld = node.start;
                                 node.ref.layerOld = node.layer;
                                 node.ref.endOld = node.end;
-                                proccessedNodeCount++;
+                                calculatedNodeCount++;
                             }
 
                             var startTime = Math.floor(node.start * audio.samplerate);
@@ -502,7 +537,9 @@ async function render() {
         console.log(error);
         success = false;
     }
-    document.querySelector("#renderProgress").innerText = success ? "Render successful! (" + proccessedNodeCount + " in " + renderTime.toFixed(1) + "s)" : "Render failed.";
+    document.querySelector("#renderProgress").innerText = success
+        ? `Render successful! (${renderTime.toFixed(2)}s, ${calculatedNodeCount} calculated, ${processedNodeCount} processed)`
+        : "Render failed.";
     if (success) {
         document.querySelector("#renderOut").src = URL.createObjectURL(blob);
     }
