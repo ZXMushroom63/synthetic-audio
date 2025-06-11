@@ -158,7 +158,7 @@ function getInversionNotes(rootIndex, formula, inversion) {
 function generateChordTable() {
     const chordTable = {};
     const reverseChordLookup = {};
-
+    const uninvertedChords = {};
     for (const chordType of chordFormulas.keys()) {
         const formula = chordFormulas.get(chordType);
         for (let rootIndex = 0; rootIndex < chromaticScale.length; rootIndex++) {
@@ -168,8 +168,7 @@ function generateChordTable() {
                 const chordNotes = getInversionNotes(rootIndex, formula, inversion);
                 const key = chordNotes.notes.join(",");
                 const chordName = root + chordType + (inversionNames[inversion] ?? ` (${inversion + 1}th inv)`);
-                
-                chordTable[key] = {
+                const result = {
                     display: chordName,
                     root: root,
                     type: chordType,
@@ -177,10 +176,16 @@ function generateChordTable() {
                     notes: new Set(chordNotes.notes),
                     values: chordNotes.values
                 };
+                if (inversion === 0) {
+                    uninvertedChords[key] = result;
+                } else {
+                    chordTable[key] = result;
+                }
                 reverseChordLookup[chordName.trim()] = chordTable[key];
             }
         }
     }
+    Object.assign(chordTable, uninvertedChords);
     return { chordDictionary: chordTable, reverseChordLookup: reverseChordLookup };
 }
 
