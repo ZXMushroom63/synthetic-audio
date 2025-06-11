@@ -58,7 +58,7 @@ addBlockType("reverb", {
 
         //Additive mixing
         inPcm.forEach((x, i)=>{
-            inPcm[i] += reverb[i + Math.floor(offset(i, inPcm) * audio.samplerate)];
+            inPcm[i] += reverb[i - Math.floor(offset(i, inPcm) * audio.samplerate)] || 0;
         });
         return inPcm;
     }
