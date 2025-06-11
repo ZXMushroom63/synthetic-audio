@@ -2,7 +2,7 @@
     const gz_synth_voicecount = 4;
     const gzsynth = {
         color: "rgba(0, 255, 255, 0.3)",
-        title: "gzSynth",
+        title: "GzSynth",
         amplitude_smoothing_knob: true,
         directRefs: ["gz"],
         configs: {
@@ -26,7 +26,7 @@
             const totalVol = _(this.conf.Volume);
 
             out.forEach((x, i) => {
-                const adsr = this.configs.EnvelopeEnabled ? findADSR(
+                const adsr = this.conf.EnvelopeEnabled ? findADSR(
                     [this.conf.AttackSeconds, this.conf.AttackExp],
                     [this.conf.DecaySeconds, this.conf.DecayExp],
                     this.conf.SustainLevel,
