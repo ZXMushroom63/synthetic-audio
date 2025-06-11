@@ -3,7 +3,10 @@ addEventListener("init", () => {
     registerTool("Synth Conv", (nodes) => {
         if (!nodes) { return };
 
-        const valid_types = ["p_waveform_plus", "instrument"];
+        const valid_types = Object.entries(filters)
+            .filter(ent => ent[1].pitchZscroller)
+            .map(x => x[0]);
+
         var foundValidType = false;
         for (let i = 0; i < nodes.length; i++) {
             const loop = nodes[i];
@@ -13,52 +16,35 @@ addEventListener("init", () => {
             }
         }
         if (!foundValidType) { return }
-        const defaultInstrument = Object.keys(SFREGISTRY)[0];
+
+        var targetIdx = parseInt(prompt(`Select conversion target: ${valid_types.map((x, i) => "\n" + (i + 1) + " - " + filters[x].title).join("")}`, "1")) - 1;
+        if (!valid_types[targetIdx]) {
+            return;
+        }
+        const targetType = valid_types[targetIdx];
+        const targetDef = filters[targetType];
 
         offload("#trackInternal");
 
-        var mode = parseInt(prompt("Select mode: \n1 - Synth to Instrument\n2 - Instrument to Synth", "1"));
-        if (mode === 1) {
-            nodes.map(node => {
-                if (node.getAttribute("data-type") !== "p_waveform_plus") {
-                    return;
-                }
-                deleteLoop(node);
-                return addBlock("instrument",
-                    parseFloat(node.getAttribute("data-start")),
-                    parseFloat(node.getAttribute("data-duration")),
-                    node.getAttribute("data-file"),
-                    parseInt(node.getAttribute("data-layer")),
-                    {
-                        Note: ":" + node.theoryNote + ":",
-                        Volume: parseFloat(node.conf.Amplitude) || 1,
-                        AmplitudeSmoothing: parseFloat(node.conf.AmplitudeSmoothing) || 0,
-                        Instrument: defaultInstrument || "(none)",
-                        FadeTime: 0.1
-                    },
-                    parseInt(node.getAttribute("data-editlayer")),
-                );
-            }).forEach(hydrateLoopPosition);
-        } else if (mode === 2) {
-            nodes.map(node => {
-                if (node.getAttribute("data-type") !== "instrument") {
-                    return;
-                }
-                deleteLoop(node);
-                return addBlock("p_waveform_plus",
-                    parseFloat(node.getAttribute("data-start")),
-                    parseFloat(node.getAttribute("data-duration")),
-                    node.getAttribute("data-file"),
-                    parseInt(node.getAttribute("data-layer")),
-                    {
-                        Frequency: ":" + node.theoryNote + ":",
-                        Amplitude: parseFloat(node.conf.Volume) || 1,
-                        AmplitudeSmoothing: parseFloat(node.conf.AmplitudeSmoothing) || 0
-                    },
-                    parseInt(node.getAttribute("data-editlayer")),
-                );
-            }).forEach(hydrateLoopPosition);
-        }
+        nodes.map(node => {
+            if (!valid_types.includes(node.getAttribute("data-type"))) {
+                return;
+            }
+            deleteLoop(node);
+            const referenceDef = filters[node.getAttribute("data-type")];
+            const cout = {};
+            targetDef.applyMidi({ conf: cout }, node.conf[referenceDef.midiMappings.note], node.conf[referenceDef.midiMappings.velocity]);
+
+            return addBlock(targetType,
+                parseFloat(node.getAttribute("data-start")),
+                parseFloat(node.getAttribute("data-duration")),
+                node.getAttribute("data-file"),
+                parseInt(node.getAttribute("data-layer")),
+                cout,
+                parseInt(node.getAttribute("data-editlayer")),
+            );
+        }).forEach(hydrateLoopPosition);
+
         reflow("#trackInternal");
     });
 });
