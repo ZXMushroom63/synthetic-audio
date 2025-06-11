@@ -73,7 +73,8 @@ function multiplayer_support(server, debugMode) {
                 localState.nodes.splice(localState.nodes.indexOf(target), 1);
                 localState.nodes.push(loop);
             } else {
-                console.log("Failed to process 'patch_loop' on uuid: " + loop.conf.uuid);
+                // either an error occurred, or we are processing a patch_loop event for a deleted loop
+                // since the latter is very common, no logs thrown here
             }
             socket.broadcast.emit("patch_loop", data);
             debugWriteState();
