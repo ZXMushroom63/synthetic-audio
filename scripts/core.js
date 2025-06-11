@@ -419,9 +419,6 @@ function constructRenderDataArray(data) {
         }));
 
         dirtyNodes.forEach((x) => {
-            if (!("editorLayer" in x)) { //ghost node
-                return;
-            }
             editorLayer.needsUpdating = true;
             if (layerCache[editorLayer.layerId]) {
                 // clear segments with content that needs to be updated
