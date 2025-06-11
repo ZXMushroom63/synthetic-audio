@@ -280,8 +280,9 @@ function chordProcess(loop, chordArray) {
 }
 
 function chordDisplayEdit(display, e, loop) {
+    e.stopPropagation();
     if (!e.key) {
-        return e.stopPropagation();
+        return;
     }
     if (e.ctrlKey || e.metaKey || e.altKey || e.repeat) {
         if (e.ctrlKey && e.key === "a") {
