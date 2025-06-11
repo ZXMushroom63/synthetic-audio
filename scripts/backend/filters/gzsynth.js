@@ -9,6 +9,7 @@
             "Note": [":A4:", "number", 1],
             "Clipping": [true, "checkbox"],
             "Volume": [1, "number", 1],
+            "Decay": [0, "number"],
         },
         dropdowns: {},
         functor: async function (inPcm, channel, data) {
@@ -25,20 +26,21 @@
             const totalVol = _(this.conf.Volume);
 
             out.forEach((x, i) => {
-                const adsr = findADSR(
+                const adsr = this.configs.EnvelopeEnabled ? findADSR(
                     [this.conf.AttackSeconds, this.conf.AttackExp],
                     [this.conf.DecaySeconds, this.conf.DecayExp],
                     this.conf.SustainLevel,
                     [this.conf.ReleaseSeconds, this.conf.ReleaseExp],
                     i / audio.samplerate,
                     inPcm.length / audio.samplerate
-                );
+                ) : 1;
+                const decay = Math.exp(-this.conf.Decay * (i / audio.samplerate));
                 const freq = note(i, inPcm);
                 for (let v = 0; v < gz_synth_voicecount; v++) {
                     const driveLFO = pconfs[`Voice${v + 1}Drive`];
                     const semiLFO = pconfs[`Voice${v + 1}SemiOffset`];
                     time[v] += dt * freq * Math.pow(2, semiLFO(i, inPcm) / 12);
-                    out[i] += waveforms[this.conf[`Voice${v + 1}WaveType`]](time[v]) * driveLFO(i, inPcm) * adsr;
+                    out[i] += waveforms[this.conf[`Voice${v + 1}WaveType`]](time[v]) * driveLFO(i, inPcm) * adsr * decay;
                 }
             });
             const self = this;
@@ -136,7 +138,9 @@
         return ret;
     }
 
+    gzsynth.configs.EnvelopeEnabled = [false, "checkbox"];
     createADSR("");
+    gzsynth.dropdowns["ADSR"].unshift("EnvelopeEnabled");
     for (let i = 0; i < gz_synth_voicecount; i++) {
         gzsynth.configs[`Voice${i + 1}Drive`] = [i === 0 ? 1 : 0, "number", 1];
         gzsynth.configs[`Voice${i + 1}WaveType`] = ["sin", ["sin", "triangle", "sawtooth", "square"]];
