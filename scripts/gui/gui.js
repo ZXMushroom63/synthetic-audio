@@ -152,7 +152,7 @@ function hydrateLoopDecoration(loop) {
         }
     }
     var loopInternal = loop.querySelector(".loopInternal");
-
+    loopInternal.style.backgroundColor = def.getColorDynamic ? def.getColorDynamic(loop) : def.color;
     if (!trueDuration) {
         return;
     }
