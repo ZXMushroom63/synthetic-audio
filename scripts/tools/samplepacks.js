@@ -93,6 +93,9 @@ addEventListener("init", () => {
 
             const img = document.createElement("img");
             img.src = SAMPLEPACK_LOGOMAP[id.replace("/", "")];
+            if (img.src.startsWith("public/")) {
+                img.style.imageRendering = "pixelated";
+            }
             span.appendChild(img);
 
             span.appendChild(document.createElement("br"));

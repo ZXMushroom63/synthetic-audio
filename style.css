@@ -942,7 +942,6 @@ code:hover {
 .samplepack img {
   width: 4rem;
   height: 4rem;
-  image-rendering: pixelated;
   -webkit-user-drag: none;
 }
 
