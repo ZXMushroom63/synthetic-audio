@@ -427,16 +427,17 @@ function constructRenderDataArray(data) {
                     if (!pcm) {
                         return;
                     }
+
                     const startIndex = Math.floor(x.start * audio.samplerate);
 
                     if (startIndex < 0) {
                         return;
                     }
 
-                    const durationSamples = Math.floor(x.duration * audio.samplerate);
+                    const durationSamples = Math.floor(x.duration * audio.samplerate) + 1; //'+1' = TypedArray.set being a pain
                     const endIndex = durationSamples + startIndex;
                     const clippedDuration = Math.min(endIndex, pcm.length) - startIndex;
-                    
+
                     pcm.set(
                         new Float32Array(clippedDuration),
                         startIndex
