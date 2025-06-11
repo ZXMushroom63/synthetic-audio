@@ -8,6 +8,7 @@
         configs: {
             "Note": [":A4:", "number", 1],
             "Clipping": [true, "checkbox"],
+            "Volume": [1, "number", 1],
         },
         dropdowns: {},
         functor: async function (inPcm, channel, data) {
@@ -21,6 +22,7 @@
             const time = (new Array(4)).fill(0);
             const dt = 1 / audio.samplerate;
             const note = _(this.conf.Note);
+            const totalVol = _(this.conf.Volume);
 
             out.forEach((x, i) => {
                 const adsr = findADSR(
@@ -62,6 +64,7 @@
                 if (this.conf.Clipping) {
                     res[i] = Math.max(Math.min(x, 1), -1);
                 }
+                res[i] *= totalVol(i, res);
                 res[i] += inPcm[i];
             });
             return res;
