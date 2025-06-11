@@ -162,6 +162,10 @@ h4 {
   opacity: 0.15;
 }
 
+html[data-libsettings-OpaqueLayers="true"] .loop.deactivated {
+  display: none;
+}
+
 .loopInternal {
   user-select: none;
   overflow-x: hidden;

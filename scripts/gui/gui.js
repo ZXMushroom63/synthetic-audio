@@ -121,6 +121,7 @@ function hydrateBeatMarkers() {
         track.appendChild(marker);
     }
 }
+
 registerSetting("LoopWaveformDisplays", true);
 function hydrateLoopDecoration(loop) {
     if (loop.updateSuppression) {
@@ -207,6 +208,7 @@ function hydrateZoom(lean) {
     });
     reflow("#trackInternal");
 }
+
 registerSetting("LoopWaveformDisplayDownsampling", 256);
 function hydrateLoopBackground(elem) {
     if (!settings.LoopWaveformDisplays) {
@@ -238,6 +240,8 @@ function hydrateLoopBackground(elem) {
     d = d.replaceAll(".0 ", " ");
     line.setAttributeNS(null, "d", d);
 }
+
+registerSetting("OpaqueLayers", false);
 function hydrateLoopSpecificLayer(elem) {
     if (elem.noEditorLayer || (parseInt(elem.getAttribute("data-editlayer")) === gui.layer) || (gui.layer === 10)) {
         elem.classList.remove("deactivated");
