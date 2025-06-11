@@ -302,7 +302,7 @@ function chordDisplayEdit(display, e, loop) {
     if (!lookupValue) {
         return;
     }
-    lookupValue[0] = lookupValue[0].toUpperCase();
+    lookupValue = lookupValue[0].toUpperCase() + lookupValue.substring(1);
     if (e.key === "Enter" && loop.relatedChord && reverseChordLookup[lookupValue]) {
         const chord = reverseChordLookup[lookupValue];
         const octaveOffset = 12 * (Math.min(...loop.relatedChord.map(x => getChromaticOctave(x.theoryNote))));
