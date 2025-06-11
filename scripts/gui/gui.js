@@ -287,7 +287,10 @@ function addBlock(type, start, duration, title, layer = 0, data = {}, editorValu
             return;
         }
         var isRight = e.target.classList.contains("handleRight");
-        if (!loop.noEditorLayer && (parseInt(loop.getAttribute("data-editlayer")) !== gui.layer)) {
+        if (
+            (!loop.noEditorLayer && (parseInt(loop.getAttribute("data-editlayer")) !== gui.layer))
+            || loop.classList.contains("active")
+        ) {
             return;
         }
 
