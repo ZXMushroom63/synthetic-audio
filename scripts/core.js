@@ -364,6 +364,7 @@ function constructRenderDataArray(data) {
                     type: "ghost",
                     start: x.ref.startOld,
                     end: x.ref.endOld,
+                    duration: x.ref.durationOld,
                     layer: x.ref.layerOld,
                 });
             }
@@ -426,8 +427,19 @@ function constructRenderDataArray(data) {
                     if (!pcm) {
                         return;
                     }
+                    const startIndex = Math.floor(x.start * audio.samplerate);
+
+                    if (startIndex < 0) {
+                        return;
+                    }
+
+                    const durationSamples = Math.floor(x.duration * audio.samplerate);
+                    const endIndex = durationSamples + startIndex;
+                    const clippedDuration = Math.min(endIndex, pcm.length) - startIndex;
+                    
                     pcm.set(
-                        new Float32Array(Math.floor(x.duration * audio.samplerate)), Math.floor(x.start * audio.samplerate)
+                        new Float32Array(clippedDuration),
+                        startIndex
                     );
                 });
             }
@@ -490,6 +502,7 @@ async function render() {
                                 node.ref.removeAttribute("data-wasMovedSinceRender");
                                 node.ref.cache = [null, null];
                                 node.ref.startOld = node.start;
+                                node.ref.durationOld = node.duration;
                                 node.ref.layerOld = node.layer;
                                 node.ref.endOld = node.end;
                                 calculatedNodeCount++;
