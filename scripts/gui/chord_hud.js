@@ -181,7 +181,7 @@ function generateChordTable() {
                 } else {
                     chordTable[key] = result;
                 }
-                reverseChordLookup[chordName.trim()] = chordTable[key];
+                reverseChordLookup[chordName.trim()] = result;
             }
         }
     }
