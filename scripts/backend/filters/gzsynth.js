@@ -51,14 +51,20 @@
                     inPcm.length / audio.samplerate
                 ));
             }
-            const lop = await applyLowpassFilter(out, audio.samplerate, getThreshold, _(this.conf.FilterResonance), this.conf.FilterType);
-            lop.map((x, i) => {
+            let res = null;
+            if (this.conf.Filter) {
+                res = await applyLowpassFilter(out, audio.samplerate, getThreshold, _(this.conf.FilterResonance), this.conf.FilterType);
+            } else{
+                res = out;
+            }
+            
+            res.map((x, i) => {
                 if (this.conf.Clipping) {
-                    lop[i] = Math.max(Math.min(x, 1), -1);
+                    res[i] = Math.max(Math.min(x, 1), -1);
                 }
-                lop[i] += inPcm[i];
+                res[i] += inPcm[i];
             });
-            return lop;
+            return res;
         },
         initMiddleware: (loop) => {
             initNoteDisplay(loop);
@@ -128,10 +134,11 @@
         gzsynth.configs[`Voice${i + 1}SemiOffset`] = [0, "number", 1];
         gzsynth.dropdowns[`Voice${i + 1}`] = ["Drive", "WaveType", "SemiOffset"].map(x => `Voice${i + 1}` + x);
     }
+    gzsynth.configs.Filter = [false, "checkbox"];
     gzsynth.configs.FilterType = ["lowpass", ["lowpass", "highpass", "lowshelf", "bandpass", "highshelf", "peaking", "notch", "allpass"]];
     gzsynth.configs.FilterFrequency = [900, "number"];
     gzsynth.configs.FilterResonance = [1, "number", 1];
-    gzsynth.dropdowns[`Filter`] = ["FilterType", "FilterFrequency", "FilterResonance"];
+    gzsynth.dropdowns[`Filter`] = ["Filter", "FilterType", "FilterFrequency", "FilterResonance"];
 
     createADSR("Filter");
 
