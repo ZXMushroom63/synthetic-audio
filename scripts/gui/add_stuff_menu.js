@@ -49,6 +49,8 @@ async function importAudioFile(file, hidden) {
     loopMap[file.name] = file;
     loopDurationMap[file.name] = await getDurationOfLoop(file);
 
+    findLoops(".loop[data-type=audio]").forEach(x => { markLoopDirty(x); hydrateLoopDecoration(x) });
+
     if (hidden) {
         return;
     }
@@ -85,6 +87,4 @@ async function importAudioFile(file, hidden) {
     });
     span.appendChild(y);
     loopsDiv.appendChild(span);
-    loopMap[file.name] = file;
-    findLoops(".loop[data-type=audio]").forEach(x => { markLoopDirty(x); hydrateLoopDecoration(x) });
 }
