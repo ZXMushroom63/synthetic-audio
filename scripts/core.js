@@ -413,8 +413,8 @@ function constructRenderDataArray(data) {
         editorLayer.rebuild = rebuildCacheMap;
         editorLayer.needsUpdating = rebuildCacheMap;
 
-        if (!audio.stereo) {
-            layerCache[editorLayer.layerid][1] = null; //free up some memory
+        if (!audio.stereo && layerCache[editorLayer.layerId]) {
+            layerCache[editorLayer.layerId][1] = null; //free up some memory
         }
 
         if (rebuildCacheMap) {
