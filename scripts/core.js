@@ -409,7 +409,7 @@ function constructRenderDataArray(data) {
             });
         }
 
-        const rebuildCacheMap = !layerCache[editorLayer.layerId] || !layerCache[editorLayer.layerId].reduce((v, acc) => v && acc) || !layerCache[editorLayer.layerId].reduce((v, acc) => v && acc && (v.length === audio.length));
+        const rebuildCacheMap = !layerCache[editorLayer.layerId] || !layerCache[editorLayer.layerId].slice(0, 1 + audio.stereo).reduce((acc, v) => !!v && !!acc) || !layerCache[editorLayer.layerId].slice(0, 1 + audio.stereo).reduce((acc, v) => (!!v) && acc && (v.length === audio.length), true);
         editorLayer.rebuild = rebuildCacheMap;
         editorLayer.needsUpdating = rebuildCacheMap;
 
