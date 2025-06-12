@@ -409,15 +409,32 @@ function constructRenderDataArray(data) {
             });
         }
 
-        editorLayer.forEach((layer, i) => editorLayer[i] = layer.filter(node => { //only process nodes that have horizontal intersection with a dirty node
-            for (let j = 0; j < dirtyNodes.length; j++) {
-                const dirtyNode = dirtyNodes[j];
-                if (doNodesIntersect(node, dirtyNode)) {
-                    return true;
-                }
+        const rebuildCacheMap = !layerCache[editorLayer.layerId] || !layerCache[editorLayer.layerId].reduce((v, acc) => v && acc) || !layerCache[editorLayer.layerId].reduce((v, acc) => v && acc && (v.length === audio.length));
+        editorLayer.rebuild = rebuildCacheMap;
+        editorLayer.needsUpdating = rebuildCacheMap;
+
+        if (!audio.stereo) {
+            layerCache[editorLayer.layerid][1] = null; //free up some memory
+        }
+
+        if (rebuildCacheMap) {
+            layerCache[editorLayer.layerId] = [null, null];
+        }
+
+        editorLayer.forEach((layer, i) => {
+            if (rebuildCacheMap) {
+                return;
             }
-            return false;
-        }));
+            editorLayer[i] = layer.filter(node => { //only process nodes that have horizontal intersection with a dirty node
+                for (let j = 0; j < dirtyNodes.length; j++) {
+                    const dirtyNode = dirtyNodes[j];
+                    if (doNodesIntersect(node, dirtyNode)) {
+                        return true;
+                    }
+                }
+                return false;
+            })
+        });
 
         dirtyNodes.forEach((x) => {
             editorLayer.needsUpdating = true;
@@ -484,7 +501,7 @@ async function render() {
                 const abstractLayerMaps = renderDataArray[q];
                 var initialPcm = layerCache[abstractLayerMaps.layerId]?.[c] || new Float32Array(audio.length);
 
-                if (abstractLayerMaps.needsUpdating || !layerCache[abstractLayerMaps.layerId] || !layerCache[abstractLayerMaps.layerId][c] || layerCache[abstractLayerMaps.layerId][c].length !== audio.length) {
+                if (abstractLayerMaps.needsUpdating) {
                     for (let l = 0; l < abstractLayerMaps.length; l++) {
                         const layer = abstractLayerMaps[l];
                         for (let n = 0; n < layer.length; n++) {
