@@ -7,6 +7,7 @@
         configs: {
             "Note": [":A4:", "number", 1],
             "Clipping": [true, "checkbox"],
+            "ClipLevel": [1, "number", 1],
             "Volume": [1, "number", 1],
             "Decay": [0, "number"],
             "AmplitudeSmoothing": [0.006, "number"]
@@ -24,6 +25,7 @@
             const dt = 1 / audio.samplerate;
             const note = _(this.conf.Note);
             const totalVol = _(this.conf.Volume);
+            const clipLvl = _(this.conf.ClipLevel);
 
             out.forEach((x, i) => {
                 const adsr = this.conf.EnvelopeEnabled ? findADSR(
@@ -76,7 +78,8 @@
                 }
 
                 if (this.conf.Clipping) {
-                    res[i] = Math.max(Math.min(x, 1), -1);
+                    const clipVal = clipLvl(i, inPcm);
+                    res[i] = Math.max(Math.min(x, clipVal), -clipVal);
                 }
                 res[i] *= totalVol(i, res);
                 res[i] *= ampSmoothingFactor;
