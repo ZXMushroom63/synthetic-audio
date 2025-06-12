@@ -65,7 +65,6 @@ function getDurationOfLoop(audioFile) {
         audioElement.src = tempUrl;
     });
 }
-var loopObjURL = null;
 var mouse = { x: 0, y: 0 };
 var keymap = {};
 function updateLOD() {
@@ -694,11 +693,9 @@ function init() {
         }
     }, { passive: false });
     registerSetting("ZoomScale", 1);
-    document.querySelector("audio#loopsample").addEventListener("ended", (() => {
-        if (loopObjURL) {
-            URL.revokeObjectURL(loopObjURL);
-        }
-    }));
+    document.querySelector("audio#loopsample").addEventListener("ended", (e) => {
+        URL.revokeObjectURL(e.target.src);
+    });
     document.querySelector("#stereobox").addEventListener("input", () => {
         if (!multiplayer.isHooked && multiplayer.on) {
             multiplayer.modifyProperty("#stereobox", "stereobox", document.querySelector("#stereobox").checked);
@@ -753,15 +750,43 @@ function init() {
         }
     });
 
-    document.querySelector("audio#loopsample").addEventListener("timeupdate", (e) => {
-        if (e.target.currentTime > 32) {
-            URL.revokeObjectURL(e.target.src);
-            e.target.src = "";
-        }
-    });
-    document.querySelector("audio#loopsample").addEventListener("ended", (e) => {
-        URL.revokeObjectURL(e.target.src);
-        e.target.src = "";
-    });
+    // document.querySelector("audio#loopsample").addEventListener("timeupdate", (e)=>{
+    //     if (e.target.currentTime > 32) {
+    //         stopSample();
+    //     }
+    // });
+    document.querySelector("audio#loopsample").addEventListener("ended", stopSample);
+}
+let stopPlayingTimer = null;
+function playSample(file, volume, speed, timeOffset) {
+    if (stopPlayingTimer) {
+        clearTimeout(stopPlayingTimer);
+    }
+    speed ??= 1;
+    volume ??= 1;
+    volume = Math.min(1, Math.max(0, volume));
+    const sample = document.querySelector("audio#loopsample");
+    if (sample.src) {
+        URL.revokeObjectURL(sample.src);
+    }
+    sample.src = URL.createObjectURL(file);
+    sample.preservesPitch = false;
+    sample.playbackRate = speed;
+    sample.volume = volume;
+    sample.currentTime = timeOffset ?? 0;
+    sample.play();
+    stopPlayingTimer = setTimeout(() => {
+        stopSample();
+    }, 32000);
+    document.querySelector("#renderProgress").innerText = "Preview successful!";
+}
+function stopSample() {
+    const sample = document.querySelector("audio#loopsample");
+    if (sample.src) {
+        URL.revokeObjectURL(sample.src);
+    }
+    sample.pause();
+    sample.src = "";
+    clearTimeout(stopPlayingTimer);
 }
 addEventListener("load", init);

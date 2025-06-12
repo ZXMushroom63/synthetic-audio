@@ -23,13 +23,8 @@ async function execZScroll(loop, value) {
     } else if (def.customGuiButtons?.Preview && value === 0) {
         def.customGuiButtons.Preview.apply(loop, []);
     } else if (value === 0 && loop.cache) {
-        if (document.querySelector("audio#loopsample").src) {
-            URL.revokeObjectURL(document.querySelector("audio#loopsample").src);
-        }
         var blob = await convertToFileBlob(loop.cache.slice(0, 1 + audio.stereo), 1 + audio.stereo, audio.samplerate, audio.bitrate, true);
-        document.querySelector("#renderProgress").innerText = "Preview successful!";
-        document.querySelector("#loopsample").src = URL.createObjectURL(blob);
-        document.querySelector("#loopsample").play();
+        playSample(blob);
     }
 }
 var zScrollProgress = 0;

@@ -1,4 +1,7 @@
 function updateNoteDisplay(loop) {
+    if (!loop.querySelector(".noteDisplay")) {
+        return;
+    }
     var basic = new Float32Array(2);
     var freq = _(loop.conf.Frequency || loop.conf.Note)(0, basic);
     var freqsemioffset = 0;

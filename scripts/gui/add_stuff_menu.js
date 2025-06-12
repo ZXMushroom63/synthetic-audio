@@ -68,15 +68,7 @@ async function importAudioFile(file, hidden) {
     var x = document.createElement("a");
     x.innerText = "[Play]";
     x.addEventListener("click", () => {
-        if (document.querySelector("audio#loopsample").src) {
-            URL.revokeObjectURL(document.querySelector("audio#loopsample").src);
-        }
-        if (loopObjURL) {
-            URL.revokeObjectURL(loopObjURL);
-        }
-        document.querySelector("audio#loopsample").src = loopObjURL = URL.createObjectURL(file);
-        document.querySelector("audio#loopsample").currentTime = 0;
-        document.querySelector("audio#loopsample").play();
+        playSample(file);
     });
     span.appendChild(x);
     span.append(" ");

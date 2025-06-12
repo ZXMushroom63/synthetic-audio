@@ -3589,14 +3589,9 @@ addBlockType("samjs", {
     },
     customGuiButtons: {
         Preview: async function () {
-            if (document.querySelector("audio#loopsample").src) {
-                URL.revokeObjectURL(document.querySelector("audio#loopsample").src);
-            }
             var pcmData = filters["samjs"].functor.apply(this, [new Float32Array(audio.samplerate), 0, {}]);
             var blob = await convertToFileBlob([pcmData], 1, audio.samplerate, audio.bitrate, true);
-            document.querySelector("#renderProgress").innerText = "Preview successful!";
-            document.querySelector("#loopsample").src = URL.createObjectURL(blob);
-            document.querySelector("#loopsample").play();
+            playSample(blob);
         }
     },
     functor: function (inPcm, channel, data) {

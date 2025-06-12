@@ -66,10 +66,7 @@ addEventListener("init", () => {
         }, 1000 / 30);
     });
     renderOut.addEventListener("play", () => {
-        document.querySelector("audio#loopsample").pause();
-        if (loopObjURL) {
-            URL.revokeObjectURL(loopObjURL);
-        }
+        stopSample();
         clearInterval(timePosMarkerAnimator);
         hydrateTimePosMarker();
         timePosMarkerAnimator = setInterval(() => {
@@ -101,11 +98,6 @@ addEventListener("init", () => {
     renderOut.addEventListener("loadstart", () => {
         timePosMarkerLoopPlayback = {};
         clearInterval(timePosMarkerAnimator);
-        document.querySelector("audio#loopsample").addEventListener("ended", (() => {
-            if (loopObjURL) {
-                URL.revokeObjectURL(loopObjURL);
-            }
-        }));
         renderOut.currentTime = gui.marker;
         hydrateTimePosMarker();
     });

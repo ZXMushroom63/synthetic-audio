@@ -72,13 +72,7 @@ addEventListener("init", () => {
                 addAudioSampleBlock(x);
             });
             item.addEventListener("mouseover", () => {
-                const url = URL.createObjectURL(loopMap[x]);
-                if (document.querySelector("audio#loopsample").src) {
-                    URL.revokeObjectURL(document.querySelector("audio#loopsample").src);
-                }
-                document.querySelector("audio#loopsample").src = url;
-                document.querySelector("audio#loopsample").currentTime = 0;
-                document.querySelector("audio#loopsample").play();
+                playSample(loopMap[x]);
             });
             tree.appendChild(item);
         });
@@ -116,10 +110,7 @@ addEventListener("init", () => {
         updateTreeView();
 
         menu.addEventListener("mouseout", () => {
-            if (document.querySelector("audio#loopsample").src) {
-                URL.revokeObjectURL(document.querySelector("audio#loopsample").src);
-            }
-            document.querySelector("audio#loopsample").src = "";
+            stopSample();
         });
     }
 

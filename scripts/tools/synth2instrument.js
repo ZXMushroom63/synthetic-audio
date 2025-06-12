@@ -4,7 +4,7 @@ addEventListener("init", () => {
         if (!nodes) { return };
 
         const valid_types = Object.entries(filters)
-            .filter(ent => ent[1].pitchZscroller)
+            .filter(ent => ent[1].pitchZscroller && (ent[0] !== "audio"))
             .map(x => x[0]);
 
         var foundValidType = false;
