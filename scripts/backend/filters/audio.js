@@ -77,7 +77,7 @@ addBlockType("audio", {
             const refNote = _(this.conf.ReferenceNote);
             const samplerEnabled = this.conf.SamplerEnabled;
             const speed = (i, inPcm) => samplerEnabled ? (_speed(i, inPcm) * (hitNote(i, inPcm) / refNote(i, inPcm))) : _speed(i, inPcm);
-            playSample(loopMap[this.getAttribute("data-file")], this.conf.Volume, speed(0, new Float32Array(2)));
+            playSample(loopMap[this.getAttribute("data-file")], this.conf.Volume, speed(0, new Float32Array(2)), this.conf.StartOffset);
         },
     }
 });
