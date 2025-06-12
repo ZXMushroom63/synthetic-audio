@@ -3,13 +3,13 @@
     const gzsynth = {
         color: "rgba(0, 255, 255, 0.3)",
         title: "GzSynth",
-        amplitude_smoothing_knob: true,
         directRefs: ["gz"],
         configs: {
             "Note": [":A4:", "number", 1],
             "Clipping": [true, "checkbox"],
             "Volume": [1, "number", 1],
             "Decay": [0, "number"],
+            "AmplitudeSmoothing": [0.006, "number"]
         },
         dropdowns: {},
         functor: async function (inPcm, channel, data) {
@@ -62,11 +62,24 @@
                 res = out;
             }
 
+            const AmpSmoothingStart = Math.floor(audio.samplerate * this.conf.AmplitudeSmoothing);
+            const AmpSmoothingEnd = inPcm.length - AmpSmoothingStart;
+
             res.map((x, i) => {
+                var ampSmoothingFactor = 1;
+                if (i < AmpSmoothingStart) {
+                    ampSmoothingFactor *= i / AmpSmoothingStart;
+                }
+
+                if (i > AmpSmoothingEnd) {
+                    ampSmoothingFactor *= 1 - ((i - AmpSmoothingEnd) / AmpSmoothingStart);
+                }
+
                 if (this.conf.Clipping) {
                     res[i] = Math.max(Math.min(x, 1), -1);
                 }
                 res[i] *= totalVol(i, res);
+                res[i] *= ampSmoothingFactor;
                 res[i] += inPcm[i];
             });
             return res;
