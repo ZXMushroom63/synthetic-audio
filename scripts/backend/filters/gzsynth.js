@@ -26,6 +26,7 @@
             const note = _(this.conf.Note);
             const totalVol = _(this.conf.Volume);
             const clipLvl = _(this.conf.ClipLevel);
+            const filterCapacity = _(this.conf.FilterFrequency);
 
             out.forEach((x, i) => {
                 const adsr = this.conf.EnvelopeEnabled ? findADSR(
@@ -47,7 +48,7 @@
             });
             const self = this;
             function getThreshold(i, inPcm) {
-                return self.conf.FilterFrequency
+                return filterCapacity(i, inPcm)
                     * Math.log2(1 + findADSR(
                         [self.conf.FilterAttackSeconds, self.conf.FilterAttackExp],
                         [self.conf.FilterDecaySeconds, self.conf.FilterDecayExp],
@@ -65,7 +66,7 @@
             }
 
             const AmpSmoothingStart = Math.floor(audio.samplerate * this.conf.AmplitudeSmoothing);
-            const AmpSmoothingEnd = inPcm.length - AmpSmoothingStart;
+            const AmpSmoothingEnd = res.length - AmpSmoothingStart;
 
             res.map((x, i) => {
                 var ampSmoothingFactor = 1;
@@ -78,7 +79,7 @@
                 }
 
                 if (this.conf.Clipping) {
-                    const clipVal = clipLvl(i, inPcm);
+                    const clipVal = clipLvl(i, res);
                     res[i] = Math.max(Math.min(x, clipVal), -clipVal);
                 }
                 res[i] *= totalVol(i, res);
@@ -130,8 +131,8 @@
 
     function findADSR(a, d, s, r, time, len) {
         a[0] = Math.min(a[0], len);
-        d[0] = Math.min(d[0], len);
-        r[0] = Math.min(r[0], len);
+        d[0] = Math.min(d[0], len - a[0]);
+        r[0] = Math.min(r[0], len - (a[0] + d[0]));
         var ret = 1;
         if (time > (d[0] + a[0]) && time <= (len - r[0])) {
             ret = s;
@@ -160,7 +161,7 @@
     }
     gzsynth.configs.Filter = [false, "checkbox"];
     gzsynth.configs.FilterType = ["lowpass", ["lowpass", "highpass", "lowshelf", "bandpass", "highshelf", "peaking", "notch", "allpass"]];
-    gzsynth.configs.FilterFrequency = [900, "number"];
+    gzsynth.configs.FilterFrequency = [900, "number", 1];
     gzsynth.configs.FilterResonance = [1, "number", 1];
     gzsynth.dropdowns[`Filter`] = ["Filter", "FilterType", "FilterFrequency", "FilterResonance"];
 
