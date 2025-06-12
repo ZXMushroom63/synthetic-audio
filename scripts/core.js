@@ -421,18 +421,30 @@ function constructRenderDataArray(data) {
             layerCache[editorLayer.layerId] = [null, null];
         }
 
+        var cleanNodes = editorLayer.flat().filter(x => !dirtyNodes.includes(x));
+        var hitNodes = [...dirtyNodes];
+        let hitCount = 1;
+        while (hitCount !== 0) {
+            hitCount = 0;
+            cleanNodes = cleanNodes.filter(node => {
+                for (let j = 0; j < hitNodes.length; j++) {
+                    const dirtyNode = hitNodes[j];
+                    if (doNodesIntersect(node, dirtyNode)) {
+                        hitCount++;
+                        hitNodes.push(node);
+                        return false;
+                    }
+                }
+                return true;
+            });
+        }
+
         editorLayer.forEach((layer, i) => {
             if (rebuildCacheMap) {
                 return;
             }
             editorLayer[i] = layer.filter(node => { //only process nodes that have horizontal intersection with a dirty node
-                for (let j = 0; j < dirtyNodes.length; j++) {
-                    const dirtyNode = dirtyNodes[j];
-                    if (doNodesIntersect(node, dirtyNode)) {
-                        return true;
-                    }
-                }
-                return false;
+                return hitNodes.includes(node);
             })
         });
 
