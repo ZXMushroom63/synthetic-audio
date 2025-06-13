@@ -170,6 +170,7 @@ As always, samplerate can be found using:\\
 
 
 ### JavaScript API
+(note: the best way to learn the API structure is to dig through the ~scripts/backend/filters/~ folder)
 <pre>
 ${`
 addBlockType("node_type_id", {
@@ -197,11 +198,31 @@ helpContent.addTab("Soundfonts", `
 To use instruments such as piano, guitar, etc, you need to install Soundfonts in the plugins tab.
 SYNTHETIC uses the MIDI.js soundfont format.
 
-In the plugins tab, SYNTHETIC by default has buttons to download the FluidR3-GM and MusyngKite soundfonts, converted to MIDI.js by [@gleitz on GitHub](http://github.com/gleitz).
-Once the soundfonts have finished downloading, restart the editor. You can access the soundfonts in editor using an ~Instrument~ node.
-In the ~Instrument~'s options menu, you can select your desired instrument.
+- In the plugins tab, SYNTHETIC by default has buttons to download the FluidR3-GM and MusyngKite soundfonts, converted to MIDI.js by [@gleitz on GitHub](http://github.com/gleitz).
+- Once the soundfonts have finished downloading, restart the editor. 
+- You can access the soundfonts in editor using an ~Instrument~ node.
+- In the ~Instrument~'s options menu, you can select your desired instrument.
 `);
-helpContent.addTab("Samplepacks", "(coming soon)");
+helpContent.addTab("Samplepacks", `
+### Adding samplepacks
+- Download a sample pack from your favourite website 
+- In the Plugins tab, press ~Upload sample pack (.zip)~
+- The samplepacks will load on the next start of the editor
+- You can delete the copy of the samplepack that you downloaded, it is now stored on the editor.
+
+
+### Using samplepacks
+- After restarting the editor, you can view samplepacks by pressing ~Shift + S~
+- If your samplepack does not appear, try closing and reopening the samplepack menu. Samplepacks are lazy-loaded to improve startup times.
+- In the samplepack menu, click on your samplepack to open it.
+- This will switch to the 'Tree View' at the top of the samplepacks menu.
+- Click on your added sample to add it to the timeline. (click to pickup, click to drop)
+
+
+### Importing samples
+- To add samples, try drag-and-dropping a sample file into the timeline.
+- You can access imported samples in the 'User' samplepack, or from the 'Samples' category in the 'Add Tracks' menu in the top right.
+`);
 helpContent.addTab("Live Mode", "(coming soon)");
 helpContent.addTab("Misc Tab", "(coming soon)");
 helpContent.addTab("Multiplayer", "(coming soon)");
