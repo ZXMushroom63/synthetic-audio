@@ -53,6 +53,7 @@ addEventListener("init", () => {
         <option value="2,2,1,2,2,1,2">Mixolydian (Diatonic)</option>
         <option value="2,2,3,2,3">Major (Pentatonic)</option>
         <option value="3,2,2,3,2">Minor (Pentatonic)</option>
+        <option value="2,2,1,2,2,3">Major (Hexatonic)</option>
         <option value="3,2,1,1,3,2">Blues</option>
         <option value="2,1,2,2,1,3,1">Harmonic Minor</option>
         <option value="2,1,2,2,2,2,1">Melodic Minor Ascending</option>
