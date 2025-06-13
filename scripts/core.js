@@ -409,7 +409,7 @@ function constructRenderDataArray(data) {
             });
         }
 
-        const rebuildCacheMap = !layerCache[editorLayer.layerId] || !layerCache[editorLayer.layerId].reduce((v, acc) => v && acc) || !layerCache[editorLayer.layerId].reduce((v, acc) => v && acc && (v.length === audio.length));
+        const rebuildCacheMap = !layerCache[editorLayer.layerId] || !layerCache[editorLayer.layerId].slice(0, 1 + audio.stereo).reduce((acc, v) => !!v && !!acc) || !layerCache[editorLayer.layerId].slice(0, 1 + audio.stereo).reduce((acc, v) => (!!v) && acc && (v.length === audio.length), true);
         editorLayer.rebuild = rebuildCacheMap;
         editorLayer.needsUpdating = rebuildCacheMap;
 
@@ -421,18 +421,30 @@ function constructRenderDataArray(data) {
             layerCache[editorLayer.layerId] = [null, null];
         }
 
+        var cleanNodes = editorLayer.flat().filter(x => !dirtyNodes.includes(x));
+        var hitNodes = [...dirtyNodes];
+        let hitCount = 1;
+        while (hitCount !== 0) {
+            hitCount = 0;
+            cleanNodes = cleanNodes.filter(node => {
+                for (let j = 0; j < hitNodes.length; j++) {
+                    const dirtyNode = hitNodes[j];
+                    if (doNodesIntersect(node, dirtyNode)) {
+                        hitCount++;
+                        hitNodes.push(node);
+                        return false;
+                    }
+                }
+                return true;
+            });
+        }
+
         editorLayer.forEach((layer, i) => {
             if (rebuildCacheMap) {
                 return;
             }
             editorLayer[i] = layer.filter(node => { //only process nodes that have horizontal intersection with a dirty node
-                for (let j = 0; j < dirtyNodes.length; j++) {
-                    const dirtyNode = dirtyNodes[j];
-                    if (doNodesIntersect(node, dirtyNode)) {
-                        return true;
-                    }
-                }
-                return false;
+                return hitNodes.includes(node);
             })
         });
 
