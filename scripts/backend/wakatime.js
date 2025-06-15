@@ -27,8 +27,8 @@ registerSetting("WakatimeEndpoint", "https://wakahost.example.com/api/waka/v1");
     let wakaInited = false;
 
     function wakatime_start() {
-        if (wakaInited) {
-            return;
+        if (activityTimer) {
+            clearTimeout(activityTimer);
         }
         wakaInited = true;
         if ((Date.now() - lastActivityTime) < 2 * 60 * 1000) {
