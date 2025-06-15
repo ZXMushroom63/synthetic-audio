@@ -124,6 +124,7 @@ addEventListener("init", () => {
             uuid: newWaveformName,
             calculated: smp
         };
+        wakatimeInteraction();
         net_push_waveform(custom_waveforms[newWaveformName]);
         hydrateWaveformTab();
     });
@@ -178,6 +179,7 @@ addEventListener("init", () => {
             net_push_samples(target);
             drawWaveform(true);
             e.preventDefault();
+            wakatimeInteraction();
         }
     });
     addEventListener("mouseup", (e) => {
@@ -521,6 +523,7 @@ addEventListener("init", () => {
         }
         target.modifiers = [];
         target.samples = target.calculated;
+        wakatimeInteraction();
         net_push_waveform(target);
         drawModifierStack();
         loadModifiersToTarget();
@@ -701,6 +704,7 @@ addEventListener("init", () => {
                 }
                 e.stopPropagation();
                 hydrateWaveformTab();
+                wakatimeInteraction();
             });
             item.appendChild(renameBtn);
 

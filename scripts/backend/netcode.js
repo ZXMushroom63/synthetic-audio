@@ -173,3 +173,4 @@ const multiplayer = {
         addEventListener("netcode:"+ev, listener);
     }
 }
+globalThis.multiplayer = multiplayer;
