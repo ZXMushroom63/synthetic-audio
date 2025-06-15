@@ -1,16 +1,15 @@
-const wakatime = {
-    enabled: false,
-    token: "",
-    endpoint: ""
-};
+registerSetting("WakatimeEnabled", false);
+registerSetting("WakatimeToken", "(token here)");
+registerSetting("WakatimeEndpoint", "https://wakahost.example.com/api/waka/v1");
 (function waka() {
     async function sendWakaTimeHeartbeat(data) {
+        const endpoint = settings.WakatimeEndpoint;
         try {
-            const response = await fetch((wakatime.endpoint.endsWith("/") ? wakatime.endpoint.substring(0, wakatime.endpoint.length - 1) : wakatime.endpoint) + "/users/current/heartbeats", {
+            const response = await fetch((endpoint.endsWith("/") ? endpoint.substring(0, endpoint.length - 1) : endpoint) + "/users/current/heartbeats", {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${wakatime.token}`
+                    'Authorization': `Bearer ${settings.WakatimeToken}`
                 },
                 body: JSON.stringify(data)
             });
@@ -33,7 +32,7 @@ const wakatime = {
         }
         wakaInited = true;
         if ((Date.now() - lastActivityTime) < 2 * 60 * 1000) {
-            if (!globalThis.lastEditedFile || !wakatime.enabled) {
+            if (!globalThis.lastEditedFile || !settings.WakatimeEnabled) {
                 return;
             }
             sendWakaTimeHeartbeat({
