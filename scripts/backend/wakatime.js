@@ -42,7 +42,7 @@ registerSetting("WakatimeEndpoint", "https://wakahost.example.com/api/waka/v1");
                 project: globalThis.lastEditedFile,
                 language: 'Music',
                 is_write: false,
-                plugin: 'SYNTHETIC Audio'
+                plugin: 'SYNTHETIC-Audio'
             });
         }
         activityTimer = setTimeout(wakatime_start, 2 * 60 * 1000);
