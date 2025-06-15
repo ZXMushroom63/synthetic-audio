@@ -53,6 +53,10 @@ app.use(blacklistMiddleware);
 server.listen(port, () => {
     console.log(`SYNTHETIC Audio running on port ${port}`);
     console.log(`http://localhost:${port}`);
-    console.log(`Multiplayer: ${multiplayerEnabled}`);
+    console.log(`Multiplayer Mode: ${multiplayerEnabled}`);
     console.log(`Logging: ${logging}`);
+
+    if (Math.random() < 0.1) {
+        console.log(`Like this project? Consider starring on GitHub: https://github.com/ZXMushroom63/synthetic-audio`);
+    }
 });
