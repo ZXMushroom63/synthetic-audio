@@ -40,7 +40,7 @@ registerSetting("WakatimeEndpoint", "https://wakahost.example.com/api/waka/v1");
                 type: 'file',
                 time: Math.floor(Date.now() / 1000),
                 project: globalThis.lastEditedFile,
-                language: 'Making Music',
+                language: 'Music',
                 is_write: false,
                 plugin: 'SYNTHETIC Audio'
             });
