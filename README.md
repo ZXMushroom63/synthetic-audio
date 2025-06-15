@@ -27,6 +27,7 @@ You can find demo files in the [demos folder](/demos/).
 - Soundfonts (plugins tab & instrument node) - Use up to 127 instruments, more if you find plugins
 - HVCC patch support - Load puredata (.pd) patches compiled with [my fork of hvcc](https://github.com/ZXMushroom63/hvcc)
 - Multiplayer support!
+- WakaTime integration (check settings menu)
 
 ## Hosting
 ### Offline
