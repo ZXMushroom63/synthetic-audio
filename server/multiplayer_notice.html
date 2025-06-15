@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SYNTHETIC Server</title>
+</head>
+<body>
+    <main>
+    </main>
+    <script>
+        const address = location.protocol + "//" + location.host;
+        document.querySelector("main").innerHTML = `
+        <h2 style="margin-bottom: 0;">SYNTHETIC Multiplayer</h2>
+        <small>By ZXMushroom63</small><br><br><br>
+
+        This is a SYNTHETIC Audio multiplayer server.<br>
+        <a target="_black" href="https://zxmushroom63.github.io/synthetic-audio?multiplayer=${encodeURIComponent(address)}">Connect with default SYNTHETIC client</a><br>
+        To use a custom client, go to the 'Misc' tab in editor, and under 'Remote Multiplayer' press connect and paste in the server address.<br>
+        This server's address is: <code>${address}</code><br><br>
+        
+        ${location.protocol === "https" ? "(Server is running on a secure host, everything should go smoothly)" : "(Server is running on an insecure host, connection problems may occur)"}
+        `;
+    </script>
+</body>
+</html>

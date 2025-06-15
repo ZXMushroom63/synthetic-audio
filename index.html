@@ -2,7 +2,10 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no"> 
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no"
+    />
     <title>SYNTHETIC</title>
     <link rel="stylesheet" href="style.css" />
     <link rel="icon" type="image/x-icon" href="public/logo_small.png" />
@@ -32,6 +35,10 @@
     <meta property="og:image:width" content="1280" />
     <meta property="og:image:height" content="640" />
     <meta property="og:image:type" content="image/png" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="upgrade-insecure-requests"
+    />
 
     <meta name="author" content="ZXMushroom63" />
   </head>
@@ -172,10 +179,10 @@
     <!-- FFMPEG CODECS -->
     <script src="https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@latest/dist/ffmpeg.min.js"></script>
     <script src="lib/init_ffmpeg.js"></script>
-    
+
     <div class="toolbox">
-        <button id="toolboxRunButton">Run</button>
-        <br />
+      <button id="toolboxRunButton">Run</button>
+      <br />
     </div>
     <span id="toolboxExpander" class="closed">&gt;</span>
     <table class="main">
@@ -337,7 +344,9 @@
       <details>
         <summary>Samples</summary>
         <div id="addloops">
-          <button id="samplepacksBtn" class="smallBtn">View sample packs...</button>
+          <button id="samplepacksBtn" class="smallBtn">
+            View sample packs...
+          </button>
         </div>
       </details>
       <details>
