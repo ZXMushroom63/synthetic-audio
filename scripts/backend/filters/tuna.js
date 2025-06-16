@@ -25,6 +25,8 @@ const TunaIRList = [];
 fetch("public/impulse_responses/index.txt?plugin=true").then(async x => {
     const res = (await x.text()).split("\n").map(x => x.trim().substring(1)).filter(x => !!x);
     TunaIRList.push(...res);
+}).catch(e=>{
+    console.log("Tuna impulse responses not available on this host.");
 });
 
 addBlockType("tuna_chorus", {
