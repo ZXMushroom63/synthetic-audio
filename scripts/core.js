@@ -15,7 +15,6 @@ function findLoops(selector) {
     return Array.prototype.filter.apply(document.querySelectorAll(selector), [(x) => !x._ignore]);
 }
 function noteToFrequency(note, octave, accidental = '') {
-    const A4 = 440;
     const notes = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
     const flats = {
         'Db': 'C#',
@@ -39,7 +38,6 @@ function noteToFrequency(note, octave, accidental = '') {
 }
 
 function frequencyToNote(frequency, useFlats) {
-    const A4 = 440;
     const notes = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
     const notesFlat = ['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B'];
     let noteNumber = 12 * (Math.log(frequency / A4) / Math.log(2)) + 57;
