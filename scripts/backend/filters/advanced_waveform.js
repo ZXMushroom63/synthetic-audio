@@ -3,7 +3,7 @@ addBlockType("p_waveform_plus", {
     title: "Advanced Synth",
     directRefs: ["syn", "synth"],
     configs: {
-        "Frequency": [440, "number", 1],
+        "Frequency": [":A4:", "number", 1],
         "SemitonesOffset": [0, "number", 1],
         "InternalSemiOffset": [0, "number"],
         "FrequencyDecay": [0, "number", 1],
