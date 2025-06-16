@@ -104,7 +104,8 @@ addBlockType("p_waveform_plus", {
     midiMappings: {
         note: "Frequency",
         velocity: "Amplitude",
-        zero: ["InternalSemiOffset", "SemitonesOffset"]
+        zero: ["InternalSemiOffset", "SemitonesOffset"],
+        useHitNote: true,
     },
     zscroll: (loop, value) => {
         loop.conf.InternalSemiOffset += value;

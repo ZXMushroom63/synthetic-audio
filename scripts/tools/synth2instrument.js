@@ -33,7 +33,11 @@ addEventListener("init", () => {
             deleteLoop(node);
             const referenceDef = filters[node.getAttribute("data-type")];
             const cout = {};
-            targetDef.applyMidi({ conf: cout }, node.conf[referenceDef.midiMappings.note], node.conf[referenceDef.midiMappings.velocity]);
+            targetDef.applyMidi(
+                { conf: cout },
+                (referenceDef.midiMappings.useHitNote && node.theoryNote) ? `:${node.theoryNote}:` : node.conf[referenceDef.midiMappings.note],
+                node.conf[referenceDef.midiMappings.velocity]
+            );
 
             return addBlock(targetType,
                 parseFloat(node.getAttribute("data-start")),
