@@ -36,10 +36,10 @@ chordFormulas.set("qr2", [0, 5]);
 chordFormulas.set("qr3", [0, 5, 10]);
 chordFormulas.set("qr4", [0, 5, 10, 15]);
 chordFormulas.set("qr5", [0, 5, 10, 15, 20]);
-chordFormulas.set("qix2", [0, 7]);
-chordFormulas.set("qix3", [0, 7, 14]);
-chordFormulas.set("qix3", [0, 7, 14, 21]);
-chordFormulas.set("qix3", [0, 7, 14, 21, 28]);
+chordFormulas.set("qi2", [0, 7]);
+chordFormulas.set("qi3", [0, 7, 14]);
+chordFormulas.set("qi4", [0, 7, 14, 21]);
+chordFormulas.set("qi5", [0, 7, 14, 21, 28]);
 
 
 // Augmented/Diminished 13ths
