@@ -2,16 +2,15 @@ addBlockType("vocoder", {
     color: "rgba(0,255,0,0.3)",
     wet_and_dry_knobs: true,
     amplitude_smoothing_knob: true,
-    title: "Vocoder",
+    title: "Phase Vocoder",
     directRefs: ["voc", "voca"],
     configs: {
         "Carrier": ["(none)", ["(none)"]],
         "LoopCarrier": [true, "checkbox"],
-        "Q": [6, "number"],
+        "Power": [0.7, "number"],
         "BandCount": [28, "number"],
-        "PostModulatorFilterGain": [6, "number"],
-        "PostHeterodyneGain": [2, "number"],
-        "PostCarrierFilterGain": [10, "number"],
+        "FFTSize": [2048, "number"],
+        "HopSize": [1024, "number"]
     },
     assetUser: true,
     selectMiddleware: (key) => {
@@ -25,18 +24,109 @@ addBlockType("vocoder", {
     },
     assetUserKeys: ["Carrier"],
     functor: async function (inPcm, channel, data) {
-        const carrierBuffer = proceduralAssets.has(this.conf.Carrier) ? proceduralAssets.get(this.conf.Carrier)[channel] : new Float32Array(0);
+        const modulatorPcm = inPcm;
+        let carrierPcm = proceduralAssets.has(this.conf.Carrier) ? proceduralAssets.get(this.conf.Carrier)[channel] : new Float32Array(0);
 
-        const ax = new OfflineAudioContext({ sampleRate: audio.samplerate, length: inPcm.length, numberOfChannels: 1 });
-        
-        const carrierAudioBuffer = ax.createBuffer(1, carrierBuffer.length, audio.samplerate);
-        carrierAudioBuffer.getChannelData(0).set(carrierAudioBuffer);
+        if (carrierPcm.length === 0) {
+            return new Float32Array(modulatorPcm.length);
+        }
 
-        const modulatorAudioBuffer = ax.createBuffer(1, inPcm.length, audio.samplerate);
-        modulatorAudioBuffer.getChannelData(0).set(inPcm);
+        const bandCount = this.conf.BandCount || 28;
+        const loopCarrier = this.conf.LoopCarrier;
 
-        vocoder(ax, carrierAudioBuffer, modulatorAudioBuffer, this.conf.Q, Math.floor(this.conf.BandCount), this.conf.LoopCarrier, this.conf.PostModulatorFilterGain, this.conf.PostHeterodyneGain, this.conf.PostCarrierFilterGain);
-        const out = (await ax.startRendering()).getChannelData(0);
+        const frameSize = this.conf.FFTSize;
+        const hopSize = this.conf.HopSize;
+        const sampleRate = data.sampleRate;
+
+        const out = new Float32Array(modulatorPcm.length);
+
+        const window = new Float32Array(frameSize);
+        //hann window
+        for (let i = 0; i < frameSize; i++) {
+            window[i] = 0.5 * (1 - Math.cos(2 * Math.PI * i / (frameSize - 1)));
+        }
+
+        const generateLogarithmicBands = (numBands, fftSize, sr) => {
+            const bands = [];
+            const minFreq = 100;
+            const maxFreq = sr / 2 * 0.9; // 90% of nyquist
+            const minLog = Math.log(minFreq);
+            const maxLog = Math.log(maxFreq);
+            const logRange = maxLog - minLog;
+
+            const freqToBin = (freq) => Math.floor(freq / sr * fftSize);
+
+            let lastFreq = minFreq;
+            for (let i = 0; i < numBands; i++) {
+                const nextFreq = Math.exp(minLog + logRange * (i + 1) / numBands);
+                const startBin = freqToBin(lastFreq);
+                const endBin = freqToBin(nextFreq);
+                if (startBin < endBin) {
+                    bands.push({ startBin: Math.max(1, startBin), endBin });
+                }
+                lastFreq = nextFreq;
+            }
+            return bands;
+        };
+
+        const getLoopedFrame = (buffer, position) => {
+            const frame = new Float32Array(frameSize);
+            const len = buffer.length;
+            for (let i = 0; i < frameSize; i++) {
+                frame[i] = buffer[(position + i) % len];
+            }
+            return frame;
+        };
+
+        const bands = generateLogarithmicBands(bandCount, frameSize, sampleRate);
+        const bandMagnitudes = new Float32Array(bands.length);
+
+        for (let pos = 0; pos + frameSize <= modulatorPcm.length; pos += hopSize) {
+            const modFrameRaw = modulatorPcm.subarray(pos, pos + frameSize).map((v, i) => v * window[i]);
+            let carrierFrameRaw;
+
+            if (loopCarrier) {
+                carrierFrameRaw = getLoopedFrame(carrierPcm, pos);
+            } else {
+                carrierFrameRaw = carrierPcm.subarray(pos, pos + frameSize);
+            }
+
+            if (carrierFrameRaw.length < frameSize) break;
+            carrierFrameRaw = carrierFrameRaw.map((v, i) => v * window[i]);
+
+            const [modFrame, modImag] = fft(modFrameRaw, new Float32Array(frameSize));
+            const [carrierFrame, carrierImag] = fft(carrierFrameRaw, new Float32Array(frameSize));
+
+            for (let i = 0; i < bands.length; i++) {
+                let totalMag = 0;
+                const band = bands[i];
+                for (let j = band.startBin; j <= band.endBin; j++) {
+                    totalMag += Math.sqrt(modFrame[j] ** 2 + modImag[j] ** 2);
+                }
+                bandMagnitudes[i] = totalMag / (band.endBin - band.startBin + 1);
+            }
+
+            for (let i = 0; i < bands.length; i++) {
+                const band = bands[i];
+                const targetMag = bandMagnitudes[i];
+                for (let j = band.startBin; j <= band.endBin; j++) {
+                    const carrierMag = Math.sqrt(carrierFrame[j] ** 2 + carrierImag[j] ** 2);
+                    if (carrierMag > 1e-9) {
+                        const scale = targetMag / carrierMag;
+                        carrierFrame[j] *= Math.pow(scale, 1 + this.conf.Power);
+                        carrierImag[j] *= Math.pow(scale, 1 + this.conf.Power);
+                    }
+                }
+            }
+
+            const [real, imag] = ifft(carrierFrame, carrierImag);
+
+            for (let i = 0; i < frameSize; i++) {
+                const val = (real[i] / frameSize) * window[i];
+                out[pos + i] += val;
+            }
+        }
+
         return out;
     }
 });
