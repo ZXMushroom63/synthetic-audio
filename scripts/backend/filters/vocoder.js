@@ -113,8 +113,8 @@ addBlockType("vocoder", {
                     const carrierMag = Math.sqrt(carrierFrame[j] ** 2 + carrierImag[j] ** 2);
                     if (carrierMag > 1e-9) {
                         const scale = targetMag / carrierMag;
-                        carrierFrame[j] *= Math.pow(scale, 1 + this.conf.Power);
-                        carrierImag[j] *= Math.pow(scale, 1 + this.conf.Power);
+                        carrierFrame[j] *= scale * this.conf.Power;
+                        carrierImag[j] *= scale * this.conf.Power;
                     }
                 }
             }
