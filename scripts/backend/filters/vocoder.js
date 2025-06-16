@@ -7,10 +7,10 @@ addBlockType("vocoder", {
     configs: {
         "Carrier": ["(none)", ["(none)"]],
         "LoopCarrier": [true, "checkbox"],
-        "Power": [0.7, "number"],
+        "Power": [5, "number"],
         "BandCount": [28, "number"],
         "FFTSize": [2048, "number"],
-        "HopSize": [1024, "number"]
+        "HopSize": [512, "number"]
     },
     assetUser: true,
     selectMiddleware: (key) => {
