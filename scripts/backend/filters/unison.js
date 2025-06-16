@@ -9,8 +9,10 @@ addBlockType("unison", {
         "uDetune": [0.01, "number"],
         "uPan": [0.0, "number", 1],
         "uTimeOffset": [0.0, "number"],
+        "DetuneInCents": [false, "checkbox"]
     },
     functor: function (inPcm, channel, data) {
+        const detune = this.conf.DetuneInCents ? Math.pow(2, this.conf.uDetune / 100 / 12) : this.conf.uDetune;
         var totalNormalisedVolume = 0;
         for (let h = 0; h < this.conf.uVoices / 2; h++) {
             if (this.conf.uAmplitudeConstant) {
@@ -35,7 +37,13 @@ addBlockType("unison", {
                 var timeOffset = i;
 
                 var detunePosition = (h + 0.5) - (this.conf.uVoices / 2);
-                timeOffset *= 1 + (this.conf.uDetune * Math.trunc(detunePosition));
+
+                if (this.conf.DetuneInCents) {
+                    timeOffset *= Math.pow(2, (this.conf.uDetune * Math.trunc(detunePosition))/100/12);
+                } else {
+                    timeOffset *= 1 + (this.conf.uDetune * Math.trunc(detunePosition));
+                }
+
                 timeOffset += (uTimeOffset * audio.samplerate) * h;
                 if (this.conf.uAmplitudeConstant) {
                     volumeRatio = Math.trunc(detunePosition) === 0 ? 1 : this.conf.uAmplitudeRatio;
