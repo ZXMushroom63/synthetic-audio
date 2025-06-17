@@ -180,7 +180,7 @@ addEventListener("init", () => {
         Chord note count: ${chord.length}
         `;
     }
-    registerTool("Arp [BETA]", (nodes) => {
+    registerTool("Arp", (nodes) => {
         if (!nodes) { return };
         const loop = nodes[0];
         template = serialiseNode(loop);

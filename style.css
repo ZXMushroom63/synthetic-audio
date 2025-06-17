@@ -1064,3 +1064,8 @@ li {
   -moz-appearance: none;
   appearance: none;
 }
+
+#sheetAbcJsTarget svg {
+  background-color: white;
+  color: black;
+}
