@@ -77,19 +77,20 @@ chordFormulas.set("min6dim", [0, 3, 7, 8]);          // Minor 6th with a diminis
 chordFormulas.set("min6aug", [0, 3, 7, 10]);         // Minor 6th with an augmented 6 (C, Eb, G, A#)
 chordFormulas.set("6dim", [0, 4, 7, 8]);           // Major 6th with a diminished 6 (C, E, G, Ab)
 chordFormulas.set("6aug", [0, 4, 7, 10]);          // Major 6th with an augmented 6 (C, E, G, A#)
-
 chordFormulas.set("add13", [0, 4, 7, 21]);           // Add13 chord (C, E, G, A)
 chordFormulas.set("add11", [0, 4, 7, 17]);           // Add11 chord (C, E, G, F)
-
-
 chordFormulas.set("add9", [0, 4, 7, 14]);            // Add9 chord (C, E, G, D)
 
-// Seventh, no fifth
+// More Sevenths
 chordFormulas.set("maj7(no5)", [0, 4, 11]);
 chordFormulas.set("minMaj7(no5)", [0, 3, 11]);
 chordFormulas.set("7(no5)", [0, 4, 10]);
 chordFormulas.set("min7(no5)", [0, 3, 10]);
 chordFormulas.set("dim7(no5)", [0, 3, 9]);
+chordFormulas.set("7#11", [0, 4, 7, 10, 18]);
+chordFormulas.set("maj7#11", [0, 4, 7, 11, 18]);
+chordFormulas.set("min7#11", [0, 3, 7, 10, 18]);
+chordFormulas.set("augMaj7#9", [0, 4, 8, 11, 15]);             // wtf even is this
 
 // Other similar chords
 chordFormulas.set("min13", [0, 3, 7, 10, 14, 17, 21]);   // Minor 13th (C, Eb, G, Bb, D, F, A)
@@ -99,14 +100,18 @@ chordFormulas.set("min11", [0, 3, 7, 10, 14, 17]);     // Minor 11th (C, Eb, G, 
 chordFormulas.set("maj11", [0, 4, 7, 11, 14, 17]);     // Major 11th (C, E, G, B, D, F)
 chordFormulas.set("11", [0, 4, 7, 10, 14, 17]);      // Dominant 11th (C, E, G, Bb, D, F)
 chordFormulas.set("min9", [0, 3, 7, 10, 14]);        // Minor 9th (C, Eb, G, Bb, D)
+chordFormulas.set("minMaj9", [0, 3, 7, 11, 14]);        // Minor-Major 9th
 chordFormulas.set("maj9", [0, 4, 7, 11, 14]);        // Major 9th (C, E, G, B, D)
 chordFormulas.set("9", [0, 4, 7, 10, 14]);         // Dominant 9th (C, E, G, Bb, D)
 chordFormulas.set("min6", [0, 3, 7, 9]);             // Minor 6th (C, Eb, G, A)
+chordFormulas.set("augMaj9", [0, 4, 8, 11, 14]);             // Augmented Major 9th
 chordFormulas.set("6", [0, 4, 7, 9]);               // Major 6th (C, E, G, A)
 
 // Suspended 7ths
-chordFormulas.set("7sus4", [0, 2, 7, 10]);      // Dominant 7th w/ Suspended 4th 
-chordFormulas.set("7sus4", [0, 5, 7, 10]);      // Dominant 7th w/ Suspended 2nd
+chordFormulas.set("7sus2", [0, 2, 7, 10]);      // Dominant 7th w/ Suspended 2nd 
+chordFormulas.set("7sus4", [0, 5, 7, 10]);      // Dominant 7th w/ Suspended 4th
+chordFormulas.set("7sus24", [0, 2, 5, 7, 10]);      // Dominant 7th w/ SomethingTM
+chordFormulas.set("7susb13", [0, 5, 7, 10, 20]);
 
 // Seventh chords
 chordFormulas.set("7b5", [0, 4, 6, 10]);       // Dominant 7♭5 (C, E, Gb, Bb)
