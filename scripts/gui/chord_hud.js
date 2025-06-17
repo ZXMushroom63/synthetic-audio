@@ -14,7 +14,7 @@ const chromaticScaleShifted = [
 ];
 
 function chromaticToIndex(note) { // A4, C#5 (no flats allowed here tho)
-    const octave = parseInt(note[note.length - 1]);
+    const octave = parseInt(note[note.length - 1]) || 0;
     const offset = chromaticScale.indexOf(note.substring(0, note.length - 1).toUpperCase());
     return octave * 12 + offset;
 }
@@ -148,8 +148,8 @@ function getInversionNotes(rootIndex, formula, inversion) {
         notes.push(chromaticScale[noteValue % 12]);
         values.push(noteValue);
     }
-    const shiftLowest = Math.floor(Math.min(...values)/12);
-    values = values.map(x => x - shiftLowest*12);
+    const shiftLowest = Math.floor(Math.min(...values) / 12);
+    values = values.map(x => x - shiftLowest * 12);
     return {
         notes,
         values
@@ -191,7 +191,7 @@ function generateChordTable() {
 
 const { chordDictionary, reverseChordLookup } = generateChordTable();
 
-Set.prototype.isSubsetOf ||= ()=>false; //quick polyfill
+Set.prototype.isSubsetOf ||= () => false; //quick polyfill
 
 function updateChordHudDatalist() {
     if (document.querySelector("#chordDatalist")) {
@@ -200,7 +200,7 @@ function updateChordHudDatalist() {
     const datalist = document.createElement("datalist");
     datalist.id = "chordDatalist";
     const possibilities = Object.keys(reverseChordLookup);
-    possibilities.sort((a, b)=>a.length - b.length);
+    possibilities.sort((a, b) => a.length - b.length);
     for (const chordType of possibilities) {
         if (gui.acceptedNotes && gui.autocorrect !== "OFF" && !reverseChordLookup[chordType].notes.isSubsetOf(gui.acceptedNotes)) {
             continue;
@@ -305,10 +305,15 @@ function chordDisplayEdit(display, e, loop) {
         .replaceAll("pwr", "5")
         .replaceAll("aug7", "augMaj7")
         .trim();
+    lookupValue = lookupValue[0].toUpperCase() + lookupValue.substring(1);
+    var bassNote = lookupValue.includes("/") ? lookupValue.split("/")[1] : "";
+    if (bassNote) {
+        lookupValue = lookupValue.split("/")[0];
+        lookupValue = lookupValue[0].toUpperCase() + lookupValue.substring(1);
+    }
     if (!lookupValue) {
         return;
     }
-    lookupValue = lookupValue[0].toUpperCase() + lookupValue.substring(1);
     if (e.key === "Enter" && loop.relatedChord && reverseChordLookup[lookupValue]) {
         const chord = reverseChordLookup[lookupValue];
         const octaveOffset = 12 * (Math.min(...loop.relatedChord.map(x => getChromaticOctave(x.theoryNote))));
@@ -321,6 +326,9 @@ function chordDisplayEdit(display, e, loop) {
         chord.values.forEach((v, i) => {
             const dt = structuredClone(template);
             var freq = `:${indexToChromatic(octaveOffset + v)}:`;
+            if (i === 0 && bassNote) {
+                freq = ":" + bassNote + ":";
+            }
             dt.layer += i;
             filters[template.type].applyMidi(dt, freq);
             const newLoop = deserialiseNode(dt, true);
