@@ -2,6 +2,13 @@ var timePosMarkerAnimator = -1;
 var timePosMarkerMidiActuator = {};
 var timePosMarkerLoopPlayback = {};
 // MIDI_NOTE : [RAISE_TIME, [loopArray]]
+function resetMidiSignals() {
+    Object.keys(timePosMarkerMidiActuator).forEach(note => {
+        sendMidiMessage(MIDI_NOTE_OFF, parseInt(note), 0);
+        delete timePosMarkerMidiActuator[note];
+    });
+    timePosMarkerLoopPlayback = {};
+}
 registerSetting("MidiOutput", false);
 function hydrateTimePosMarker(unused, isAnimated) {
     document.querySelector(".timePosMarker").style.left = gui.marker / audio.duration * 100 + "%";
@@ -27,14 +34,14 @@ function hydrateTimePosMarker(unused, isAnimated) {
     }
 }
 addEventListener("hydrate", hydrateTimePosMarker);
-addEventListener("deserialise", ()=>{
+addEventListener("deserialise", () => {
     gui.marker = 0;
     hydrateTimePosMarker();
 });
 addEventListener("init", () => {
     const renderOut = document.querySelector("#renderOut");
     document.querySelector(".timePosMarker").addEventListener("mousedown", (e) => {
-        timePosMarkerLoopPlayback = {};
+        resetMidiSignals();
         e.preventDefault();
         var bba = document.querySelector("#trackInternal").getBoundingClientRect();
         window.onmousemove = (e) => {
@@ -55,15 +62,10 @@ addEventListener("init", () => {
     });
     renderOut.addEventListener("timeupdate", () => {
         if (!renderOut.currentTime) {
-            clearInterval(timePosMarkerAnimator);
             return hydrateTimePosMarker();
         }
         gui.marker = renderOut.currentTime;
-        clearInterval(timePosMarkerAnimator);
-        timePosMarkerAnimator = setInterval(() => {
-            gui.marker = renderOut.currentTime;
-            hydrateTimePosMarker(null, true);
-        }, 1000 / 30);
+        hydrateTimePosMarker();
     });
     renderOut.addEventListener("play", () => {
         stopSample();
@@ -76,12 +78,13 @@ addEventListener("init", () => {
     });
     renderOut.addEventListener("pause", () => {
         clearInterval(timePosMarkerAnimator);
+        resetMidiSignals();
     });
     renderOut.addEventListener("ended", () => {
         clearInterval(timePosMarkerAnimator);
+        resetMidiSignals();
     });
     renderOut.addEventListener("seeking", () => {
-        clearInterval(timePosMarkerAnimator);
         if (!renderOut.currentTime) {
             return hydrateTimePosMarker();
         }
@@ -89,14 +92,14 @@ addEventListener("init", () => {
         hydrateTimePosMarker();
     });
     renderOut.addEventListener("loadedmetadata", () => {
-        timePosMarkerLoopPlayback = {};
+        resetMidiSignals();
         clearInterval(timePosMarkerAnimator);
         document.querySelector('#renderOut').playbackRate = parseFloat(document.querySelector('#playbackRateSlider').value) || 0
         renderOut.currentTime = gui.marker;
         hydrateTimePosMarker();
     });
     renderOut.addEventListener("loadstart", () => {
-        timePosMarkerLoopPlayback = {};
+        resetMidiSignals();
         clearInterval(timePosMarkerAnimator);
         renderOut.currentTime = gui.marker;
         hydrateTimePosMarker();
