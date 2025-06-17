@@ -243,13 +243,14 @@ function getChordTypeFromStack(loops) {
     return chordDictionary[backupKey]?.display;
 }
 
-function getChordStack(loop) {
+function getChordStack(loop, allowAtonal) {
     if (loop.hasAttribute("data-deleted")) {
         return [];
     }
+    var combiner = allowAtonal ? "" : ":has(.noteDisplay)";
     var startingRange = parseInt(loop.getAttribute("data-layer"));
     var endingRange = startingRange;
-    var loops = [...findLoops(`.loop:has(.noteDisplay):not([data-deleted])[data-start="${loop.getAttribute("data-start")
+    var loops = [...findLoops(`.loop${combiner}:not([data-deleted])[data-start="${loop.getAttribute("data-start")
         }"][data-duration="${loop.getAttribute("data-duration")
         }"][data-editlayer="${loop.getAttribute("data-editlayer")
         }"]`)]

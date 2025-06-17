@@ -299,7 +299,7 @@ function addBlock(type, start, duration, title, layer = 0, data = {}, editorValu
 
         if (e.altKey) {
             Object.defineProperty(e, "altKey", { value: false });
-            getChordStack(loop).forEach(l => {
+            getChordStack(loop, true).forEach(l => {
                 const ev = new MouseEvent("mousedown", {
                     bubbles: true,
                     clientX: mouse.x,
