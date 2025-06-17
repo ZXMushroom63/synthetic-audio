@@ -1,3 +1,4 @@
 marked.js|https://unpkg.com/marked@latest/marked.min.js
 filesaver.min.js|https://raw.githubusercontent.com/eligrey/FileSaver.js/refs/heads/master/dist/FileSaver.min.js
 jszip.min.js|https://raw.githubusercontent.com/Stuk/jszip/refs/heads/main/dist/jszip.min.js
+abcjs-basic.js|https://raw.githubusercontent.com/paulrosen/abcjs/refs/heads/main/dist/abcjs-basic-min.js
