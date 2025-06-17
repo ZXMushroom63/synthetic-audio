@@ -7,6 +7,7 @@ addEventListener("init", () => {
         <label>Time Signature: </label><input type="text" id="sheetTimeSig" value="4/4"><br>
         <label>Center Octave: </label><input type="number" id="sheetOctave" value="5"><br>
         <label>Key Signature: </label><input type="text" id="sheetKey" value="C major"><br>
+        <label>Jazz Chords</label><input type="checkbox" checked id="sheetJazzChords"><br>
         <button id="sheetGoButton">Generate</button><br>
         <small>Note: substepping levels not equal to 1, 2, or 4 are unstable.</small>
     `);
@@ -45,36 +46,54 @@ addEventListener("init", () => {
         let abc = `X:1\n`;
         abc += `T:${document.querySelector("#sheetTitle").value}\n`;
         abc += `M:${timeSignature}\n`;
-        abc += `L:1/4\n`; // Set default note length (e.g., quarter note is 1 unit)
-        abc += `K:${document.querySelector("#sheetKey").value}\n`; // Default key, adjust if you detect it from MIDI
+        abc += `L:1/4\n`;
+        abc += `K:${document.querySelector("#sheetKey").value}\n`;
 
         let currentBeat = 0;
         let measureBeats = 0;
         const beatsPerMeasure = parseInt(timeSignature.split('/')[0]);
-        const beatUnit = parseInt(timeSignature.split('/')[1]); // e.g. 4 for quarter note
+        let i = 0;
 
-        for (let i = 0; i < parsedNotes.length; i++) {
+        while (i < parsedNotes.length) {
             const note = parsedNotes[i];
+
             if (note.startTime > currentBeat) {
                 const restDuration = note.startTime - currentBeat;
                 abc += `z${beatDurationToAbcDuration(restDuration)} `;
                 measureBeats += restDuration;
             }
 
-            const abcNote = midiToAbcNote(note.midi);
+            let lookahead = i + 1;
+            while (lookahead < parsedNotes.length && parsedNotes[lookahead].startTime === note.startTime) {
+                lookahead++;
+            }
+
+            const chordNotes = parsedNotes.slice(i, lookahead);
+            let abcNotes;
+
+            if (chordNotes.length > 1) {
+                abcNotes = `[${chordNotes.map(n => midiToAbcNote(n.midi)).join('')}]`;
+            } else {
+                abcNotes = midiToAbcNote(note.midi);
+            }
+
             const abcDuration = beatDurationToAbcDuration(note.duration);
-            abc += `${abcNote}${abcDuration} `;
+            abc += `${abcNotes}${abcDuration} `;
+
             measureBeats += note.duration;
             currentBeat = note.startTime + note.duration;
 
             if (measureBeats >= beatsPerMeasure) {
                 abc += '| ';
-                measureBeats = 0; // Reset for next measure
+                measureBeats = 0;
             }
+
+            i = lookahead;
         }
 
         return abc;
     };
+
     function renderSheet() {
         const parsedNotes = sheetTargets.map(x => ({
             midi: chromaticToIndex(x.theoryNote) + 12,
@@ -82,10 +101,12 @@ addEventListener("init", () => {
             duration: quantise(x.duration / audio.beatSize, 0.25),
             name: x.theoryNote
         }));
+        parsedNotes.sort((a, b) => a.startTime - b.startTime);
         ABCJS.renderAbc('sheetAbcJsTarget', generateAbcString(parsedNotes, document.querySelector("#sheetTimeSig").value), {
             staffwidth: 780, // Adjust width
             responsive: 'resize',
-            selectionColor: "#000000"
+            selectionColor: "#000000",
+            jazzchords: document.querySelector("#sheetJazzChords")
         });
         MODMENU_OpenTab(null, "Sheet");
     }
@@ -96,8 +117,8 @@ addEventListener("init", () => {
     }
     registerTool("Sheet [BETA]", (nodes) => {
         if (!nodes) { return };
-        sheetTargets = [...nodes].filter(x => !!x.theoryNote).map(x => serialiseNode(x)).map((x, i) => {x.theoryNote = nodes[i].theoryNote; return x});
-        console.log(sheetTargets);
+        sheetTargets = [...nodes].filter(x => !!x.theoryNote).map(x => serialiseNode(x)).map((x, i) => { x.theoryNote = nodes[i].theoryNote; return x });
+
         sheetGui.init({
             onclose: () => {
             }
