@@ -137,7 +137,9 @@ chordFormulas.set("m3", [0, 3]);
 chordFormulas.set("5", [0, 7]);
 
 // Triads
+chordFormulas.set("b5", [0, 4, 6]);
 chordFormulas.set("sus2b5", [0, 2, 6]);
+chordFormulas.set("m#5", [0, 3, 8]);
 chordFormulas.set("sus24", [0, 2, 5, 7]);
 chordFormulas.set("sus4", [0, 5, 7]);      // Suspended 4th (C, F, G)
 chordFormulas.set("sus2", [0, 2, 7]);      // Suspended 2nd (C, D, G)
