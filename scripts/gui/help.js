@@ -62,6 +62,7 @@ helpContent.addTab("Keybinds", `
 - ~CTRL + Q~ = Multi-edit selected loops
 - ~ALT + A~ = Arpeggiate selected loops
 - ~F2~ = Rename selected loops
+- ~CTRL + P~ = Convert selected loops into sheet music
 `);
 
 helpContent.addTab("Programmable Fields", `
