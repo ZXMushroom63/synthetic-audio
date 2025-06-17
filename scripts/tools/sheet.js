@@ -3,11 +3,11 @@ addEventListener("init", () => {
     var tabs = new ModMenuTabList();
 
     tabs.addTab("Sheet Settings", `
-        <label>Title: </label><input type="text" id="sheetTitle" value="abc.js is cool"><br>
-        <label>Time Signature: </label><input type="text" id="sheetTimeSig" value="4/4"><br>
-        <label>Center Octave: </label><input type="number" id="sheetOctave" value="5"><br>
-        <label>Key Signature: </label><input type="text" id="sheetKey" value="C major"><br>
-        <label>Jazz Chords</label><input type="checkbox" checked id="sheetJazzChords"><br>
+        <label>Title: </label><input type="text" id="sheetTitle" value="abc.js is cool" class="inputStyles"><br>
+        <label>Time Signature: </label><input type="text" id="sheetTimeSig" value="4/4" class="inputStyles"><br>
+        <label>Center Octave: </label><input type="number" id="sheetOctave" value="5" class="inputStyles"><br>
+        <label>Key Signature: </label><input type="text" id="sheetKey" value="C major" class="inputStyles"><br>
+        <label>Jazz Chords</label><input type="checkbox" id="sheetJazzChords" class="inputStyles"><br>
         <button id="sheetGoButton">Generate</button><br>
         <small>Note: substepping levels not equal to 1, 2, or 4 are unstable.</small>
     `);
@@ -46,7 +46,7 @@ addEventListener("init", () => {
         let abc = `X:1\n`;
         abc += `T:${document.querySelector("#sheetTitle").value}\n`;
         abc += `M:${timeSignature}\n`;
-        abc += `L:1/4\n`;
+        abc += `L:1/2\n`;
         abc += `K:${document.querySelector("#sheetKey").value}\n`;
 
         let currentBeat = 0;
