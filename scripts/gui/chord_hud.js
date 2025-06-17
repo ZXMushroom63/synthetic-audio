@@ -98,9 +98,11 @@ chordFormulas.set("7,6sus4", [0, 4, 7, 9, 10, 14, 17]);
 
 // Other similar chords
 chordFormulas.set("min13", [0, 3, 7, 10, 14, 17, 21]);   // Minor 13th (C, Eb, G, Bb, D, F, A)
+chordFormulas.set("minMaj13", [0, 3, 7, 11, 14, 17, 21]);   // Minor-Major 13th (C, Eb, G, B, D, F, A)
 chordFormulas.set("maj13", [0, 4, 7, 11, 14, 17, 21]);   // Major 13th (C, E, G, B, D, F, A)
 chordFormulas.set("13", [0, 4, 7, 10, 14, 17, 21]);     // Dominant 13th (C, E, G, Bb, D, F, A)
 chordFormulas.set("min11", [0, 3, 7, 10, 14, 17]);     // Minor 11th (C, Eb, G, Bb, D, F)
+chordFormulas.set("minMaj11", [0, 3, 7, 11, 14, 17]);     // Minor-Major 11th (C, Eb, G, B, D, F)
 chordFormulas.set("maj11", [0, 4, 7, 11, 14, 17]);     // Major 11th (C, E, G, B, D, F)
 chordFormulas.set("11", [0, 4, 7, 10, 14, 17]);      // Dominant 11th (C, E, G, Bb, D, F)
 chordFormulas.set("min9", [0, 3, 7, 10, 14]);        // Minor 9th (C, Eb, G, Bb, D)
@@ -135,6 +137,8 @@ chordFormulas.set("m3", [0, 3]);
 chordFormulas.set("5", [0, 7]);
 
 // Triads
+chordFormulas.set("sus2b5", [0, 2, 6]);
+chordFormulas.set("sus24", [0, 2, 5, 7]);
 chordFormulas.set("sus4", [0, 5, 7]);      // Suspended 4th (C, F, G)
 chordFormulas.set("sus2", [0, 2, 7]);      // Suspended 2nd (C, D, G)
 chordFormulas.set("dim", [0, 3, 6]);       // Diminished triad (C, Eb, Gb)
