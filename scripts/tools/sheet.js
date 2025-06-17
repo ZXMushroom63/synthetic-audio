@@ -7,7 +7,8 @@ addEventListener("init", () => {
         <label>Time Signature: </label><input type="text" id="sheetTimeSig" value="4/4" class="inputStyles"><br>
         <label>Center Octave: </label><input type="number" id="sheetOctave" value="5" class="inputStyles"><br>
         <label>Key Signature: </label><input type="text" id="sheetKey" value="C major" class="inputStyles"><br>
-        <label>Jazz Chords</label><input type="checkbox" id="sheetJazzChords" class="inputStyles"><br>
+        <label>Jazz Chords: </label><input type="checkbox" id="sheetJazzChords" class="inputStyles"><br>
+        <label>Guitar Tablature: </label><input type="checkbox" id="sheetTablature" class="inputStyles"><br>
         <button id="sheetGoButton">Generate</button><br>
         <small>Note: substepping levels not equal to 1, 2, or 4 are unstable.</small>
     `);
@@ -102,12 +103,20 @@ addEventListener("init", () => {
             name: x.theoryNote
         }));
         parsedNotes.sort((a, b) => a.startTime - b.startTime);
-        ABCJS.renderAbc('sheetAbcJsTarget', generateAbcString(parsedNotes, document.querySelector("#sheetTimeSig").value), {
+        const flags = {
             staffwidth: 780, // Adjust width
             responsive: 'resize',
             selectionColor: "#000000",
-            jazzchords: document.querySelector("#sheetJazzChords")
-        });
+            jazzchords: document.querySelector("#sheetJazzChords").checked
+        };
+        if (document.querySelector("#sheetTablature").checked) {
+            flags.tablature = [{
+                instrument: "guitar",
+                label: "Guitar (%T)",
+                tuning: ["D,", "A,", "D", "G", "A", "d"],
+            }];
+        }
+        ABCJS.renderAbc('sheetAbcJsTarget', generateAbcString(parsedNotes, document.querySelector("#sheetTimeSig").value), flags);
         MODMENU_OpenTab(null, "Sheet");
     }
 
