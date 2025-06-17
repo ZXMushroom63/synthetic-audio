@@ -7,7 +7,8 @@
     "lib": "lib"
   },
   "scripts": {
-    "host": "node server/index.js"
+    "host": "node server/index.js",
+    "getlib": "node server/dl_libs.mjs"
   },
   "repository": {
     "type": "git",
@@ -28,6 +29,7 @@
   "dependencies": {
     "cors": "^2.8.5",
     "express": "^5.1.0",
+    "node-fetch": "^3.3.2",
     "socket.io": "^4.8.1",
     "uuid": "^11.1.0"
   }
