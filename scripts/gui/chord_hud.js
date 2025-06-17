@@ -91,6 +91,10 @@ chordFormulas.set("7#11", [0, 4, 7, 10, 18]);
 chordFormulas.set("maj7#11", [0, 4, 7, 11, 18]);
 chordFormulas.set("min7#11", [0, 3, 7, 10, 18]);
 chordFormulas.set("augMaj7#9", [0, 4, 8, 11, 15]);             // wtf even is this
+chordFormulas.set("7,6", [0, 4, 7, 9, 10]);
+chordFormulas.set("7,6sus2", [0, 4, 7, 9, 10, 14]);
+chordFormulas.set("7,6sus4", [0, 4, 7, 9, 10, 14, 17]);
+
 
 // Other similar chords
 chordFormulas.set("min13", [0, 3, 7, 10, 14, 17, 21]);   // Minor 13th (C, Eb, G, Bb, D, F, A)
