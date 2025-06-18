@@ -55,6 +55,7 @@ addEventListener("init", () => {
         if (beats === 1) return ""; // quarter note
         if (beats === 0.5) return "/2"; // eighth note
         if (beats === 0.25) return "/4"; // sixteenth note
+        if (beats === 0.125) return "/8"; // sixteenth note
         return ""; // Default to quarter
     }
 
@@ -113,8 +114,8 @@ addEventListener("init", () => {
     function renderSheet() {
         const parsedNotes = sheetTargets.map(x => ({
             midi: chromaticToIndex(x.theoryNote) + 12,
-            startTime: quantise(x.start / audio.beatSize, 0.25),
-            duration: quantise(x.duration / audio.beatSize, 0.25),
+            startTime: quantise(x.start / audio.beatSize, 0.125),
+            duration: quantise(x.duration / audio.beatSize, 0.125),
             name: x.theoryNote
         }));
         parsedNotes.sort((a, b) => a.startTime - b.startTime);
