@@ -73,7 +73,7 @@ addEventListener("init", () => {
         const num = frac.n;
         const den = frac.d;
 
-        if (den === 1) return num.toString(); 
+        if (den === 1) return num.toString();
         if (num === 1 && den === 2) return "/2";
         if (num === 1) return `/${den}`;
         return `${num}/${den}`;
@@ -95,6 +95,7 @@ addEventListener("init", () => {
 
         const voices = [];
         const voiceEndTimes = [];
+        const voicesMidi = [];
 
         let i = 0;
         while (i < parsedNotes.length) {
@@ -136,8 +137,12 @@ addEventListener("init", () => {
                 if (group.length > 1) {
                     const chordNotes = group.map(n => midiToAbcNote(n.midi)).join('');
                     elementAbc = `[${chordNotes}]`;
+                    voicesMidi[voiceIndex] ||= [group[0].midi];
+                    voicesMidi[voiceIndex].push(group[0].midi);
                 } else {
                     elementAbc = midiToAbcNote(group[0].midi);
+                    voicesMidi[voiceIndex] ||= [group[0].midi];
+                    voicesMidi[voiceIndex].push(group[0].midi);
                 }
 
                 const durationAbc = beatDurationToAbc(duration, defaultNoteLengthInBeats);
@@ -159,10 +164,20 @@ addEventListener("init", () => {
             }
         }
 
-        for (let v = 0; v < voices.length; v++) {
-            abc += `V:${v + 1} clef=treble\n${voices[v].trim()}\n`;
-        }
+        voicesMidi.forEach((x, v) => {
+            voicesMidi[v] = Math.floor(x.reduce((acc, v) => v + acc, 0) / x.length / 12);
+            voices[v] = Object(voices[v]);
+            voices[v].__oct = voicesMidi[v];
+        });
 
+        voices.sort((a, b)=>b.__oct - a.__oct);
+
+        const sheetCenter = parseInt(document.querySelector("#sheetOctave").value);
+        for (let v = 0; v < voices.length; v++) {
+            const octaveOffset = voicesMidi[voices.length - v - 1] - sheetCenter;
+            abc += `V:${voices.length - v} clef=${octaveOffset < 0 ? "bass" : "treble"}\n${voices[v].trim()}\n`;
+        }
+        
         return abc;
     };
 
