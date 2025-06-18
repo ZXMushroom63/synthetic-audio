@@ -1069,3 +1069,26 @@ li {
   background-color: white;
   color: black;
 }
+
+[data-abcjs-disable-sheet=true] g[data-name="bar"] path, [data-abcjs-disable-sheet=true] svg>g:last-child>path:last-child {
+  transform-origin: bottom;
+  transform: scaleY(0.6);
+}
+#sheetAbcJsTarget * {
+  white-space: normal;
+}
+@media print {
+  body *:not(.printable, .printable *) {
+    display: none;
+  }
+  .printable {
+    display: block !important;
+    position: fixed !important;
+    z-index: 999;
+    width: 100vw !important;
+    height: 100vh !important;
+    top: 0 !important;
+    left: 0 !important;
+    background-color: white;
+  }
+}
