@@ -49,63 +49,118 @@ addEventListener("init", () => {
         return abcNote;
     }
 
-    function beatDurationToAbcDuration(beats) {
-        if (beats === 4) return "4"; // whole note
-        if (beats === 2) return "2"; // half note
-        if (beats === 1) return ""; // quarter note
-        if (beats === 0.5) return "/2"; // eighth note
-        if (beats === 0.25) return "/4"; // sixteenth note
-        if (beats === 0.125) return "/8"; // sixteenth note
-        return ""; // Default to quarter
+    function toFraction(decimal, tolerance = 1.0E-9) {
+        if (decimal === Math.round(decimal)) {
+            return { n: decimal, d: 1 };
+        }
+        let h1 = 1, h2 = 0, k1 = 0, k2 = 1;
+        let b = decimal;
+        do {
+            let a = Math.floor(b);
+            let aux = h1; h1 = a * h1 + h2; h2 = aux;
+            aux = k1; k1 = a * k1 + k2; k2 = aux;
+            b = 1 / (b - a);
+        } while (Math.abs(decimal - h1 / k1) > decimal * tolerance);
+        return { n: h1, d: k1 };
+    }
+
+    function beatDurationToAbc(beats, defaultNoteLengthInBeats = 1) {
+        const ratio = beats / defaultNoteLengthInBeats;
+
+        if (Math.abs(ratio - 1) < 1.0E-9) return "";
+
+        const frac = toFraction(ratio);
+        const num = frac.n;
+        const den = frac.d;
+
+        if (den === 1) return num.toString(); 
+        if (num === 1 && den === 2) return "/2";
+        if (num === 1) return `/${den}`;
+        return `${num}/${den}`;
     }
 
     const generateAbcString = (parsedNotes, timeSignature = "4/4") => {
         let abc = `X:1\n`;
         abc += `T:${document.querySelector("#sheetTitle").value}\n`;
         abc += `M:${timeSignature}\n`;
-        abc += `L:1/2\n`;
+
+        const defaultNoteLengthInBeats = 0.5;
+        abc += `L:1/8\n`;
+
         abc += `K:${document.querySelector("#sheetKey").value}\n`;
 
-        let currentBeat = 0;
-        let measureBeats = 0;
-        const beatsPerMeasure = parseInt(timeSignature.split('/')[0]);
+        if (parsedNotes.length === 0) {
+            return abc;
+        }
+
+        const voices = [];
+        const voiceEndTimes = [];
+
         let i = 0;
-
         while (i < parsedNotes.length) {
-            const note = parsedNotes[i];
-
-            if (note.startTime > currentBeat) {
-                const restDuration = note.startTime - currentBeat;
-                abc += `z${beatDurationToAbcDuration(restDuration)} `;
-                measureBeats += restDuration;
-            }
-
-            let lookahead = i + 1;
-            while (lookahead < parsedNotes.length && parsedNotes[lookahead].startTime === note.startTime) {
+            const startTime = parsedNotes[i].startTime;
+            let lookahead = i;
+            while (lookahead < parsedNotes.length && Math.abs(parsedNotes[lookahead].startTime - startTime) < 0.001) {
                 lookahead++;
             }
+            const notesInEvent = parsedNotes.slice(i, lookahead);
 
-            const chordNotes = parsedNotes.slice(i, lookahead);
-            let abcNotes;
-
-            if (chordNotes.length > 1) {
-                abcNotes = `[${chordNotes.map(n => midiToAbcNote(n.midi)).join('')}]`;
-            } else {
-                abcNotes = midiToAbcNote(note.midi);
+            const notesByDuration = {};
+            for (const note of notesInEvent) {
+                const duration = note.duration;
+                if (!notesByDuration[duration]) {
+                    notesByDuration[duration] = [];
+                }
+                notesByDuration[duration].push(note);
             }
 
-            const abcDuration = beatDurationToAbcDuration(note.duration);
-            abc += `${abcNotes}${abcDuration} `;
+            for (const durationStr in notesByDuration) {
+                const group = notesByDuration[durationStr];
+                const duration = parseFloat(durationStr);
 
-            measureBeats += note.duration;
-            currentBeat = note.startTime + note.duration;
+                let voiceIndex = voiceEndTimes.findIndex(endTime => endTime <= startTime + 0.001);
 
-            if (measureBeats >= beatsPerMeasure) {
-                abc += '| ';
-                measureBeats = 0;
+                if (voiceIndex === -1) {
+                    voiceIndex = voices.length;
+                    voices.push("");
+                    voiceEndTimes.push(0);
+                }
+
+                const restDuration = startTime - voiceEndTimes[voiceIndex];
+                if (restDuration > 0.001) {
+                    const restAbc = beatDurationToAbc(restDuration, defaultNoteLengthInBeats);
+                    voices[voiceIndex] += `z${restAbc} `;
+                }
+
+                let elementAbc;
+                if (group.length > 1) {
+                    const chordNotes = group.map(n => midiToAbcNote(n.midi)).join('');
+                    elementAbc = `[${chordNotes}]`;
+                } else {
+                    elementAbc = midiToAbcNote(group[0].midi);
+                }
+
+                const durationAbc = beatDurationToAbc(duration, defaultNoteLengthInBeats);
+                voices[voiceIndex] += `${elementAbc}${durationAbc} `;
+
+                voiceEndTimes[voiceIndex] = startTime + duration;
             }
 
             i = lookahead;
+        }
+
+        const maxEndTime = Math.max(0, ...voiceEndTimes);
+
+        for (let v = 0; v < voices.length; v++) {
+            const paddingNeeded = maxEndTime - voiceEndTimes[v];
+            if (paddingNeeded > 0.001) {
+                const restAbc = beatDurationToAbc(paddingNeeded, defaultNoteLengthInBeats);
+                voices[v] += `z${restAbc}`;
+            }
+        }
+
+        for (let v = 0; v < voices.length; v++) {
+            abc += `V:${v + 1} clef=treble\n${voices[v].trim()}\n`;
         }
 
         return abc;
@@ -120,7 +175,7 @@ addEventListener("init", () => {
         }));
         parsedNotes.sort((a, b) => a.startTime - b.startTime);
         const flags = {
-            staffwidth: 780, // Adjust width
+            staffwidth: 780,
             responsive: 'resize',
             selectionColor: "#000000",
             jazzchords: document.querySelector("#sheetJazzChords").checked,
@@ -131,8 +186,8 @@ addEventListener("init", () => {
             }
         };
         if (document.querySelector("#sheetTablature").checked) {
-            const tuning = document.querySelector("#sheetTabTuning").value.split(",").map(x => midiToAbcNote(chromaticToIndex(x.trim().toUpperCase())+12));
-            console.log(tuning);
+            const tuning = document.querySelector("#sheetTabTuning").value.split(",").map(x => midiToAbcNote(chromaticToIndex(x.trim().toUpperCase()) + 12));
+
             flags.tablature = [{
                 instrument: document.querySelector("#sheetTabMode").value,
                 label: document.querySelector("#sheetTabTitle").value,
@@ -154,7 +209,7 @@ addEventListener("init", () => {
             const vb = svg.getAttribute("viewBox").split(" ");
             vb[1] = title.getAttribute("y");
             svg.setAttribute("viewBox", vb.join(" "));
-            title.setAttribute("y", parseFloat(title.getAttribute("y"))*2 + 20);
+            title.setAttribute("y", parseFloat(title.getAttribute("y")) * 2 + 20);
         }
         MODMENU_OpenTab(null, "Sheet");
     }
