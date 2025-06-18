@@ -109,7 +109,7 @@ function deserialise(serialisedStr) {
     ser.nodes ||= [];
     ser.duration ||= 10;
     ser.zoom ||= 100;
-    ser.bpm ||= 240;
+    ser.bpm ||= 120;
     ser.loopInterval ||= 0.001;
     ser.editorLayer ||= 0;
     ser.substepping ||= 1;
