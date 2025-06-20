@@ -53,7 +53,7 @@ addEventListener("init", async () => {
         console.log("%cStar the project on github! https://github.com/ZXMushroom63/synthetic-audio", "border: 4px solid black; border-radius: 6px; padding: 0.5rem; font-size: 1.5em; background-color: black; background-image: linear-gradient(140deg,rgba(255, 0, 0, 0.3) 0%,rgba(255, 255, 255, 0) 34%,rgba(0, 255, 187, 0.2) 100%); color: white; font-style: italic;")
     }
     const postInitQueue = [];
-    const allowedAudioFormats = [".ogg", ".mp3", ".flac", ".m4a", ".mp4", ".aiff", ".wav"];
+    const allowedAudioFormats = [".ogg", ".mp3", ".flac", ".m4a", ".mp4", ".aiff", ".wav", ".mov", ".webm"];
     const isAudio = (fname) => !!allowedAudioFormats.find(x => fname.endsWith(x));
     async function loadSamplePack(pack, packName) {
         logToLoader(`Loading sample pack: ${packName}`);
