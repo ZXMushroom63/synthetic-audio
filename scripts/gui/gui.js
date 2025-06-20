@@ -219,7 +219,7 @@ function hydrateLoopBackground(elem) {
         return;
     }
     var d = "M0 50";
-    var downsample = Math.min(Math.max(64, settings.LoopWaveformDisplayDownsampling || 256), 1024);
+    var downsample = Math.min(Math.max(64, settings.LoopWaveformDisplayDownsampling || 256), 8192);
     prevY = 0;
     elem.cache[0].forEach((v, i) => {
         var isFinalSample = i === (elem.cache[0].length - 1);
