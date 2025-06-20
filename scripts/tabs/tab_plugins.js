@@ -76,6 +76,10 @@ addEventListener("init", async () => {
                 if (rootFolders.length === 1) {
                     filename = filename.replace(rootFolders[0], "");
                 }
+                const subdir = prefix + filename.match(/.+\//)[0];
+                if (!SAMPLEPACK_DIRECTORIES.includes(subdir)) {
+                    SAMPLEPACK_DIRECTORIES.push(subdir);
+                }
                 const out = new File([await file.async("uint8array")], prefix + filename);
                 await importAudioFile(out, true);
             } else if (file.dir) {
