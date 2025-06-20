@@ -32,7 +32,11 @@ registerSetting("WakatimeEndpoint", "https://wakahost.example.com/api/waka/v1");
         }
         wakaInited = true;
         if ((Date.now() - lastActivityTime) < 2 * 60 * 1000) {
-            if (!globalThis.lastEditedFile || !settings.WakatimeEnabled) {
+            if (!settings.WakatimeEnabled) {
+                return;
+            }
+            if (!globalThis.lastEditedFile) {
+                document.querySelector("#renderProgress").innerText = "Wakatime: Didn't send heartbeat: no file open!";
                 return;
             }
             sendWakaTimeHeartbeat({
