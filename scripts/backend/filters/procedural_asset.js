@@ -77,7 +77,7 @@ addBlockType("p_readasset", {
         });
         var duration = Math.floor(Math.round((((currentData.length / audio.samplerate) || 0) + 0.0) / data.loopInterval) * data.loopInterval * audio.samplerate);
         const empty = new Float32Array(2);
-        const speed = this.conf.Speed * (_(this.conf.Note)(0, empty) / _(this.conf.ReferenceNote)(0, empty));
+        const speed = this.conf.SamplerEnabled ? (this.conf.Speed * (_(this.conf.Note)(0, empty) / _(this.conf.ReferenceNote)(0, empty))) : this.conf.Speed;
         if (this.conf.Sidechain) {
             applySoundbiteToPcmSidechain(this.conf.Reverse, this.conf.Looping, currentData, inPcm, duration, speed, this.conf.Volume, this.conf.StartOffset, this.conf.SidechainPower, this.conf.Silent);
         } else {
