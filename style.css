@@ -181,18 +181,19 @@ html[data-libsettings-OpaqueLayers="true"] .loop.deactivated {
   background-blend-mode: color;
 }
 
-.loop.active .loopInternal {
-  outline: 2px solid rgba(255, 255, 255, 0.75);
-}
+
 
 .loopInternal.selected {
   outline: 2px solid rgba(0, 255, 255, 0.75);
 }
 
 .loop[data-bad-note] .loopInternal {
-  outline: 2px solid rgba(255, 153, 0, 0.75);
+  outline: 1.5px solid rgba(255, 153, 0, 0.75);
 }
 
+.loop.active .loopInternal {
+  outline: 2px solid rgba(255, 255, 255, 0.75);
+}
 .loopInternal:hover {
   border: 1px solid rgb(199, 199, 255);
 }
