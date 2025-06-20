@@ -108,7 +108,7 @@ addEventListener("init", () => {
                         pasteData(fr.result, e.shiftKey, true);
                     };
                     fr.readAsText(file);
-                } else if (file.type.startsWith("audio/")) {
+                } else if (file.type.startsWith("audio/") || file.type.startsWith("video/")) {
                     const newFile = new File([file], "User/" + file.name, { type: file.type });
 
                     await addSample(newFile.name, newFile);
