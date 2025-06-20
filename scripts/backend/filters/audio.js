@@ -19,7 +19,7 @@ addBlockType("audio", {
     amplitude_smoothing_knob: true,
     functor: function (inPcm, channel, data) {
         var obj = decodedPcmCache[this.file];
-        var currentData = obj ? obj.getChannelData(Math.min(channel, obj.numberOfChannels - 1)) : new Float32Array(0);
+        var currentData = obj ? obj.getChannelData(Math.min(channel, obj.numberOfChannels - 1)).slice() : new Float32Array(0);
         const FADETIME = Math.min(this.conf.FadeTime * audio.samplerate, Math.min(inPcm.length, currentData.length));
         const FADESTART = Math.min(inPcm.length, currentData.length) - FADETIME;
         const tail = currentData.subarray(FADESTART);
