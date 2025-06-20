@@ -4,6 +4,7 @@ addBlockType("audio", {
     configs: {
         "Note": [":A4:", "number", 1],
         "Volume": [1, "number"],
+        "FadeTime": [0, "number"],
         "SamplerEnabled": [false, "checkbox"],
         "ReferenceNote": [":A4:", "number", 1],
         "StartOffset": [0, "number"],
@@ -18,7 +19,13 @@ addBlockType("audio", {
     amplitude_smoothing_knob: true,
     functor: function (inPcm, channel, data) {
         var obj = decodedPcmCache[this.file];
-        var currentData = obj ? obj.getChannelData(Math.min(channel, obj.numberOfChannels - 1)) : [];
+        var currentData = obj ? obj.getChannelData(Math.min(channel, obj.numberOfChannels - 1)) : new Float32Array(0);
+        const FADETIME = Math.min(this.conf.FadeTime * audio.samplerate, Math.min(inPcm.length, currentData.length));
+        const FADESTART = Math.min(inPcm.length, currentData.length) - FADETIME;
+        const tail = currentData.subarray(FADESTART);
+        tail.forEach((x, i) => {
+            tail[i] = x * (1 - i / FADETIME);
+        });
         var duration = Math.floor(Math.round(((loopDurationMap[this.file] || 0) + 0.0) / data.loopInterval) * data.loopInterval * audio.samplerate);
         const _speed = _(this.conf.Speed);
         const hitNote = _(this.conf.Note);
