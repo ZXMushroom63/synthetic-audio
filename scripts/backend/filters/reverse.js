@@ -6,6 +6,6 @@ addBlockType("reverse", {
     configs: {
     },
     functor: function (inPcm, channel, data) {
-        return inPcm.reverse();
+        return inPcm.toReversed();
     }
 });
