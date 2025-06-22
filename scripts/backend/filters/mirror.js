@@ -1,9 +1,8 @@
 addBlockType("mirror", {
     color: "rgba(0,255,0,0.3)",
     title: "Mirror",
-    hidden: true,
     configs: {
-        "Side": ["LEFT", ["LEFT", "RIGHT"]],
+        "Side": ["RIGHT", ["LEFT", "RIGHT"]],
         "Invert": [true, "checkbox"],
     },
     functor: function (inPcm, channel, data) {
