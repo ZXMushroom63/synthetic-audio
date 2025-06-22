@@ -213,6 +213,10 @@ function addBlockType(id, data) {
     (data.directRefs || []).forEach(x => {
         directRefs[x] = id;
     });
+    if (data.creditURL) {
+        data.customGuiButtons ||= {};
+        data.customGuiButtons["Credit"] = ()=>window.open(data.creditURL);
+    }
     if (data.midiMappings) {
         data.applyMidi = function (loop, note, vel) {
             let calculatedNote = note;

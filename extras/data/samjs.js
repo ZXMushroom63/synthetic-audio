@@ -3576,6 +3576,7 @@
 addBlockType("samjs", {
     color: "rgba(241, 216, 123, 0.3)",
     title: "S.A.M.",
+    creditURL: "https://github.com/discordier/sam",
     wet_and_dry_knobs: true,
     amplitude_smoothing_knob: true,
     isPlugin: true,
