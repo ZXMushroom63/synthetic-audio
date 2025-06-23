@@ -585,7 +585,6 @@ addEventListener("init", async () => {
             if (!item.data) {
                 continue;
             }
-            logToLoader(`Loading wavetable: ${item.name}`);
             const buffer = (await ax.decodeAudioData(await item.data.arrayBuffer())).getChannelData(0);
             if ((buffer.length % 2048) !== 0) {
                 logToLoader(`${item.name} buffer is bad size.`);
