@@ -20,13 +20,20 @@ addEventListener("init", async () => {
     }
     const loadingScreenTabs = new ModMenuTabList();
     loadingScreenTabs.addTab("Loader", `<pre style="width:100%;height:35vh;margin-top:0;margin:0;overflow-x:hidden;overflow-y:scroll;" id="loader_logs"></pre>`);
+    const logs = [];
     const loadingScreenModMenu = new ModMenu("SYNTHETIC Bootloader", loadingScreenTabs, "bootloader", syntheticMenuStyles);
     function logToLoader(txt) {
         if (!document.querySelector("#loader_logs")) {
             return;
         }
-        document.querySelector("#loader_logs").innerHTML += txt.replaceAll(" ", "&nbsp").replaceAll("<", "").replaceAll(">", "").replaceAll("\n", "<br>") + "<br>";
+        if (txt !== undefined) {
+            logs.push(txt.replaceAll(" ", "&nbsp").replaceAll("<", "").replaceAll(">", "").replaceAll("\n", "<br>"));
+        }
+        document.querySelector("#loader_logs").innerHTML = logs.join("<br>");
         document.querySelector("#loader_logs").scrollTop = document.querySelector("#loader_logs").scrollHeight;
+    }
+    loadingScreenModMenu.oninit = () => {
+        logToLoader();
     }
     function isMobile() {
         const regex = /Mobi|Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i;
@@ -41,7 +48,7 @@ addEventListener("init", async () => {
  |___/ |_| |_|\_| |_| |_||_|___| |_| |___\___|
 `
         );
-        logToLoader(`Server                  -   ${location.host}`);
+        logToLoader(`Server                  -   ${location.host || "Offline copy"}`);
         logToLoader(`User Agent              -   ${navigator.userAgent}`);
         logToLoader(`Is Mobile               -   ${isMobile() ? "YES" : "NO"}`);
         if (isMobile()) {
@@ -264,12 +271,26 @@ addEventListener("init", async () => {
     mkBtn("Upload sample pack (.zip)", () => {
         var f = document.createElement("input");
         f.type = "file";
-        f.multiple = "false";
+        f.multiple = true;
         f.accept = ".zip";
         f.addEventListener("input", async () => {
             var files = [...f.files].filter(x => x.name.endsWith(".zip"));
             for (x of files) {
                 await addSample(x.name, x);
+                await drawModArray();
+            }
+        });
+        f.click();
+    }, "usamples");
+    mkBtn("Upload wavetable (.wav)", () => {
+        var f = document.createElement("input");
+        f.type = "file";
+        f.multiple = true;
+        f.accept = ".wav";
+        f.addEventListener("input", async () => {
+            var files = [...f.files].filter(x => x.name.endsWith(".wav"));
+            for (x of files) {
+                await addSample("wt/" + x.name.replaceAll(".wav", ".wt.wav"), x);
                 await drawModArray();
             }
         });
@@ -412,6 +433,13 @@ addEventListener("init", async () => {
                 name: modList[i],
                 data: await getSample(modList[i])
             });
+        } else if (modList[i].startsWith("wt/") && modList[i].endsWith(".wt.wav")) {
+            logToLoader(`Queueing wavetable: ${modList[i]}`);
+            postInitQueue.push({
+                type: "wavetable",
+                name: modList[i],
+                data: await getSample(modList[i])
+            });
         } else if (isAudio(modList[i])) {
             logToLoader(`Queueing sample: ${modList[i]}`);
             postInitQueue.push({
@@ -540,6 +568,7 @@ addEventListener("init", async () => {
         });
         document.body.appendChild(socketio);
     }
+    const ax = new OfflineAudioContext({ sampleRate: 44100, numberOfChannels: 1, length: 1 });
     for (item of postInitQueue) {
         if (item.type === "samplepack") {
             await loadSamplePack(item.data, item.name);
@@ -551,10 +580,29 @@ addEventListener("init", async () => {
             logToLoader(`Loading sample: ${item.name}`);
             await importAudioFile(item.data);
         }
+        if (item.type === "wavetable") {
+            if (!item.data) {
+                continue;
+            }
+            logToLoader(`Loading wavetable: ${item.name}`);
+            const buffer = (await ax.decodeAudioData(await item.data.arrayBuffer())).getChannelData(0);
+            if ((buffer.length % 2048) !== 0) {
+                logToLoader(`${item.name} buffer is bad size.`);
+                continue;
+            }
+            const key = item.name.replace("wt/", "").replaceAll(".wt.wav", "");
+
+            WAVETABLES[key] = buffer;
+        }
     }
     if (performance.measureUserAgentSpecificMemory) {
         console.log("Startup completed, using ", (await performance.measureUserAgentSpecificMemory()).bytes / (1024 ** 2), "MB of memory.");
     }
+    window.addEventListener("keydown", (e) => {
+        if (e.key === "H" && e.shiftKey && !e.altKey && !e.metaKey && !e.ctrlKey && (e.target.tagName !== "INPUT") && (e.target.contentEditable !== "true")) {
+            loadingScreenModMenu.init();
+        }
+    })
 });
 registerHelp("[data-helptarget=uhvcc]",
     `

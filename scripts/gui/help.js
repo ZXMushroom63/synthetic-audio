@@ -63,6 +63,7 @@ helpContent.addTab("Keybinds", `
 - ~ALT + A~ = Arpeggiate selected loops
 - ~F2~ = Rename selected loops
 - ~CTRL + P~ = Convert selected loops into sheet music
+- ~SHIFT + H~ = Open developer logs
 `);
 
 helpContent.addTab("Programmable Fields", `
