@@ -307,8 +307,11 @@ addBlockType("p_waveform_plus", {
                 }
                 if (this.conf.WavetableMode) {
                     if (wavetable) {
-                        const wt_pos = Math.floor(wavetablePos(i, inPcm) * (wavetableFrames - 1)) * 2048;
-                        y += wavetable[wt_pos + (Math.floor((waveformTime + wavePhaseOffset) * (2048 / 1)) % 2048)] || 0;
+                        const wt_pos_idx = wavetablePos(i, inPcm) * (wavetableFrames - 1);
+                        const wt_pos_lower = Math.floor(wt_pos_idx) * 2048;
+                        const wt_pos_upper = Math.ceil(wt_pos_idx) * 2048;
+                        const oscPos = (Math.floor((waveformTime + wavePhaseOffset) * (2048 / 1)) % 2048);
+                        y += lerp(wavetable[wt_pos_lower + oscPos] || 0, wavetable[wt_pos_upper + oscPos] || 0, wt_pos_idx % 1) || 0;
                     }
                 } else if (this.conf.UseCustomWaveform) {
                     const wt_blend = waveformAlpha(i, inPcm);
