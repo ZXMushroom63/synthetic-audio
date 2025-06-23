@@ -23,11 +23,11 @@ addEventListener("init", async () => {
     const logs = [];
     const loadingScreenModMenu = new ModMenu("SYNTHETIC Bootloader", loadingScreenTabs, "bootloader", syntheticMenuStyles);
     function logToLoader(txt) {
-        if (!document.querySelector("#loader_logs")) {
-            return;
-        }
         if (txt !== undefined) {
             logs.push(txt.replaceAll(" ", "&nbsp").replaceAll("<", "").replaceAll(">", "").replaceAll("\n", "<br>"));
+        }
+        if (!document.querySelector("#loader_logs")) {
+            return;
         }
         document.querySelector("#loader_logs").innerHTML = logs.join("<br>");
         document.querySelector("#loader_logs").scrollTop = document.querySelector("#loader_logs").scrollHeight;
@@ -572,13 +572,14 @@ addEventListener("init", async () => {
     for (item of postInitQueue) {
         if (item.type === "samplepack") {
             await loadSamplePack(item.data, item.name);
+            logToLoader(`Loaded samplepack: ${item.name}`);
         }
         if (item.type === "sample") {
             if (!item.data) {
                 continue;
             }
-            logToLoader(`Loading sample: ${item.name}`);
             await importAudioFile(item.data);
+            logToLoader(`Loaded sample: ${item.name}`);
         }
         if (item.type === "wavetable") {
             if (!item.data) {
@@ -593,6 +594,8 @@ addEventListener("init", async () => {
             const key = item.name.replace("wt/", "").replaceAll(".wt.wav", "");
 
             WAVETABLES[key] = buffer;
+            logToLoader(`Loaded wavetable: ${item.name}`);
+            findLoops(".loop[data-wt-user]").forEach(markLoopDirty);
         }
     }
     if (performance.measureUserAgentSpecificMemory) {

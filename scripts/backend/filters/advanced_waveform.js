@@ -17,7 +17,10 @@ addBlockType("p_waveform_plus", {
         "UseCustomWaveform": [false, "checkbox"],
         "WaveformAsset": ["(none)", ["(none)"]],
         "WaveformAsset2": ["(none)", ["(none)"]],
-        "WavetablePos": [0, "number", 1],
+        "WaveformAlpha": [0, "number", 1],
+        "WavetableMode": [false, "checkbox"],
+        "Wavetable": ["(none)", ["(none)"]],
+        "WavetablePosition": ["#0~1", "number", 1],
         "Amplitude": [1, "number", 1],
         "AmplitudeSmoothTime": [0.006, "number"],
         "Decay": [0, "number", 1],
@@ -60,7 +63,12 @@ addBlockType("p_waveform_plus", {
             "UseCustomWaveform",
             "WaveformAsset",
             "WaveformAsset2",
-            "WavetablePos"
+            "WaveformAlpha"
+        ],
+        "Wavetable": [
+            "WavetableMode",
+            "Wavetable",
+            "WavetablePosition"
         ],
         "BadSine": [
             "BadSine",
@@ -92,8 +100,12 @@ addBlockType("p_waveform_plus", {
         ]
     },
     selectMiddleware: (key) => {
-        if (key.startsWith("WaveformAsset") || key.endsWith("Wavetable")) {
+        if (key.startsWith("WaveformAsset")) {
             return ["(none)", ...Object.keys(custom_waveforms)];
+        }
+
+        if (key === "Wavetable") {
+            return ["(none)", ...Object.keys(WAVETABLES)];
         }
     },
     initMiddleware: (loop) => {
@@ -131,6 +143,7 @@ addBlockType("p_waveform_plus", {
             playSample(blob);
         },
     },
+    wavtableUser: true,
     updateMiddleware: (loop) => {
         if (loop.conf.Unison) {
             loop.conf.Harmonics = false;
@@ -161,29 +174,33 @@ addBlockType("p_waveform_plus", {
         return t % 1;
     },
     functor: function (inPcm, channel, data) {
-        var keys = ["Sine", "Square", "Sawtooth", "Triangle"];
-        var underscores = {};
+        const keys = ["Sine", "Square", "Sawtooth", "Triangle"];
+        const underscores = {};
         keys.forEach(k => {
             underscores[k] = _(this.conf[k]);
         });
-        var freq = _(this.conf.Frequency);
-        var freqsemioffset = _(this.conf.SemitonesOffset);
-        var decay = _(this.conf.Decay);
-        var badsineoffset = _(this.conf.BadSineOffsetHz);
-        var fdecay = _(this.conf.FrequencyDecay);
-        var exp = _(this.conf.Exponent);
-        var amp = _(this.conf.Amplitude);
-        var period = _(this.conf.Period);
+        const freq = _(this.conf.Frequency);
+        const freqsemioffset = _(this.conf.SemitonesOffset);
+        const decay = _(this.conf.Decay);
+        const badsineoffset = _(this.conf.BadSineOffsetHz);
+        const fdecay = _(this.conf.FrequencyDecay);
+        const exp = _(this.conf.Exponent);
+        const amp = _(this.conf.Amplitude);
+        const period = _(this.conf.Period);
 
-        var customWaveform = custom_waveforms[this.conf.WaveformAsset]?.calculated;
-        var customWaveform2 = custom_waveforms[this.conf.WaveformAsset2]?.calculated;
-        var wavetablePos = _(this.conf.WavetablePos);
+        const customWaveform = custom_waveforms[this.conf.WaveformAsset]?.calculated;
+        const customWaveform2 = custom_waveforms[this.conf.WaveformAsset2]?.calculated;
+        const waveformAlpha = _(this.conf.WaveformAlpha);
 
-        var semitones = _(this.conf.HarmonicsSemitoneOffset);
+        const wavetable = WAVETABLES[this.conf.Wavetable];
+        const wavetableFrames = Math.floor(WAVETABLES[this.conf.Wavetable]?.length / 2048);
+        const wavetablePos = _(this.conf.WavetablePosition);
 
-        var uDetuneHz = _(this.conf.uDetuneHz);
-        var uPan = _(this.conf.uPan);
-        var uPhase = _(this.conf.uPhase);
+        const semitones = _(this.conf.HarmonicsSemitoneOffset);
+
+        const uDetuneHz = _(this.conf.uDetuneHz);
+        const uPan = _(this.conf.uPan);
+        const uPhase = _(this.conf.uPhase);
 
         var totalNormalisedVolume = 0;
         if (this.conf.Harmonics) {
@@ -288,14 +305,18 @@ addBlockType("p_waveform_plus", {
                         waveformTime *= h + 1;
                     }
                 }
-
-                if (this.conf.UseCustomWaveform) {
-                    const wavetable_pos = wavetablePos(i, inPcm);
+                if (this.conf.WavetableMode) {
+                    if (wavetable) {
+                        const wt_pos = Math.floor(wavetablePos(i, inPcm) * (wavetableFrames - 1)) * 2048;
+                        y += wavetable[wt_pos + (Math.floor((waveformTime + wavePhaseOffset) * (2048 / 1)) % 2048)] || 0;
+                    }
+                } else if (this.conf.UseCustomWaveform) {
+                    const wt_blend = waveformAlpha(i, inPcm);
                     if (customWaveform) {
-                        y += -1 * customWaveform[Math.floor((waveformTime + wavePhaseOffset) * WAVEFORM_RES) % WAVEFORM_RES] * volumeRatio * (1 - wavetable_pos);
+                        y += -1 * customWaveform[Math.floor((waveformTime + wavePhaseOffset) * WAVEFORM_RES) % WAVEFORM_RES] * volumeRatio * (1 - wt_blend);
                     }
                     if (customWaveform2) {
-                        y += -1 * customWaveform2[Math.floor((waveformTime + wavePhaseOffset) * WAVEFORM_RES) % WAVEFORM_RES] * volumeRatio * wavetable_pos;
+                        y += -1 * customWaveform2[Math.floor((waveformTime + wavePhaseOffset) * WAVEFORM_RES) % WAVEFORM_RES] * volumeRatio * wt_blend;
                     }
                 } else {
                     y += waveforms.sin(waveformTime + wavePhaseOffset) * values.Sine * volumeRatio;

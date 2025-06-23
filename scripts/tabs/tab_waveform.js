@@ -175,6 +175,7 @@ addEventListener("init", () => {
             }
             prevIdx = newIdx;
             prevValue = newValue;
+            target.samples[target.samples.length - 2] = target.samples[target.samples.length - 3];
             target.samples[target.samples.length - 1] = target.samples[target.samples.length - 2];
             net_push_samples(target);
             drawWaveform(true);
