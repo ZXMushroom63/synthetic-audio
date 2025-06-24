@@ -20,7 +20,6 @@ body {
   width: 100vw;
   height: calc(100vh - 15rem);
   border-collapse: collapse;
-  overflow-y: auto;
 }
 
 #track #time {

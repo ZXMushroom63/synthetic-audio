@@ -4,6 +4,7 @@ addEventListener("init", () => {
     const params = new URLSearchParams(location.search);
     const container = document.createElement("div");
     container.id = "miscTools";
+    container.style.overflowY = "auto";
 
     document.querySelector("#tabContent").appendChild(container);
 
