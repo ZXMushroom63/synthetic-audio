@@ -66,14 +66,14 @@ function applySoundbiteToPcmSidechain(reverse, looping, currentData, inPcm, dura
             }
             var idx = (i * speed(i, inPcm) + offsetValue) % duration;
             var sidechainCoefficient = Math.pow(1 - Math.max(Math.min(1, LOOKUPTABLE_PERSAMPLE[Math.floor(idx)] || 0), 0), Math.abs(sideChain)) || 0;
-            var y = (lerp(currentData[Math.floor(idx)], currentData[Math.ceil(idx)], idx % 1) || 0) * volume;
+            var y = (lerp(currentData[Math.floor(idx)] || 0, currentData[Math.ceil(idx)], idx % 1) || 0) * volume;
             if (sideChain < 0) {
                 y *= sidechainCoefficient;
             } else {
                 inPcm[i] *= sidechainCoefficient;
             }
             if (!silent) {
-                inPcm[i] += y;
+                inPcm[i] += y || 0;
             }
         }
     } else {
