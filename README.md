@@ -1,6 +1,6 @@
 ![SYNTHETIC Audio Logo](public/logo.png)
 # A feature-rich web-based DAW
-SYNTHETIC Audio is a DAW made from scratch, with no inspiration from other softwares. Almost everything is implemented in a different and unique way.\
+SYNTHETIC Audio is a DAW made from scratch, with almost no inspiration from other softwares. Almost everything is implemented in a different and unique way.\
 [Try it here](https://zxmushroom63.github.io/synthetic-audio/)
 
 <img alt="Editor Screenshot #1" src="public/screenshot-wide.png" width=512px>
