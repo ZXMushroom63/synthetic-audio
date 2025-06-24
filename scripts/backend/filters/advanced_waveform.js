@@ -26,6 +26,8 @@ addBlockType("p_waveform_plus", {
         "Decay": [0, "number", 1],
         "BadSine": [false, "checkbox"],
         "BadSineOffsetHz": [50, "number", 1],
+        "BadSineUseSemis": [false, "checkbox"],
+        "BadSineOffsetSemis": [3, "number", 1],
         "BadSineSeed": [1, "number"],
         "BadSineInterval": [0.005, "number"],
         "Harmonics": [false, "checkbox"],
@@ -73,6 +75,8 @@ addBlockType("p_waveform_plus", {
         "BadSine": [
             "BadSine",
             "BadSineOffsetHz",
+            "BadSineUseSemis",
+            "BadSineOffsetSemis",
             "BadSineSeed",
             "BadSineInterval"
         ],
@@ -183,6 +187,7 @@ addBlockType("p_waveform_plus", {
         const freqsemioffset = _(this.conf.SemitonesOffset);
         const decay = _(this.conf.Decay);
         const badsineoffset = _(this.conf.BadSineOffsetHz);
+        const badsineoffsetsemi = _(this.conf.BadSineOffsetSemis);
         const fdecay = _(this.conf.FrequencyDecay);
         const exp = _(this.conf.Exponent);
         const amp = _(this.conf.Amplitude);
@@ -230,7 +235,7 @@ addBlockType("p_waveform_plus", {
         if (this.conf.BadSine) {
             Math.newRandom(this.conf.BadSineSeed);
         }
-        var badsineinterval = (this.conf.BadSineInterval * audio.samplerate) || 1;
+        var badsineinterval = Math.round(this.conf.BadSineInterval * audio.samplerate) || 1;
         var badsineamount = 0;
         inPcm.forEach((x, i) => {
             var absoluteTime = i / audio.samplerate;
@@ -241,16 +246,19 @@ addBlockType("p_waveform_plus", {
                 total += Math.abs(x);
                 return [[k, x]];
             }));
-            if (this.conf.BadSine && i % badsineinterval === 0) {
+            if (this.conf.BadSine && (i % badsineinterval) === 0) {
                 badsineamount = 2 * (Math.random() - 0.5);
             }
             var f = (
                 freq(i, inPcm)
                 + (
-                    badsineoffset(i, inPcm) * badsineamount
+                    this.conf.BadSineUseSemis ? 0 : badsineoffset(i, inPcm) * badsineamount
                 )
             )
                 * Math.pow(2, (freqsemioffset(i, inPcm) + this.conf.InternalSemiOffset) / 12);
+            if (this.conf.BadSineUseSemis) {
+                f *= Math.pow(2, badsineoffsetsemi(i, inPcm) * badsineamount / 12)
+            }
             f *= Math.exp(-fdecay(i, inPcm) * absoluteTime);
             t += f * dt;
             var y = 0;
