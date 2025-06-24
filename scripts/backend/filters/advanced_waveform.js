@@ -28,7 +28,8 @@ addBlockType("p_waveform_plus", {
         "BadSineOffsetHz": [50, "number", 1],
         "BadSineUseSemis": [false, "checkbox"],
         "BadSineOffsetSemis": [3, "number", 1],
-        "BadSineSeed": [1, "number"],
+        "BadSineSeedLeft": [1, "number"],
+        "BadSineSeedRight": [1, "number"],
         "BadSineInterval": [0.005, "number"],
         "Harmonics": [false, "checkbox"],
         "HarmonicsStrum": [0, "number"],
@@ -77,7 +78,8 @@ addBlockType("p_waveform_plus", {
             "BadSineOffsetHz",
             "BadSineUseSemis",
             "BadSineOffsetSemis",
-            "BadSineSeed",
+            "BadSineSeedLeft",
+            "BadSineSeedRight",
             "BadSineInterval"
         ],
         "Harmonics": [
@@ -233,7 +235,7 @@ addBlockType("p_waveform_plus", {
         var dt = Math.pow(audio.samplerate, -1);
         var t = this.conf.PhaseOffset;
         if (this.conf.BadSine) {
-            Math.newRandom(this.conf.BadSineSeed);
+            Math.newRandom((channel === 0) ? this.conf.BadSineSeedLeft : this.conf.BadSineSeedRight);
         }
         var badsineinterval = Math.round(this.conf.BadSineInterval * audio.samplerate) || 1;
         var badsineamount = 0;
