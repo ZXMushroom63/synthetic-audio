@@ -192,7 +192,7 @@ addBlockType("p_waveform_plus", {
         const customWaveform2 = custom_waveforms[this.conf.WaveformAsset2]?.calculated;
         const waveformAlpha = _(this.conf.WaveformAlpha);
 
-        const wavetable = WAVETABLES[this.conf.Wavetable];
+        const wavetable = WAVETABLES[this.conf.Wavetable] ? WAVETABLES[this.conf.Wavetable].getChannelData(Math.min(channel, WAVETABLES[this.conf.Wavetable].numberOfChannels - 1)) : null;
         const wavetableFrames = Math.floor(WAVETABLES[this.conf.Wavetable]?.length / 2048);
         const wavetablePos = _(this.conf.WavetablePosition);
 

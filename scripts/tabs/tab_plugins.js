@@ -591,7 +591,7 @@ addEventListener("init", async () => {
             if (!item.data) {
                 continue;
             }
-            const buffer = (await ax.decodeAudioData(await item.data.arrayBuffer())).getChannelData(0);
+            const buffer = await ax.decodeAudioData(await item.data.arrayBuffer());
             if ((buffer.length % 2048) !== 0) {
                 logToLoader(`${item.name} buffer is bad size.`);
                 continue;
