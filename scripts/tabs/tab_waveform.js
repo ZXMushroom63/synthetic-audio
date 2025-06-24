@@ -34,7 +34,7 @@ addEventListener("init", () => {
         });
         multiplayer.writePath("waveforms." + wv.uuid, serialisedWv);
     }
-    multiplayer.listen("waveform_send", (ev)=>{
+    multiplayer.listen("waveform_send", (ev) => {
         custom_waveforms[ev.detail.uuid] = deserialiseWaveform(ev.detail.waveform, ev.detail.uuid);
         custom_waveforms[ev.detail.uuid].dirty = true;
         hydrateWaveformTab();
@@ -48,7 +48,7 @@ addEventListener("init", () => {
         });
         multiplayer.deletePath("waveforms." + wv.uuid);
     }
-    multiplayer.listen("waveform_remove", (ev)=>{
+    multiplayer.listen("waveform_remove", (ev) => {
         delete custom_waveforms[ev.detail.uuid];
         hydrateWaveformTab();
     });
@@ -59,10 +59,10 @@ addEventListener("init", () => {
         multiplayer.custom_buffered("waveform_samples", {
             samples: [...wv.samples],
             uuid: wv.uuid
-        }, wv.uuid);
+        }, "wv:" + wv.uuid);
         multiplayer.writePath("waveforms." + wv.uuid + ".samples", [...wv.samples]);
     }
-    multiplayer.listen("waveform_samples", (ev)=>{
+    multiplayer.listen("waveform_samples", (ev) => {
         custom_waveforms[ev.detail.uuid].samples = new Float32Array(ev.detail.samples);
         calculateWaveform(custom_waveforms[ev.detail.uuid], true);
         if (target && target.uuid === ev.detail.uuid) {
@@ -76,10 +76,10 @@ addEventListener("init", () => {
         multiplayer.custom_buffered("waveform_modifiers", {
             modifiers: wv.modifiers,
             uuid: wv.uuid
-        }, wv.uuid);
+        }, "wv:" + wv.uuid);
         multiplayer.writePath("waveforms." + wv.uuid + ".modifiers", wv.modifiers);
     }
-    multiplayer.listen("waveform_modifiers", (ev)=>{
+    multiplayer.listen("waveform_modifiers", (ev) => {
         custom_waveforms[ev.detail.uuid].modifiers = ev.detail.modifiers;
         calculateWaveform(custom_waveforms[ev.detail.uuid], true);
         if (target && target.uuid === ev.detail.uuid) {
