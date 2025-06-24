@@ -42,8 +42,11 @@
                 for (let v = 0; v < gz_synth_voicecount; v++) {
                     const driveLFO = pconfs[`Voice${v + 1}Drive`];
                     const semiLFO = pconfs[`Voice${v + 1}SemiOffset`];
+                    const panLFO = pconfs[`Voice${v + 1}Pan`];
+                    const panVal = panLFO(i, inPcm);
+                    const panVolMult = (channel === 0) ? (1 - Math.max(0, panVal)) : (1 + Math.min(0, panVal));
                     time[v] += dt * freq * Math.pow(2, semiLFO(i, inPcm) / 12);
-                    out[i] += waveforms[this.conf[`Voice${v + 1}WaveType`]](time[v]) * driveLFO(i, inPcm) * adsr * decay;
+                    out[i] += waveforms[this.conf[`Voice${v + 1}WaveType`]](time[v]) * driveLFO(i, inPcm) * adsr * decay * panVolMult;
                 }
             });
             const self = this;
@@ -157,7 +160,8 @@
         gzsynth.configs[`Voice${i + 1}Drive`] = [i === 0 ? 1 : 0, "number", 1];
         gzsynth.configs[`Voice${i + 1}WaveType`] = ["sin", ["sin", "triangle", "sawtooth", "square"]];
         gzsynth.configs[`Voice${i + 1}SemiOffset`] = [0, "number", 1];
-        gzsynth.dropdowns[`Voice${i + 1}`] = ["Drive", "WaveType", "SemiOffset"].map(x => `Voice${i + 1}` + x);
+        gzsynth.configs[`Voice${i + 1}Pan`] = [0, "number", 1];
+        gzsynth.dropdowns[`Voice${i + 1}`] = ["Drive", "WaveType", "SemiOffset", "Pan"].map(x => `Voice${i + 1}` + x);
     }
     gzsynth.configs.Filter = [false, "checkbox"];
     gzsynth.configs.FilterType = ["lowpass", ["lowpass", "highpass", "lowshelf", "bandpass", "highshelf", "peaking", "notch", "allpass"]];
