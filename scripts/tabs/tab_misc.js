@@ -529,9 +529,10 @@ addEventListener("init", () => {
                 net_push_custom_chords();
             });
             entryItem.appendChild(suffixInput);
-
+            entryItem.appendChild(document.createElement("br"));
+            
             label = document.createElement("label");
-            label.innerText = "\tSemitone Offsets: ";
+            label.innerText = "Semitone Offsets: ";
             entryItem.appendChild(label);
 
             const contentInput = document.createElement("input");
