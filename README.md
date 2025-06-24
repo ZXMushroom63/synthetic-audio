@@ -13,12 +13,17 @@ You can find demo files in the [demos folder](/demos/).
 - synth2_demo.sm - Longer song demonstrating how synths work in SYNTHETIC, along with heavy use of the filter stack.
 
 ## Feature list:
+- Multiplayer support!
 - Timeline
-- Use audio samples
-- Synths
+- Powerful Chord Editor
+- MIDI I/O
+- The Fl Studio Arpeggiator
+- Soundfonts (MIDI.js format)
+- Use audio samples, with pitch-sampling support
+- Synths (subtractive & wavetable)
 - Editor layers
 - Lots of filters
-- Easily draw custom waveforms
+- Easily draw custom waveforms (Waveforms tab)
 - Stereo audio and noise
 - Waveform visualiser
 - Cool logo
@@ -26,7 +31,6 @@ You can find demo files in the [demos folder](/demos/).
 - ffmpeg transcoding - export as wav, mp3, m4a, flac, opus & ogg
 - Soundfonts (plugins tab & instrument node) - Use up to 127 instruments, more if you find plugins
 - HVCC patch support - Load puredata (.pd) patches compiled with [my fork of hvcc](https://github.com/ZXMushroom63/hvcc)
-- Multiplayer support!
 - WakaTime integration (check settings menu)
 
 ## Hosting
