@@ -26,7 +26,9 @@ addEventListener("load", () => {
     source.connect(analyser);
     analyser.connect(audioCtx.destination);
 
-    analyser.fftSize = 2048;
+    const FFT_SIZE = 2048;
+
+    analyser.fftSize = FFT_SIZE;
     const bufferLength = analyser.fftSize;
     const dataArray = new Uint8Array(bufferLength);
     const freqDataArray = new Uint8Array(analyser.frequencyBinCount);
@@ -44,7 +46,7 @@ addEventListener("load", () => {
         return freq.toFixed(2);
     }
     var logoImage = document.querySelector("#logo");
-    canvasCtx.drawImage(logoImage, 0, 40, 450, 135);
+    canvasCtx.drawImage(logoImage, 0, 80, 900, 270);
     var keepDrawing = true;
     var started = false;
     var eqMode = false;
@@ -52,7 +54,7 @@ addEventListener("load", () => {
     const previousFFTData = [];
     function drawWaveform() {
         globalThis.vizDrawnWaveform = previousByteData[0];
-        canvasCtx.lineWidth = 2;
+        canvasCtx.lineWidth = 4;
         canvasCtx.strokeStyle = 'rgb(255, 255, 255)';
 
         canvasCtx.beginPath();
@@ -78,16 +80,23 @@ addEventListener("load", () => {
     }
     function drawEq() {
         const shelves = [
-            [20, 60, "red"],   // sub
-            [61, 250, "yellow"],  // bass
-            [251, 500, "lime"], // low-mid
-            [501, 2000, "green"], // midrange
-            [2001, 4000, "white"], // high-mid
-            [4001, 6000, "magenta"], // presence
-            [6001, 16000, "cyan"] // brilliance
+            [20, 60, "#ff0000"],
+            [61, 250, "#ffff00"],
+            [251, 500, "#00ff00"],
+            [501, 2000, "#008000"],
+            [2001, 4000, "#ffffff"],
+            [4001, 6000, "#ff00ff"],
+            [6001, 16000, "#00ffff"]
         ];
 
+        if (!previousFFTData || previousFFTData.length === 0) return;
+
+        const freqData = previousFFTData[0];
         const shelfWidth = canvas.width / shelves.length;
+        let lastPoint = null;
+
+        canvasCtx.lineWidth = 4;
+        canvasCtx.globalAlpha = 0.5;
         for (let i = 0; i < shelves.length; i++) {
             const [minFreq, maxFreq] = shelves[i];
 
@@ -109,12 +118,48 @@ addEventListener("load", () => {
             canvasCtx.fillStyle = shelves[i][2];
             canvasCtx.fillRect(i * shelfWidth, canvas.height - barHeight, shelfWidth - 1, barHeight);
         }
+
+        canvasCtx.globalAlpha = 1;
+
+        for (let i = 0; i < shelves.length; i++) {
+            const [minFreq, maxFreq, color] = shelves[i];
+            const minIdx = getFftBinIndex(minFreq, audioCtx.sampleRate, FFT_SIZE);
+            const maxIdx = getFftBinIndex(maxFreq, audioCtx.sampleRate, FFT_SIZE);
+            const shelfStartX = i * shelfWidth;
+
+            canvasCtx.beginPath();
+            canvasCtx.strokeStyle = color;
+
+            if (lastPoint) {
+                canvasCtx.moveTo(lastPoint.x, lastPoint.y);
+            } else {
+                const firstAmplitude = freqData[minIdx] / 255.0;
+                const firstY = canvas.height - (firstAmplitude * canvas.height);
+                canvasCtx.moveTo(shelfStartX, firstY);
+            }
+
+            for (let j = minIdx; j <= maxIdx; j++) {
+                if (j >= freqData.length) break;
+
+                const percentThroughShelf = (maxIdx - minIdx === 0) ? 1 : (j - minIdx) / (maxIdx - minIdx);
+                const x = shelfStartX + (percentThroughShelf * shelfWidth);
+                const amplitude = freqData[j] / 255.0;
+                const y = canvas.height - (amplitude * canvas.height * 0.9);
+
+                canvasCtx.lineTo(x, y);
+
+                if (j === maxIdx) {
+                    lastPoint = { x, y };
+                }
+            }
+            canvasCtx.stroke();
+        }
     }
     function calculateVolume() {
         if (!previousByteData[0]) {
             return 0;
         }
-        return previousByteData[0].reduce((acc, v)=>acc + Math.abs(v / 128 - 1)) / previousByteData[0].length * 2;
+        return previousByteData[0].reduce((acc, v) => acc + Math.abs(v / 128 - 1)) / previousByteData[0].length * 2;
     }
     const dataHistrogramSize = 3;
     globalThis.vizDrawnWaveform = null;
@@ -132,7 +177,7 @@ addEventListener("load", () => {
         const currentVolume = calculateVolume();
         canvasCtx.clearRect(0, 0, canvas.width, canvas.height);
         canvasCtx.globalAlpha = lerp(0.2, 0.5, currentVolume);
-        canvasCtx.drawImage(logoImage, 0, 40, 450, 135);
+        canvasCtx.drawImage(logoImage, 0, 80, 900, 270);
         canvasCtx.globalAlpha = 1;
 
         if (eqMode) {
@@ -144,11 +189,11 @@ addEventListener("load", () => {
         // Display the most common frequency
         const mostCommonFrequency = getMostCommonFrequency();
 
-        canvasCtx.lineWidth = 1;
+        canvasCtx.lineWidth = 2;
         canvasCtx.fillStyle = 'rgb(255, 255, 255)';
-        canvasCtx.font = "30px sans-serif";
-        canvasCtx.fillText("SYNTHETIC", 0, 30);
-        canvasCtx.fillText(`${mostCommonFrequency} Hz`, 0, 60);
+        canvasCtx.font = "60px sans-serif";
+        canvasCtx.fillText("SYNTHETIC", 0, 60);
+        canvasCtx.fillText(`${mostCommonFrequency} Hz`, 0, 120);
 
         if (keepDrawing) {
             requestAnimationFrame(draw);
@@ -182,7 +227,7 @@ addEventListener("load", () => {
 });
 
 registerHelp("canvas#viz",
-`
+    `
 ********************
 *  THE VISUALISER  *
 ********************
