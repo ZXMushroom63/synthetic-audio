@@ -580,7 +580,7 @@ async function render() {
         success = false;
     }
     document.querySelector("#renderProgress").innerText = success
-        ? `Render successful! (${renderTime.toFixed(2)}s, ${calculatedNodeCount} calculated, ${processedNodeCount} processed)`
+        ? `Render successful! (${renderTime.toFixed(2)}s, ${calculatedNodeCount} calculated, ${processedNodeCount / (1 + audio.stereo)} processed)`
         : "Render failed.";
     if (success) {
         document.querySelector("#renderOut").src = URL.createObjectURL(blob);
