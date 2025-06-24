@@ -412,6 +412,12 @@ addEventListener("init", async () => {
 
     document.body.style.pointerEvents = "none";
 
+    window.addEventListener("keydown", (e) => {
+        if (e.key === "H" && e.shiftKey && !e.altKey && !e.metaKey && !e.ctrlKey && (e.target.tagName !== "INPUT") && (e.target.contentEditable !== "true")) {
+            loadingScreenModMenu.init();
+        }
+    })
+
     // load the mods
     loadingScreenModMenu.init();
     logDiagnostics();
@@ -600,11 +606,6 @@ addEventListener("init", async () => {
     if (performance.measureUserAgentSpecificMemory) {
         console.log("Startup completed, using ", (await performance.measureUserAgentSpecificMemory()).bytes / (1024 ** 2), "MB of memory.");
     }
-    window.addEventListener("keydown", (e) => {
-        if (e.key === "H" && e.shiftKey && !e.altKey && !e.metaKey && !e.ctrlKey && (e.target.tagName !== "INPUT") && (e.target.contentEditable !== "true")) {
-            loadingScreenModMenu.init();
-        }
-    })
 });
 registerHelp("[data-helptarget=uhvcc]",
     `
