@@ -1,4 +1,4 @@
-async function applyBandpassFilter(pcmData, sampleRate, freq, falloff) {
+async function applyBandpassFilterSingle(pcmData, sampleRate, freq, falloff) {
     falloff ||= ()=>1;
     const offlineContext = new OfflineAudioContext(1, pcmData.length, sampleRate);
 
@@ -47,6 +47,6 @@ addBlockType("bandpass1", {
         "Falloff": [1, "number", 1]
     },
     functor: async function (inPcm, channel, data) {
-        return await applyBandpassFilter(inPcm, audio.samplerate, _(this.conf.Frequency), _(this.conf.Falloff));
+        return await applyBandpassFilterSingle(inPcm, audio.samplerate, _(this.conf.Frequency), _(this.conf.Falloff));
     }
 });
