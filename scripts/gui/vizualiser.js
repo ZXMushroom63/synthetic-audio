@@ -221,7 +221,7 @@ addEventListener("load", () => {
         stopViz();
         setTimeout(() => {
             canvasCtx.clearRect(0, 0, canvas.width, canvas.height);
-            canvasCtx.drawImage(logoImage, 0, 40, 450, 135);
+            canvasCtx.drawImage(logoImage, 0, 80, 900, 270);
         }, 450);
     });
 });
