@@ -480,6 +480,124 @@ addEventListener("init", () => {
     openSettingsBtn.onclick = openSettings;
     settingsModule.appendChild(openSettingsBtn);
 
+
+
+    const customChordModule = mkModule("Custom Chords");
+
+    let projectChordDefArr = [];
+
+    addEventListener('projinit', (e) => {
+        projectChordDefArr = e.detail.data.customChords || [];
+        renderChordList();
+    });
+
+    addEventListener('serialise', (e) => {
+        e.detail.data.customChords = projectChordDefArr;
+    });
+
+
+    function net_push_custom_chords() {
+        if (!multiplayer.on) {
+            return;
+        }
+        multiplayer.custom_buffered("custom_chords", {
+            chords: projectChordDefArr,
+        }, "chords");
+        multiplayer.writePath("customChords", projectChordDefArr);
+    }
+    multiplayer.listen("custom_chords", (ev) => {
+        projectChordDefArr = ev.detail.chords;
+        renderChordList();
+    });
+
+    const chordList = document.createElement("ol");
+    function renderChordList() {
+        chordList.innerHTML = "";
+        projectChordDefArr.forEach((ent, i) => {
+            const entryItem = document.createElement("li");
+            let label;
+            label = document.createElement("label");
+            label.innerText = "Chord Suffix: ";
+            entryItem.appendChild(label);
+
+            const suffixInput = document.createElement("input");
+            suffixInput.classList.add("inputStyles");
+            suffixInput.type = "text";
+            suffixInput.value = ent[0];
+            suffixInput.addEventListener("input", () => {
+                ent[0] = suffixInput.value;
+                net_push_custom_chords();
+            });
+            entryItem.appendChild(suffixInput);
+
+            label = document.createElement("label");
+            label.innerText = "\tSemitone Offsets: ";
+            entryItem.appendChild(label);
+
+            const contentInput = document.createElement("input");
+            contentInput.classList.add("inputStyles");
+            contentInput.type = "text";
+            contentInput.value = ent[1];
+            contentInput.addEventListener("input", () => {
+                ent[1] = contentInput.value;
+                net_push_custom_chords();
+            });
+            entryItem.appendChild(contentInput);
+
+            const deleteBtn = document.createElement("button");
+            deleteBtn.innerText = "Remove";
+            deleteBtn.addEventListener("click", () => {
+                projectChordDefArr.splice(i, 1);
+                renderChordList();
+                net_push_custom_chords();
+            });
+            entryItem.appendChild(deleteBtn);
+
+            chordList.appendChild(entryItem);
+        });
+    }
+    customChordModule.appendChild(chordList);
+    customChordModule.appendChild(document.createElement("br"));
+
+    const newChordBtn = document.createElement("button");
+    newChordBtn.innerText = "New Entry";
+    newChordBtn.addEventListener("click", () => {
+        projectChordDefArr.push(["custom", "0,4,7"]);
+        renderChordList();
+        net_push_custom_chords();
+    });
+
+    const registerChordsBtn = document.createElement("button");
+    registerChordsBtn.innerText = "Register Chords";
+    registerChordsBtn.addEventListener("click", () => {
+        if (multiplayer.on) {
+            setTimeout(() => {
+                multiplayer.custom("register_custom_chords", {});
+            }, 500);
+        }
+        registerCustomChords();
+    });
+
+    multiplayer.listen("register_custom_chords", (ev) => {
+        registerCustomChords();
+    });
+
+    function registerCustomChords() {
+        chordFormulas.clear();
+        projectChordDefArr.forEach(ent => {
+            chordFormulas.set(ent[0], ent[1].trim().split(",").map(x => parseInt(x.trim())));
+        });
+        registerVanillaChords();
+        const calcs = generateChordTable();
+        chordDictionary = calcs.chordDictionary;
+        reverseChordLookup = calcs.reverseChordLookup;
+        findLoops(".loop:has(.noteDisplay):has(.chordDisplay)").forEach(chordComponentEdited);
+        updateChordHudDatalist();
+    }
+
+    customChordModule.appendChild(newChordBtn);
+    customChordModule.appendChild(registerChordsBtn);
+
     registerTab("Misc", container, false, () => {
         updateScales();
     });
