@@ -650,7 +650,7 @@ select option {
 
 #viz {
   border: 1px solid white;
-  image-rendering: optimizeQuality;
+  image-rendering: pixelated;
   width: 150px;
   height: 75px;
   background: black;
