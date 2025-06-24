@@ -11,7 +11,7 @@ addBlockType("mirror", {
     },
     functor: function (inPcm, channel, data) {
         var outPcm = inPcm.slice();
-        var mid = Math.floor(inPcm.length / 2);
+        var mid = Math.round(inPcm.length / 2);
         var isLeft = (this.conf.Side === "LEFT");
         var sub = !isLeft ? inPcm.slice(mid, inPcm.length) : inPcm.slice(0, mid);
         var factor = this.conf.MirrorAmplitude * ((1 - this.conf.Invert) || -1);
