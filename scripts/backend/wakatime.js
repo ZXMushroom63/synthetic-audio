@@ -9,7 +9,8 @@ registerSetting("WakatimeEndpoint", "https://wakahost.example.com/api/waka/v1");
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${settings.WakatimeToken}`
+                    'Authorization': `Bearer ${settings.WakatimeToken}`,
+                    'User-Agent': 'SYNTHETIC'
                 },
                 body: JSON.stringify(data)
             });
