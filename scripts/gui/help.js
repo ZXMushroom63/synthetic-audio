@@ -64,6 +64,12 @@ helpContent.addTab("Keybinds", `
 - ~F2~ = Rename selected loops
 - ~CTRL + P~ = Convert selected loops into sheet music
 - ~SHIFT + H~ = Open developer logs
+- ~ALT + ;~ = Selected nodes will be bumped down by a fifth.
+- ~ALT + '~ = Selected nodes will be bumped up by a fifth.
+- ~ALT + [~ = Selected nodes will be bumped down by an octave.
+- ~ALT + ]~ = Selected nodes will be bumped up by an octave.
+- ~ALT + ,~ = Selected nodes will be bumped down by a semitone.
+- ~ALT + .~ = Selected nodes will be bumped up by a semitone.
 `);
 
 helpContent.addTab("Programmable Fields", `
