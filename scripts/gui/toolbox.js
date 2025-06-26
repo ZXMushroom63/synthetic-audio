@@ -29,7 +29,7 @@ addEventListener("init", () => {
         if (TOOL_ACTIVE) {
             return;
         }
-        ACTIVE_TOOL_FN(null);
+        ACTIVE_TOOL_FN(null, null);
     });
 });
 function registerTool(name, fn, selected = false, bindChecker) {
@@ -75,7 +75,7 @@ addEventListener("keydown", (e) => {
             const checkKb = TOOL_KEYBIND_DATABASE[key];
             if (checkKb(e)) {
                 e.preventDefault();
-                tool(activeLoops.length > 0 ? activeLoops : null);
+                tool(activeLoops.length > 0 ? activeLoops : null, e);
             }
         }
     }
