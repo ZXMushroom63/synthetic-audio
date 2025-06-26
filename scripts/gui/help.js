@@ -103,7 +103,7 @@ In programmable input boxes, pressing...
 - ~'~ evaluates any inline script at 0% ( ~:a4:~ -> ~440~ , ~#0.5~1~ -> ~0.5~ )
 `);
 helpContent.addTab("Custom Waveforms",
-`
+  `
 <img src="public/tutorial/wv.png" width=350><br>
 This tab is where custom waveforms or LFOs are designed.
 
@@ -194,10 +194,46 @@ addBlockType("node_type_id", {
     "Bool": [false, "checkbox"],
     "Dropdown": ["Default", ["Default", "Opt1", "Opt2", "Opt3"]]
   },
-  functor: function(inPcm, channel, data) { //lambdas not supported. processes pcm signal data in the form of Float32Arrays
+  functor: function(inPcm, channel, data) { //lambdas not supported. processes pcm signal data in the form of Float32Arrays. can be async
     return inPcm.map(x => x*0.5);
+  },
+
+  //OPTIONAL PARAMS:
+  zscroll: (loop, value)=>{
+    // zscrolling is the term for the value scrolling from holding down alt and using the scroll wheel.
+    // function to modify the node on a zscroll. usually transposing the node up or down a semitone (value is an integer offset)
+  }, 
+  pitchZscroller: false, // does the node change in pitch when z-scrolling
+  directRefs: ["mn"], // in the Shift+A add menu, this is an array shortcut aliases. in this example, typing ;mn would autocomplete to the node
+  midiMappings: { // Object to map midi features into nodes. also used by the synth converter. the 'zero' array is a list of config entries that should be set to 0 when converting from midi/a different synth
+    note: "Note",
+    velocity: "Volume",
+    zero: []
+  },
+  selectMiddleware: (key) => { //function to override the output of dropdown inputs. this demo shows how to add an asset input.
+    if (key === "Dropdown") {
+      var assetNames = [...new Set(Array.prototype.flatMap.apply(
+        findLoops(".loop[data-type=p_writeasset]"),
+        [(node) => node.conf.Asset]
+      ))];
+      return ["(none)", ...assetNames];
+    }
+  },
+  assetUser: true, //if the node uses assets, set this flag to make sure the cache system recognises it
+  assetUserKeys: ["Dropdown"], //the property names that reference/use assets. also part of the cache system
+  
+  creditURL: "https://github.com/ZXMushroom63", //url to credit the creator of a filter/synth
+  
+  dropdowns: {
+    "Cool Dropdown": ["Text", "RegularNumber"] //object to allow you to visually group properties
   }
 });
+
+
+// NOTE FOR RANDOMNESS, Math.random() is patched and seeded. reseed every time functor is called
+// const seed = 2;
+// Math.newRandom(seed);
+// Math.random()
 `.replaceAll(" ", "&nbsp").replaceAll("\n", "<br>")}
 </pre>
 
