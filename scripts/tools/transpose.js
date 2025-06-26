@@ -15,13 +15,13 @@ addEventListener("init", () => {
         globalThis.zscrollisInternal = false;
         [...nodes].forEach((node, i) => {
             const def = filters[node.getAttribute("data-type")];
-            if (!def.pitchZscroller || !def.zscroll) {
+            if ((!def.pitchZscroller && (Math.abs(dir) !== 1)) || !def.zscroll) { //only zscroll if possible, and allow single number zscrolling for non pitch zscollers
                 return;
             }
             globalThis.zscrollIsFirst = (i === 0);
             def.zscroll(node, dir);
         });
-    }, false, (e)=>e.altKey && !e.ctrlKey && !e.metaKey && Object.keys(directionMap).includes(e.key));
+    }, false, (e) => e.altKey && !e.ctrlKey && !e.metaKey && Object.keys(directionMap).includes(e.key));
 });
 registerHelp(".tool[data-tool=KEYCHANGE]",
     `
