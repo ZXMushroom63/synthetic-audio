@@ -49,7 +49,7 @@ async function importAudioFile(file, hidden) {
     loopMap[file.name] = file;
     loopDurationMap[file.name] = await getDurationOfLoop(file);
 
-    findLoops(".loop[data-type=audio]").forEach(x => { forceMarkDirty(x); hydrateLoopDecoration(x) });
+    findLoops(".loop[data-type=audio]").forEach(x => { forceLoopDirty(x); hydrateLoopDecoration(x) });
 
     if (hidden) {
         return;

@@ -335,7 +335,7 @@ function doNodesIntersect(x, dirtyNode) {
         (x.end > dirtyNode.start &&
             x.start < dirtyNode.end)
 }
-function forceMarkDirty(loop, wasMoved) {
+function forceLoopDirty(loop, wasMoved) {
     markLoopDirty(loop, wasMoved);
     resetRenderHash(loop);
 }
