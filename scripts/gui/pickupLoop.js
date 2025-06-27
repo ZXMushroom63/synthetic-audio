@@ -1,5 +1,5 @@
 function pickupLoop(loop, natural = false) {
-    if (loop.classList.contains("deactivated")) {
+    if (loop.classList.contains("deactivated") || loop.hasAttribute("data-deleted")) {
         return;
     }
     loop.classList.add("active");
@@ -35,6 +35,7 @@ function pickupLoop(loop, natural = false) {
     }
     function mouseUp(unused, cancel) {
         dropHandlers.splice(dropHandlers.indexOf(mouseUp), 1);
+        loopMoveHandlers.splice(loopMoveHandlers.indexOf(mouseMove), 1);
         if (!cancel) {
             markLoopDirty(loop, true);
             if (!loop.getAttribute("data-new-start")) {
@@ -54,6 +55,7 @@ function pickupLoop(loop, natural = false) {
         }
     }
     dropHandlers.push(mouseUp);
+    loopMoveHandlers.push(mouseMove);
     var trackBB = document.querySelector("#trackInternal").getBoundingClientRect();
     var originalBB = loop.querySelector(".loopInternal").getBoundingClientRect();
     document.addEventListener("mousemove", mouseMove);

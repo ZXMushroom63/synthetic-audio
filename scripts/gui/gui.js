@@ -3,10 +3,16 @@ function customEvent(ev, data = {}) {
     window.dispatchEvent(new CustomEvent(ev, { detail: data }));
 }
 var dropHandlers = [];
+var loopMoveHandlers = [];
 function resetDrophandlers(cancel) {
     while (dropHandlers.length > 0) {
         dropHandlers[0](null, cancel);
     }
+}
+function hibernateMoveHandlers() {
+    loopMoveHandlers.forEach(handler => {
+        document.removeEventListener("mousemove", handler);
+    });
 }
 const SHIFT_KEY_DELAY = 150;
 var delayedShiftPress = null;
