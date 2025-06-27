@@ -16,17 +16,23 @@ addEventListener("init", () => {
         }
         const dir = directionMap[e.key];
         globalThis.zscrollisInternal = false;
-        [...nodes].forEach((node, i) => {
-            const def = filters[node.getAttribute("data-type")];
-            if ((!def.pitchZscroller && (Math.abs(dir) !== 1)) || !def.zscroll) { //only zscroll if possible, and allow single number zscrolling for non pitch zscollers
-                return;
-            }
-            globalThis.zscrollIsFirst = (i === 0);
-            def.zscroll(node, dir);
-            if (!multiplayer.isHooked && multiplayer.on && !node._ignore) {
-                multiplayer.patchLoop(node);
-            }
-        });
+        [...nodes]
+            .sort((a, b) => {
+                return parseFloat(a.getAttribute("data-layer")) - parseFloat(b.getAttribute("data-layer"))
+            })
+            .sort((a, b) => {
+                return parseFloat(a.getAttribute("data-start")) - parseFloat(b.getAttribute("data-start"))
+            }).forEach((node, i) => {
+                const def = filters[node.getAttribute("data-type")];
+                if ((!def.pitchZscroller && (Math.abs(dir) !== 1)) || !def.zscroll) { //only zscroll if possible, and allow single number zscrolling for non pitch zscollers
+                    return;
+                }
+                globalThis.zscrollIsFirst = (i === 0);
+                def.zscroll(node, dir);
+                if (!multiplayer.isHooked && multiplayer.on && !node._ignore) {
+                    multiplayer.patchLoop(node);
+                }
+            });
     }, false, (e) => e.altKey && !e.ctrlKey && !e.metaKey && Object.keys(directionMap).includes(e.key));
 });
 registerHelp(".tool[data-tool=TRANSPOSE]",
