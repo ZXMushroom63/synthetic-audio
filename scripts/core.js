@@ -336,7 +336,7 @@ function doNodesIntersect(x, dirtyNode) {
             x.start < dirtyNode.end)
 }
 
-registerSetting("NodeHashing", true);
+registerSetting("NodeHashing", false);
 registerSetting("NodeCaching", true);
 function constructRenderDataArray(data) {
     data.nodes.sort((a, b) => a.layer - b.layer);
