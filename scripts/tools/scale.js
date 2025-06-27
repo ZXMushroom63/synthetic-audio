@@ -41,23 +41,22 @@ addEventListener("init", () => {
                 node.setAttribute(`data-duration`, duration * dir);
             }
             hydrateLoopPosition(node);
+            hydrateLoopDecoration(node);
             if (!isNoPickupMode) {
                 pickupLoop(node, true);
             }
         });
     }, false, (e) => !e.shiftKey && !e.altKey && !e.ctrlKey && !e.metaKey && Object.keys(scaleMap).includes(e.key));
 });
-registerHelp(".tool[data-tool=TRANSPOSE]",
+registerHelp(".tool[data-tool=SCALE]",
     `
-************************
-*  THE TRANSPOSE TOOL  *
-************************
-This tool adds various keybinds to transpose notes by certain amounts.
+********************
+*  THE SCALE TOOL  *
+********************
+Nothing to do with musical scales!
 
-ALT+; = Selected nodes will be bumped down by a fifth.
-ALT+' = Selected nodes will be bumped up by a fifth.
-ALT+[ = Selected nodes will be bumped down by an octave.
-ALT+] = Selected nodes will be bumped up by an octave.
-ALT+, = Selected nodes will be bumped down by a semitone.
-ALT+. = Selected nodes will be bumped up by a semitone.
+PageDown = Selected nodes will be squashed to half the space
+PageUp = Selected nodes will be expanded to double the space
+PageDown = Hovered node will be shrunk by 1 substep
+PageUp = Hovered node will be expanded by 1 substep
 `);
