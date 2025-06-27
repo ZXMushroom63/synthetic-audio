@@ -8,37 +8,42 @@ addEventListener("init", () => {
         "PageDown": -1
     }
     registerTool("Scale", (nodes, e) => {
+        let isNoPickupMode = false;
         if (!nodes) {
+            isNoPickupMode = true;
             nodes = [document.elementFromPoint(mouse.x, mouse.y).closest(".loop")];
         }
         if (!nodes || !e || !nodes[0]) {
             return;
         }
-        hibernateMoveHandlers();
+        if (!isNoPickupMode) {
+            resetDrophandlers(false);
+        }
         const shiftMode = nodes.length === 1;
-        const ins = shiftMode ? "" : "-new";
         const mapper = shiftMode ? soloScaleMap : scaleMap;
         const dir = mapper[e.key];
         globalThis.zscrollisInternal = false;
         let absoluteStart = Infinity;
         [...nodes].forEach(n => {
-            const start = parseFloat(n.getAttribute(`data${ins}-start`));
+            const start = parseFloat(n.getAttribute(`data-start`));
             absoluteStart = Math.min(start, absoluteStart);
         });
         [...nodes].forEach((node, i) => {
             globalThis.zscrollIsFirst = (i === 0);
-            const start = parseFloat(node.getAttribute(`data${ins}-start`));
-            const duration = parseFloat(parseFloat(node.getAttribute(`data-duration`)));
+            const start = parseFloat(node.getAttribute(`data-start`));
+            const duration = parseFloat(node.getAttribute(`data-duration`));
             if (shiftMode) {
                 const newDuration = Math.max((audio.beatSize / gui.substepping), duration + (audio.beatSize / gui.substepping * dir));
                 node.setAttribute(`data-duration`, newDuration);
             } else {
                 const newStart = dir * (start - absoluteStart) + absoluteStart;
-                node.setAttribute(`data${ins}-start`, newStart);
                 node.setAttribute(`data-start`, newStart);
                 node.setAttribute(`data-duration`, duration * dir);
             }
             hydrateLoopPosition(node);
+            if (!isNoPickupMode) {
+                pickupLoop(node, true);
+            }
         });
     }, false, (e) => !e.shiftKey && !e.altKey && !e.ctrlKey && !e.metaKey && Object.keys(scaleMap).includes(e.key));
 });
