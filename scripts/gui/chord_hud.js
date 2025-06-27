@@ -253,7 +253,7 @@ function getChordStack(loop, allowAtonal) {
     if (loop.hasAttribute("data-deleted")) {
         return [];
     }
-    var combiner = allowAtonal ? "" : ":has(.noteDisplay)";
+    var combiner = allowAtonal ? "" : ":has(.chordDisplay)";
     var startingRange = parseInt(loop.getAttribute("data-layer"));
     var endingRange = startingRange;
     var loops = [...findLoops(`.loop${combiner}:not([data-deleted])[data-start="${loop.getAttribute("data-start")
@@ -286,7 +286,7 @@ function getChordStack(loop, allowAtonal) {
 
 function chordProcess(loop, chordArray) {
     if (!chordArray) {
-        var loops = getChordStack(loop);
+        var loops = getChordStack(loop);    
         loop.relatedChord = loops;
     } else if (Array.isArray(chordArray)) {
         loop.relatedChord = chordArray;
