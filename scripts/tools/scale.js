@@ -29,7 +29,6 @@ addEventListener("init", () => {
             absoluteStart = Math.min(start, absoluteStart);
         });
         [...nodes].forEach((node, i) => {
-            globalThis.zscrollIsFirst = (i === 0);
             const start = parseFloat(node.getAttribute(`data-start`));
             const duration = parseFloat(node.getAttribute(`data-duration`));
             if (shiftMode) {
