@@ -26,7 +26,7 @@ addEventListener("init", () => {
         });
     }, false, (e) => e.altKey && !e.ctrlKey && !e.metaKey && Object.keys(directionMap).includes(e.key));
 });
-registerHelp(".tool[data-tool=KEYCHANGE]",
+registerHelp(".tool[data-tool=TRANSPOSE]",
     `
 ************************
 *  THE TRANSPOSE TOOL  *
