@@ -832,7 +832,7 @@ addEventListener("init", () => {
 
     addEventListener("preserialisenode", (e) => {
         if ((e.detail.node.getAttribute("data-type") === "p_waveform_plus") && e.detail.node.conf.UseCustomWaveform && (custom_waveforms[e.detail.node.conf.WaveformAsset]?.dirty || custom_waveforms[e.detail.node.conf.WaveformAsset2]?.dirty)) {
-            markLoopDirty(e.detail.node);
+            forceMarkDirty(e.detail.node);
             return;
         }
         Object.values(e.detail.node.conf).forEach(x => {
@@ -843,7 +843,7 @@ addEventListener("init", () => {
                 return;
             }
             if (custom_waveforms[x.replace(matchWaveformPart, "").replace(matchWaveformHz, "")]?.dirty) {
-                markLoopDirty(e.detail.node);
+                forceMarkDirty(e.detail.node);
                 return;
             }
         });

@@ -600,7 +600,8 @@ addEventListener("init", async () => {
 
             WAVETABLES[key] = buffer;
             logToLoader(`Loaded wavetable: ${item.name}`);
-            findLoops(".loop[data-wt-user]").forEach(markLoopDirty);
+            findLoops(".loop[data-wt-user]").forEach(forceMarkDirty);
+
         }
     }
     if (performance.measureUserAgentSpecificMemory) {

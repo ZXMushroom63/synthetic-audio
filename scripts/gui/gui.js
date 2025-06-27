@@ -619,7 +619,7 @@ function init() {
         if (!multiplayer.isHooked && multiplayer.on) {
             multiplayer.modifyProperty("#loopi", "loopi", document.querySelector("#loopi").value);
         }
-        findLoops(".loop[data-type=audio], .loop[data-type=p_readasset]").forEach(x => markLoopDirty(x));
+        findLoops(".loop[data-type=audio], .loop[data-type=p_readasset]").forEach(x => forceMarkDirty(x) && hydrateLoopDecoration(x));
         hydrateBeatMarkers();
         hydrateDecorations();
     });
