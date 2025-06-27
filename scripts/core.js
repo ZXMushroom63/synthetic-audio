@@ -215,7 +215,7 @@ function addBlockType(id, data) {
     });
     if (data.creditURL) {
         data.customGuiButtons ||= {};
-        data.customGuiButtons["Credit"] = ()=>window.open(data.creditURL);
+        data.customGuiButtons["Credit"] = () => window.open(data.creditURL);
     }
     if (data.midiMappings) {
         data.applyMidi = function (loop, note, vel) {
@@ -335,8 +335,22 @@ function doNodesIntersect(x, dirtyNode) {
         (x.end > dirtyNode.start &&
             x.start < dirtyNode.end)
 }
+
+registerSetting("NodeHashing", true);
+registerSetting("NodeCaching", true);
 function constructRenderDataArray(data) {
     data.nodes.sort((a, b) => a.layer - b.layer);
+
+    //hash check
+    data.nodes.forEach(node => {
+        if (node.dirty && node.ref.renderHash === node.hash && !node.deleted && settings.NodeHashing) {
+            undirtyRenderTreeNode(node);
+        }
+        if (!settings.NodeCaching) {
+            node.dirty = true;
+        }
+    });
+
     var usedEditorLayers = [...new Set(data.nodes.flatMap(x => { return x.editorLayer }))].sort((a, b) => { return a - b });
     var renderDataArray = [];
     usedEditorLayers.forEach(editorLayer => {
@@ -351,132 +365,135 @@ function constructRenderDataArray(data) {
         const abstractLayerMap = constructAbstractLayerMapsForLevel(nodesForLevel, usedLayers);
         abstractLayerMap.editorOnly = editorOnlyFlag;
         abstractLayerMap.layerId = editorLayer;
-        abstractLayerMap.needsUpdating = false;
+        abstractLayerMap.needsUpdating = !settings.NodeCaching;
         renderDataArray.push(abstractLayerMap);
     });
     var assetMap = {};
-    renderDataArray.forEach(editorLayer => {
-        var dirtyNodes = editorLayer.flat().filter(x => x.dirty)
-        dirtyNodes.forEach(x => {
-            if (x.type === "p_writeasset") {
-                assetMap[x.conf.Asset] = true;
-            }
-            if (x.wasMovedSinceRender) {
-                dirtyNodes.push({
-                    type: "ghost",
-                    start: x.ref.startOld,
-                    end: x.ref.endOld,
-                    duration: x.ref.durationOld,
-                    layer: x.ref.layerOld,
-                });
-            }
-        });
-        dirtyNodes.push({
-            start: -1,
-            end: -2,
-            layer: 9999
-        });
-
-        for (let layer = 0; layer < editorLayer.length; layer++) {
-            const nodes = editorLayer[layer];
-
-            nodes.forEach(x => {
-                if (x.dirty) {
-                    if (x.type === "p_writeasset") {
-                        //console.log("Dirty asset found: ", x.conf.Asset);
-                        assetMap[x.conf.Asset] = true;
-                    }
-                    return;
+    if (settings.NodeCaching) {
+        renderDataArray.forEach(editorLayer => {
+            //dirtying and caching shenanigans
+            var dirtyNodes = editorLayer.flat().filter(x => x.dirty)
+            dirtyNodes.forEach(x => {
+                if (x.type === "p_writeasset") {
+                    assetMap[x.conf.Asset] = true;
                 }
-                for (let i = 0; i < dirtyNodes.length; i++) {
-                    const dirtyNode = dirtyNodes[i];
-                    if (
-                        (!dirtyNodes.includes(x)) &&
-                        (((
-                            doNodesIntersect(x, dirtyNode)
-                        ) && (x.layer > dirtyNode.layer)) || (assetUserTypes.includes(x.type) && usesDirtyAssets(assetMap, x)))
-                    ) {
-                        x.dirty = true;
-                        x.ref.setAttribute("data-dirty", "yes");
-                        dirtyNodes.push(x);
+                if (x.wasMovedSinceRender) {
+                    dirtyNodes.push({
+                        type: "ghost",
+                        start: x.ref.startOld,
+                        end: x.ref.endOld,
+                        duration: x.ref.durationOld,
+                        layer: x.ref.layerOld,
+                    });
+                }
+            });
+            dirtyNodes.push({
+                start: -1,
+                end: -2,
+                layer: 9999
+            });
+
+            for (let layer = 0; layer < editorLayer.length; layer++) {
+                const nodes = editorLayer[layer];
+
+                nodes.forEach(x => {
+                    if (x.dirty) {
                         if (x.type === "p_writeasset") {
+                            //console.log("Dirty asset found: ", x.conf.Asset);
                             assetMap[x.conf.Asset] = true;
                         }
-                        if (assetUserTypes.includes(x.type)) {
-                            console.log("Asset user marked as dirty: ", x);
+                        return;
+                    }
+                    for (let i = 0; i < dirtyNodes.length; i++) {
+                        const dirtyNode = dirtyNodes[i];
+                        if (
+                            (!dirtyNodes.includes(x)) &&
+                            (((
+                                doNodesIntersect(x, dirtyNode)
+                            ) && (x.layer > dirtyNode.layer)) || (assetUserTypes.includes(x.type) && usesDirtyAssets(assetMap, x)))
+                        ) {
+                            x.dirty = true;
+                            x.ref.setAttribute("data-dirty", "yes");
+                            dirtyNodes.push(x);
+                            if (x.type === "p_writeasset") {
+                                assetMap[x.conf.Asset] = true;
+                            }
+                            if (assetUserTypes.includes(x.type)) {
+                                console.log("Asset user marked as dirty: ", x);
+                            }
+                            break;
                         }
-                        break;
                     }
-                }
-            });
-        }
-
-        const rebuildCacheMap = !layerCache[editorLayer.layerId] || !layerCache[editorLayer.layerId].slice(0, 1 + audio.stereo).reduce((acc, v) => !!v && !!acc) || !layerCache[editorLayer.layerId].slice(0, 1 + audio.stereo).reduce((acc, v) => (!!v) && acc && (v.length === audio.length), true);
-        editorLayer.rebuild = rebuildCacheMap;
-        editorLayer.needsUpdating = rebuildCacheMap;
-
-        if (!audio.stereo && layerCache[editorLayer.layerId]) {
-            layerCache[editorLayer.layerId][1] = null; //free up some memory
-        }
-
-        if (rebuildCacheMap) {
-            layerCache[editorLayer.layerId] = [null, null];
-        }
-
-        var cleanNodes = editorLayer.flat().filter(x => !dirtyNodes.includes(x));
-        var hitNodes = [...dirtyNodes];
-        let hitCount = 1;
-        while (hitCount !== 0) {
-            hitCount = 0;
-            cleanNodes = cleanNodes.filter(node => {
-                for (let j = 0; j < hitNodes.length; j++) {
-                    const dirtyNode = hitNodes[j];
-                    if (doNodesIntersect(node, dirtyNode)) {
-                        hitCount++;
-                        hitNodes.push(node);
-                        return false;
-                    }
-                }
-                return true;
-            });
-        }
-
-        editorLayer.forEach((layer, i) => {
-            if (rebuildCacheMap) {
-                return;
-            }
-            editorLayer[i] = layer.filter(node => { //only process nodes that have horizontal intersection with a dirty node
-                return hitNodes.includes(node);
-            })
-        });
-
-        dirtyNodes.forEach((x) => {
-            editorLayer.needsUpdating = true;
-            if (layerCache[editorLayer.layerId]) {
-                // clear segments with content that needs to be updated
-                layerCache[editorLayer.layerId].forEach(pcm => {
-                    if (!pcm) {
-                        return;
-                    }
-
-                    const startIndex = Math.floor(x.start * audio.samplerate);
-
-                    if (startIndex < 0) {
-                        return;
-                    }
-
-                    const durationSamples = Math.floor(x.duration * audio.samplerate) + 1; //'+1' = TypedArray.set being a pain
-                    const endIndex = durationSamples + startIndex;
-                    const clippedDuration = Math.min(endIndex, pcm.length) - startIndex;
-
-                    pcm.set(
-                        new Float32Array(clippedDuration),
-                        startIndex
-                    );
                 });
             }
+
+            const rebuildCacheMap = !settings.NodeCaching || !layerCache[editorLayer.layerId] || !layerCache[editorLayer.layerId].slice(0, 1 + audio.stereo).reduce((acc, v) => !!v && !!acc) || !layerCache[editorLayer.layerId].slice(0, 1 + audio.stereo).reduce((acc, v) => (!!v) && acc && (v.length === audio.length), true);
+            editorLayer.rebuild = rebuildCacheMap;
+            editorLayer.needsUpdating = rebuildCacheMap;
+
+            if (!audio.stereo && layerCache[editorLayer.layerId]) {
+                layerCache[editorLayer.layerId][1] = null; //free up some memory
+            }
+
+            if (rebuildCacheMap) {
+                layerCache[editorLayer.layerId] = [null, null];
+            }
+
+            var cleanNodes = editorLayer.flat().filter(x => !dirtyNodes.includes(x));
+            var hitNodes = [...dirtyNodes];
+            let hitCount = 1;
+            while (hitCount !== 0) {
+                hitCount = 0;
+                cleanNodes = cleanNodes.filter(node => {
+                    for (let j = 0; j < hitNodes.length; j++) {
+                        const dirtyNode = hitNodes[j];
+                        if (doNodesIntersect(node, dirtyNode)) {
+                            hitCount++;
+                            hitNodes.push(node);
+                            return false;
+                        }
+                    }
+                    return true;
+                });
+            }
+
+            editorLayer.forEach((layer, i) => {
+                if (rebuildCacheMap) {
+                    return;
+                }
+                editorLayer[i] = layer.filter(node => { //only process nodes that have horizontal intersection with a dirty node
+                    return hitNodes.includes(node);
+                })
+            });
+
+            dirtyNodes.forEach((x) => {
+                editorLayer.needsUpdating = true;
+                if (layerCache[editorLayer.layerId]) {
+                    // clear segments with content that needs to be updated
+                    layerCache[editorLayer.layerId].forEach(pcm => {
+                        if (!pcm) {
+                            return;
+                        }
+
+                        const startIndex = Math.floor(x.start * audio.samplerate);
+
+                        if (startIndex < 0) {
+                            return;
+                        }
+
+                        const durationSamples = Math.floor(x.duration * audio.samplerate) + 1; //'+1' = TypedArray.set being a pain
+                        const endIndex = durationSamples + startIndex;
+                        const clippedDuration = Math.min(endIndex, pcm.length) - startIndex;
+
+                        pcm.set(
+                            new Float32Array(clippedDuration),
+                            startIndex
+                        );
+                    });
+                }
+            });
         });
-    });
+    }
     return renderDataArray;
 }
 var processRendering = false;
@@ -529,14 +546,8 @@ async function render() {
                             var newPcm;
 
                             if (node.dirty || (!node.ref.cache)) {
-                                node.dirty = false;
-                                node.ref.removeAttribute("data-dirty");
-                                node.ref.removeAttribute("data-wasMovedSinceRender");
+                                undirtyRenderTreeNode(node);
                                 node.ref.cache = [null, null];
-                                node.ref.startOld = node.start;
-                                node.ref.durationOld = node.duration;
-                                node.ref.layerOld = node.layer;
-                                node.ref.endOld = node.end;
                                 calculatedNodeCount++;
                             }
 
@@ -545,7 +556,9 @@ async function render() {
 
                             if (!node.ref.cache[c]) {
                                 newPcm = await filters[node.type].functor.apply(node, [initialPcm.slice(startTime, endTime), c, data]);
-                                node.ref.cache[c] = newPcm;
+                                if (settings.NodeCaching) {
+                                    node.ref.cache[c] = newPcm;
+                                }
                                 if (c === 0) {
                                     hydrateLoopBackground(node.ref);
                                 }
@@ -559,7 +572,9 @@ async function render() {
                         if (!layerCache[abstractLayerMaps.layerId]) {
                             layerCache[abstractLayerMaps.layerId] = [null, null];
                         }
-                        layerCache[abstractLayerMaps.layerId][c] = initialPcm;
+                        if (settings.NodeCaching) {
+                            layerCache[abstractLayerMaps.layerId][c] = initialPcm;
+                        }
                     }
                 } else {
                     initialPcm = layerCache[abstractLayerMaps.layerId][c];
@@ -595,4 +610,15 @@ async function render() {
     document.querySelector("#renderBtn").disabled = false;
 
     findLoops(".loop").forEach(hydrateLoopDecoration);
+}
+
+function undirtyRenderTreeNode(node) {
+    node.dirty = false;
+    node.ref.removeAttribute("data-dirty");
+    node.ref.removeAttribute("data-wasMovedSinceRender");
+    node.ref.startOld = node.start;
+    node.ref.durationOld = node.duration;
+    node.ref.layerOld = node.layer;
+    node.ref.endOld = node.end;
+    node.ref.renderHash = hashNode(node.ref);
 }

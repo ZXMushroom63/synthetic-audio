@@ -217,7 +217,7 @@ function hydrateZoom(lean) {
 
 registerSetting("LoopWaveformDisplayDownsampling", 256);
 function hydrateLoopBackground(elem) {
-    if (!settings.LoopWaveformDisplays) {
+    if (!settings.LoopWaveformDisplays || !elem.cache[0]) {
         return;
     }
     var line = elem.querySelector(".backgroundSvg path");

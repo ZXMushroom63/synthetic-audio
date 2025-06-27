@@ -57,6 +57,9 @@ function serialise(forRender, forMultiplayer) {
     customEvent("serialise", { data: out });
     return out;
 }
+function hashNode(node) {
+    return cyrb53(JSON.stringify(serialiseNode(node)));
+}
 function serialiseNode(node, forRender, forMultiplayer) {
     customEvent("preserialisenode", { node: node });
     var out = {};
@@ -79,6 +82,7 @@ function serialiseNode(node, forRender, forMultiplayer) {
         out.wasMovedSinceRender = node.hasAttribute("data-wasMovedSinceRender");
         out.definition = filters[out.type];
         out.ref = node;
+        out.hash = hashNode(node);
     }
     customEvent("serialisenode", { node: node, data: out });
     return out;
