@@ -35,6 +35,7 @@ async function applyHighpassFilter(pcmData, sampleRate, threshold, falloff) {
     source.start(0);
 
     return offlineContext.startRendering().then(renderedBuffer => {
+        scriptProcessor.onaudioprocess = null;
         return renderedBuffer.getChannelData(0);
     });
 }

@@ -32,6 +32,7 @@ async function applyBandpassFilterSingle(pcmData, sampleRate, freq, falloff) {
     source.start(0);
 
     return offlineContext.startRendering().then(renderedBuffer => {
+        scriptProcessor.onaudioprocess = null;
         return renderedBuffer.getChannelData(0);
     });
 }

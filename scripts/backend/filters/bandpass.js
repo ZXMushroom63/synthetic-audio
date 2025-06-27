@@ -38,6 +38,7 @@ async function applyBandpassFilter(pcmData, sampleRate, lowCutoff, highCutoff, f
     source.start(0);
 
     return offlineContext.startRendering().then(renderedBuffer => {
+        scriptProcessor.onaudioprocess = null;
         return renderedBuffer.getChannelData(0);
     });
 }

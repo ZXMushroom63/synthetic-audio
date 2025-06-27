@@ -36,6 +36,7 @@ async function applyLowpassFilter(pcmData, sampleRate, threshold, falloff, overr
     source.start(0);
 
     return offlineContext.startRendering().then(renderedBuffer => {
+        scriptProcessor.onaudioprocess = null;
         return renderedBuffer.getChannelData(0);
     });
 }
