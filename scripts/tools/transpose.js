@@ -29,6 +29,7 @@ addEventListener("init", () => {
                 }
                 globalThis.zscrollIsFirst = (i === 0);
                 def.zscroll(node, dir);
+                markLoopDirty(node);
                 if (!multiplayer.isHooked && multiplayer.on && !node._ignore) {
                     multiplayer.patchLoop(node);
                 }
