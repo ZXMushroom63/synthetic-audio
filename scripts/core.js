@@ -335,7 +335,9 @@ function doNodesIntersect(x, dirtyNode) {
         (x.end > dirtyNode.start &&
             x.start < dirtyNode.end)
 }
-
+function resetRenderHashes() {
+    findLoops(".loop").forEach(x => x.renderHash = null);
+}
 registerSetting("NodeHashing", false);
 registerSetting("NodeCaching", true);
 function constructRenderDataArray(data) {

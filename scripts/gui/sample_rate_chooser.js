@@ -7,6 +7,7 @@ addEventListener("init", () => {
             SFCACHE = {};
             proceduralAssets.clear();
             findLoops(".loop").forEach(x => x.setAttribute("data-dirty", "yes"));
+            resetRenderHashes();
             layerCache = {};
         }
     });
