@@ -8,7 +8,10 @@ addEventListener("init", () => {
         ".": +1
     }
     registerTool("Transpose", (nodes, e) => {
-        if (!nodes || !e) {
+        if (!nodes) {
+            nodes = [document.elementFromPoint(mouse.x, mouse.y).closest(".loop")];
+        }
+        if (!nodes || !e || !nodes[0]) {
             return;
         }
         const dir = directionMap[e.key];
