@@ -45,7 +45,6 @@ function zscroll(e) {
                     return parseFloat(a.getAttribute("data-start")) - parseFloat(b.getAttribute("data-start"))
                 });
             if (currentlyActiveLoops[0]) {
-                globalThis.zscrollMulti = true;
                 currentlyActiveLoops.forEach((x, i) => {
                     globalThis.zscrollIsFirst = i === 0;
                     execZScroll(x, -delta);
@@ -57,7 +56,6 @@ function zscroll(e) {
             } else {
                 var targetLoop = document.elementFromPoint(mouse.x, mouse.y)?.closest(".loop");
                 if (targetLoop) {
-                    globalThis.zscrollMulti = false;
                     globalThis.zscrollIsFirst = true;
                     execZScroll(targetLoop, -delta);
                     markLoopDirty(targetLoop);
@@ -74,7 +72,6 @@ addEventListener("mousedown", (e) => {
     var targetLoop = document.elementsFromPoint(mouse.x, mouse.y).find(x => !x.classList.contains("deactivated"))?.closest(".loop");
     if (targetLoop && keymap["Alt"]) {
         e.preventDefault();
-        globalThis.zscrollMulti = false;
         globalThis.zscrollIsFirst = true;
         execZScroll(targetLoop, 0);
     }
