@@ -23,6 +23,9 @@ addEventListener("init", () => {
             }
             globalThis.zscrollIsFirst = (i === 0);
             def.zscroll(node, dir);
+            if (!multiplayer.isHooked && multiplayer.on && !node._ignore) {
+                multiplayer.patchLoop(node);
+            }
         });
     }, false, (e) => e.altKey && !e.ctrlKey && !e.metaKey && Object.keys(directionMap).includes(e.key));
 });
