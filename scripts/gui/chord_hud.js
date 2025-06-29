@@ -293,6 +293,9 @@ function chordProcess(loop, chordArray) {
         loop.relatedChord = chordArray;
     }
 
+    if (!loop.querySelector(".chordDisplay")) {
+        return;
+    }
 
     if (loop.relatedChord[loop.relatedChord.length - 1] === loop) {
         loop.querySelector(".chordDisplay").style.display = "";
