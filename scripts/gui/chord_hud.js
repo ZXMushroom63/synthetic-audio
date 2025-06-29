@@ -31,6 +31,13 @@ function getChromaticOctave(note) {
 
 const chordFormulas = new Map();
 
+const progressionArray = [
+    "IV-V-I-vi",
+    "I-vi-IV-V",
+    "I–V–vi–IV",
+    "ii–V–I"
+]
+
 function registerVanillaChords() {
     // Quartal & Quintal harmonies
     chordFormulas.set("qr2", [0, 5]);
@@ -128,6 +135,7 @@ function registerVanillaChords() {
     chordFormulas.set("augMaj7", [0, 4, 8, 11]);   // Augmented major 7th (C, E, G#, B)
     chordFormulas.set("minMaj7", [0, 3, 7, 11]);   // Minor-major 7th (C, Eb, G, B)
     chordFormulas.set("min7b5", [0, 3, 6, 10]);    // Half-diminished (minor 7♭5) (C, Eb, Gb, Bb)
+    chordFormulas.set("m7#5", [0, 3, 8, 10]);
     chordFormulas.set("dim7", [0, 3, 6, 9]);       // Diminished 7th (C, Eb, Gb, A)
     chordFormulas.set("min7", [0, 3, 7, 10]);      // Minor 7th (C, Eb, G, Bb)
     chordFormulas.set("maj7", [0, 4, 7, 11]);      // Major 7th (C, E, G, B)
