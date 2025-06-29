@@ -31,13 +31,6 @@ function getChromaticOctave(note) {
 
 const chordFormulas = new Map();
 
-const progressionArray = [
-    "IV-V-I-vi",
-    "I-vi-IV-V",
-    "I–V–vi–IV",
-    "ii–V–I"
-]
-
 function registerVanillaChords() {
     // Quartal & Quintal harmonies
     chordFormulas.set("qr2", [0, 5]);
