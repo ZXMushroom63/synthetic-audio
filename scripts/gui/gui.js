@@ -14,7 +14,7 @@ function hibernateMoveHandlers() {
         document.removeEventListener("mousemove", handler);
     });
 }
-const SHIFT_KEY_DELAY = 150;
+const SHIFT_KEY_DELAY = 300;
 var delayedShiftPress = null;
 var gui = {
     noLOD: true,
@@ -650,9 +650,16 @@ function init() {
     });
 
     addEventListener("keydown", (e) => {
-        if (e.key === "Shift" && !delayedShiftPress && !e.repeat) {
+        if (e.key === "Shift") {
+            if (e.repeat || delayedShiftPress) {
+                console.log("N");
+                return;
+            } else {
+                console.log("Y");
+            }
             delayedShiftPress = setTimeout(() => {
                 keymap["Shift"] = true;
+                delayedShiftPress = null;
             }, SHIFT_KEY_DELAY);
             return;
         }
@@ -672,9 +679,11 @@ function init() {
         }
     });
     addEventListener("keyup", (e) => {
-        if (e.shiftKey) {
+        if (e.key === "Shift") {
             clearTimeout(delayedShiftPress);
+            delayedShiftPress = null;
             keymap["Shift"] = false;
+            return;
         }
         keymap[e.key] = false;
     });
