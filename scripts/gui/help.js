@@ -70,6 +70,10 @@ helpContent.addTab("Keybinds", `
 - ~ALT + ]~ = Selected nodes will be bumped up by an octave.
 - ~ALT + ,~ = Selected nodes will be bumped down by a semitone.
 - ~ALT + .~ = Selected nodes will be bumped up by a semitone.
+- ~PageDown~ = Selected nodes will be squashed to half the space
+- ~PageUp~ = Selected nodes will be expanded to double the space
+- ~PageDown~ = Hovered node will be shrunk by 1 substep
+- ~PageUp~ = Hovered node will be expanded by 1 substep
 `);
 
 helpContent.addTab("Programmable Fields", `
