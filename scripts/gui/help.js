@@ -74,6 +74,9 @@ helpContent.addTab("Keybinds", `
 - ~PageUp~ = Selected nodes will be expanded to double the space
 - ~PageDown~ = Hovered node will be shrunk by 1 substep
 - ~PageUp~ = Hovered node will be expanded by 1 substep
+- ~CTRL + B~ = Split at playhead
+- ~ALT + 2~ = Split in two
+- ~ALT + 3~ = Split in three
 `);
 
 helpContent.addTab("Programmable Fields", `
