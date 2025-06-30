@@ -3,15 +3,39 @@ addBlockType("speed", {
     title: "Speed Change",
     configs: {
         "Speed": [1, "number", 1],
+        "FromEnd": [false, "checkbox"],
+        "AntiAlias": [false, "checkbox"],
+        "FadeTime": [0.006, "number"],
     },
     functor: function (inPcm, channel, data) {
         var samplePosition = 0;
         var speed = _(this.conf.Speed);
-        var out = new Float32Array(inPcm.length).fill(0);
+        const original = inPcm.slice();
+        if (this.conf.FromEnd) {
+            original.reverse();
+        }
+        var out = new Float32Array(original.length).fill(0);
         out.forEach((x, i) => {
-            out[i] = inPcm[Math.floor(samplePosition)] || 0;
-            samplePosition += (speed(i, inPcm) || 0.0);
+            if (this.conf.AntiAlias) {
+                out[i] = lerp(original[Math.floor(samplePosition)] || 0, original[Math.ceil(samplePosition)] || 0, samplePosition % 1) || 0;
+            } else {
+                out[i] = original[Math.floor(samplePosition)] || 0;
+            }
+            if (this.conf.FromEnd) {
+                samplePosition += (speed(original.length - i, original) || 0.0);
+            } else {
+                samplePosition += (speed(i, original) || 0.0);
+            }
         });
+        const FADETIME = Math.min(this.conf.FadeTime * audio.samplerate, inPcm.length);
+        const FADESTART = inPcm.length - FADETIME;
+        const tail = out.subarray(FADESTART);
+        tail.forEach((x, i) => {
+            tail[i] = x * (1 - i / FADETIME);
+        });
+        if (this.conf.FromEnd) {
+            out.reverse()
+        }
         return out;
     }
 });
