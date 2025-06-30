@@ -652,10 +652,7 @@ function init() {
     addEventListener("keydown", (e) => {
         if (e.key === "Shift") {
             if (e.repeat || delayedShiftPress) {
-                console.log("N");
                 return;
-            } else {
-                console.log("Y");
             }
             delayedShiftPress = setTimeout(() => {
                 keymap["Shift"] = true;
