@@ -282,26 +282,35 @@ async function decodeSoundFonts(ax) {
         }
     }
 }
-function sumFloat32ArraysNormalised(arrays) {
+function sumFloat32Arrays(arrays) {
     if (arrays.length === 0) return new Float32Array(0);
-    var largestsample = 0.001;
     const length = arrays[0].length;
     const result = new Float32Array(length);
 
     for (let i = 0; i < length; i++) {
         for (let array of arrays) {
-            largestsample = Math.max(largestsample, Math.abs(array[i]));
             result[i] += array[i];
         }
     }
 
-    if (audio.normalise) {
-        for (let i = 0; i < length; i++) {
-            result[i] /= largestsample;
+    return result;
+}
+function normaliseFloat32Arrays(arrays) {
+    if (arrays.length === 0) return [];
+    var largestsample = 0.001;
+    const length = arrays[0].length;
+
+    for (let i = 0; i < length; i++) {
+        for (let array of arrays) {
+            largestsample = Math.max(largestsample, Math.abs(array[i]));
         }
     }
 
-    return result;
+    for (let i = 0; i < length; i++) {
+        for (let array of arrays) {
+            array[i] /= largestsample;
+        }
+    }
 }
 var layerCache = {};
 function constructAbstractLayerMapsForLevel(nodes, usedLayers) {
@@ -596,9 +605,12 @@ async function render() {
                     channelPcms.push(initialPcm);
                 }
             }
-            output.push(sumFloat32ArraysNormalised(channelPcms));
+            output.push(sumFloat32Arrays(channelPcms));
         }
         customEvent("render");
+        if (audio.normalise) {
+            normaliseFloat32Arrays(output);
+        }
         var renderTime = stopTiming("render");
         document.querySelector("#renderProgress").innerText = "Encoding...";
         var blob = await convertToFileBlob(output, channels, audio.samplerate, audio.bitrate);
