@@ -2,7 +2,7 @@ addBlockType("vocoder", {
     color: "rgba(0,255,0,0.3)",
     wet_and_dry_knobs: true,
     amplitude_smoothing_knob: true,
-    title: "Phase Vocoder",
+    title: "Vocoder",
     directRefs: ["voc", "voca"],
     configs: {
         "Carrier": ["(none)", ["(none)"]],
@@ -37,6 +37,8 @@ addBlockType("vocoder", {
         const frameSize = this.conf.FFTSize;
         const hopSize = this.conf.HopSize;
         const sampleRate = data.sampleRate;
+
+        const fft = new FFTJS(frameSize);
 
         const out = new Float32Array(modulatorPcm.length);
 
@@ -94,14 +96,20 @@ addBlockType("vocoder", {
             if (carrierFrameRaw.length < frameSize) break;
             carrierFrameRaw = carrierFrameRaw.map((v, i) => v * window[i]);
 
-            const [modFrame, modImag] = fft(modFrameRaw, new Float32Array(frameSize));
-            const [carrierFrame, carrierImag] = fft(carrierFrameRaw, new Float32Array(frameSize));
+            const modComplex = fft.createComplexArray();
+            fft.realTransform(modComplex, modFrameRaw);
+
+            const carrierComplex = fft.createComplexArray();
+            fft.realTransform(carrierComplex, carrierFrameRaw);
+
 
             for (let i = 0; i < bands.length; i++) {
                 let totalMag = 0;
                 const band = bands[i];
                 for (let j = band.startBin; j <= band.endBin; j++) {
-                    totalMag += Math.sqrt(modFrame[j] ** 2 + modImag[j] ** 2);
+                    const real = modComplex[2 * j];
+                    const imag = modComplex[2 * j + 1];
+                    totalMag += Math.sqrt(real * real + imag * imag);
                 }
                 bandMagnitudes[i] = totalMag / (band.endBin - band.startBin + 1);
             }
@@ -110,19 +118,24 @@ addBlockType("vocoder", {
                 const band = bands[i];
                 const targetMag = bandMagnitudes[i];
                 for (let j = band.startBin; j <= band.endBin; j++) {
-                    const carrierMag = Math.sqrt(carrierFrame[j] ** 2 + carrierImag[j] ** 2);
+                    const realIndex = 2 * j;
+                    const imagIndex = 2 * j + 1;
+                    const carrierMag = Math.sqrt(carrierComplex[realIndex] * carrierComplex[realIndex] + carrierComplex[imagIndex] * carrierComplex[imagIndex]);
                     if (carrierMag > 1e-9) {
                         const scale = targetMag / carrierMag;
-                        carrierFrame[j] *= scale * this.conf.Power;
-                        carrierImag[j] *= scale * this.conf.Power;
+                        carrierComplex[realIndex] *= scale * this.conf.Power;
+                        carrierComplex[imagIndex] *= scale * this.conf.Power;
                     }
                 }
             }
 
-            const [real, imag] = ifft(carrierFrame, carrierImag);
+            const timeDomain = fft.createComplexArray();
+            fft.inverseTransform(timeDomain, carrierComplex);
+            const real = fft.fromComplexArray(timeDomain);
+
 
             for (let i = 0; i < frameSize; i++) {
-                const val = (real[i] / frameSize) * window[i];
+                const val = (real[i]) * window[i];
                 out[pos + i] += val;
             }
         }
