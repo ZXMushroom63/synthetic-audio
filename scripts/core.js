@@ -241,7 +241,7 @@ function wait(s) {
         }, 1000 * s);
     });
 }
-async function decodeUsedAudioFiles(ax) {
+async function decodeAudioFiles(ax) {
     document.querySelector("#renderProgress").innerText = "Decoding loop PCM Data...";
     var usedAudioFiles = Array.prototype.flatMap.apply(document.querySelectorAll("div.loop[data-type=audio]"), [((x) => { return x.getAttribute("data-file") })]);
     usedAudioFiles = [...new Set(usedAudioFiles)];
@@ -261,7 +261,7 @@ async function decodeUsedAudioFiles(ax) {
         await wait(0.02);
     }
 }
-async function decodeUsedSoundFonts(ax) {
+async function decodeSoundFonts(ax) {
     document.querySelector("#renderProgress").innerText = "Decoding font PCM Data...";
     var usedInstruments = Array.prototype.flatMap.apply(document.querySelectorAll("div.loop[data-type=instrument]"), [((x) => { return x.conf.Instrument })]);
     usedInstruments = [...new Set(usedInstruments)];
@@ -345,7 +345,7 @@ function resetRenderHash(loop) {
 function resetRenderHashes() {
     findLoops(".loop").forEach(resetRenderHash);
 }
-registerSetting("NodeHashing", false);
+registerSetting("NodeHashing", true);
 registerSetting("NodeCaching", true);
 function constructRenderDataArray(data) {
     data.nodes.sort((a, b) => a.layer - b.layer);
@@ -523,11 +523,12 @@ async function render() {
     var ax = new OfflineAudioContext(channels, audio.length, audio.samplerate);
 
     document.querySelector("#renderBtn").setAttribute("disabled", "true");
-    await decodeUsedAudioFiles(ax);
-    await decodeUsedSoundFonts(ax);
+    await decodeAudioFiles(ax);
+    await decodeSoundFonts(ax);
 
     startTiming("data_construction");
     var renderDataArray = constructRenderDataArray(data);
+    const dirtyNodeTotal = data.nodes.filter(x => x.dirty).length;
     stopTiming("data_construction");
 
     document.querySelector("#renderProgress").innerText = "Processing layers...";
@@ -557,7 +558,6 @@ async function render() {
                             if (node.dirty || (!node.ref.cache)) {
                                 undirtyRenderTreeNode(node);
                                 node.ref.cache = [null, null];
-                                calculatedNodeCount++;
                             }
 
                             var startTime = Math.floor(node.start * audio.samplerate);
@@ -570,6 +570,10 @@ async function render() {
                                 }
                                 if (c === 0) {
                                     hydrateLoopBackground(node.ref);
+                                }
+                                calculatedNodeCount++;
+                                if (calculatedNodeCount % 5 === 0) {
+                                    document.querySelector("#renderProgress").innerText = `Processing layers... (${Math.floor(calculatedNodeCount / (1 + audio.stereo))}/${dirtyNodeTotal})`;
                                 }
                             } else {
                                 newPcm = node.ref.cache[c];
@@ -604,7 +608,7 @@ async function render() {
         success = false;
     }
     document.querySelector("#renderProgress").innerText = success
-        ? `Render successful! (${renderTime.toFixed(2)}s, ${calculatedNodeCount} calculated, ${processedNodeCount / (1 + audio.stereo)} processed)`
+        ? `Render successful! (${renderTime.toFixed(2)}s, ${calculatedNodeCount / (1 + audio.stereo)} calculated, ${processedNodeCount / (1 + audio.stereo)} processed)`
         : "Render failed.";
     if (success) {
         document.querySelector("#renderOut").src = URL.createObjectURL(blob);
