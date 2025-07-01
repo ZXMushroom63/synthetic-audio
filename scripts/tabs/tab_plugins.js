@@ -57,6 +57,8 @@ addEventListener("init", async () => {
         logToLoader(`randomUUID() support    -   ${crypto.randomUUID ? "YES" : "NO"}`);
         logToLoader(`Microphone support      -   ${navigator?.mediaDevices?.enumerateDevices ? "YES" : "NO"}`);
         logToLoader(`Storage size queries    -   ${navigator?.storage?.estimate ? "YES" : "NO"}`);
+        logToLoader(`Document PiP API        -   ${("documentPictureInPicture" in window) ? "YES" : "NO"}`);
+        logToLoader(`scheduler.yield()        -   ${(globalThis.scheduler?.yield) ? "YES" : "NO"}`);
         console.log("%cStar the project on github! https://github.com/ZXMushroom63/synthetic-audio", "border: 4px solid black; border-radius: 6px; padding: 0.5rem; font-size: 1.5em; background-color: black; background-image: linear-gradient(140deg,rgba(255, 0, 0, 0.3) 0%,rgba(255, 255, 255, 0) 34%,rgba(0, 255, 187, 0.2) 100%); color: white; font-style: italic;")
     }
     const postInitQueue = [];
