@@ -228,7 +228,7 @@
         customGuiButtons: {
             "Preview": async function () {
                 var pcmData = await tb303synth.functor.apply(this, [new Float32Array(audio.samplerate), 0, {}]);
-                var blob = await convertToFileBlob([sumFloat32ArraysNormalised([pcmData])], 1, audio.samplerate, audio.bitrate, true);
+                var blob = await convertToFileBlob([sumFloat32Arrays([pcmData])], 1, audio.samplerate, audio.bitrate, true);
                 playSample(blob);
             },
         },

@@ -92,7 +92,7 @@ addBlockType("p_readasset", {
     customGuiButtons: {
         "Preview": async function () {
             var pcmData = filters["p_readasset"].functor.apply(this, [new Float32Array(audio.samplerate), 0, {}]);
-            var blob = await convertToFileBlob([sumFloat32ArraysNormalised([pcmData])], 1, audio.samplerate, audio.bitrate, true);
+            var blob = await convertToFileBlob([sumFloat32Arrays([pcmData])], 1, audio.samplerate, audio.bitrate, true);
             playSample(blob);
         },
     }
