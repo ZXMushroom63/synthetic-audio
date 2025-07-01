@@ -68,7 +68,10 @@ addBlockType("p_readasset", {
         }
     },
     functor: function (inPcm, channel, data) {
-        var currentData = proceduralAssets.has(this.conf.Asset) ? proceduralAssets.get(this.conf.Asset)[channel].slice() : new Float32Array(0);
+        var currentData = proceduralAssets.has(this.conf.Asset) ? proceduralAssets.get(this.conf.Asset)[channel].slice() : null;
+        if (!currentData) {
+            return inPcm;
+        }
         const FADETIME = Math.min(this.conf.FadeTime * audio.samplerate, Math.min(inPcm.length, currentData.length));
         const FADESTART = Math.min(inPcm.length, currentData.length) - FADETIME;
         const tail = currentData.subarray(FADESTART);

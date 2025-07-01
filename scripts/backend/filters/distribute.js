@@ -22,7 +22,10 @@ addBlockType("distribute", {
         }
     },
     functor: function (inPcm, channel, data) {
-        var currentData = proceduralAssets.has(this.conf.Asset) ? proceduralAssets.get(this.conf.Asset)[channel] : [];
+        var currentData = proceduralAssets.has(this.conf.Asset) ? proceduralAssets.get(this.conf.Asset)[channel] : null;
+        if (!currentData) {
+            return inPcm;
+        }
         var duration = Math.floor(Math.round((((currentData.length / audio.samplerate) || 0) + 0.0) / data.loopInterval) * data.loopInterval * audio.samplerate);
         var currentTime = this.conf.Offset;
         var currentIdx = Math.floor(currentTime * audio.samplerate);
