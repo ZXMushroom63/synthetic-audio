@@ -1,3 +1,6 @@
+function getFftBinIndex(freq, samplerate, fftSize) {
+    return Math.floor((freq / samplerate) * fftSize);
+}
 addEventListener("load", () => {
     const audio = document.querySelector('#renderOut');
     const canvas = document.querySelector('#viz');
@@ -123,6 +126,7 @@ addEventListener("load", () => {
 
         for (let i = 0; i < shelves.length; i++) {
             const [minFreq, maxFreq, color] = shelves[i];
+
             const minIdx = getFftBinIndex(minFreq, audioCtx.sampleRate, FFT_SIZE);
             const maxIdx = getFftBinIndex(maxFreq, audioCtx.sampleRate, FFT_SIZE);
             const shelfStartX = i * shelfWidth;
