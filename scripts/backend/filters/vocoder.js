@@ -8,6 +8,7 @@ addBlockType("vocoder", {
         "Carrier": ["(none)", ["(none)"]],
         "LoopCarrier": [true, "checkbox"],
         "Power": [5, "number"],
+        "Accuracy": [100, "number"],
         "BandCount": [28, "number"],
         "FFTSize": [2048, "number"],
         "HopSize": [512, "number"]
@@ -123,8 +124,8 @@ addBlockType("vocoder", {
                     const carrierMag = Math.sqrt(carrierComplex[realIndex] * carrierComplex[realIndex] + carrierComplex[imagIndex] * carrierComplex[imagIndex]);
                     if (carrierMag > 1e-9) {
                         const scale = targetMag / carrierMag;
-                        carrierComplex[realIndex] *= scale * this.conf.Power;
-                        carrierComplex[imagIndex] *= scale * this.conf.Power;
+                        carrierComplex[realIndex] *= scale * this.conf.Power * this.conf.Accuracy;
+                        carrierComplex[imagIndex] *= scale * this.conf.Power * this.conf.Accuracy;
                     }
                 }
             }
@@ -136,7 +137,7 @@ addBlockType("vocoder", {
 
             for (let i = 0; i < frameSize; i++) {
                 const val = (real[i]) * window[i];
-                out[pos + i] += val;
+                out[pos + i] += val / this.conf.Accuracy;
             }
         }
 
