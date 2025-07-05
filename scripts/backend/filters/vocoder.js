@@ -5,6 +5,7 @@ addBlockType("vocoder", {
     title: "Vocoder",
     directRefs: ["voc", "voca"],
     configs: {
+        "UseCarrier": [true, "checkbox"],
         "Carrier": ["(none)", ["(none)"]],
         "LoopCarrier": [true, "checkbox"],
         "Power": [5, "number"],
@@ -26,16 +27,13 @@ addBlockType("vocoder", {
     assetUserKeys: ["Carrier"],
     functor: async function (inPcm, channel, data) {
         const modulatorPcm = inPcm;
-        let carrierPcm = proceduralAssets.has(this.conf.Carrier) ? proceduralAssets.get(this.conf.Carrier)[channel] : new Float32Array(0);
-
-        if (carrierPcm.length === 0) {
-            return new Float32Array(modulatorPcm.length);
-        }
+        const frameSize = this.conf.FFTSize;
+        let carrierPcm = proceduralAssets.has(this.conf.Carrier) ? proceduralAssets.get(this.conf.Carrier)[channel] : new Float32Array(frameSize);
 
         const bandCount = this.conf.BandCount || 28;
         const loopCarrier = this.conf.LoopCarrier;
 
-        const frameSize = this.conf.FFTSize;
+        
         const hopSize = this.conf.HopSize;
         const sampleRate = data.sampleRate;
 
@@ -122,10 +120,15 @@ addBlockType("vocoder", {
                     const realIndex = 2 * j;
                     const imagIndex = 2 * j + 1;
                     const carrierMag = Math.sqrt(carrierComplex[realIndex] * carrierComplex[realIndex] + carrierComplex[imagIndex] * carrierComplex[imagIndex]);
-                    if (carrierMag > 1e-9) {
-                        const scale = targetMag / carrierMag;
-                        carrierComplex[realIndex] *= scale * this.conf.Power * this.conf.Accuracy;
-                        carrierComplex[imagIndex] *= scale * this.conf.Power * this.conf.Accuracy;
+                    if (carrierMag > 1e-9 || !this.conf.UseCarrier) {
+                        if (this.conf.UseCarrier) {
+                            const scale = targetMag / carrierMag;
+                            carrierComplex[realIndex] *= scale * this.conf.Power * this.conf.Accuracy;
+                            carrierComplex[imagIndex] *= scale * this.conf.Power * this.conf.Accuracy;
+                        } else {
+                            carrierComplex[realIndex] = targetMag * this.conf.Power * this.conf.Accuracy;
+                            carrierComplex[imagIndex] = targetMag * this.conf.Power * this.conf.Accuracy;
+                        }
                     }
                 }
             }
