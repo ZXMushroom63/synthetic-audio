@@ -8,8 +8,8 @@ addBlockType("vocoder", {
         "UseCarrier": [true, "checkbox"],
         "Carrier": ["(none)", ["(none)"]],
         "LoopCarrier": [true, "checkbox"],
-        "Power": [5, "number"],
-        "Accuracy": [100, "number"],
+        "Power": [1, "number"],
+        "Accuracy": [550, "number"],
         "BandCount": [28, "number"],
         "FFTSize": [2048, "number"],
         "HopSize": [512, "number"]
