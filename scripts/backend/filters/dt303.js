@@ -91,7 +91,7 @@
         directRefs: ["tb303"],
         credits: "https://dittytoy.net/ditty/0029103012",
         configs: {
-            "Note": [":A1:", "number", 1],
+            "Note": [":F2:", "number", 1],
             "Clipping": [true, "checkbox"],
             "ClipLevel": [2, "number", 1],
             "Volume": [1, "number", 1],

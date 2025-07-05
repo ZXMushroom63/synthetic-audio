@@ -1057,6 +1057,14 @@ li {
   display: none;
 }
 
+a {
+  color: lightblue;
+  transition: 0.3s color;
+}
+a:hover {
+  color: white;
+}
+
 .loop .chordDisplay:focus-within {
   opacity: 1;
   pointer-events: all;
