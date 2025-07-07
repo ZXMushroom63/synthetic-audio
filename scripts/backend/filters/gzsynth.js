@@ -12,6 +12,7 @@
             "Decay": [0, "number"],
             "AmplitudeSmoothing": [0.006, "number"]
         },
+        forcePrimitive: true,
         dropdowns: {},
         functor: async function (inPcm, channel, data) {
             const pconfs = Object.fromEntries(Object.entries(gzsynth.configs).map(ent => {
