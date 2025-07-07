@@ -59,8 +59,8 @@ addBlockType("stereopositioner", {
                     prevDelay = lerp(prevDelay, params.delay, this.conf.DopplerSmoothingRatio);
                 }
             }
-            var delaySamples = Math.floor(prevDelay * audio.samplerate * this.conf.DopplerMultiplier);
-            var value = inPcm[i - delaySamples] || 0;
+            var delaySamples = i - prevDelay * audio.samplerate * this.conf.DopplerMultiplier;
+            var value = lerp(inPcm[Math.floor(delaySamples)], inPcm[Math.ceil(delaySamples)], delaySamples % 1) || 0;
             outPcm[i] = value * params.intensity;
         });
         return outPcm;
