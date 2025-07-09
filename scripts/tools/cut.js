@@ -45,7 +45,7 @@ addEventListener("init", () => {
 
     }, false, (e) => {
         return (e.ctrlKey && !e.altKey && !e.shiftKey && !e.metaKey && e.key === "b")
-            || (e.altKey && !e.ctrlKey && !e.shiftKey && !e.metaKey && ["2", "3"].includes(e.key))
+            || (e.altKey && !e.ctrlKey && !e.shiftKey && !e.metaKey && ["2", "3", "4"].includes(e.key))
     });
 });
 registerHelp(".tool[data-tool=CUT]",
@@ -53,7 +53,7 @@ registerHelp(".tool[data-tool=CUT]",
 ******************
 *  THE CUT TOOL  *
 ******************
-(CTRL+B, ALT+2, ALT+3)
+(CTRL+B, ALT+2, ALT+3, ALT+4)
 If the cut tool is enabled, when a 
  - loop is clicked, or
  - a group of loops are selected using RMB
@@ -65,5 +65,6 @@ Only loops with the 'StartOffset' config entry (play asset, or an audio file) ar
 CTRL+B = Split at playhead
 ALT+2 = Split in two
 ALT+3 = Split in three
+ALT+4 = Split in four
 `
 );
