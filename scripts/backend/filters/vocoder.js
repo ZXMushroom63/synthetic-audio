@@ -82,6 +82,10 @@ addBlockType("vocoder", {
         const bands = generateLogarithmicBands(bandCount, frameSize, sampleRate);
         const bandMagnitudes = new Float32Array(bands.length);
 
+        const modComplex = fft.createComplexArray();
+        const carrierComplex = fft.createComplexArray();
+        const timeDomain = fft.createComplexArray();
+
         for (let pos = 0; pos + frameSize <= modulatorPcm.length; pos += hopSize) {
             const modFrameRaw = modulatorPcm.subarray(pos, pos + frameSize).map((v, i) => v * window[i]);
             let carrierFrameRaw;
@@ -95,12 +99,10 @@ addBlockType("vocoder", {
             if (carrierFrameRaw.length < frameSize) break;
             carrierFrameRaw = carrierFrameRaw.map((v, i) => v * window[i]);
 
-            const modComplex = fft.createComplexArray();
             fft.realTransform(modComplex, modFrameRaw);
-
-            const carrierComplex = fft.createComplexArray();
+            fft.completeSpectrum(modComplex);
             fft.realTransform(carrierComplex, carrierFrameRaw);
-
+            fft.completeSpectrum(carrierComplex);
 
             for (let i = 0; i < bands.length; i++) {
                 let totalMag = 0;
@@ -133,7 +135,7 @@ addBlockType("vocoder", {
                 }
             }
 
-            const timeDomain = fft.createComplexArray();
+            
             fft.inverseTransform(timeDomain, carrierComplex);
             const real = fft.fromComplexArray(timeDomain);
 
