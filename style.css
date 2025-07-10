@@ -1057,11 +1057,11 @@ li {
   display: none;
 }
 
-a {
+a[href] {
   color: lightblue;
   transition: 0.3s color;
 }
-a:hover {
+a[href]:hover {
   color: white;
 }
 
