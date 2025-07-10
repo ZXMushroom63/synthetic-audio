@@ -25,7 +25,7 @@ addBlockType("vocoder", {
         }
     },
     assetUserKeys: ["Carrier"],
-    functor: async function (inPcm, channel, data) {
+    functor: function (inPcm, channel, data) {
         const modulatorPcm = inPcm;
         const frameSize = this.conf.FFTSize;
         let carrierPcm = proceduralAssets.has(this.conf.Carrier) ? proceduralAssets.get(this.conf.Carrier)[channel] : new Float32Array(frameSize);

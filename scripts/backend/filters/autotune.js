@@ -25,7 +25,7 @@ addBlockType("autotune", {
         loop.conf.Note = ":" + frequencyToNote(_(loop.conf.Note)(0, new Float32Array(1)) * Math.pow(2, value / 12)) + ":";
         updateNoteDisplay(loop);
     },
-    functor: async function (inPcm, channel, data) {
+    functor: function (inPcm, channel, data) {
         const modulatorPcm = inPcm;
         const frameSize = this.conf.FFTSize;
         const hopSize = this.conf.HopSize;
