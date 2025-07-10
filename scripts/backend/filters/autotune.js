@@ -12,7 +12,7 @@ addBlockType("autotune", {
         initNoteDisplay(loop);
     },
     updateMiddleware: (loop) => {
-        updateNodeDisplay(loop);
+        updateNoteDisplay(loop);
     },
     pitchZscroller: true,
     midiMappings: {
@@ -29,27 +29,21 @@ addBlockType("autotune", {
         const modulatorPcm = inPcm;
         const frameSize = this.conf.FFTSize;
         const hopSize = this.conf.HopSize;
-        const noteFreq = _(this.conf.Note)(0, inPcm);
+        
 
         const fft = new FFTJS(frameSize);
         const out = new Float32Array(modulatorPcm.length);
         const window = new Float32Array(frameSize);
-        //blackman-harris window
+        //hann window
         for (let i = 0; i < frameSize; i++) {
-            const alpha0 = 0.35875;
-            const alpha1 = 0.48829;
-            const alpha2 = 0.14128;
-            const alpha3 = 0.01168;
-            window[i] = alpha0 - alpha1 * Math.cos(2 * Math.PI * i / (frameSize - 1)) +
-                alpha2 * Math.cos(4 * Math.PI * i / (frameSize - 1)) -
-                alpha3 * Math.cos(6 * Math.PI * i / (frameSize - 1));
+            window[i] = 0.5 * (1 - Math.cos(2 * Math.PI * i / (frameSize - 1)));
         }
-
         const frequencyResolution = audio.samplerate / frameSize;
 
         const modComplex = fft.createComplexArray();
         const timeDomain = fft.createComplexArray();
         for (let pos = 0; pos + frameSize <= modulatorPcm.length; pos += hopSize) {
+            const noteFreq = _(this.conf.Note)(pos, inPcm);
             const modFrameRaw = modulatorPcm.slice(pos, pos + frameSize).map((v, i) => v * window[i]);
             
             fft.realTransform(modComplex, modFrameRaw);
