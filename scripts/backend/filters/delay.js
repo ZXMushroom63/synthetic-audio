@@ -6,11 +6,11 @@ addBlockType("delay", {
     configs: {
         "Iterations": [6, "number"],
         "DelayTimes": ["1,1,1", "text", 0],
-        "VolumeRatio": [0.5, "number", 1],
+        "VolumeRatio": ["0.5", "text", 1],
         "PingPong": ["NONE", ["NONE", "LEFT-FIRST", "RIGHT-FIRST"]]
     },
     functor: function (inPcm, channel, data) {
-        var volRatio = _(this.conf.VolumeRatio);
+        var volRatios = this.conf.VolumeRatio.split(",").map(x=>_(x));
         var delayTimes = this.conf.DelayTimes.split(",").map(x => Math.floor((parseFloat(x.trim()) || 0) * audio.samplerate));
         var pingPongEnabled = this.conf.PingPong !== "NONE";
         var pingPongChannel = (this.conf.PingPong === "RIGHT-FIRST") ? 0 : 1;
@@ -20,7 +20,7 @@ addBlockType("delay", {
             var ping = pingPongChannel;
             for (let j = 1; j < (this.conf.Iterations + 1); j++) {
                 timeOffset += delayTimes[(j-1) % (delayTimes.length)];
-                var vol = Math.pow(volRatio(i, out), j)
+                var vol = Math.pow(volRatios[(j-1) % (volRatios.length)](i, out), j)
                 if (pingPongEnabled) {
                     ping = (ping + 1) % 2;
                     if (ping !== channel) {
