@@ -158,7 +158,7 @@ function registerVanillaChords() {
 }
 registerVanillaChords();
 
-const inversionNames = ["(root)", " (1st inv)", " (2nd inv)", " (3rd inv)"];
+const inversionNames = [" (root)", " (1st inv)", " (2nd inv)", " (3rd inv)"];
 function getInversionNotes(rootIndex, formula, inversion) {
     const n = formula.length;
     let notes = [];
