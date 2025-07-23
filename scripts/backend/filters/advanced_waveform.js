@@ -46,6 +46,7 @@ addBlockType("p_waveform_plus", {
         "uPhase": [0.0, "number", 1],
         "IsSlide": [false, "checkbox"],
         "SlideExponent": [6, "number"],
+        "SlideOverrideSmoothing": [true, "checkbox"],
         "SlideWavetable": ["(none)", ["(none)"]],
         "Absolute": [false, "checkbox"],
         "Multiply": [false, "checkbox"],
@@ -103,6 +104,7 @@ addBlockType("p_waveform_plus", {
             "IsSlide",
             "SlideExponent",
             "SlideWavetable",
+            "SlideOverrideSmoothing",
         ]
     },
     selectMiddleware: (key) => {
@@ -233,7 +235,7 @@ addBlockType("p_waveform_plus", {
             totalNormalisedVolume = 1;
         }
 
-        const AmpSmoothingStart = Math.floor(audio.samplerate * this.conf.AmplitudeSmoothTime);
+        const AmpSmoothingStart = (this.conf.IsSlide && this.conf.SlideOverrideSmoothing) ? 0 : Math.floor(audio.samplerate * this.conf.AmplitudeSmoothTime);
         const AmpSmoothingEnd = inPcm.length - AmpSmoothingStart;
         var dt = Math.pow(audio.samplerate, -1);
         var t = this.conf.PhaseOffset;
