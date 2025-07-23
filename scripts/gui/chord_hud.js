@@ -158,7 +158,7 @@ function registerVanillaChords() {
 }
 registerVanillaChords();
 
-const inversionNames = ["", " (1st inv)", " (2nd inv)", " (3rd inv)"];
+const inversionNames = ["(root)", " (1st inv)", " (2nd inv)", " (3rd inv)"];
 function getInversionNotes(rootIndex, formula, inversion) {
     const n = formula.length;
     let notes = [];
@@ -231,7 +231,7 @@ function updateChordHudDatalist() {
 
         const opt = document.createElement("option");
         opt.value = chordType;
-        opt.innerText = "Spread: " + reverseChordLookup[chordType].range;
+        opt.innerText = "Spread: " + reverseChordLookup[chordType].range + "; Notes: " + reverseChordLookup[chordType].values.length;
         datalist.appendChild(opt);
     }
     document.head.appendChild(datalist);
