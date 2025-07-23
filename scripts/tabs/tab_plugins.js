@@ -105,6 +105,31 @@ addEventListener("init", async () => {
             }
         }
     }
+    async function loadWavetablePack(pack, packName) {
+        logToLoader(`Loading wavetable pack: ${packName}`);
+        const zip = new JSZip();
+        await zip.loadAsync(pack);
+        const rootFolders = getRootFolders(zip);
+        for (const path in zip.files) {
+            const file = zip.files[path];
+            if (!file.dir && isAudio(path) && path.endsWith(".wav")) {
+                var filename = path;
+                if (rootFolders.length === 1) {
+                    filename = filename.replace(rootFolders[0], "");
+                }
+
+                const buffer = await ax.decodeAudioData(await file.async("arraybuffer"));
+
+                if ((buffer.length % 2048) !== 0) {
+                    logToLoader(`${filename} buffer is bad size.`);
+                    continue;
+                }
+                const key = filename.replace("wt/", "").replaceAll(".wav", "");
+
+                WAVETABLES[key] = buffer;
+            }
+        }
+    }
     function calculateConcurrentNotes(notes) {
         const concurrentCounts = [];
         for (let i = 0; i < notes.length; i++) {
@@ -160,6 +185,8 @@ addEventListener("init", async () => {
         ".sf.js": "[🎸]", //["[🎸]", "[🎻]", "[🎺]", "[🪕]", "[🎷]", "[📯]", "[🪗]"]
         ".pd.js": "[🎛️]",
         ".arp.js": "[𝄂𝄚]",
+        ".wt.wav": "[∿]",
+        ".wt.zip": "[∿+]",
         ".aiff": "[🔊]",
         ".wav": "[🔊]",
         ".mp3": "[🔊]",
@@ -170,7 +197,7 @@ addEventListener("init", async () => {
         ".mp4": "[🎞️]",
         "tool.js": "[🔨]",
         ".js": "[🇯‌🇸‌]",
-        ".zip": "[📦]"
+        ".zip": "[📦]",
     }
     function getTypeSymbol(fileName) {
         for (ent of Object.entries(typeSymbols)) {
@@ -284,6 +311,20 @@ addEventListener("init", async () => {
         });
         f.click();
     }, "usamples");
+    mkBtn("Upload wavetable pack (.zip)", () => {
+        var f = document.createElement("input");
+        f.type = "file";
+        f.multiple = true;
+        f.accept = ".zip";
+        f.addEventListener("input", async () => {
+            var files = [...f.files].filter(x => x.name.endsWith(".zip"));
+            for (x of files) {
+                await addSample("wt/" + x.name.replaceAll(".zip", ".wt.zip"), x);
+                await drawModArray();
+            }
+        });
+        f.click();
+    }, "usamples");
     mkBtn("Upload wavetable (.wav)", () => {
         var f = document.createElement("input");
         f.type = "file";
@@ -370,6 +411,7 @@ addEventListener("init", async () => {
             const quotaEstimateData = await navigator.storage.estimate();
             quotaEstimate.innerText = `Storage Quota Usage: ${(quotaEstimateData.usage / quotaEstimateData.quota * 100).toFixed(1)}% (${(quotaEstimateData.usage / (Math.pow(1024, 2))).toFixed(1)}MB)`
         }
+        const scrollPos = container.scrollTop;
         container.querySelectorAll("div").forEach(x => x.remove());
         var modsArr = (await getMods()).map((x, i) => { var z = Object(/\..+/.exec(x)?.[0] || ""); z.__key = x; z.__idx = i; return z; }).sort();
         var idxMap = modsArr.map(z => z.__idx);
@@ -407,6 +449,7 @@ addEventListener("init", async () => {
 
             container.appendChild(entry);
         });
+        container.scrollTop = scrollPos;
     }
 
     document.querySelector("#tabContent").appendChild(container);
@@ -434,6 +477,13 @@ addEventListener("init", async () => {
             } catch (error) {
                 console.error("Failed to load " + modList[i]);
             }
+        } else if (modList[i].startsWith("wt/") && modList[i].endsWith(".wt.zip")) { //wavetable pack
+            logToLoader(`Queuing wavetable pack: ${modList[i]}`);
+            postInitQueue.push({
+                type: "wavetablepack",
+                name: modList[i],
+                data: await getSample(modList[i])
+            });
         } else if (modList[i].endsWith(".zip")) { //sample pack
             logToLoader(`Queuing sample pack: ${modList[i]}`);
             postInitQueue.push({
@@ -581,6 +631,10 @@ addEventListener("init", async () => {
         if (item.type === "samplepack") {
             await loadSamplePack(item.data, item.name);
             logToLoader(`Loaded samplepack: ${item.name}`);
+        }
+        if (item.type === "wavetablepack") {
+            await loadWavetablePack(item.data, item.name);
+            logToLoader(`Loaded wavetable pack: ${item.name}`);
         }
         if (item.type === "sample") {
             if (!item.data) {
