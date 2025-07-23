@@ -45,7 +45,7 @@ addBlockType("p_waveform_plus", {
         "uPan": [0.0, "number", 1],
         "uPhase": [0.0, "number", 1],
         "IsSlide": [false, "checkbox"],
-        "SlideExponent": [3, "number"],
+        "SlideExponent": [6, "number"],
         "SlideWavetable": ["(none)", ["(none)"]],
         "Absolute": [false, "checkbox"],
         "Multiply": [false, "checkbox"],
@@ -117,6 +117,9 @@ addBlockType("p_waveform_plus", {
     initMiddleware: (loop) => {
         initNoteDisplay(loop);
         addChordDisplay(loop);
+    },
+    getColorDynamic: (loop)=>{
+        return loop.conf.IsSlide ? "rgba(255, 143, 31, 0.4)" : "rgba(255,0,0,0.3)";
     },
     pitchZscroller: true,
     midiMappings: {
