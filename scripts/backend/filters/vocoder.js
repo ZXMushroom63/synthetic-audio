@@ -31,7 +31,7 @@ addBlockType("vocoder", {
         let carrierPcm = proceduralAssets.has(this.conf.Carrier) ? proceduralAssets.get(this.conf.Carrier)[channel] : new Float32Array(frameSize);
 
         const bandCount = this.conf.BandCount || 28;
-        const loopCarrier = this.conf.LoopCarrier;
+        const loopCarrier = this.conf.LoopCarrier || !this.conf.UseCarrier;
 
         
         const hopSize = this.conf.HopSize;
