@@ -117,16 +117,32 @@ addEventListener("init", async () => {
                 if (rootFolders.length === 1) {
                     filename = filename.replace(rootFolders[0], "");
                 }
+                var buffer;
+                try {
+                    const arrbuf = await file.async("arraybuffer");
+                    buffer = await ax.decodeAudioData(arrbuf);
+                } catch (error) {
+                    logToLoader(`${filename} buffer is corrupt.`);
+                    continue;
+                }
 
-                const buffer = await ax.decodeAudioData(await file.async("arraybuffer"));
+                if (buffer.length < 2048) {
+                    const newBuffer = ax.createBuffer(buffer.numberOfChannels, 2048, buffer.sampleRate);
+                    for (let c = 0; c < buffer.numberOfChannels; c++) {
+                        const pcm = buffer.getChannelData(c);
+                        newBuffer.getChannelData(c).set(upsampleFloat32Array(pcm, 2048))
+                    }
+                    buffer = newBuffer;
+                }
 
-                if ((buffer.length % 2048) !== 0) {
+                if ((buffer.length % 2048) !== 0 || !buffer) {
                     logToLoader(`${filename} buffer is bad size.`);
                     continue;
                 }
                 const key = filename.replace("wt/", "").replaceAll(".wav", "");
 
                 WAVETABLES[key] = buffer;
+                
             }
         }
     }
@@ -647,8 +663,14 @@ addEventListener("init", async () => {
             if (!item.data) {
                 continue;
             }
-            const buffer = await ax.decodeAudioData(await item.data.arrayBuffer());
-            if ((buffer.length % 2048) !== 0) {
+            var buffer;
+            try {
+                buffer = await ax.decodeAudioData(await item.data.arrayBuffer());
+            } catch (error) {
+                logToLoader(`${item.name} buffer is corrupt.`);
+                continue;
+            }
+            if ((buffer.length % 2048) !== 0 || !buffer) {
                 logToLoader(`${item.name} buffer is bad size.`);
                 continue;
             }
