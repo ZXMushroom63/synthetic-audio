@@ -651,6 +651,7 @@ addEventListener("init", async () => {
         if (item.type === "wavetablepack") {
             await loadWavetablePack(item.data, item.name);
             logToLoader(`Loaded wavetable pack: ${item.name}`);
+            findLoops(".loop[data-wt-user]").forEach(forceLoopDirty);
         }
         if (item.type === "sample") {
             if (!item.data) {
