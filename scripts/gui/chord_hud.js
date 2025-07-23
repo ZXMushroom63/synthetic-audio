@@ -196,7 +196,8 @@ function generateChordTable() {
                     type: chordType,
                     inversion: inversion,
                     notes: new Set(chordNotes.notes),
-                    values: chordNotes.values
+                    values: chordNotes.values,
+                    range: Math.max(...chordNotes.values) - Math.min(...chordNotes.values)
                 };
                 if (inversion === 0) {
                     uninvertedChords[key] = result;
@@ -230,6 +231,7 @@ function updateChordHudDatalist() {
 
         const opt = document.createElement("option");
         opt.value = chordType;
+        opt.innerText = "Spread: " + reverseChordLookup[chordType].range;
         datalist.appendChild(opt);
     }
     document.head.appendChild(datalist);
