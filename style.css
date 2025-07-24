@@ -1059,7 +1059,7 @@ li {
   overflow: hidden;
 }
 
-.loop.deactivated .chordDisplay {
+.loop.deactivated .chordDisplay, .loop.deactivated .genericDisplay {
   display: none;
 }
 
