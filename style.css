@@ -802,12 +802,18 @@ button:hover .addModifierDiv {
   text-shadow: rgba(0, 0, 0, 0.8) 0px 0px 3px;
 }
 
-.noteDisplay {
+.noteDisplay, .genericDisplay {
   font: bold 2.5rem monospace;
   line-height: 2.5rem;
   opacity: 0.75;
+  color: white;
   margin-left: min(0.75rem, 10%);
   text-shadow: 0px 0px 5px rgba(0, 0, 0, 0.8);
+}
+.genericDisplay {
+  font: bold 1.5rem monospace;
+  line-height: 2.75rem;
+  margin-top: 0.5rem;
 }
 
 code {

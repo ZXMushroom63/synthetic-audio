@@ -25,3 +25,10 @@ function initNoteDisplay(loop) {
     internal.appendChild(txt);
     updateNoteDisplay(loop);
 }
+function initGenericDisplay(loop, text) {
+    var internal = loop.querySelector(".loopInternal");
+    var txt = document.createElement("span");
+    txt.classList.add("genericDisplay");
+    txt.innerText = text;
+    internal.appendChild(txt);
+}

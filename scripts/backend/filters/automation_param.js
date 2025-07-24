@@ -6,6 +6,7 @@ function automationParamHandler(loop) {
     var newTitle = "@" + loop.conf.Identifier + " - Automation Parameter";
     loop.setAttribute("data-file", newTitle);
     loop.querySelector(".loopInternal .name").innerText = newTitle;
+    loop.querySelector(".genericDisplay").innerText = ("" + loop.conf.Value).startsWith("#") ? loop.conf.Value.replace("#", "") : loop.conf.Value;
 }
 addBlockType("automation_parameter", {
     color: "rgba(255, 0, 119, 0.42)",
@@ -15,7 +16,10 @@ addBlockType("automation_parameter", {
         "Identifier": ["Param", "text"],
         "Value": ["#0~1", "number", 1],
     },
-    initMiddleware: automationParamHandler,
+    initMiddleware: (loop)=>{
+        initGenericDisplay(loop, "");
+        automationParamHandler(loop);
+    },
     updateMiddleware: automationParamHandler,
     functor: function (inPcm, channel, data) {
         var val = _(this.conf.Value);
