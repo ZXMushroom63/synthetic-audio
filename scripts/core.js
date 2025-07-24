@@ -329,10 +329,13 @@ function constructAbstractLayerMapsForLevel(nodes, usedLayers) {
     });
     return abstractLayerMaps;
 }
-function usesDirtyAssets(assetMap, serialisedNode) {
+function usesDirtyAssets(assetMap, serialisedNode,) {
     return serialisedNode.definition.assetUserKeys.map(x => !!assetMap[serialisedNode.conf[x]]).reduce((acc, v) => {
         return acc || v;
     });
+}
+function usesDirtyParams(automationParamMap, serialisedNode) {
+    return Object.values(serialisedNode.conf).reduce((acc, v) => { return ((typeof acc === "string") && acc.startsWith("@") && automationParamMap[acc.replace("@", "").split(":")[0]]) || v }, false);;
 }
 function doNodesIntersect(x, dirtyNode) {
     return (x.start >= dirtyNode.start &&
@@ -386,7 +389,8 @@ function constructRenderDataArray(data) {
         abstractLayerMap.needsUpdating = !settings.NodeCaching;
         renderDataArray.push(abstractLayerMap);
     });
-    var assetMap = {};
+    const assetMap = {};
+    const paramMap = {};
     if (settings.NodeCaching) {
         renderDataArray.forEach(editorLayer => {
             //dirtying and caching shenanigans
@@ -420,6 +424,10 @@ function constructRenderDataArray(data) {
                             //console.log("Dirty asset found: ", x.conf.Asset);
                             assetMap[x.conf.Asset] = true;
                         }
+                        if (x.type === "automation_parameter") {
+                            //console.log("Dirty asset found: ", x.conf.Asset);
+                            paramMap[x.conf.Identifier] = true;
+                        }
                         return;
                     }
                     for (let i = 0; i < dirtyNodes.length; i++) {
@@ -428,13 +436,16 @@ function constructRenderDataArray(data) {
                             (!dirtyNodes.includes(x)) &&
                             (((
                                 doNodesIntersect(x, dirtyNode)
-                            ) && (x.layer > dirtyNode.layer)) || (assetUserTypes.includes(x.type) && usesDirtyAssets(assetMap, x)))
+                            ) && (x.layer > dirtyNode.layer)) || (assetUserTypes.includes(x.type) && usesDirtyAssets(assetMap, x)) || usesDirtyParams(paramMap, x))
                         ) {
                             x.dirty = true;
                             x.ref.setAttribute("data-dirty", "yes");
                             dirtyNodes.push(x);
                             if (x.type === "p_writeasset") {
                                 assetMap[x.conf.Asset] = true;
+                            }
+                            if (x.type === "automation_parameter") {
+                                paramMap[x.conf.Identifier] = true;
                             }
                             if (assetUserTypes.includes(x.type)) {
                                 console.log("Asset user marked as dirty: ", x);
@@ -515,11 +526,13 @@ function constructRenderDataArray(data) {
     return renderDataArray;
 }
 var processRendering = false;
+var currentlyRenderedLoop = null;
 async function render() {
     if (processRendering) {
         return;
     }
     processRendering = true;
+    currentlyRenderedLoop = null;
     document.querySelector("#renderBtn").disabled = true;
     if (document.querySelector("#renderOut").src) {
         URL.revokeObjectURL(document.querySelector("#renderOut").src);
@@ -573,6 +586,7 @@ async function render() {
                             var endTime = Math.floor((node.start + node.duration) * audio.samplerate);
 
                             if (!node.ref.cache[c]) {
+                                currentlyRenderedLoop = node;
                                 newPcm = await filters[node.type].functor.apply(node, [initialPcm.slice(startTime, endTime), c, data]);
                                 if (settings.NodeCaching) {
                                     node.ref.cache[c] = newPcm;
@@ -635,6 +649,7 @@ async function render() {
     document.querySelector("#renderBtn").disabled = false;
 
     findLoops(".loop").forEach(hydrateLoopDecoration);
+    currentlyRenderedLoop = null;
 }
 
 function undirtyRenderTreeNode(node) {
