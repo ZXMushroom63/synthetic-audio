@@ -10,13 +10,13 @@
             "Clipping": [true, "checkbox"],
             "ClipLevel": [1, "number", 1],
             "Volume": [1, "number", 1],
-            "Decay": [0, "number"],
+            "Decay": [0, "number", 1],
             "AmplitudeSmoothing": [0.006, "number"]
         },
         forcePrimitive: true,
         dropdowns: {},
         functor: async function (inPcm, channel, data) {
-            const adsrMap = Object.fromEntries(adsr_dynamic_keys.map(x=>[x, _(this.conf[x])]))
+            const adsrMap = Object.fromEntries(adsr_dynamic_keys.map(x => [x, _(this.conf[x])]))
             const pconfs = Object.fromEntries(Object.entries(gzsynth.configs).map(ent => {
                 if (ent[1][2] === 1) {
                     return [ent[0], _(this.conf[ent[0]])];
@@ -30,6 +30,7 @@
             const totalVol = _(this.conf.Volume);
             const clipLvl = _(this.conf.ClipLevel);
             const filterCapacity = _(this.conf.FilterFrequency);
+            const decayFn = _(this.conf.Decay);
 
             out.forEach((x, i) => {
                 const adsr = this.conf.EnvelopeEnabled ? findADSR(
@@ -40,7 +41,7 @@
                     i,
                     inPcm.length
                 ) : 1;
-                const decay = Math.exp(-this.conf.Decay * (i / audio.samplerate));
+                const decay = Math.exp(-decayFn(i, inPcm) * (i / audio.samplerate));
                 const freq = note(i, inPcm);
                 for (let v = 0; v < gz_synth_voicecount; v++) {
                     const driveLFO = pconfs[`Voice${v + 1}Drive`];
