@@ -335,7 +335,9 @@ function usesDirtyAssets(assetMap, serialisedNode,) {
     });
 }
 function usesDirtyParams(automationParamMap, serialisedNode) {
-    return Object.values(serialisedNode.conf).reduce((acc, v) => { return ((typeof acc === "string") && acc.startsWith("@") && automationParamMap[acc.replace("@", "").split(":")[0]]) || v }, false);;
+    return Object.values(serialisedNode.conf).reduce((v, acc) => {
+        return ((typeof acc === "string") && acc.startsWith("@") && automationParamMap[acc.replace("@", "").split(":")[0]]) || v
+    }, false);
 }
 function doNodesIntersect(x, dirtyNode) {
     return (x.start >= dirtyNode.start &&
