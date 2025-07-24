@@ -761,38 +761,7 @@ addEventListener("init", () => {
         drawModifierStack();
         drawWaveform();
     }
-    function upsampleFloat32Array(inputArray, targetLength) {
-        if (!(inputArray instanceof Float32Array)) {
-            throw new Error("Input must be a Float32Array.");
-        }
-
-        const inputLength = inputArray.length;
-        if (inputLength === 0 || targetLength <= inputLength) {
-            throw new Error("Target length must be greater than input length.");
-        }
-
-        const outputArray = new Float32Array(targetLength);
-        const scaleFactor = (inputLength - 1) / (targetLength - 1);
-
-        for (let i = 0; i < targetLength; i++) {
-            const position = i * scaleFactor;
-            const leftIndex = Math.floor(position);
-            const rightIndex = Math.ceil(position);
-            const weight = position - leftIndex;
-
-            if (rightIndex < inputLength) {
-                // Perform linear interpolation
-                outputArray[i] =
-                    inputArray[leftIndex] * (1 - weight) +
-                    inputArray[rightIndex] * weight;
-            } else {
-                // Handle the edge case for the last element
-                outputArray[i] = inputArray[leftIndex];
-            }
-        }
-
-        return outputArray;
-    }
+    
     function deserialiseWaveform(wv, uuid) {
         wv.samples = new Float32Array(wv.samples);
         if (wv.samples.length !== WAVEFORM_RES) { //upsample old
