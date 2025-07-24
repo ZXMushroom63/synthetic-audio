@@ -1,5 +1,6 @@
 (function GzSynth() {
     const gz_synth_voicecount = 4;
+    const adsr_dynamic_keys = [];
     const gzsynth = {
         color: "rgba(0, 255, 255, 0.3)",
         title: "GzSynth",
@@ -15,6 +16,7 @@
         forcePrimitive: true,
         dropdowns: {},
         functor: async function (inPcm, channel, data) {
+            const adsrMap = Object.fromEntries(adsr_dynamic_keys.map(x=>[x, _(this.conf[x])]))
             const pconfs = Object.fromEntries(Object.entries(gzsynth.configs).map(ent => {
                 if (ent[1][2] === 1) {
                     return [ent[0], _(this.conf[ent[0]])];
@@ -31,12 +33,12 @@
 
             out.forEach((x, i) => {
                 const adsr = this.conf.EnvelopeEnabled ? findADSR(
-                    [this.conf.AttackSeconds, this.conf.AttackExp],
-                    [this.conf.DecaySeconds, this.conf.DecayExp],
-                    this.conf.SustainLevel,
-                    [this.conf.ReleaseSeconds, this.conf.ReleaseExp],
-                    i / audio.samplerate,
-                    inPcm.length / audio.samplerate
+                    [this.conf.AttackSeconds, adsrMap.AttackExp],
+                    [this.conf.DecaySeconds, adsrMap.DecayExp],
+                    adsrMap.SustainLevel,
+                    [this.conf.ReleaseSeconds, adsrMap.ReleaseExp],
+                    i,
+                    inPcm.length
                 ) : 1;
                 const decay = Math.exp(-this.conf.Decay * (i / audio.samplerate));
                 const freq = note(i, inPcm);
@@ -54,12 +56,12 @@
             function getThreshold(i, inPcm) {
                 return filterCapacity(i, inPcm)
                     * Math.log2(1 + findADSR(
-                        [self.conf.FilterAttackSeconds, self.conf.FilterAttackExp],
-                        [self.conf.FilterDecaySeconds, self.conf.FilterDecayExp],
-                        self.conf.FilterSustainLevel,
-                        [self.conf.FilterReleaseSeconds, self.conf.FilterReleaseExp],
-                        i / audio.samplerate,
-                        inPcm.length / audio.samplerate
+                        [self.conf.FilterAttackSeconds, adsrMap.FilterAttackExp],
+                        [self.conf.FilterDecaySeconds, adsrMap.FilterDecayExp],
+                        adsrMap.FilterSustainLevel,
+                        [self.conf.FilterReleaseSeconds, adsrMap.FilterReleaseExp],
+                        i,
+                        inPcm.length
                     ));
             }
             let res = null;
@@ -123,17 +125,22 @@
     };
     function createADSR(prefix) {
         gzsynth.configs[prefix + "AttackSeconds"] = [0.1, "number"];
-        gzsynth.configs[prefix + "AttackExp"] = [1, "number"];
+        gzsynth.configs[prefix + "AttackExp"] = [1, "number", 1];
         gzsynth.configs[prefix + "DecaySeconds"] = [0, "number"];
-        gzsynth.configs[prefix + "DecayExp"] = [1, "number"];
-        gzsynth.configs[prefix + "SustainLevel"] = [1, "number"];
+        gzsynth.configs[prefix + "DecayExp"] = [1, "number", 1];
+        gzsynth.configs[prefix + "SustainLevel"] = [1, "number", 1];
         gzsynth.configs[prefix + "ReleaseSeconds"] = [0.1, "number"];
-        gzsynth.configs[prefix + "ReleaseExp"] = [1, "number"];
+        gzsynth.configs[prefix + "ReleaseExp"] = [1, "number", 1];
         gzsynth.dropdowns[`${prefix}ADSR`] =
             ["AttackSeconds", "AttackExp", "DecaySeconds", "DecayExp", "SustainLevel", "ReleaseSeconds", "ReleaseExp"].map(x => prefix + x);
+        adsr_dynamic_keys.push(...["AttackExp", "DecayExp", "SustainLevel", "ReleaseExp"].map(x => prefix + x));
     }
 
-    function findADSR(a, d, s, r, time, len) {
+    function findADSR(a, d, _s, r, sample, pcmLen) {
+        const time = sample / audio.samplerate;
+        const len = pcmLen / audio.samplerate;
+        const mprPcm = new Float32Array(pcmLen);
+        const s = _s(sample, mprPcm);
         a[0] = Math.min(a[0], len);
         d[0] = Math.min(d[0], len - a[0]);
         r[0] = Math.min(r[0], len - (a[0] + d[0]));
@@ -142,14 +149,14 @@
             ret = s;
         }
         if (time <= a[0]) {
-            const val = Math.pow(time / a[0], a[1]);
+            const val = Math.pow(time / a[0], a[1](sample, mprPcm));
             ret *= isNaN(val) ? 1 : val;
         }
         if (time > a[0] && time <= (d[0] + a[0])) {
-            ret = lerp(1, s, Math.pow((time - a[0]) / d[0], 1 / d[1])) || s;
+            ret = lerp(1, s, Math.pow((time - a[0]) / d[0], 1 / d[1](sample, mprPcm))) || s;
         }
         if (time > (len - r[0])) {
-            ret *= Math.pow(((len - time) / r[0]), r[1]) * s || 0;
+            ret *= Math.pow(((len - time) / r[0]), r[1](sample, mprPcm)) * s || 0;
         }
         return ret;
     }
