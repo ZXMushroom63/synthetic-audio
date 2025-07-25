@@ -96,6 +96,11 @@ These scripts have access to the following variables:
 - ~rt~ - The total runtime of the node
 - ~i~ - The index of the current sample
 
+You can also bind programmable inputs to 'Automation Parameters', a type of node that lets you create and configure settings for synths and complex filter stacks.
+Create an 'Automation Parameter' node, and name it. You can bind using:
+- ~@MyParam~ - Directly binds the value
+- ~@MyParam!0~5~ - Binds the value, and maps from 0-1 to the specified range
+
 In purple input boxes, you can also use autocomplete for notes.
 - ~:a:~  =  ~:a4:~  =  ~440~
 - ~:g#3:~  =  ~207~
