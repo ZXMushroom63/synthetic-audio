@@ -280,7 +280,21 @@ helpContent.addTab("Samplepacks", `
 - To add samples, try drag-and-dropping a sample file into the timeline.
 - You can access imported samples in the 'User' samplepack, or from the 'Samples' category in the 'Add Tracks' menu in the top right.
 `);
-helpContent.addTab("Live Mode", "(coming soon)");
+helpContent.addTab("Live Mode", `
+### Live Mode
+If you are lucky enough to own an audio interface, SYNTHETIC instances hosted on websites can be used to process incoming signals through the 'Live' tab.
+To start:
+- Press 'Request Perms' to enable microphone/audio input permissions.
+- In the dropdown, select the desired port of your audio interface
+- In your operating systems audio mixer, choose your audio interface as the output device.
+- Press 'Start Input'
+- To stop, press 'Stop Input'
+
+On the right side, some built-in filters like delay and a basic reverb are available.
+On the left, you can use the filter module buttons to add filters to the stack column in the centre.
+You can right click added modules to configure them.
+Just remember to be careful to not accidentally destroy your ear drums.
+`);
 helpContent.addTab("Misc Tab", "(coming soon)");
 helpContent.addTab("Multiplayer", "(coming soon)");
 
