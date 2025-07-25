@@ -158,7 +158,7 @@ function registerVanillaChords() {
 }
 registerVanillaChords();
 
-const inversionNames = [" (root)", " (1st inv)", " (2nd inv)", " (3rd inv)"];
+const inversionNames = ["", " (1st inv)", " (2nd inv)", " (3rd inv)"];
 function getInversionNotes(rootIndex, formula, inversion) {
     const n = formula.length;
     let notes = [];
@@ -183,11 +183,11 @@ function generateChordTable() {
     const uninvertedChords = {};
     for (const chordType of chordFormulas.keys()) {
         const formula = chordFormulas.get(chordType);
-        for (let rootIndex = 0; rootIndex < chromaticScale.length; rootIndex++) {
-            const root = chromaticScale[rootIndex];
+        for (let rootIndex = 8+12; rootIndex > 8; rootIndex--) {
+            const root = chromaticScale[rootIndex % 12];
 
-            for (let inversion = 0; inversion < formula.length; inversion++) {
-                const chordNotes = getInversionNotes(rootIndex, formula, inversion);
+            for (let inversion = formula.length-1; inversion >= 0; inversion--) {
+                const chordNotes = getInversionNotes(rootIndex % 12, formula, inversion);
                 const key = chordNotes.notes.join(",");
                 const chordName = root + chordType + (inversionNames[inversion] ?? ` (${inversion + 1}th inv)`);
                 const result = {
@@ -199,7 +199,7 @@ function generateChordTable() {
                     values: chordNotes.values,
                     range: Math.max(...chordNotes.values) - Math.min(...chordNotes.values)
                 };
-                if (inversion === 0) {
+                if (false) { //inversion === 0
                     uninvertedChords[key] = result;
                 } else {
                     chordTable[key] = result;
@@ -208,7 +208,7 @@ function generateChordTable() {
             }
         }
     }
-    Object.assign(chordTable, uninvertedChords);
+    //Object.assign(chordTable, uninvertedChords);
     return { chordDictionary: chordTable, reverseChordLookup: reverseChordLookup };
 }
 
@@ -222,16 +222,17 @@ function updateChordHudDatalist() {
     }
     const datalist = document.createElement("datalist");
     datalist.id = "chordDatalist";
-    const possibilities = Object.keys(reverseChordLookup);
-    possibilities.sort((a, b) => a.length - b.length);
+    const possibilities = Object.entries(reverseChordLookup);
+    possibilities.reverse();
+    
     for (const chordType of possibilities) {
-        if (gui.acceptedNotes && gui.autocorrect !== "OFF" && !reverseChordLookup[chordType].notes.isSubsetOf(gui.acceptedNotes)) {
+        if (gui.acceptedNotes && gui.autocorrect !== "OFF" && !chordType[1].notes.isSubsetOf(gui.acceptedNotes)) {
             continue;
         }
 
         const opt = document.createElement("option");
-        opt.value = chordType;
-        opt.innerText = "Spread: " + reverseChordLookup[chordType].range + "; Notes: " + reverseChordLookup[chordType].values.length;
+        opt.value = chordType[0];
+        opt.innerText = "Spread: " + chordType[1].range + "; Notes: " + chordType[1].values.length;
         datalist.appendChild(opt);
     }
     document.head.appendChild(datalist);
@@ -311,20 +312,22 @@ function chordDisplayEdit(display, e, loop) {
     e.stopPropagation();
     if (!e.key) {
         return;
-    }
+    } else
     if (e.ctrlKey || e.metaKey || e.altKey || e.repeat) {
         if (e.ctrlKey && e.key === "a") {
             return; //Ctrl + A is a G
         }
         return e.preventDefault();
-    }
+    } else
     if (e.key === "Enter") {
         e.preventDefault();
-    }
+    } else
     if (e.key === "Escape") {
         e.preventDefault();
         deselectText();
         display.blur();
+    } else {
+        return;
     }
     var lookupValue = display.value.replace(/[\r\n\t]/gm, "")
         .replaceAll("major", "maj")
@@ -332,6 +335,7 @@ function chordDisplayEdit(display, e, loop) {
         .replaceAll("power", "5")
         .replaceAll("pwr", "5")
         .replaceAll("aug7", "augMaj7")
+        .replaceAll("(root)", "")
         .trim();
     lookupValue = lookupValue[0].toUpperCase() + lookupValue.substring(1);
     var bassNote = lookupValue.includes("/") ? lookupValue.split("/")[1] : "";
@@ -342,7 +346,7 @@ function chordDisplayEdit(display, e, loop) {
     if (!lookupValue) {
         return;
     }
-    if (e.key === "Enter" && loop.relatedChord && reverseChordLookup[lookupValue]) {
+    if ((e.key === "Enter") && loop.relatedChord && reverseChordLookup[lookupValue]) {
         const chord = reverseChordLookup[lookupValue];
         const octaveOffset = 12 * (Math.min(...loop.relatedChord.map(x => getChromaticOctave(x.theoryNote))));
         e.preventDefault();
