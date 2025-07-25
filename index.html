@@ -211,11 +211,11 @@
               <input
                 id="playbackRateSlider"
                 type="range"
-                min="0.075"
-                step="0.01"
-                max="1"
+                min="0.0"
+                step="0.2"
+                max="2"
                 value="1"
-                oninput="document.querySelector('#renderOut').playbackRate = parseFloat(this.value)"
+                oninput="document.querySelector('#renderOut').playbackRate = Math.max(0.075, parseFloat(this.value))"
               />
             </div>
           </h4>
