@@ -303,7 +303,7 @@ addBlockType("p_waveform_plus", {
                 if (this.conf.Unison) {
                     var detunePosition = (h + 0.5) - (waveCount / 2);
                     harmonicFrequency += detuneHz * Math.trunc(detunePosition);
-                    wavePhaseOffset = uPhaseAmount * h;
+                    wavePhaseOffset = uPhaseAmount * h + this.conf.PhaseOffset;
                     if (this.conf.uRandomisePhase) {
                         wavePhaseOffset += wcPhases[h];
                     }
