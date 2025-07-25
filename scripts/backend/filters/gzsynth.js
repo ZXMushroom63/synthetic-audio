@@ -118,7 +118,7 @@
         },
         customGuiButtons: {
             "Preview": async function () {
-                var pcmData = await gzsynth.functor.apply(this, [new Float32Array(audio.samplerate), 0, {}]);
+                var pcmData = await gzsynth.functor.apply(this, [new Float32Array(audio.samplerate), 0, getProjectMeta()]);
                 var blob = await convertToFileBlob([sumFloat32Arrays([pcmData])], 1, audio.samplerate, audio.bitrate, true);
                 playSample(blob);
             },

@@ -1,3 +1,17 @@
+function getProjectMeta() {
+    return {
+        encformat: audio.format,
+        duration: audio.duration,
+        bpm: audio.bpm,
+        zoom: gui.zoom,
+        loopInterval: loopi,
+        stereo: audio.stereo,
+        sampleRate: audio.samplerate,
+        bitRate: audio.bitrate,
+        normalise: audio.normalise,
+        substepping: gui.substepping
+    };;
+}
 function serialise(forRender, forMultiplayer) {
     var hNodes = findLoops(".loop");
     if (!forRender) {
@@ -41,19 +55,8 @@ function serialise(forRender, forMultiplayer) {
     var x = Array.prototype.flatMap.apply(hNodes, [(node => {
         return serialiseNode(node, forRender, forMultiplayer);
     })]);
-    var out = {
-        encformat: audio.format,
-        nodes: x,
-        duration: audio.duration,
-        bpm: audio.bpm,
-        zoom: gui.zoom,
-        loopInterval: loopi,
-        stereo: audio.stereo,
-        sampleRate: audio.samplerate,
-        bitRate: audio.bitrate,
-        normalise: audio.normalise,
-        substepping: gui.substepping
-    };
+    var out = getProjectMeta();
+    out.nodes = x;
     customEvent("serialise", { data: out });
     return out;
 }

@@ -69,6 +69,7 @@ addBlockType("p_readasset", {
     },
     functor: function (inPcm, channel, data) {
         var currentData = proceduralAssets.has(this.conf.Asset) ? proceduralAssets.get(this.conf.Asset)[channel].slice() : null;
+
         if (!currentData) {
             return inPcm;
         }
@@ -91,7 +92,7 @@ addBlockType("p_readasset", {
     },
     customGuiButtons: {
         "Preview": async function () {
-            var pcmData = filters["p_readasset"].functor.apply(this, [new Float32Array(audio.samplerate), 0, {}]);
+            var pcmData = filters["p_readasset"].functor.apply(this, [new Float32Array(audio.samplerate), 0, getProjectMeta()]);
             var blob = await convertToFileBlob([sumFloat32Arrays([pcmData])], 1, audio.samplerate, audio.bitrate, true);
             playSample(blob);
         },
