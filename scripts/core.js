@@ -499,6 +499,29 @@ function constructRenderDataArray(data) {
 
             dirtyNodes.forEach((x) => {
                 editorLayer.needsUpdating = true;
+                const startIndex = Math.floor(x.start * audio.samplerate);
+
+                if (startIndex < 0) {
+                    return;
+                }
+
+                const durationSamples = Math.floor(x.duration * audio.samplerate) + 1; //'+1' = TypedArray.set being a pain
+                const endIndex = durationSamples + startIndex;
+                const clippedDuration = Math.min(endIndex, audio.length) - startIndex;
+
+                if (x?.definition?.clearCache) {
+                    x.definition.clearCache(
+                        x,
+                        {
+                            length: clippedDuration,
+                            end: endIndex,
+                            fullLength: durationSamples,
+                            start: startIndex
+                        },
+                        layerCache[editorLayer.layerId]
+                    );
+                }
+
                 if (layerCache[editorLayer.layerId]) {
                     // clear segments with content that needs to be updated
                     layerCache[editorLayer.layerId].forEach(pcm => {
@@ -506,15 +529,7 @@ function constructRenderDataArray(data) {
                             return;
                         }
 
-                        const startIndex = Math.floor(x.start * audio.samplerate);
 
-                        if (startIndex < 0) {
-                            return;
-                        }
-
-                        const durationSamples = Math.floor(x.duration * audio.samplerate) + 1; //'+1' = TypedArray.set being a pain
-                        const endIndex = durationSamples + startIndex;
-                        const clippedDuration = Math.min(endIndex, pcm.length) - startIndex;
 
                         pcm.set(
                             new Float32Array(clippedDuration),

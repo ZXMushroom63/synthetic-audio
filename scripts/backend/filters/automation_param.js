@@ -16,12 +16,27 @@ addBlockType("automation_parameter", {
         "Identifier": ["Param", "text"],
         "Value": ["#0~1", "number", 1],
     },
-    initMiddleware: (loop)=>{
+    clearCache: (self, info, layer) => {
+        if (!self.ref.hasAttribute("data-lastrenparam")) {
+            return;
+        }
+        const internalId = "@__params::" + self.ref.getAttribute("data-lastrenparam").toUpperCase();
+        const alreadyExists = proceduralAssets.has(internalId);
+        if (alreadyExists) {
+            proceduralAssets.get(internalId).set(
+                new Float32Array(info.length),
+                info.start
+            );
+        }
+
+    },
+    initMiddleware: (loop) => {
         initGenericDisplay(loop, "");
         automationParamHandler(loop);
     },
     updateMiddleware: automationParamHandler,
     functor: function (inPcm, channel, data) {
+        this.ref.setAttribute("data-lastrenparam", this.conf.Identifier);
         var val = _(this.conf.Value);
         const internalId = "@__params::" + this.conf.Identifier.toUpperCase();
         const alreadyExists = proceduralAssets.has(internalId);
