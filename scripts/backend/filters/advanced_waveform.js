@@ -122,7 +122,7 @@ addBlockType("p_waveform_plus", {
         initNoteDisplay(loop);
         addChordDisplay(loop);
     },
-    getColorDynamic: (loop)=>{
+    getColorDynamic: (loop) => {
         return loop.conf.IsSlide ? "rgba(255, 143, 31, 0.4)" : "rgba(255,0,0,0.3)";
     },
     pitchZscroller: true,
@@ -241,12 +241,27 @@ addBlockType("p_waveform_plus", {
         const AmpSmoothingStart = (this.conf.IsSlide && this.conf.SlideOverrideSmoothing) ? 0 : Math.floor(audio.samplerate * this.conf.AmplitudeSmoothTime);
         const AmpSmoothingEnd = inPcm.length - AmpSmoothingStart;
         var dt = Math.pow(audio.samplerate, -1);
-        var t = this.conf.PhaseOffset;
+        var t = 0;
         if (this.conf.BadSine) {
             Math.newRandom((channel === 0) ? this.conf.BadSineSeedLeft : this.conf.BadSineSeedRight);
         }
         var badsineinterval = Math.round(this.conf.BadSineInterval * audio.samplerate) || 1;
         var badsineamount = 0;
+
+        var waveCount = 1;
+
+        if (this.conf.Harmonics) {
+            waveCount = this.conf.HarmonicsCount + 1;
+        }
+        if (this.conf.Unison) {
+            waveCount = this.conf.uVoices;
+        }
+
+        const wcPhases = new Float32Array(waveCount);
+        wcPhases.forEach((x, i) => {
+            wcPhases[i] = (cyrb53a_beta("" + i, 0) / 100) % 1;
+        });
+
         inPcm.forEach((x, i) => {
             var absoluteTime = i / audio.samplerate;
             var denominator = Math.max(...keys.flatMap((k) => { return underscores[k](i, inPcm) })) || 1;
@@ -272,13 +287,7 @@ addBlockType("p_waveform_plus", {
             f *= Math.exp(-fdecay(i, inPcm) * absoluteTime);
             t += f * dt;
             var y = 0;
-            var waveCount = 1;
-            if (this.conf.Harmonics) {
-                waveCount = this.conf.HarmonicsCount + 1;
-            }
-            if (this.conf.Unison) {
-                waveCount = this.conf.uVoices;
-            }
+
             var detuneHz = uDetuneHz(i, inPcm);
             var uPhaseAmount = uPhase(i, inPcm);
             var panAmount = uPan(i, inPcm) / this.conf.uVoices;
@@ -290,13 +299,13 @@ addBlockType("p_waveform_plus", {
                 }
                 var harmonicFrequency = f;
                 var volumeRatio = 1;
-                var wavePhaseOffset = 0;
+                var wavePhaseOffset = this.conf.PhaseOffset;
                 if (this.conf.Unison) {
                     var detunePosition = (h + 0.5) - (waveCount / 2);
                     harmonicFrequency += detuneHz * Math.trunc(detunePosition);
                     wavePhaseOffset = uPhaseAmount * h;
                     if (this.conf.uRandomisePhase) {
-                        wavePhaseOffset += (cyrb53a_beta("" + h, 0) / 100) % 1
+                        wavePhaseOffset += wcPhases[h];
                     }
                     if (this.conf.uAmplitudeConstant) {
                         volumeRatio = Math.trunc(detunePosition) === 0 ? 1 : this.conf.uAmplitudeRatio;
