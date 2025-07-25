@@ -44,6 +44,7 @@ addBlockType("p_waveform_plus", {
         "uDetuneHz": [0, "number", 1],
         "uPan": [0.0, "number", 1],
         "uPhase": [0.0, "number", 1],
+        "uRandomisePhase": [true, "checkbox"],
         "IsSlide": [false, "checkbox"],
         "SlideExponent": [6, "number"],
         "SlideOverrideSmoothing": [true, "checkbox"],
@@ -98,7 +99,8 @@ addBlockType("p_waveform_plus", {
             "uAmplitudeConstant",
             "uDetuneHz",
             "uPan",
-            "uPhase"
+            "uPhase",
+            "uRandomisePhase"
         ],
         "Slide": [
             "IsSlide",
@@ -142,6 +144,7 @@ addBlockType("p_waveform_plus", {
         //     loop.conf.Frequency = ":" + frequencyToNote(_(loop.conf.Frequency)(0, new Float32Array(1)) * Math.pow(2, loop.conf.SemitonesOffset/12)) + ":";
         //     loop.conf.SemitonesOffset = 0;
         // }
+
         updateNoteDisplay(loop);
         if (globalThis.zscrollIsFirst && !globalThis.zscrollIsInternal) {
             filters["p_waveform_plus"].customGuiButtons.Preview.apply(loop, []);
@@ -292,6 +295,9 @@ addBlockType("p_waveform_plus", {
                     var detunePosition = (h + 0.5) - (waveCount / 2);
                     harmonicFrequency += detuneHz * Math.trunc(detunePosition);
                     wavePhaseOffset = uPhaseAmount * h;
+                    if (this.conf.uRandomisePhase) {
+                        wavePhaseOffset += (cyrb53a_beta("" + h, 0) / 100) % 1
+                    }
                     if (this.conf.uAmplitudeConstant) {
                         volumeRatio = Math.trunc(detunePosition) === 0 ? 1 : this.conf.uAmplitudeRatio;
                     } else {
