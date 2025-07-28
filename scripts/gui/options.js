@@ -70,7 +70,9 @@ function createOptionsMenu(loop, definition) {
         } else {
             var input = document.createElement((value[1] === "textarea") ? "textarea" : "input");
             input.contentEditable = true;
-            input.type = value[1];
+            if (value[1] !== "textarea") {
+                input.type = value[1];
+            }
             if (value[2] === 1) {
                 input.classList.add("modifyable");
                 input.type = "text";
@@ -202,6 +204,9 @@ function createMultiEditMenu(initData, editingTargets, propDefs, dropDownDefs) {
             var input = document.createElement((value[1] === "textarea") ? "textarea" : "input");
             input.contentEditable = true;
             input.type = value[1];
+            if (value[1] !== "textarea") {
+                input.type = value[1];
+            }
             if (value[2] === 1) {
                 input.classList.add("modifyable");
                 input.type = "text";
