@@ -13,7 +13,6 @@ addBlockType("p_waveform_plus", {
         "Triangle": [0, "number", 1],
         "Period": [1.0, "number", 1],
         "Exponent": [1, "number", 1],
-        "PhaseOffset": [1, "number"],
         "UseCustomWaveform": [false, "checkbox"],
         "WaveformAsset": ["(none)", ["(none)"]],
         "WaveformAsset2": ["(none)", ["(none)"]],
@@ -49,6 +48,7 @@ addBlockType("p_waveform_plus", {
         "SlideExponent": [6, "number"],
         "SlideOverrideSmoothing": [true, "checkbox"],
         "SlideWavetable": ["(none)", ["(none)"]],
+        "SlidePhaseData": ["0", "textarea"],
         "Absolute": [false, "checkbox"],
         "Multiply": [false, "checkbox"],
         "Sidechain": [false, "checkbox"],
@@ -107,6 +107,7 @@ addBlockType("p_waveform_plus", {
             "SlideExponent",
             "SlideWavetable",
             "SlideOverrideSmoothing",
+            "SlidePhaseData",
         ]
     },
     selectMiddleware: (key) => {
@@ -169,13 +170,32 @@ addBlockType("p_waveform_plus", {
         }
     },
     guessEndPhase: function (duration) {
-        var examplePcm = new Float32Array(Math.floor(duration * audio.samplerate));
-        var fdecay = _(this.conf.FrequencyDecay);
-        var freq = _(this.conf.Frequency);
-        var freqsemioffset = _(this.conf.SemitonesOffset);
+        //maybe: add harmonics sync?
+        const examplePcm = new Float32Array(Math.floor(duration * audio.samplerate));
+        const fdecay = _(this.conf.FrequencyDecay);
+        const freq = _(this.conf.Frequency);
+        const freqsemioffset = _(this.conf.SemitonesOffset);
 
         var dt = Math.pow(audio.samplerate, -1);
-        var t = this.conf.PhaseOffset;
+        var t = 0;
+
+        var waveCount = 1;
+        if (this.conf.Unison) {
+            waveCount = this.conf.uVoices;
+        }
+
+        const uDetuneHz = _(this.conf.uDetuneHz);
+        const uPhase = _(this.conf.uPhase);
+        const period = _(this.conf.Period);
+
+        const wcPhases = new Float32Array(waveCount);
+        wcPhases.forEach((x, i) => {
+            wcPhases[i] = (cyrb53a_beta("" + i, 0) / 100) % 1;
+        });
+
+        const finalPhases = new Array(waveCount);
+
+        const phaseData = this.conf.SlidePhaseData.split(",").map(x => parseFloat(x));
 
         examplePcm.forEach((x, i) => {
             var absoluteTime = i / audio.samplerate;
@@ -183,9 +203,27 @@ addBlockType("p_waveform_plus", {
                 freq(i, examplePcm)
                 * Math.pow(2, (freqsemioffset(i, examplePcm) + this.conf.InternalSemiOffset) / 12);
             f *= Math.exp(-fdecay(i, examplePcm) * absoluteTime);
+            var detuneHz = uDetuneHz(i, examplePcm);
+            var uPhaseAmount = uPhase(i, examplePcm);
+            var thePeriod = period(i, examplePcm);
+            for (let h = 0; h < waveCount; h++) {
+                var harmonicFrequency = f;
+                var wavePhaseOffset = uPhaseAmount * h + (phaseData[h] || 0);
+
+                if (this.conf.Unison) {
+                    var detunePosition = (h + 0.5) - (waveCount / 2);
+                    harmonicFrequency += detuneHz * Math.trunc(detunePosition);
+                    if (this.conf.uRandomisePhase) {
+                        wavePhaseOffset += wcPhases[h];
+                    }
+                }
+                harmonicFrequency = harmonicFrequency / f;
+                var waveformTime = (harmonicFrequency * t) % thePeriod;
+                finalPhases[h] = (waveformTime + wavePhaseOffset) % 1;
+            }
             t += f * dt;
         });
-        return t % 1;
+        return finalPhases;
     },
     functor: function (inPcm, channel, data) {
         const keys = ["Sine", "Square", "Sawtooth", "Triangle"];
@@ -262,6 +300,8 @@ addBlockType("p_waveform_plus", {
             wcPhases[i] = (cyrb53a_beta("" + i, 0) / 100) % 1;
         });
 
+        const phaseData = this.conf.SlidePhaseData.split(",").map(x => parseFloat(x));
+
         inPcm.forEach((x, i) => {
             var absoluteTime = i / audio.samplerate;
             var denominator = Math.max(...keys.flatMap((k) => { return underscores[k](i, inPcm) })) || 1;
@@ -299,11 +339,11 @@ addBlockType("p_waveform_plus", {
                 }
                 var harmonicFrequency = f;
                 var volumeRatio = 1;
-                var wavePhaseOffset = this.conf.PhaseOffset;
+                var wavePhaseOffset = phaseData[h] || 0;
                 if (this.conf.Unison) {
                     var detunePosition = (h + 0.5) - (waveCount / 2);
                     harmonicFrequency += detuneHz * Math.trunc(detunePosition);
-                    wavePhaseOffset = uPhaseAmount * h + this.conf.PhaseOffset;
+                    wavePhaseOffset = uPhaseAmount * h + (phaseData[h] || 0);
                     if (this.conf.uRandomisePhase) {
                         wavePhaseOffset += wcPhases[h];
                     }
@@ -433,7 +473,7 @@ function slideNoteHandler(l) {
     l.conf.Frequency = `#:${l.theoryNote}:~:${slideTarget[0].theoryNote}:@${mapper}`;
     if (oldFreq !== l.conf.Frequency || l.hasAttribute("data-dirty")) {
         markLoopDirty(l);
-        slideTarget[0].conf.PhaseOffset = filters["p_waveform_plus"].guessEndPhase.apply(l, [parseFloat(l.getAttribute("data-duration"))]);
+        slideTarget[0].conf.SlidePhaseData = filters["p_waveform_plus"].guessEndPhase.apply(l, [parseFloat(l.getAttribute("data-duration"))]).join(",\n");
         markLoopDirty(slideTarget[0]);
     }
 }
