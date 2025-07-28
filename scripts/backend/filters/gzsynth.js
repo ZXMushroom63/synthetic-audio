@@ -45,12 +45,16 @@
                 const freq = note(i, inPcm);
                 for (let v = 0; v < gz_synth_voicecount; v++) {
                     const driveLFO = pconfs[`Voice${v + 1}Drive`];
+                    const drive = driveLFO(i, inPcm);
+                    if (drive === 0) {
+                        continue;
+                    }
                     const semiLFO = pconfs[`Voice${v + 1}SemiOffset`];
                     const panLFO = pconfs[`Voice${v + 1}Pan`];
                     const panVal = panLFO(i, inPcm);
                     const panVolMult = (channel === 0) ? (1 - Math.max(0, panVal)) : (1 + Math.min(0, panVal));
                     time[v] += dt * freq * Math.pow(2, semiLFO(i, inPcm) / 12);
-                    out[i] += waveforms[this.conf[`Voice${v + 1}WaveType`]](time[v]) * driveLFO(i, inPcm) * adsr * decay * panVolMult;
+                    out[i] += waveforms[this.conf[`Voice${v + 1}WaveType`]](time[v]) * drive * adsr * decay * panVolMult;
                 }
             });
             const self = this;
