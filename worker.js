@@ -1,6 +1,6 @@
 importScripts('lib/uglifyjs.umd.min.js');
 
-const doMinify = localStorage.getItem("settings:MinifyOnUpdate") === "true";
+var doMinify = true;
 const coepCredentialless = false;
 const CACHE_NAME = 'synthetic-cache';
 
@@ -104,6 +104,12 @@ self.addEventListener('message', event => {
             );
         });
         console.log("Cleared cache!");
+    }
+    if (data.cmd === 'OPTIM_ON') {
+        doMinify = true;
+    }
+    if (data.cmd === 'OPTIM_OFF') {
+        doMinify = false;
     }
 });
 
