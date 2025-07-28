@@ -380,10 +380,6 @@ addBlockType("p_waveform_plus", {
                 t[h] += harmonicFrequency * dt;
                 var waveformTime = t[h];
 
-                if (i === inPcm.length - 1) {
-                    console.log(`h${h} final phase = ${t[h] % 1}`);
-                }
-
 
                 if (volumeRatio === 0) {
                     continue;
