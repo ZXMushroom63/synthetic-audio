@@ -8,7 +8,7 @@ import fs from "fs/promises";
             continue;
         }
         const libContent = await (await fetch(library[1])).text();
-        await fs.writeFile("./lib/" + library[0], libContent);
+        await fs.writeFile("./lib/" + library[0], `//Automatically pulled from ${library[1]}\n` + libContent);
         console.log("Fetched: " + library[0]);
     }
     console.log("Updated libraries!");
