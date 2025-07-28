@@ -44,7 +44,7 @@ addBlockType("p_waveform_plus", {
         "uPhase": [0.0, "number", 1],
         "uRandomisePhase": [true, "checkbox"],
         "IsSlide": [false, "checkbox"],
-        "SlideExponent": [6, "number"],
+        "SlideExponent": [9, "number"],
         "SlideOverrideSmoothing": [true, "checkbox"],
         "SlideWavetable": ["(none)", ["(none)"]],
         "SlidePhaseData": ["0", "textarea"],
@@ -167,7 +167,11 @@ addBlockType("p_waveform_plus", {
         }
         updateNoteDisplay(loop);
         if (loop.conf.IsSlide) {
-            slideNoteHandler(loop);
+            try {
+                slideNoteHandler(loop);
+            } catch(e) {
+
+            }
         }
     },
     guessEndPhase: function (duration) {
