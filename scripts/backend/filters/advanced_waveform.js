@@ -11,7 +11,6 @@ addBlockType("p_waveform_plus", {
         "Square": [0, "number", 1],
         "Sawtooth": [0, "number", 1],
         "Triangle": [0, "number", 1],
-        "Period": [1.0, "number", 1],
         "Exponent": [1, "number", 1],
         "UseCustomWaveform": [false, "checkbox"],
         "WaveformAsset": ["(none)", ["(none)"]],
@@ -60,7 +59,6 @@ addBlockType("p_waveform_plus", {
             "Square",
             "Sawtooth",
             "Triangle",
-            "Period",
             "Exponent",
             "PhaseOffset"
         ],
@@ -180,16 +178,21 @@ addBlockType("p_waveform_plus", {
         const freqsemioffset = _(this.conf.SemitonesOffset);
 
         var dt = Math.pow(audio.samplerate, -1);
-        var t = 0;
+
 
         var waveCount = 1;
+        if (this.conf.Harmonics) {
+            waveCount = this.conf.HarmonicsCount + 1;
+        }
         if (this.conf.Unison) {
             waveCount = this.conf.uVoices;
         }
 
+        const t = new Float32Array(waveCount);
+
         const uDetuneHz = _(this.conf.uDetuneHz);
         const uPhase = _(this.conf.uPhase);
-        const period = _(this.conf.Period);
+        const semitones = _(this.conf.HarmonicsSemitoneOffset);        
         const finalPhases = new Array(waveCount);
 
         const phaseData = this.conf.SlidePhaseData.split(",").map(x => parseFloat(x));
@@ -202,7 +205,7 @@ addBlockType("p_waveform_plus", {
             f *= Math.exp(-fdecay(i, examplePcm) * absoluteTime);
             var detuneHz = uDetuneHz(i, examplePcm);
             var uPhaseAmount = uPhase(i, examplePcm);
-            var thePeriod = period(i, examplePcm);
+            var semiOffset = semitones(i, examplePcm);
             for (let h = 0; h < waveCount; h++) {
                 var harmonicFrequency = f;
                 var wavePhaseOffset = uPhaseAmount * h + (phaseData[h] || 0);
@@ -211,11 +214,16 @@ addBlockType("p_waveform_plus", {
                     var detunePosition = (h + 0.5) - (waveCount / 2);
                     harmonicFrequency += detuneHz * Math.trunc(detunePosition);
                 }
-                harmonicFrequency = harmonicFrequency / f;
-                var waveformTime = (harmonicFrequency * t) % thePeriod;
-                finalPhases[h] = (waveformTime + wavePhaseOffset) % 1;
+                if (this.conf.Harmonics) {
+                    if (this.conf.HarmonicsUseSemitones) {
+                        harmonicFrequency *= getSemitoneCoefficient(Math.round(h * semiOffset));
+                    } else {
+                        harmonicFrequency *= h + 1;
+                    }
+                }
+                t[h] += harmonicFrequency * dt;
+                finalPhases[h] = (t[h] + wavePhaseOffset) % 1;
             }
-            t += f * dt;
         });
         return finalPhases;
     },
@@ -233,7 +241,6 @@ addBlockType("p_waveform_plus", {
         const fdecay = _(this.conf.FrequencyDecay);
         const exp = _(this.conf.Exponent);
         const amp = _(this.conf.Amplitude);
-        const period = _(this.conf.Period);
 
         const customWaveform = custom_waveforms[this.conf.WaveformAsset]?.calculated;
         const customWaveform2 = custom_waveforms[this.conf.WaveformAsset2]?.calculated;
@@ -273,7 +280,7 @@ addBlockType("p_waveform_plus", {
         const AmpSmoothingStart = (this.conf.IsSlide && this.conf.SlideOverrideSmoothing) ? 0 : Math.floor(audio.samplerate * this.conf.AmplitudeSmoothTime);
         const AmpSmoothingEnd = inPcm.length - AmpSmoothingStart;
         var dt = Math.pow(audio.samplerate, -1);
-        var t = 0;
+
         if (this.conf.BadSine) {
             Math.newRandom((channel === 0) ? this.conf.BadSineSeedLeft : this.conf.BadSineSeedRight);
         }
@@ -288,6 +295,8 @@ addBlockType("p_waveform_plus", {
         if (this.conf.Unison) {
             waveCount = this.conf.uVoices;
         }
+
+        const t = new Float32Array(waveCount);
 
         const wcPhases = new Float32Array(waveCount);
         wcPhases.forEach((x, i) => {
@@ -319,13 +328,11 @@ addBlockType("p_waveform_plus", {
                 f *= Math.pow(2, badsineoffsetsemi(i, inPcm) * badsineamount / 12)
             }
             f *= Math.exp(-fdecay(i, inPcm) * absoluteTime);
-            t += f * dt;
             var y = 0;
 
             var detuneHz = uDetuneHz(i, inPcm);
             var uPhaseAmount = uPhase(i, inPcm);
             var panAmount = uPan(i, inPcm) / this.conf.uVoices;
-            var thePeriod = period(i, inPcm);
             var semiOffset = semitones(i, inPcm);
             for (let h = 0; h < waveCount; h++) {
                 if (absoluteTime < (h * this.conf.HarmonicsStrum * this.conf.Harmonics)) {
@@ -358,21 +365,22 @@ addBlockType("p_waveform_plus", {
                         volumeRatio *= right;
                     }
                 }
-                harmonicFrequency = harmonicFrequency / f;
-                var waveformTime = (harmonicFrequency * t) % thePeriod;
-
-                if (i === inPcm.length - 1) {
-                    console.log(`h${h} final phase = ${waveformTime % 1}`);
-                }
-
                 if (this.conf.Harmonics) {
                     volumeRatio = Math.pow(this.conf.HarmonicsRatio, h);
                     if (this.conf.HarmonicsUseSemitones) {
-                        waveformTime *= getSemitoneCoefficient(Math.round(h * semiOffset));
+                        harmonicFrequency *= getSemitoneCoefficient(Math.round(h * semiOffset));
                     } else {
-                        waveformTime *= h + 1;
+                        harmonicFrequency *= h + 1;
                     }
                 }
+                t[h] += harmonicFrequency * dt;
+                var waveformTime = t[h];
+
+                if (i === inPcm.length - 1) {
+                    console.log(`h${h} final phase = ${t[h] % 1}`);
+                }
+
+
                 if (volumeRatio === 0) {
                     continue;
                 }
