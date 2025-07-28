@@ -1,5 +1,5 @@
 globalThis.sw = null;
-
+registerSetting("MinifyOnUpdate", false);
 if ('serviceWorker' in navigator) {
     addEventListener('load', () => {
         navigator.serviceWorker.register('./worker.js').then(registration => {

@@ -1,3 +1,6 @@
+importScripts('lib/uglifyjs.umd.min.js');
+
+const doMinify = localStorage.getItem("settings:MinifyOnUpdate") === "true";
 const coepCredentialless = false;
 const CACHE_NAME = 'synthetic-cache';
 
@@ -7,13 +10,28 @@ self.addEventListener('fetch', event => {
             if (response) {
                 return patchResponseHeaders(response);
             }
-            return fetch(event.request).then(networkResponse => {
+            return fetch(event.request).then(async networkResponse => {
                 if (!networkResponse || networkResponse.status !== 200 || networkResponse.type !== 'basic') {
                     return networkResponse;
                 }
 
                 if ((new URLSearchParams(networkResponse.url)).get("plugin") !== "true" && !networkResponse.url.endsWith("/check.txt") && !networkResponse.url.startsWith("chrome-extension://") && !networkResponse.url.startsWith("data:") && !networkResponse.url.startsWith("blob:") && !networkResponse.url.endsWith("/multiplayer_support") && !networkResponse.url.includes("socket.io")) {
-                    const responseToCache = networkResponse.clone();
+                    var responseToCache = networkResponse.clone();
+                    if (doMinify && (networkResponse.url.endsWith(".js") || networkResponse.url.endsWith(".js?plugin=true"))) {
+                        const newText = UglifyJS.minify(await responseToCache.text(), {
+                            compress: true,
+                            output: {
+                                beautify: false,
+                                comments: false,
+                                semicolons: true,
+                            }
+                        }).code;
+                        responseToCache = new Response(newText, {
+                            status: responseToCache.status,
+                            statusText: responseToCache.statusText,
+                            headers: responseToCache.headers
+                        });
+                    }
 
                     caches.open(CACHE_NAME).then(cache => {
                         try {
@@ -25,7 +43,7 @@ self.addEventListener('fetch', event => {
                 }
 
                 return patchResponseHeaders(networkResponse);
-            }).catch((reason)=>{
+            }).catch((reason) => {
                 console.log("Failed to worker fetch: ", event.request);
                 console.error(reason);
             });
