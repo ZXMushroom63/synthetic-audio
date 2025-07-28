@@ -1,380 +1,319 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no"
-    />
-    <title>SYNTHETIC</title>
-    <link rel="stylesheet" href="style.css" />
-    <link rel="icon" type="image/x-icon" href="public/logo_small.png" />
-    <link rel="manifest" href="manifest.json" />
 
-    <meta
-      name="description"
-      content="SYNTHETIC Audio is a web-based DAW with a multitude of features, such as powerful synths, a powerful LFO engine, and multiplayer - all in your browser."
-    />
-    <link
-      rel="canonical"
-      href="https://zxmushroom63.github.io/synthetic-audio/"
-    />
-    <meta property="og:type" content="website" />
-    <meta property="og:locale" content="en_US" />
-    <meta property="og:title" content="SYNTHETIC Audio" />
-    <meta
-      property="og:url"
-      content="https://zxmushroom63.github.io/synthetic-audio/"
-    />
-    <meta property="og:site_name" content="SYNTHETIC Audio - web-based DAW" />
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no" />
+  <title>SYNTHETIC</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="icon" type="image/x-icon" href="public/logo_small.png" />
+  <link rel="manifest" href="manifest.json" />
 
-    <meta
-      property="og:image"
-      content="http://zxmushroom63.github.io/synthetic-audio/public/repository-open-graph.png"
-    />
-    <meta property="og:image:width" content="1280" />
-    <meta property="og:image:height" content="640" />
-    <meta property="og:image:type" content="image/png" />
-    <meta
-      http-equiv="Content-Security-Policy"
-      content="upgrade-insecure-requests"
-    />
+  <meta name="description"
+    content="SYNTHETIC Audio is a web-based DAW with a multitude of features, such as powerful synths, a powerful LFO engine, and multiplayer - all in your browser." />
+  <link rel="canonical" href="https://zxmushroom63.github.io/synthetic-audio/" />
+  <meta property="og:type" content="website" />
+  <meta property="og:locale" content="en_US" />
+  <meta property="og:title" content="SYNTHETIC Audio" />
+  <meta property="og:url" content="https://zxmushroom63.github.io/synthetic-audio/" />
+  <meta property="og:site_name" content="SYNTHETIC Audio - web-based DAW" />
 
-    <meta name="author" content="ZXMushroom63" />
-  </head>
-  <body>
-    <!-- SERVICE WORKER LOADER -->
-    <script src="scripts/sw/sw_loader.js"></script>
+  <meta property="og:image" content="http://zxmushroom63.github.io/synthetic-audio/public/repository-open-graph.png" />
+  <meta property="og:image:width" content="1280" />
+  <meta property="og:image:height" content="640" />
+  <meta property="og:image:type" content="image/png" />
+  <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests" />
 
-    <!-- LIBRARIES -->
-     <script src="lib/cyrb53.js"></script>
-    <script src="lib/wav-encoder.js"></script>
-    <script src="lib/floats2str.js"></script>
-    <script src="lib/filesaver.min.js"></script>
-    <script src="lib/midi_lib.js"></script>
-    <script src="lib/seeded_random.js"></script>
-    <script src="lib/lib_offloader.js"></script>
-    <script src="lib/modmenuapi.js"></script>
-    <script src="lib/libsettings.js"></script>
-    <script src="lib/lfo.js"></script>
-    <script src="lib/modapi_modloader_idb.js"></script>
-    <script src="lib/plugin_constants.js"></script>
-    <script src="lib/utils.js"></script>
-    <script src="lib/allorigins_fetch.js"></script>
-    <script src="lib/jszip.min.js"></script>
-    <script src="lib/marked.js"></script>
-    <script src="lib/tuna.js"></script>
-    <script src="lib/abcjs-basic.js"></script>
-    <script src="lib/fft.js"></script>
+  <meta name="author" content="ZXMushroom63" />
+</head>
 
-    <!-- GUI MODULES -->
-    <script src="scripts/gui/help.js"></script>
-    <script src="scripts/gui/tabs.js"></script>
-    <script src="scripts/gui/pickupLoop.js"></script>
-    <script src="scripts/gui/add_stuff_menu.js"></script>
-    <script src="scripts/gui/timePosMarker.js"></script>
-    <script src="scripts/gui/selectbox.js"></script>
-    <script src="scripts/gui/duplicate.js"></script>
-    <script src="scripts/gui/clipboard.js"></script>
-    <script src="scripts/gui/quantiseToNote.js"></script>
-    <script src="scripts/gui/vizualiser.js"></script>
-    <script src="scripts/gui/sample_rate_chooser.js"></script>
-    <script src="scripts/gui/options.js"></script>
-    <script src="scripts/gui/toolbox.js"></script>
-    <script src="scripts/gui/add_keybind.js"></script>
-    <script src="scripts/gui/zScroll.js"></script>
-    <script src="scripts/gui/touch_support.js"></script>
-    <script src="scripts/gui/encoders.js"></script>
-    <script src="scripts/gui/note_display.js"></script>
-    <script src="scripts/gui/chord_hud.js"></script>
+<body>
+  <!-- LIBRARIES -->
+  <script src="lib/cyrb53.js"></script>
+  <script src="lib/wav-encoder.js"></script>
+  <script src="lib/floats2str.js"></script>
+  <script src="lib/filesaver.min.js"></script>
+  <script src="lib/midi_lib.js"></script>
+  <script src="lib/seeded_random.js"></script>
+  <script src="lib/lib_offloader.js"></script>
+  <script src="lib/modmenuapi.js"></script>
+  <script src="lib/libsettings.js"></script>
+  <script src="lib/lfo.js"></script>
+  <script src="lib/modapi_modloader_idb.js"></script>
+  <script src="lib/plugin_constants.js"></script>
+  <script src="lib/utils.js"></script>
+  <script src="lib/allorigins_fetch.js"></script>
+  <script src="lib/jszip.min.js"></script>
+  <script src="lib/marked.js"></script>
+  <script src="lib/tuna.js"></script>
+  <script src="lib/abcjs-basic.js"></script>
+  <script src="lib/fft.js"></script>
 
-    <!-- TOOLS -->
-    <script src="scripts/tools/move.js"></script>
-    <script src="scripts/tools/delete.js"></script>
-    <script src="scripts/tools/rename.js"></script>
-    <script src="scripts/tools/cut.js"></script>
-    <script src="scripts/tools/export.js"></script>
-    <script src="scripts/tools/multiedit.js"></script>
-    <script src="scripts/tools/Rec2Note.js"></script>
-    <script src="scripts/tools/synth2instrument.js"></script>
-    <script src="scripts/tools/arpeggiator.js"></script>
-    <script src="scripts/tools/samplepacks.js"></script>
-    <script src="scripts/tools/sheet.js"></script>
-    <script src="scripts/tools/transpose.js"></script>
-    <script src="scripts/tools/scale.js"></script>
+  <!-- SERVICE WORKER LOADER -->
+  <script src="scripts/sw/sw_loader.js"></script>
 
-    <!-- TABS -->
-    <script src="scripts/tabs/tab_waveform.js"></script>
-    <script src="scripts/tabs/tab_live.js"></script>
-    <script src="scripts/tabs/tab_plugins.js"></script>
-    <script src="scripts/tabs/tab_misc.js"></script>
+  <!-- GUI MODULES -->
+  <script src="scripts/gui/help.js"></script>
+  <script src="scripts/gui/tabs.js"></script>
+  <script src="scripts/gui/pickupLoop.js"></script>
+  <script src="scripts/gui/add_stuff_menu.js"></script>
+  <script src="scripts/gui/timePosMarker.js"></script>
+  <script src="scripts/gui/selectbox.js"></script>
+  <script src="scripts/gui/duplicate.js"></script>
+  <script src="scripts/gui/clipboard.js"></script>
+  <script src="scripts/gui/quantiseToNote.js"></script>
+  <script src="scripts/gui/vizualiser.js"></script>
+  <script src="scripts/gui/sample_rate_chooser.js"></script>
+  <script src="scripts/gui/options.js"></script>
+  <script src="scripts/gui/toolbox.js"></script>
+  <script src="scripts/gui/add_keybind.js"></script>
+  <script src="scripts/gui/zScroll.js"></script>
+  <script src="scripts/gui/touch_support.js"></script>
+  <script src="scripts/gui/encoders.js"></script>
+  <script src="scripts/gui/note_display.js"></script>
+  <script src="scripts/gui/chord_hud.js"></script>
 
-    <!-- GUI CORE -->
-    <script src="scripts/gui/gui.js"></script>
+  <!-- TOOLS -->
+  <script src="scripts/tools/move.js"></script>
+  <script src="scripts/tools/delete.js"></script>
+  <script src="scripts/tools/rename.js"></script>
+  <script src="scripts/tools/cut.js"></script>
+  <script src="scripts/tools/export.js"></script>
+  <script src="scripts/tools/multiedit.js"></script>
+  <script src="scripts/tools/Rec2Note.js"></script>
+  <script src="scripts/tools/synth2instrument.js"></script>
+  <script src="scripts/tools/arpeggiator.js"></script>
+  <script src="scripts/tools/samplepacks.js"></script>
+  <script src="scripts/tools/sheet.js"></script>
+  <script src="scripts/tools/transpose.js"></script>
+  <script src="scripts/tools/scale.js"></script>
 
-    <!-- BACKEND -->
-    <script src="scripts/backend/importMidi.js"></script>
-    <script src="scripts/backend/serialisation.js"></script>
-    <script src="scripts/backend/wakatime.js"></script>
-    <script src="scripts/backend/apply_soundbite.js"></script>
-    <script src="scripts/backend/waveforms.js"></script>
-    <script src="scripts/backend/applyModifierStack.js"></script>
+  <!-- TABS -->
+  <script src="scripts/tabs/tab_waveform.js"></script>
+  <script src="scripts/tabs/tab_live.js"></script>
+  <script src="scripts/tabs/tab_plugins.js"></script>
+  <script src="scripts/tabs/tab_misc.js"></script>
 
-    <!-- CORE -->
-    <script src="scripts/core.js"></script>
+  <!-- GUI CORE -->
+  <script src="scripts/gui/gui.js"></script>
 
-    <!-- FILTERS -->
-    <script src="scripts/backend/filters/audio.js"></script>
-    <script src="scripts/backend/filters/advanced_compressor.js"></script>
-    <script src="scripts/backend/filters/reverb.js"></script>
-    <script src="scripts/backend/filters/chorus.js"></script>
-    <script src="scripts/backend/filters/bandpass.js"></script>
-    <script src="scripts/backend/filters/lowpass.js"></script>
-    <script src="scripts/backend/filters/highpass.js"></script>
-    <script src="scripts/backend/filters/splice.js"></script>
-    <script src="scripts/backend/filters/soundwave.js"></script>
-    <script src="scripts/backend/filters/waveform.js"></script>
-    <script src="scripts/backend/filters/advanced_waveform.js"></script>
-    <script src="scripts/backend/filters/procedural_asset.js"></script>
-    <script src="scripts/backend/filters/bitcrunch.js"></script>
-    <script src="scripts/backend/filters/comb.js"></script>
-    <script src="scripts/backend/filters/compressors.js"></script>
-    <script src="scripts/backend/filters/fade.js"></script>
-    <script src="scripts/backend/filters/multiply.js"></script>
-    <script src="scripts/backend/filters/noise.js"></script>
-    <script src="scripts/backend/filters/normalise.js"></script>
-    <script src="scripts/backend/filters/power.js"></script>
-    <script src="scripts/backend/filters/quantise.js"></script>
-    <script src="scripts/backend/filters/repeat.js"></script>
-    <script src="scripts/backend/filters/sidechannel.js"></script>
-    <script src="scripts/backend/filters/smooth.js"></script>
-    <script src="scripts/backend/filters/speed.js"></script>
-    <script src="scripts/backend/filters/stereo.js"></script>
-    <script src="scripts/backend/filters/value.js"></script>
-    <script src="scripts/backend/filters/volume.js"></script>
-    <script src="scripts/backend/filters/reverse.js"></script>
-    <script src="scripts/backend/filters/exciter.js"></script>
-    <script src="scripts/backend/filters/equaliser.js"></script>
-    <script src="scripts/backend/filters/gate.js"></script>
-    <script src="scripts/backend/filters/window.js"></script>
-    <script src="scripts/backend/filters/vinyl.js"></script>
-    <script src="scripts/backend/filters/distribute.js"></script>
-    <script src="scripts/backend/filters/fuzz.js"></script>
-    <script src="scripts/backend/filters/tape.js"></script>
-    <script src="scripts/backend/filters/clamp.js"></script>
-    <script src="scripts/backend/filters/adsr.js"></script>
-    <script src="scripts/backend/filters/offset.js"></script>
-    <script src="scripts/backend/filters/reshape.js"></script>
-    <script src="scripts/backend/filters/delay.js"></script>
-    <script src="scripts/backend/filters/note.js"></script>
-    <script src="scripts/backend/filters/warp.js"></script>
-    <script src="scripts/backend/filters/mirror.js"></script>
-    <script src="scripts/backend/filters/modulo.js"></script>
-    <script src="scripts/backend/filters/sculpt.js"></script>
-    <script src="scripts/backend/filters/randomwalk.js"></script>
-    <script src="scripts/backend/filters/unison.js"></script>
-    <script src="scripts/backend/filters/instrument.js"></script>
-    <script src="scripts/backend/filters/markers.js"></script>
-    <script src="scripts/backend/filters/bandpass_singlepole.js"></script>
-    <script src="scripts/backend/filters/tuna.js"></script>
-    <script src="scripts/backend/filters/gzsynth.js"></script>
-    <script src="scripts/backend/filters/vocoder.js"></script>
-    <script src="scripts/backend/filters/dt303.js"></script>
-    <script src="scripts/backend/filters/panner.js"></script>
-    <script src="scripts/backend/filters/autotune.js"></script>
-    <script src="scripts/backend/filters/automation_param.js"></script>
+  <!-- BACKEND -->
+  <script src="scripts/backend/importMidi.js"></script>
+  <script src="scripts/backend/serialisation.js"></script>
+  <script src="scripts/backend/wakatime.js"></script>
+  <script src="scripts/backend/apply_soundbite.js"></script>
+  <script src="scripts/backend/waveforms.js"></script>
+  <script src="scripts/backend/applyModifierStack.js"></script>
 
-    <!-- NETCODE :( -->
-    <script src="scripts/backend/netcode.js"></script>
+  <!-- CORE -->
+  <script src="scripts/core.js"></script>
 
-    <!-- FFMPEG CODECS -->
-    <script src="https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@latest/dist/ffmpeg.min.js"></script>
-    <script src="lib/init_ffmpeg.js"></script>
+  <!-- FILTERS -->
+  <script src="scripts/backend/filters/audio.js"></script>
+  <script src="scripts/backend/filters/advanced_compressor.js"></script>
+  <script src="scripts/backend/filters/reverb.js"></script>
+  <script src="scripts/backend/filters/chorus.js"></script>
+  <script src="scripts/backend/filters/bandpass.js"></script>
+  <script src="scripts/backend/filters/lowpass.js"></script>
+  <script src="scripts/backend/filters/highpass.js"></script>
+  <script src="scripts/backend/filters/splice.js"></script>
+  <script src="scripts/backend/filters/soundwave.js"></script>
+  <script src="scripts/backend/filters/waveform.js"></script>
+  <script src="scripts/backend/filters/advanced_waveform.js"></script>
+  <script src="scripts/backend/filters/procedural_asset.js"></script>
+  <script src="scripts/backend/filters/bitcrunch.js"></script>
+  <script src="scripts/backend/filters/comb.js"></script>
+  <script src="scripts/backend/filters/compressors.js"></script>
+  <script src="scripts/backend/filters/fade.js"></script>
+  <script src="scripts/backend/filters/multiply.js"></script>
+  <script src="scripts/backend/filters/noise.js"></script>
+  <script src="scripts/backend/filters/normalise.js"></script>
+  <script src="scripts/backend/filters/power.js"></script>
+  <script src="scripts/backend/filters/quantise.js"></script>
+  <script src="scripts/backend/filters/repeat.js"></script>
+  <script src="scripts/backend/filters/sidechannel.js"></script>
+  <script src="scripts/backend/filters/smooth.js"></script>
+  <script src="scripts/backend/filters/speed.js"></script>
+  <script src="scripts/backend/filters/stereo.js"></script>
+  <script src="scripts/backend/filters/value.js"></script>
+  <script src="scripts/backend/filters/volume.js"></script>
+  <script src="scripts/backend/filters/reverse.js"></script>
+  <script src="scripts/backend/filters/exciter.js"></script>
+  <script src="scripts/backend/filters/equaliser.js"></script>
+  <script src="scripts/backend/filters/gate.js"></script>
+  <script src="scripts/backend/filters/window.js"></script>
+  <script src="scripts/backend/filters/vinyl.js"></script>
+  <script src="scripts/backend/filters/distribute.js"></script>
+  <script src="scripts/backend/filters/fuzz.js"></script>
+  <script src="scripts/backend/filters/tape.js"></script>
+  <script src="scripts/backend/filters/clamp.js"></script>
+  <script src="scripts/backend/filters/adsr.js"></script>
+  <script src="scripts/backend/filters/offset.js"></script>
+  <script src="scripts/backend/filters/reshape.js"></script>
+  <script src="scripts/backend/filters/delay.js"></script>
+  <script src="scripts/backend/filters/note.js"></script>
+  <script src="scripts/backend/filters/warp.js"></script>
+  <script src="scripts/backend/filters/mirror.js"></script>
+  <script src="scripts/backend/filters/modulo.js"></script>
+  <script src="scripts/backend/filters/sculpt.js"></script>
+  <script src="scripts/backend/filters/randomwalk.js"></script>
+  <script src="scripts/backend/filters/unison.js"></script>
+  <script src="scripts/backend/filters/instrument.js"></script>
+  <script src="scripts/backend/filters/markers.js"></script>
+  <script src="scripts/backend/filters/bandpass_singlepole.js"></script>
+  <script src="scripts/backend/filters/tuna.js"></script>
+  <script src="scripts/backend/filters/gzsynth.js"></script>
+  <script src="scripts/backend/filters/vocoder.js"></script>
+  <script src="scripts/backend/filters/dt303.js"></script>
+  <script src="scripts/backend/filters/panner.js"></script>
+  <script src="scripts/backend/filters/autotune.js"></script>
+  <script src="scripts/backend/filters/automation_param.js"></script>
 
-    <div class="toolbox">
-      <button id="toolboxRunButton">Run</button>
-      <br />
-    </div>
-    <span id="toolboxExpander" class="closed">&gt;</span>
-    <table class="main">
-      <tr>
-        <td style="height: 10rem">
-          <h4>
-            <img id="logo" style="display: none" src="public/logo.png" />
-            <canvas width="900" height="450" id="viz"></canvas>
-            <button id="renderBtn" onclick="if(this.disabled){return};render()">
-              Render Audio
-            </button>
-            <audio id="renderOut" controls></audio>
-            <div style="display: inline-block">
-              <span>Playback Rate: </span><br />
-              <input
-                id="playbackRateSlider"
-                type="range"
-                min="0.0"
-                step="0.2"
-                max="2"
-                value="1"
-                oninput="document.querySelector('#renderOut').playbackRate = Math.max(0.075, parseFloat(this.value))"
-              />
-            </div>
-          </h4>
-          <div id="renderProgress">(no render task currently active)</div>
-          <div id="controlsAndStuff">
-            <button onclick="save()">Save</button>
-            <button onclick="load()">Load</button>
-            <button onclick="deserialise('{}')">Clear</button>
-            <button onclick="viewHelp()">Help</button>
-            <button onclick="updateApp()">Update App</button>
-            <button onclick="writeAutosave()">Backup</button>
-            <button data-convert-to-sync onclick="loadAutosave()">
-              Revert
-            </button>
-            <a
-              target="_blank"
-              href="https://github.com/ZXMushroom63/synthetic-audio"
-              title="Star us on GitHub!"
-              ><button>GitHub</button></a
-            >
-            <ins></ins>
-          </div>
-        </td>
-      </tr>
-      <tr>
-        <td id="tabContent">
-          <div id="track">
-            <div id="trackInternal">
-              <div id="time"></div>
-              <span class="timePosMarker" style="left: 0%"></span>
-            </div>
-          </div>
-        </td>
-      </tr>
-      <tr>
-        <td
-          style="align-content: flex-end; white-space: nowrap; overflow-x: auto"
-        >
-          <div id="tray">
-            <span class="trayElem">
-              Editor Layer:
-              <input
-                step="1"
-                min="-10"
-                max="10"
-                type="number"
-                id="editorlayer"
-                value="0"
-              />
-            </span>
-            <span class="trayElem">
-              BPM:
-              <input
-                step="1"
-                min="20"
-                max="480"
-                type="number"
-                id="bpm"
-                value="120"
-              />
-            </span>
-            <span class="trayElem">
-              Loop Interval:
-              <input
-                step="1"
-                min="0.1"
-                max="16"
-                type="number"
-                id="loopi"
-                value="0.001"
-              />
-            </span>
-            <span class="trayElem">
-              Duration:
-              <input
-                step="1"
-                min="1"
-                max="360"
-                type="number"
-                id="duration"
-                value="10"
-              />s
-            </span>
-            <span class="trayElem">
-              Stereo: <input checked type="checkbox" id="stereobox" />
-            </span>
-            <span class="trayElem">
-              Normalised: <input checked type="checkbox" id="normalisebox" />
-            </span>
-            <span class="trayElem">
-              Quality:
-              <select id="samplerate" style="width: 7.5rem">
-                <option value="4000">Landfill (4k)</option>
-                <option value="8000">Trash (8k)</option>
-                <option value="16000">Low (16k)</option>
-                <option value="24000" selected>Medium (24k)</option>
-                <option value="48000">High (48k)</option>
-                <option value="88200">Extreme (88.2k)</option>
-              </select>
-              <select id="bitrate" style="width: 4.5rem">
-                <option value="64">64kbps</option>
-                <option value="96">96kbps</option>
-                <option value="128">128kbps</option>
-                <option value="256">256kbps</option>
-                <option value="320" selected>320kbps</option>
-              </select>
-            </span>
-            <span class="trayElem">
-              NoLOD: <input checked type="checkbox" id="nolod" />
-            </span>
-            <span class="trayElem">
-              ForceWaveform: <input type="checkbox" id="forceWv" />
-            </span>
-            <span class="trayElem">
-              Format:
-              <select id="encformat"></select>
-            </span>
-            <span class="trayElem">
-              Substepping:
-              <input
-                step="1"
-                min="1"
-                max="8"
-                type="number"
-                id="substepping"
-                value="1"
-              />
-            </span>
-            <span class="trayElem">
-              Isolate Layer: <input type="checkbox" id="isolate" />
-            </span>
-          </div>
-        </td>
-      </tr>
-    </table>
-    <div id="addstuff">
-      <h4>Add Tracks</h4>
-      <details>
-        <summary>Samples</summary>
-        <div id="addloops">
-          <button id="samplepacksBtn" class="smallBtn">
-            View sample packs...
+  <!-- NETCODE :( -->
+  <script src="scripts/backend/netcode.js"></script>
+
+  <!-- FFMPEG CODECS -->
+  <script src="https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@latest/dist/ffmpeg.min.js"></script>
+  <script src="lib/init_ffmpeg.js"></script>
+
+  <div class="toolbox">
+    <button id="toolboxRunButton">Run</button>
+    <br />
+  </div>
+  <span id="toolboxExpander" class="closed">&gt;</span>
+  <table class="main">
+    <tr>
+      <td style="height: 10rem">
+        <h4>
+          <img id="logo" style="display: none" src="public/logo.png" />
+          <canvas width="900" height="450" id="viz"></canvas>
+          <button id="renderBtn" onclick="if(this.disabled){return};render()">
+            Render Audio
           </button>
+          <audio id="renderOut" controls></audio>
+          <div style="display: inline-block">
+            <span>Playback Rate: </span><br />
+            <input id="playbackRateSlider" type="range" min="0.0" step="0.2" max="2" value="1"
+              oninput="document.querySelector('#renderOut').playbackRate = Math.max(0.075, parseFloat(this.value))" />
+          </div>
+        </h4>
+        <div id="renderProgress">(no render task currently active)</div>
+        <div id="controlsAndStuff">
+          <button onclick="save()">Save</button>
+          <button onclick="load()">Load</button>
+          <button onclick="deserialise('{}')">Clear</button>
+          <button onclick="viewHelp()">Help</button>
+          <button onclick="updateApp()">Update App</button>
+          <button onclick="writeAutosave()">Backup</button>
+          <button data-convert-to-sync onclick="loadAutosave()">
+            Revert
+          </button>
+          <a target="_blank" href="https://github.com/ZXMushroom63/synthetic-audio"
+            title="Star us on GitHub!"><button>GitHub</button></a>
+          <ins></ins>
         </div>
-      </details>
-      <details>
-        <summary>Filters</summary>
-        <div id="addfilters"></div>
-      </details>
-      <details>
-        <summary>Primitives</summary>
-        <div id="addprims"></div>
-      </details>
-      <details>
-        <summary>Plugins</summary>
-        <div id="addplugs"></div>
-      </details>
-    </div>
-    <audio id="loopsample"></audio>
-    <audio id="loopmeta"></audio>
-  </body>
+      </td>
+    </tr>
+    <tr>
+      <td id="tabContent">
+        <div id="track">
+          <div id="trackInternal">
+            <div id="time"></div>
+            <span class="timePosMarker" style="left: 0%"></span>
+          </div>
+        </div>
+      </td>
+    </tr>
+    <tr>
+      <td style="align-content: flex-end; white-space: nowrap; overflow-x: auto">
+        <div id="tray">
+          <span class="trayElem">
+            Editor Layer:
+            <input step="1" min="-10" max="10" type="number" id="editorlayer" value="0" />
+          </span>
+          <span class="trayElem">
+            BPM:
+            <input step="1" min="20" max="480" type="number" id="bpm" value="120" />
+          </span>
+          <span class="trayElem">
+            Loop Interval:
+            <input step="1" min="0.1" max="16" type="number" id="loopi" value="0.001" />
+          </span>
+          <span class="trayElem">
+            Duration:
+            <input step="1" min="1" max="360" type="number" id="duration" value="10" />s
+          </span>
+          <span class="trayElem">
+            Stereo: <input checked type="checkbox" id="stereobox" />
+          </span>
+          <span class="trayElem">
+            Normalised: <input checked type="checkbox" id="normalisebox" />
+          </span>
+          <span class="trayElem">
+            Quality:
+            <select id="samplerate" style="width: 7.5rem">
+              <option value="4000">Landfill (4k)</option>
+              <option value="8000">Trash (8k)</option>
+              <option value="16000">Low (16k)</option>
+              <option value="24000" selected>Medium (24k)</option>
+              <option value="48000">High (48k)</option>
+              <option value="88200">Extreme (88.2k)</option>
+            </select>
+            <select id="bitrate" style="width: 4.5rem">
+              <option value="64">64kbps</option>
+              <option value="96">96kbps</option>
+              <option value="128">128kbps</option>
+              <option value="256">256kbps</option>
+              <option value="320" selected>320kbps</option>
+            </select>
+          </span>
+          <span class="trayElem">
+            NoLOD: <input checked type="checkbox" id="nolod" />
+          </span>
+          <span class="trayElem">
+            ForceWaveform: <input type="checkbox" id="forceWv" />
+          </span>
+          <span class="trayElem">
+            Format:
+            <select id="encformat"></select>
+          </span>
+          <span class="trayElem">
+            Substepping:
+            <input step="1" min="1" max="8" type="number" id="substepping" value="1" />
+          </span>
+          <span class="trayElem">
+            Isolate Layer: <input type="checkbox" id="isolate" />
+          </span>
+        </div>
+      </td>
+    </tr>
+  </table>
+  <div id="addstuff">
+    <h4>Add Tracks</h4>
+    <details>
+      <summary>Samples</summary>
+      <div id="addloops">
+        <button id="samplepacksBtn" class="smallBtn">
+          View sample packs...
+        </button>
+      </div>
+    </details>
+    <details>
+      <summary>Filters</summary>
+      <div id="addfilters"></div>
+    </details>
+    <details>
+      <summary>Primitives</summary>
+      <div id="addprims"></div>
+    </details>
+    <details>
+      <summary>Plugins</summary>
+      <div id="addplugs"></div>
+    </details>
+  </div>
+  <audio id="loopsample"></audio>
+  <audio id="loopmeta"></audio>
+</body>
+
 </html>
