@@ -355,18 +355,10 @@ addBlockType("p_waveform_plus", {
                         y += -1 * customWaveform2[Math.floor((waveformTime + wavePhaseOffset) * WAVEFORM_RES) % WAVEFORM_RES] * volumeRatio * wt_blend;
                     }
                 } else {
-                    if (values.Sine !== 0) {
-                        y += waveforms.sin(waveformTime + wavePhaseOffset) * values.Sine * volumeRatio;
-                    }
-                    if (values.Square !== 0) {
-                        y += waveforms.square(waveformTime + wavePhaseOffset) * values.Square * volumeRatio;
-                    }
-                    if (values.Sawtooth) {
-                        y += waveforms.sawtooth(waveformTime + wavePhaseOffset) * values.Sawtooth * volumeRatio;
-                    }
-                    if (values.Triangle) {
-                        y += waveforms.triangle(waveformTime + wavePhaseOffset) * values.Triangle * volumeRatio;
-                    }
+                    y += waveforms.sin(waveformTime + wavePhaseOffset) * values.Sine * volumeRatio;
+                    y += waveforms.square(waveformTime + wavePhaseOffset) * values.Square * volumeRatio;
+                    y += waveforms.sawtooth(waveformTime + wavePhaseOffset) * values.Sawtooth * volumeRatio;
+                    y += waveforms.triangle(waveformTime + wavePhaseOffset) * values.Triangle * volumeRatio;
                 }
 
                 y /= total;
