@@ -1,6 +1,3 @@
-importScripts('lib/uglifyjs.umd.min.js');
-
-var doMinify = true;
 const coepCredentialless = false;
 const CACHE_NAME = 'synthetic-cache';
 
@@ -17,21 +14,6 @@ self.addEventListener('fetch', event => {
 
                 if ((new URLSearchParams(networkResponse.url)).get("plugin") !== "true" && !networkResponse.url.endsWith("/check.txt") && !networkResponse.url.startsWith("chrome-extension://") && !networkResponse.url.startsWith("data:") && !networkResponse.url.startsWith("blob:") && !networkResponse.url.endsWith("/multiplayer_support") && !networkResponse.url.includes("socket.io")) {
                     var responseToCache = networkResponse.clone();
-                    if (doMinify && (networkResponse.url.endsWith(".js") || networkResponse.url.endsWith(".js?plugin=true"))) {
-                        const newText = UglifyJS.minify(await responseToCache.text(), {
-                            compress: true,
-                            output: {
-                                beautify: false,
-                                comments: false,
-                                semicolons: true,
-                            }
-                        }).code;
-                        responseToCache = new Response(newText, {
-                            status: responseToCache.status,
-                            statusText: responseToCache.statusText,
-                            headers: responseToCache.headers
-                        });
-                    }
 
                     caches.open(CACHE_NAME).then(cache => {
                         try {
@@ -104,12 +86,6 @@ self.addEventListener('message', event => {
             );
         });
         console.log("Cleared cache!");
-    }
-    if (data.cmd === 'OPTIM_ON') {
-        doMinify = true;
-    }
-    if (data.cmd === 'OPTIM_OFF') {
-        doMinify = false;
     }
 });
 
