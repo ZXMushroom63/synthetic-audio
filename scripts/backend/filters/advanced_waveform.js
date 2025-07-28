@@ -335,6 +335,9 @@ addBlockType("p_waveform_plus", {
                         waveformTime *= h + 1;
                     }
                 }
+                if (volumeRatio === 0) {
+                    continue;
+                }
                 if (this.conf.WavetableMode) {
                     if (wavetable) {
                         const wt_pos_idx = wavetablePos(i, inPcm) * (wavetableFrames - 1);
@@ -352,10 +355,18 @@ addBlockType("p_waveform_plus", {
                         y += -1 * customWaveform2[Math.floor((waveformTime + wavePhaseOffset) * WAVEFORM_RES) % WAVEFORM_RES] * volumeRatio * wt_blend;
                     }
                 } else {
-                    y += waveforms.sin(waveformTime + wavePhaseOffset) * values.Sine * volumeRatio;
-                    y += waveforms.square(waveformTime + wavePhaseOffset) * values.Square * volumeRatio;
-                    y += waveforms.sawtooth(waveformTime + wavePhaseOffset) * values.Sawtooth * volumeRatio;
-                    y += waveforms.triangle(waveformTime + wavePhaseOffset) * values.Triangle * volumeRatio;
+                    if (values.Sine !== 0) {
+                        y += waveforms.sin(waveformTime + wavePhaseOffset) * values.Sine * volumeRatio;
+                    }
+                    if (values.Square !== 0) {
+                        y += waveforms.square(waveformTime + wavePhaseOffset) * values.Square * volumeRatio;
+                    }
+                    if (values.Sawtooth) {
+                        y += waveforms.sawtooth(waveformTime + wavePhaseOffset) * values.Sawtooth * volumeRatio;
+                    }
+                    if (values.Triangle) {
+                        y += waveforms.triangle(waveformTime + wavePhaseOffset) * values.Triangle * volumeRatio;
+                    }
                 }
 
                 y /= total;
