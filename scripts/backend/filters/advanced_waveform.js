@@ -157,6 +157,9 @@ addBlockType("p_waveform_plus", {
             var blob = await convertToFileBlob([sumFloat32Arrays([pcmData])], 1, audio.samplerate, audio.bitrate, true);
             playSample(blob);
         },
+        "Dbg": function () {
+            console.log(filters["p_waveform_plus"].guessEndPhase.apply(this, [parseFloat(this.getAttribute("data-duration"))]));
+        }
     },
     wavtableUser: true,
     updateMiddleware: (loop) => {
@@ -187,12 +190,6 @@ addBlockType("p_waveform_plus", {
         const uDetuneHz = _(this.conf.uDetuneHz);
         const uPhase = _(this.conf.uPhase);
         const period = _(this.conf.Period);
-
-        const wcPhases = new Float32Array(waveCount);
-        wcPhases.forEach((x, i) => {
-            wcPhases[i] = (cyrb53a_beta("" + i, 0) / 100) % 1;
-        });
-
         const finalPhases = new Array(waveCount);
 
         const phaseData = this.conf.SlidePhaseData.split(",").map(x => parseFloat(x));
@@ -213,9 +210,6 @@ addBlockType("p_waveform_plus", {
                 if (this.conf.Unison) {
                     var detunePosition = (h + 0.5) - (waveCount / 2);
                     harmonicFrequency += detuneHz * Math.trunc(detunePosition);
-                    if (this.conf.uRandomisePhase) {
-                        wavePhaseOffset += wcPhases[h];
-                    }
                 }
                 harmonicFrequency = harmonicFrequency / f;
                 var waveformTime = (harmonicFrequency * t) % thePeriod;
@@ -366,6 +360,10 @@ addBlockType("p_waveform_plus", {
                 }
                 harmonicFrequency = harmonicFrequency / f;
                 var waveformTime = (harmonicFrequency * t) % thePeriod;
+
+                if (i === inPcm.length - 1) {
+                    console.log(`h${h} final phase = ${waveformTime % 1}`);
+                }
 
                 if (this.conf.Harmonics) {
                     volumeRatio = Math.pow(this.conf.HarmonicsRatio, h);
