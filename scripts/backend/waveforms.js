@@ -1,11 +1,11 @@
 const waveforms = {
-    tau: 6.28318530718,
+    tau: Math.PI * 2,
     sqrt2: Math.sqrt(2),
     sin: function (t) {
         return Math.sin(t * this.tau);
     },
     square: function (t) {
-        return Math.sign(Math.sin(t * this.tau));
+        return 1 * ((t % 1) < 0.5);
     },
     sawtooth: function (t) {
         return 2 * (((t + 0.5) % 1) - 0.5);
