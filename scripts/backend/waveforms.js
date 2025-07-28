@@ -1,16 +1,16 @@
+const TAU = Math.PI * 2;
 const waveforms = {
-    tau: Math.PI * 2,
-    sqrt2: Math.sqrt(2),
-    sin: function (t) {
-        return Math.sin(t * this.tau);
+    sqrt2: Math.SQRT2,
+    sin: (t) => {
+        return Math.sin(t * TAU);
     },
-    square: function (t) {
+    square: (t) => {
         return 1 * ((t % 1) < 0.5);
     },
-    sawtooth: function (t) {
+    sawtooth: (t) => {
         return 2 * (((t + 0.5) % 1) - 0.5);
     },
-    triangle: function (t) {
+    triangle: (t) => {
         return 2 * Math.abs(2 * ((t + 0.75) % 1) - 1) - 1;
     }
 }
