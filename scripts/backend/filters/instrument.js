@@ -6,7 +6,7 @@ addBlockType("instrument", {
     directRefs: ["sf", "piano", "instrument", "sf2"],
     configs: {
         "Note": [":A4:", "number", 1],
-        "Volume": [1, "number"],
+        "Volume": [1, "number", 1],
         "FadeTime": [0.5, "number"],
         "Reverse": [false, "checkbox"],
         "Speed": [1, "number"],
@@ -70,6 +70,8 @@ addBlockType("instrument", {
 
         var note = _(this.conf.Note)(0, new Float32Array(2));
         note = frequencyToNote(note, true);
+
+        const volume = _(this.conf.Volume)(0, new Float32Array(2));
         var currentData = SFCACHE[this.conf.Instrument][note];
         if (!currentData) {
             return inPcm;
@@ -83,9 +85,9 @@ addBlockType("instrument", {
         });
         var duration = Math.floor(Math.round((((currentData.length / audio.samplerate) || 0) + 0.0) / data.loopInterval) * data.loopInterval * audio.samplerate);
         if (this.conf.Sidechain) {
-            applySoundbiteToPcmSidechain(this.conf.Reverse, this.conf.Looping, currentData, inPcm, duration, this.conf.Speed, this.conf.Volume, 0, this.conf.SidechainPower, false);
+            applySoundbiteToPcmSidechain(this.conf.Reverse, this.conf.Looping, currentData, inPcm, duration, this.conf.Speed, volume, 0, this.conf.SidechainPower, false);
         } else {
-            applySoundbiteToPcm(this.conf.Reverse, this.conf.Looping, currentData, inPcm, duration, this.conf.Speed, this.conf.Volume, 0);
+            applySoundbiteToPcm(this.conf.Reverse, this.conf.Looping, currentData, inPcm, duration, this.conf.Speed, volume, 0);
         }
         return inPcm;
     }
