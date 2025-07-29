@@ -1,3 +1,4 @@
+const MAX_LAYER = 100;
 let webpageUsesTouch = false;
 function customEvent(ev, data = {}) {
     window.dispatchEvent(new CustomEvent(ev, { detail: data }));
@@ -249,7 +250,7 @@ function hydrateLoopBackground(elem) {
 
 registerSetting("OpaqueLayers", false);
 function hydrateLoopSpecificLayer(elem) {
-    if (elem.noEditorLayer || (parseInt(elem.getAttribute("data-editlayer")) === gui.layer) || (gui.layer === 10)) {
+    if (elem.noEditorLayer || (parseInt(elem.getAttribute("data-editlayer")) === gui.layer) || (gui.layer === MAX_LAYER)) {
         elem.classList.remove("deactivated");
     } else {
         elem.classList.add("deactivated");
@@ -285,7 +286,7 @@ function hydrate() {
     hydrateEditorLayer();
     reflow("#trackInternal");
 }
-function addBlock(type, start, duration, title, layer = 0, data = {}, editorValue = Math.min(gui.layer, 9), noTimeline) {
+function addBlock(type, start, duration, title, layer = 0, data = {}, editorValue = Math.min(gui.layer, MAX_LAYER - 1), noTimeline) {
     var definition = window.filters[type];
     function resizeBlock(e) {
         e.preventDefault();
@@ -555,7 +556,7 @@ function addBlock(type, start, duration, title, layer = 0, data = {}, editorValu
     hydrateLoopDecoration(loop);
     return loop;
 }
-function addIgnoredBlock(type, start, duration, title, layer = 0, data = {}, editorValue = Math.min(gui.layer, 9)) {
+function addIgnoredBlock(type, start, duration, title, layer = 0, data = {}, editorValue = Math.min(gui.layer, MAX_LAYER - 1)) {
     multiplayer.isHooked = true;
     var loop = addBlock(type, start, duration, title, layer, data, editorValue, true);
     loop._ignore = true;
@@ -603,7 +604,7 @@ function init() {
             e.preventDefault();
         }
         if (e.ctrlKey && e.key.toLowerCase() === " " && document.activeElement === document.body) {
-            document.querySelector("#editorlayer").value = gui.layer = 10;
+            document.querySelector("#editorlayer").value = gui.layer = MAX_LAYER;
             hydrateEditorLayer();
             e.preventDefault();
         }

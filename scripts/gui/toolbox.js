@@ -39,7 +39,7 @@ function registerTool(name, fn, selected = false, bindChecker) {
     tool.setAttribute("data-tool", namespacedId);
     tool.classList.add("tool");
     TOOL_DATABASE[namespacedId] = function (...args) {
-        if (gui.layer === 10) {
+        if (gui.layer === MAX_LAYER) {
             return;
         }
         fn.apply(this, args);

@@ -56,7 +56,7 @@ addEventListener("init", () => {
         }
         var data = JSON.parse(clipText.replace("sp_loopdata::", ""));
         data.forEach(entry => {
-            entry.editorLayer = Math.min(gui.layer, 9);
+            entry.editorLayer = Math.min(gui.layer, MAX_LAYER - 1);
             if (accountForBeatSize) {
                 entry.start *= audio.beatSize;
                 entry.duration *= audio.beatSize;
