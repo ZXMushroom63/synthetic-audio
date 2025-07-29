@@ -103,11 +103,12 @@ Create an 'Automation Parameter' node, and name it. You can bind using:
 - ~@MyParam~ - Directly binds the value
 - ~@MyParam!0~5~ - Binds the value, and maps from 0-1 to the specified range
 
-Much like Automation Parameters, the LFO engine has built-in support for per-note randomisation, with this syntax:
+Much like Automation Parameters, the LFO engine has built-in support for per-chord randomisation, with this syntax:
 - ~&RANDOMID~ (random between 0.0 and 1.0)
-- ~&RANDOMID!-2~5~ (random between -2.0 and 5.0)
-- ~&RANDOMID!0~12~12~ (random between 0.0 and 12.0, spacing each random value out by 12. Effectively, randomly pick 0 or 12)
-- ~&RANDOMID!-2~5@2~ (random between -2.0 and 5.0, exponent of 2)
+- ~&MYRAND!-2~5~ (random between -2.0 and 5.0)
+- ~&anything!0~12~12~ (random between 0.0 and 12.0, spacing each random value out by 12. Effectively, randomly pick 0 or 12)
+- ~&Name!-2~5@2~ (random between -2.0 and 5.0, exponent of 2)
+- ~&&PerNote!0~1~ (random between 0.0 and 1.0 for each individual note in the chord)
 Different random ids (part directly after ~&~)
 
 In purple input boxes, you can also use autocomplete for notes.
