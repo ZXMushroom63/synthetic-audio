@@ -194,8 +194,8 @@
           <audio id="renderOut" controls></audio>
           <div style="display: inline-block">
             <span>Playback Rate: </span><br />
-            <input id="playbackRateSlider" type="range" min="0.0" step="0.2" max="2" value="1"
-              oninput="document.querySelector('#renderOut').playbackRate = Math.max(0.075, parseFloat(this.value))" />
+            <input title="Speed: 100%" id="playbackRateSlider" type="range" min="0.0" step="0.2" max="2" value="1"
+              oninput="const speed = Math.max(0.075, parseFloat(this.value)); this.title = 'Speed: ' + (speed * 100) + '%'; document.querySelector('#renderOut').playbackRate = speed" />
           </div>
         </h4>
         <div id="renderProgress">(no render task currently active)</div>
