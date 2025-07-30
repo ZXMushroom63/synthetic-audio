@@ -525,6 +525,20 @@ function addBlock(type, start, duration, title, layer = 0, data = {}, editorValu
             hydrateLoopPosition(loop);
         }
     });
+    internal.addEventListener("mousedown", (e) => {
+        if (e.button !== 1 || !definition.specialAction) {
+            return;
+        }
+        e.preventDefault();
+        const shouldDirty = definition.specialAction(loop);
+        if (shouldDirty) {
+            if (definition.updateMiddleware) {
+                definition.updateMiddleware(loop);
+            }
+            hydrateLoopDecoration(loop);
+            markLoopDirty(loop);
+        }
+    });
 
     const backgroundSvg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
     backgroundSvg.classList.add("backgroundSvg");
