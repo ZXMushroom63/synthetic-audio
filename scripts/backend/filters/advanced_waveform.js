@@ -107,6 +107,7 @@ addBlockType("p_waveform_plus", {
             "SlideWavetable",
             "SlideOverrideSmoothing",
             "SlidePhaseData",
+            "SlideStateData"
         ]
     },
     selectMiddleware: (key) => {
