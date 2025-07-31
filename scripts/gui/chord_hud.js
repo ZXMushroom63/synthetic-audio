@@ -263,8 +263,32 @@ const chordMacros = {
     ToTheII: {
         applies: ["VII"],
         returns: ["II"]
+    },
+    ResolveIrregular: {
+        applies: ["V^7"],
+        returns: ["III^7"]
     }
 };
+
+importStepChordMacro("MontgomeryWardStep%s", ["I+maj", "IV+maj", "II+min", "V+maj"]);
+importStepChordMacro("RagtimeStep%s", ["III^7", "VI^7", "II^7", "V^7"]);
+importStepChordMacro("RomanescaStep%s", ["III+maj", "VII+maj", "i+min", "V+maj", "III+maj", "VII+maj", "i+min", "V+maj", "i+min"]);
+importStepChordMacro("CircleStep%s", ["vi+min", "ii+min", "V+maj", "I+maj"]);
+importStepChordMacro("TurnaroundStep%s", ["V+maj", "IV+maj", "I+maj"]);
+
+
+function importStepChordMacro(name, steps) {
+    let prev = steps.shift();
+    let stepIdx = 1;
+    while (steps.length > 0) {
+        chordMacros[name.replace("%s", stepIdx)] = {
+            applies: [prev],
+            returns: [steps[0]]
+        }
+        prev = steps.shift();
+        stepIdx++;
+    }
+}
 
 const chromaticScale = [
     "C", "C#", "D", "D#", "E", "F",
@@ -602,12 +626,13 @@ function drawChordMacros(loop) {
             if (acc) {
                 return acc;
             }
-            const parts = v.split("+");
+            const searchFn = v.includes("+") ? String.prototype.startsWith : String.prototype.includes;
+            const parts = v.includes("+") ? v.split("+") : v.split("^");
             const match = loop.romanNumeral.toUpperCase() === parts[0].toUpperCase();
             if (parts.length === 1) {
                 return match;
             }
-            return match && chordData.type.startsWith(parts[1]);
+            return match && searchFn.apply(chordData.type, [parts[1]]);
         }, false)
     }).forEach((ent) => {
         const size = chordData.values.length;
@@ -617,12 +642,13 @@ function drawChordMacros(loop) {
                     if (acc) {
                         return acc;
                     }
-                    const parts = v.split("+");
+                    const searchFn = v.includes("+") ? String.prototype.startsWith : String.prototype.includes;
+                    const parts = v.includes("+") ? v.split("+") : v.split("^");
                     const match = x.root === chordIndexMap[parts[0].toUpperCase()];
                     if (parts.length === 1) {
                         return match;
                     }
-                    return match && x.type.startsWith(parts[1]);
+                    return match && searchFn.apply(x.type, [parts[1]]);
                 }, false)
                 && x.values.length === size
         ).reverse()?.[0];
