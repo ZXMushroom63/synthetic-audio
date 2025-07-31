@@ -591,6 +591,9 @@ function drawChordMacros(loop) {
     [...document.querySelectorAll("ins.chordMacro")].forEach(e => e.remove());
     const rightHandle = loop.querySelector(".loopInternal span.handleRight");
     const chordData = getChordTypeFromStack(loop.relatedChord);
+    if (!chordData) {
+        return;
+    }
     const chordIndexMap = Object.fromEntries([...gui.acceptedNotes].map((x, i) => {
         return [romanize(((i + 1) % gui.acceptedNotes.size) + 1), x];
     }));
@@ -624,7 +627,7 @@ function drawChordMacros(loop) {
                 && x.values.length === size
         ).reverse()?.[0];
         if (!chord) {
-            return;
+            return //console.warn("Missing chord for ", ent);
         }
         const octaveOffset = 12 * (Math.min(...loop.relatedChord.map(x => getChromaticOctave(x.theoryNote))));
         const template = serialiseNode(loop.relatedChord[0]);
