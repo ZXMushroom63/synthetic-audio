@@ -537,6 +537,9 @@ function addBlock(type, start, duration, title, layer = 0, data = {}, editorValu
             }
             hydrateLoopDecoration(loop);
             markLoopDirty(loop);
+            if (!multiplayer.isHooked && multiplayer.on && !loop._ignore) {
+                multiplayer.patchLoop(loop);
+            }
         }
     });
 
