@@ -267,6 +267,14 @@ const chordMacros = {
     ResolveIrregular: {
         applies: ["V^7"],
         returns: ["III^7"]
+    },
+    SnazzyA: {
+        applies: ["IV+maj"],
+        returns: ["III+min"]
+    },
+    SnazzyB: {
+        applies: ["III+min"],
+        returns: ["IV+maj"]
     }
 };
 
