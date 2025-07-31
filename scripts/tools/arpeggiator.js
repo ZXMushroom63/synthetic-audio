@@ -175,7 +175,7 @@ addEventListener("init", () => {
         Unique note count: ${arp.diversity}
         Duration (beats): ${arp.beatsDuration}
 
-        Identified Chord: ${getChordTypeFromStack(rawChord) || "Unknown"}
+        Identified Chord: ${getChordTypeFromStack(rawChord)?.display || "Unknown"}
         Chord data: ${chord.map(x => x.theoryNote).join(", ")}
         Chord note count: ${chord.length}
         `;

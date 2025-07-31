@@ -170,9 +170,10 @@ addEventListener("init", () => {
     });
     function updateLoopHighlight(loop) {
         if (!loop._netIngore && loop.theoryNote) {
-            const note = loop.theoryNoteNormalised;
-            const noteDisplay = loop.querySelector(".noteDisplay");
             const scale = [...gui.acceptedNotes];
+            const note = loop.theoryNoteNormalised;
+            loop.romanNumeral = scale.includes(note) ? romanize(((scale.indexOf(note) + 1) % scale.length) + 1) : "U";
+            const noteDisplay = loop.querySelector(".noteDisplay");
             if (noteDisplay) {
                 switch (note) {
                     case scale[3]:

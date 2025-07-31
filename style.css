@@ -14,9 +14,9 @@ body {
   overflow-y: auto;
 }
 
-#tabContent > div,
-#tabContent > table,
-#tabContent > table > tr > td {
+#tabContent>div,
+#tabContent>table,
+#tabContent>table>tr>td {
   width: 100vw;
   height: calc(100vh - 15rem);
   border-collapse: collapse;
@@ -227,7 +227,7 @@ html[data-libsettings-OpaqueLayers="true"] .loop.deactivated {
 
 .loopInternal span.handleLeft {
   left: 0;
-  z-index: 3;
+  z-index: 0;
   border-radius: 0.5rem 0px 0px 0.5rem;
 }
 
@@ -334,7 +334,7 @@ select:focus {
   list-style-type: "+ ";
 }
 
-#addstuff details[open] > summary {
+#addstuff details[open]>summary {
   list-style-type: "- ";
 }
 
@@ -347,11 +347,11 @@ select:focus {
   color: white;
 }
 
-#addstuff > details > div span {
+#addstuff>details>div span {
   display: block;
 }
 
-#addstuff > details > div span a {
+#addstuff>details>div span a {
   color: lightblue;
   text-decoration: underline;
   cursor: pointer;
@@ -359,7 +359,7 @@ select:focus {
   transition: color 0.3s;
 }
 
-#addstuff > details > div span a:hover {
+#addstuff>details>div span a:hover {
   color: white;
 }
 
@@ -488,12 +488,10 @@ button {
 #track,
 button,
 .themeGradient {
-  background: linear-gradient(
-    140deg,
-    rgba(255, 0, 0, 0.3) 0%,
-    rgba(255, 255, 255, 0) 34%,
-    rgba(0, 255, 187, 0.2) 100%
-  );
+  background: linear-gradient(140deg,
+      rgba(255, 0, 0, 0.3) 0%,
+      rgba(255, 255, 255, 0) 34%,
+      rgba(0, 255, 187, 0.2) 100%);
 }
 
 #trackInternal {
@@ -766,11 +764,11 @@ input[type="number"]::-webkit-inner-spin-button {
   cursor: pointer;
 }
 
-.loopOptionsMenu.multiEditMenu details + br + details {
+.loopOptionsMenu.multiEditMenu details+br+details {
   margin-top: 0.75rem;
 }
 
-.loopOptionsMenu.multiEditMenu details + br {
+.loopOptionsMenu.multiEditMenu details+br {
   display: none;
 }
 
@@ -802,7 +800,28 @@ button:hover .addModifierDiv {
   text-shadow: rgba(0, 0, 0, 0.8) 0px 0px 3px;
 }
 
-.noteDisplay, .genericDisplay {
+ins.chordMacro {
+  width: 6rem;
+  display: block;
+  background-color: rgba(255, 255, 255, 0.2);
+  position: relative;
+  left: 0.75rem;
+  backdrop-filter: blur(2px);
+  border-radius: 8px;
+  cursor: pointer;
+  color: white;
+  padding: 0.25rem;
+  line-height: 1rem;
+  font-size: 0.75rem;
+  text-decoration: none;
+  margin-bottom: 2.5px;
+  text-shadow: 0px 0px 3px black;
+  overflow: hidden;
+  z-index: 1200;
+}
+
+.noteDisplay,
+.genericDisplay {
   font: bold 2.5rem monospace;
   line-height: 2.5rem;
   opacity: 0.75;
@@ -810,6 +829,7 @@ button:hover .addModifierDiv {
   margin-left: min(0.75rem, 10%);
   text-shadow: 0px 0px 5px rgba(0, 0, 0, 0.8);
 }
+
 .genericDisplay {
   font: bold 1.5rem monospace;
   line-height: 2.75rem;
@@ -859,19 +879,19 @@ code:hover {
   overflow-x: hidden;
 }
 
-#pluginsUI > div {
+#pluginsUI>div {
   border-bottom: 1px solid white;
   color: white;
   font-family: sans-serif;
   padding: 4px 2px;
 }
 
-#pluginsUI > div:first-of-type {
+#pluginsUI>div:first-of-type {
   margin-top: 1rem;
   border-top: 1px solid white;
 }
 
-#pluginsUI > div a {
+#pluginsUI>div a {
   text-decoration-color: red;
   cursor: pointer;
   user-select: none;
@@ -1059,7 +1079,8 @@ li {
   overflow: hidden;
 }
 
-.loop.deactivated .chordDisplay, .loop.deactivated .genericDisplay {
+.loop.deactivated .chordDisplay,
+.loop.deactivated .genericDisplay {
   display: none;
 }
 
@@ -1067,6 +1088,7 @@ a[href] {
   color: lightblue;
   transition: 0.3s color;
 }
+
 a[href]:hover {
   color: white;
 }
@@ -1086,17 +1108,21 @@ a[href]:hover {
   color: black;
 }
 
-[data-abcjs-disable-sheet=true] g[data-name="bar"] path, [data-abcjs-disable-sheet=true] svg>g:last-child>path:last-child {
+[data-abcjs-disable-sheet=true] g[data-name="bar"] path,
+[data-abcjs-disable-sheet=true] svg>g:last-child>path:last-child {
   transform-origin: bottom;
   transform: scaleY(0.6);
 }
+
 #sheetAbcJsTarget * {
   white-space: normal;
 }
+
 @media print {
   body *:not(.printable, .printable *) {
     display: none;
   }
+
   .printable {
     display: block !important;
     position: fixed !important;

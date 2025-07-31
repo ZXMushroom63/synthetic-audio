@@ -4,6 +4,268 @@ function deselectText() {
     }
 }
 
+// Capitalisation does not matter
+// Use +maj or +min to select major or minor chords, using prefix selection
+// some from wikipedia, some from Gemini. don't blame me, I'm not a musical genius or anything
+const chordMacros = {
+    ResolveTonic: {
+        applies: ["V", "IV", "VII+dim"],
+        returns: ["I"]
+    },
+    DeceptiveCadence: {
+        applies: ["V"],
+        returns: ["VI+min"]
+    },
+    HalfCadence: {
+        applies: ["I", "II+min", "IV"],
+        returns: ["V"]
+    },
+    PlagalMinor: {
+        applies: ["IV+min"],
+        returns: ["I"]
+    },
+
+    // --- DIATONIC PROGRESSIONS ---
+    ToSubdominant: {
+        applies: ["I"],
+        returns: ["IV"]
+    },
+    ToDominant: {
+        applies: ["II+min"],
+        returns: ["V"]
+    },
+    ToSupertonic: {
+        applies: ["VI+min"],
+        returns: ["II+min"]
+    },
+    Suspend: {
+        applies: ["V", "IV", "VII+dim"],
+        returns: ["I+sus"]
+    },
+    PicardyThird: {
+        applies: ["I+min"],
+        returns: ["I+maj"]
+    },
+    MinorSubdominant: {
+        applies: ["IV+maj"],
+        returns: ["IV+min"]
+    },
+    BackdoorProgression: {
+        applies: ["IV+min"],
+        returns: ["VII+maj"]
+    },
+    BackdoorResolve: {
+        applies: ["VII+maj"],
+        returns: ["I"]
+    },
+    SecondaryDominantToV: {
+        applies: ["II+7", "II+maj"],
+        returns: ["V"]
+    },
+    SecondaryDominantToIV: {
+        applies: ["I+7"],
+        returns: ["IV"]
+    },
+    SecondaryDominantToVI: {
+        applies: ["III+7", "III+maj"],
+        returns: ["VI+min"]
+    },
+    AndalusianStep2: {
+        applies: ["I+min"],
+        returns: ["VII+maj"]
+    },
+    AndalusianStep3: {
+        applies: ["VII+maj"],
+        returns: ["VI+maj"]
+    },
+    AndalusianStep4: {
+        applies: ["VI+maj"],
+        returns: ["V"]
+    },
+
+    // --- SECONDARY DOMINANTS ---
+    SecondaryDominantToII: {
+        applies: ["VI+7", "VI+maj"],
+        returns: ["II+min"]
+    },
+    SecondaryDominantToIII: {
+        applies: ["VII+7", "VII+maj"],
+        returns: ["III+min"]
+    },
+    DeceptiveSecondaryToV: {
+        applies: ["II+7", "II+maj"],
+        returns: ["III+min"]
+    },
+
+    // --- MODAL PROGRESSIONS ---
+    DorianLift: {
+        applies: ["I+min"],
+        returns: ["IV+maj"]
+    },
+    LydianJump: {
+        applies: ["I+maj"],
+        returns: ["II+maj"]
+    },
+    MixolydianDrop: {
+        applies: ["I"],
+        returns: ["VII+maj"]
+    },
+    MixolydianReturn: {
+        applies: ["VII+maj"],
+        returns: ["IV"]
+    },
+
+    // --- COMMON POP & ANIME PROGRESSIONS ---
+    RoyalRoadStep2: {
+        applies: ["IV"],
+        returns: ["V"]
+    },
+    RoyalRoadStep3: {
+        applies: ["V"],
+        returns: ["III+min"]
+    },
+    RoyalRoadStep4: {
+        applies: ["III+min"],
+        returns: ["VI+min"]
+    },
+    The50sProgression: {
+        applies: ["VI+min"],
+        returns: ["IV"]
+    },
+
+    // --- CHROMATIC MEDIANTS & MODAL BORROWING ---
+    ChromaticMediantMajor: {
+        applies: ["I+maj"],
+        returns: ["III+maj"]
+    },
+    ChromaticSubmediantMajor: {
+        applies: ["I+maj"],
+        returns: ["VI+maj"]
+    },
+    ToMinorSubmediant: {
+        applies: ["I+min"],
+        returns: ["VI+maj"]
+    },
+
+    // --- AUGMENTED & DIMINISHED RESOLUTIONS ---
+    ResolveAugmentedTonic: {
+        applies: ["I+aug"],
+        returns: ["IV"]
+    },
+    ResolveAugmentedDominant: {
+        applies: ["V+aug"],
+        returns: ["I"]
+    },
+    MinorSupertonicToDominant: {
+        applies: ["II+dim"],
+        returns: ["V"]
+    },
+
+    // --- MINOR KEY VAMPS & PROGRESSIONS ---
+    MinorVampOut: {
+        applies: ["I+min"],
+        returns: ["V+min"]
+    },
+    MinorVampIn: {
+        applies: ["V+min"],
+        returns: ["I+min"]
+    },
+    ToMinorDominant: {
+        applies: ["IV+min"],
+        returns: ["V+min"]
+    },
+
+    // --- CIRCLE OF FIFTHS CHAIN ---
+    CircleStepIVToVII: {
+        applies: ["IV"],
+        returns: ["VII+dim"]
+    },
+    CircleStepVIIToIII: {
+        applies: ["VII+dim"],
+        returns: ["III+min"]
+    },
+    CircleStepIIIToVI: {
+        applies: ["III+min"],
+        returns: ["VI+min"]
+    },
+
+    // --- CHORD EMBELLISHMENTS ---
+    AddFinalSixth: {
+        applies: ["I+maj"],
+        returns: ["I+6"]
+    },
+    JazzUpTonic: {
+        applies: ["I+maj"],
+        returns: ["I+maj7"]
+    },
+    JazzUpSubdominant: {
+        applies: ["IV+maj"],
+        returns: ["IV+maj7"]
+    },
+
+    // --- NEO-RIEMANNIAN & NON-FUNCTIONAL ---
+    Slide: {
+        applies: ["I+maj"],
+        returns: ["I+min"]
+    },
+    Parallel: {
+        applies: ["I+maj"],
+        returns: ["VI+min"]
+    },
+    LeadingToneExchange: {
+        applies: ["I+maj"],
+        returns: ["III+min"]
+    },
+
+    // --- ADVANCED MODAL & BORROWED CHORDS ---
+    SetupNeapolitan: {
+        applies: ["IV+min"],
+        returns: ["II+maj"]
+    },
+    ResolveNeapolitan: {
+        applies: ["II+maj"],
+        returns: ["V"]
+    },
+    ResolveMinorDominant: {
+        applies: ["V+min"],
+        returns: ["IV"]
+    },
+
+    // --- BLUES & ALTERED DOMINANT HARMONY ---
+    BluesyDominant: {
+        applies: ["I"],
+        returns: ["V+9aug"]
+    },
+    AlteredDominant: {
+        applies: ["II+min"],
+        returns: ["V+7b5"]
+    },
+    TritoneSubToTonic: {
+        applies: ["II+7"],
+        returns: ["I"]
+    },
+
+    // --- UNEXPECTED RESOLUTIONS & CADENCES ---
+    RockPowerCadence: {
+        applies: ["VII+maj"],
+        returns: ["I"]
+    },
+    DeceptiveSubdominant: {
+        applies: ["V"],
+        returns: ["IV"]
+    },
+    SupertonicDeception: {
+        applies: ["V"],
+        returns: ["II+min"]
+    },
+
+    // -- CUSTOM ONES I MADE LMAO ---
+    ToTheII: {
+        applies: ["VII"],
+        returns: ["II"]
+    }
+};
+
 const chromaticScale = [
     "C", "C#", "D", "D#", "E", "F",
     "F#", "G", "G#", "A", "A#", "B"
@@ -26,7 +288,7 @@ function indexToChromatic(idx) {
 }
 
 function getChromaticOctave(note) {
-    return parseInt(note[note.length - 1]);
+    return parseInt(note.replace("#", "").replace("b", "").substring(1));
 }
 
 const chordFormulas = new Map();
@@ -183,10 +445,10 @@ function generateChordTable() {
     const uninvertedChords = {};
     for (const chordType of chordFormulas.keys()) {
         const formula = chordFormulas.get(chordType);
-        for (let rootIndex = 8+12; rootIndex > 8; rootIndex--) {
+        for (let rootIndex = 8 + 12; rootIndex > 8; rootIndex--) {
             const root = chromaticScale[rootIndex % 12];
 
-            for (let inversion = formula.length-1; inversion >= 0; inversion--) {
+            for (let inversion = formula.length - 1; inversion >= 0; inversion--) {
                 const chordNotes = getInversionNotes(rootIndex % 12, formula, inversion);
                 const key = chordNotes.notes.join(",");
                 const chordName = root + chordType + (inversionNames[inversion] ?? ` (${inversion + 1}th inv)`);
@@ -199,7 +461,7 @@ function generateChordTable() {
                     values: chordNotes.values,
                     range: Math.max(...chordNotes.values) - Math.min(...chordNotes.values)
                 };
-                if (false) { //inversion === 0
+                if (inversion === 0) { //inversion === 0
                     uninvertedChords[key] = result;
                 } else {
                     chordTable[key] = result;
@@ -208,7 +470,7 @@ function generateChordTable() {
             }
         }
     }
-    //Object.assign(chordTable, uninvertedChords);
+    Object.assign(chordTable, uninvertedChords);
     return { chordDictionary: chordTable, reverseChordLookup: reverseChordLookup };
 }
 
@@ -224,7 +486,7 @@ function updateChordHudDatalist() {
     datalist.id = "chordDatalist";
     const possibilities = Object.entries(reverseChordLookup);
     possibilities.reverse();
-    
+
     for (const chordType of possibilities) {
         if (gui.acceptedNotes && gui.autocorrect !== "OFF" && !chordType[1].notes.isSubsetOf(gui.acceptedNotes)) {
             continue;
@@ -244,13 +506,13 @@ function getChordTypeFromStack(loops) {
     loops = [...loops]; //shallow clone
     const key = [...new Set(loops.sort((a, b) => a.hitFrequency - b.hitFrequency).map(x => x.theoryNoteNormalised))].join(",");
     if (chordDictionary[key]) {
-        return chordDictionary[key]?.display;
+        return chordDictionary[key];
     }
     const backupKey = [...new Set(loops.sort((a, b) =>
         chromaticScaleShifted.indexOf(a.theoryNoteNormalised) - chromaticScaleShifted.indexOf(b.theoryNoteNormalised)
     ).map(x => x.theoryNoteNormalised))].join(",");
 
-    return chordDictionary[backupKey]?.display;
+    return chordDictionary[backupKey];
 }
 
 function getChordStack(loop, allowAtonal) {
@@ -290,7 +552,7 @@ function getChordStack(loop, allowAtonal) {
 
 function chordProcess(loop, chordArray) {
     if (!chordArray) {
-        var loops = getChordStack(loop);    
+        var loops = getChordStack(loop);
         loop.relatedChord = loops;
     } else if (Array.isArray(chordArray)) {
         loop.relatedChord = chordArray;
@@ -302,33 +564,137 @@ function chordProcess(loop, chordArray) {
 
     if (loop.relatedChord[loop.relatedChord.length - 1] === loop) {
         loop.querySelector(".chordDisplay").style.display = "";
-        loop.querySelector(".chordDisplay").value = getChordTypeFromStack(loop.relatedChord) || "";
+        loop.querySelector(".chordDisplay").value = getChordTypeFromStack(loop.relatedChord)?.display || "";
     } else {
+        loop.lastChordType = "";
         loop.querySelector(".chordDisplay").style.display = "none";
     }
 }
+registerSetting("ChordMacros", true);
+addEventListener("keydown", (e) => {
+    if ((e.key === "`" || e.key === "~") && settings.ChordMacros && !e.altKey && !e.shiftKey && !e.metaKey && !e.repeat) {
+        e.preventDefault();
+        const targetLoop = document.elementFromPoint(mouse.x, mouse.y)?.closest(".loop");
+        drawChordMacros(targetLoop);
+    };
+});
+function drawChordMacros(loop) {
+    loop = getChordStack(loop)[0];
+    function unfocusHandler(event) {
+        if (event && loop.contains(event.target)) {
+            return;
+        }
+        [...loop.querySelectorAll("ins.chordMacro")].forEach(e => e.remove());
+        removeEventListener("mousedown", unfocusHandler)
+    }
+    addEventListener("mousedown", unfocusHandler);
+    [...document.querySelectorAll("ins.chordMacro")].forEach(e => e.remove());
+    const rightHandle = loop.querySelector(".loopInternal span.handleRight");
+    const chordData = getChordTypeFromStack(loop.relatedChord);
+    const chordIndexMap = Object.fromEntries([...gui.acceptedNotes].map((x, i) => {
+        return [romanize(((i + 1) % gui.acceptedNotes.size) + 1), x];
+    }));
+    Object.entries(chordMacros).filter(ent => {
+        return ent[1].applies.reduce((acc, v) => {
+            if (acc) {
+                return acc;
+            }
+            const parts = v.split("+");
+            const match = loop.romanNumeral.toUpperCase() === parts[0].toUpperCase();
+            if (parts.length === 1) {
+                return match;
+            }
+            return match && chordData.type.startsWith(parts[1]);
+        }, false)
+    }).forEach((ent) => {
+        const size = chordData.values.length;
+        const chord = Object.values(reverseChordLookup).filter(
+            x => x.notes.isSubsetOf(gui.acceptedNotes)
+                && ent[1].returns.reduce((acc, v) => {
+                    if (acc) {
+                        return acc;
+                    }
+                    const parts = v.split("+");
+                    const match = x.root === chordIndexMap[parts[0].toUpperCase()];
+                    if (parts.length === 1) {
+                        return match;
+                    }
+                    return match && x.type.startsWith(parts[1]);
+                }, false)
+                && x.values.length === size
+        ).reverse()?.[0];
+        if (!chord) {
+            return;
+        }
+        const octaveOffset = 12 * (Math.min(...loop.relatedChord.map(x => getChromaticOctave(x.theoryNote))));
+        const template = serialiseNode(loop.relatedChord[0]);
+        template.start += template.duration;
+        const unrealisedChords = chord.values.map((v, i) => {
+            const dt = structuredClone(template);
+            var freq = `:${indexToChromatic(octaveOffset + v)}:`;
+            dt.layer += i;
+            filters[template.type].applyMidi(dt, freq);
+            return dt;
+        });
+        const macroBadge = document.createElement("ins");
+        macroBadge.classList.add("chordMacro");
+        macroBadge.innerText = ent[0];
+        macroBadge.addEventListener("mouseover", async (e) => {
+            if (macroBadge.processing) {
+                return;
+            }
+            if (macroBadge.blob) {
+                return playSample(macroBadge.blob);
+            }
+            macroBadge.processing = true;
+            const pcm = new Float32Array(audio.samplerate / 2);
+            const def = filters[template.type];
+            for (let i = 0; i < unrealisedChords.length; i++) {
+                const dt = unrealisedChords[i];
+                pcm.set(await def.functor.apply(dt, [pcm, 0, getProjectMeta()]));
+            }
+            if (audio.normalise) {
+                normaliseFloat32Arrays([pcm]);
+            }
+            const blob = await convertToFileBlob([pcm], 1, audio.samplerate, audio.bitrate, true);
+            macroBadge.blob = blob;
+            playSample(blob);
+            macroBadge.processing = false;
+        });
+        macroBadge.addEventListener("mousedown", (e) => {
+            e.stopPropagation();
+            e.preventDefault();
 
+            unrealisedChords.forEach((dt) => {
+                const newLoop = deserialiseNode(dt, true);
+                hydrateLoopPosition(newLoop);
+            });
+            unfocusHandler();
+        });
+        rightHandle.appendChild(macroBadge);
+    });
+}
 function chordDisplayEdit(display, e, loop) {
     e.stopPropagation();
     if (!e.key) {
         return;
     } else
-    if (e.ctrlKey || e.metaKey || e.altKey || e.repeat) {
-        if (e.ctrlKey && e.key === "a") {
-            return; //Ctrl + A is a G
-        }
-        return e.preventDefault();
-    } else
-    if (e.key === "Enter") {
-        e.preventDefault();
-    } else
-    if (e.key === "Escape") {
-        e.preventDefault();
-        deselectText();
-        display.blur();
-    } else {
-        return;
-    }
+        if (e.ctrlKey || e.metaKey || e.altKey || e.repeat) {
+            if (e.ctrlKey && e.key === "a") {
+                return; //Ctrl + A is a G
+            }
+            return e.preventDefault();
+        } else
+            if (e.key === "Enter") {
+                e.preventDefault();
+            } else
+                if (e.key === "Escape") {
+                    e.preventDefault();
+                    deselectText();
+                    display.blur();
+                } else {
+                    return;
+                }
     var lookupValue = display.value.replace(/[\r\n\t]/gm, "")
         .replaceAll("major", "maj")
         .replaceAll("minor", "min")

@@ -78,6 +78,7 @@ helpContent.addTab("Keybinds", `
 - ~ALT + 2~ = Split selected node in two
 - ~ALT + 3~ = Split selected node in three
 - ~ALT + 4~ = Split selected node in four
+- ~\`~ while hovering over a node = See potential chord options
 `);
 
 helpContent.addTab("Programmable Fields", `
