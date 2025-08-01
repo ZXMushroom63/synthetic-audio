@@ -287,6 +287,10 @@ const chordMacros = {
     OkieProgressor: {
         applies: ["II"],
         returns: ["IV"]
+    },
+    Flatten: {
+        applies: ["I+sus"],
+        returns: ["VII+m#5"]
     }
 };
 
