@@ -505,7 +505,7 @@ function generateChordTable() {
 
             for (let inversion = formula.length - 1; inversion >= 0; inversion--) {
                 const chordNotes = getInversionNotes(rootIndex % 12, formula, inversion, chordType);
-                const key = chordNotes.notes.join(",");
+                const key = chordNotes.values.sort((a, b) => a - b).join(",");
                 const chordName = root + chordType + (inversionNames[inversion] ?? ` (${inversion + 1}th inv)`);
                 const result = {
                     display: chordName,
@@ -565,15 +565,14 @@ addEventListener("theoryscaleupdated", updateChordHudDatalist);
 
 function getChordTypeFromStack(loops) {
     loops = [...loops]; //shallow clone
-    const key = [...new Set(loops.sort((a, b) => a.hitFrequency - b.hitFrequency).map(x => x.theoryNoteNormalised))].join(",");
+    const midiNotesRaw = [...new Set(loops.sort((a, b) => a.hitFrequency - b.hitFrequency).map(x => x.midiNote))];
+    const octaveOffset = Math.floor(Math.min(...midiNotesRaw) / 12);
+    const midiNotes = midiNotesRaw.map(x => x - octaveOffset * 12);
+    const key = midiNotes.sort((a, b) => a - b).join(",");
+
     if (chordDictionary[key]) {
         return chordDictionary[key];
     }
-    const backupKey = [...new Set(loops.sort((a, b) =>
-        chromaticScaleShifted.indexOf(a.theoryNoteNormalised) - chromaticScaleShifted.indexOf(b.theoryNoteNormalised)
-    ).map(x => x.theoryNoteNormalised))].join(",");
-
-    return chordDictionary[backupKey];
 }
 
 function getChordStack(loop, allowAtonal) {
@@ -694,7 +693,7 @@ function drawChordMacros(loop) {
                 }, false)
                 && x.values.length >= sizeCutoff
         ).reverse();
-        const chord = chordOptions?.[Math.floor(Math.pow(0.5, settings.ChordMacrosStability) * chordOptions.length)];
+        const chord = chordOptions?.[Math.floor(Math.pow(Math.classicRandom(), settings.ChordMacrosStability) * chordOptions.length)];
         if (!chord) {
             return //console.warn("Missing chord for ", ent);
         }
