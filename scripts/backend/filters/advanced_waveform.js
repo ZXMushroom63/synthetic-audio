@@ -230,6 +230,7 @@ addBlockType("p_waveform_plus", {
                     }
                 }
                 t[h] += harmonicFrequency * dt;
+                t[h] %= 1;
                 finalPhases[h] = (t[h] + wavePhaseOffset) % 1;
             }
         });
@@ -382,6 +383,7 @@ addBlockType("p_waveform_plus", {
                     }
                 }
                 t[h] += harmonicFrequency * dt;
+                t[h] %= 1;
                 var waveformTime = t[h];
 
 
