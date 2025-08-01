@@ -471,7 +471,11 @@ function registerVanillaChords() {
 registerVanillaChords();
 
 const inversionNames = ["", " (1st inv)", " (2nd inv)", " (3rd inv)"];
-function getInversionNotes(rootIndex, formula, inversion) {
+function getInversionNotes(rootIndex, formula, inversion, debugType) {
+    const isDebugTarget = inversion === 5 && debugType === "maj13" && rootIndex === 0;
+    if (isDebugTarget) {
+        debugger;
+    }
     const n = formula.length;
     let notes = [];
     let values = [];
@@ -484,6 +488,7 @@ function getInversionNotes(rootIndex, formula, inversion) {
     }
     const shiftLowest = Math.floor(Math.min(...values) / 12);
     values = values.map(x => x - shiftLowest * 12);
+
     return {
         notes,
         values
@@ -499,7 +504,7 @@ function generateChordTable() {
             const root = chromaticScale[rootIndex % 12];
 
             for (let inversion = formula.length - 1; inversion >= 0; inversion--) {
-                const chordNotes = getInversionNotes(rootIndex % 12, formula, inversion);
+                const chordNotes = getInversionNotes(rootIndex % 12, formula, inversion, chordType);
                 const key = chordNotes.notes.join(",");
                 const chordName = root + chordType + (inversionNames[inversion] ?? ` (${inversion + 1}th inv)`);
                 const result = {
@@ -627,6 +632,7 @@ function chordProcess(loop, chordArray) {
     }
 }
 registerSetting("ChordMacros", true);
+registerSetting("ChordMacrosStability", 100);
 addEventListener("keydown", (e) => {
     if ((e.key === "`" || e.key === "~") && settings.ChordMacros && !e.altKey && !e.shiftKey && !e.metaKey && !e.repeat) {
         e.preventDefault();
@@ -671,7 +677,8 @@ function drawChordMacros(loop) {
         }, false)
     }).forEach((ent) => {
         const size = chordData.values.length;
-        const chord = Object.values(reverseChordLookup).filter(
+        const sizeCutoff = size >= 3 ? 3 : size;
+        const chordOptions = Object.values(reverseChordLookup).filter(
             x => x.notes.isSubsetOf(gui.acceptedNotes)
                 && ent[1].returns.reduce((acc, v) => {
                     if (acc) {
@@ -685,8 +692,9 @@ function drawChordMacros(loop) {
                     }
                     return match && searchFn.apply(x.type, [parts[1]]);
                 }, false)
-                && x.values.length === size
-        ).reverse()?.[0];
+                && x.values.length >= sizeCutoff
+        ).reverse();
+        const chord = chordOptions?.[Math.floor(Math.pow(0.5, settings.ChordMacrosStability) * chordOptions.length)];
         if (!chord) {
             return //console.warn("Missing chord for ", ent);
         }
@@ -702,7 +710,7 @@ function drawChordMacros(loop) {
         });
         const macroBadge = document.createElement("ins");
         macroBadge.classList.add("chordMacro");
-        macroBadge.innerText = `(${reverseChordIndexMap[chord.root]}${chord.values.length}) ` + ent[0];
+        macroBadge.innerHTML = `<code>${chord.type}</code> <code>${reverseChordIndexMap[chord.root]}${chord.values.length}</code> ` + ent[0];
         macroBadge.addEventListener("mouseover", async (e) => {
             if (macroBadge.processing) {
                 return;
