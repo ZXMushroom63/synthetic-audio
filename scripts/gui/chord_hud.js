@@ -275,6 +275,14 @@ const chordMacros = {
     SnazzyB: {
         applies: ["III+min"],
         returns: ["IV+maj"]
+    },
+    SighResolve: {
+        applies: ["II+min"],
+        returns: ["I+maj"]
+    },
+    SevenResolve: {
+        applies: ["VII+7"],
+        returns: ["I^7"]
     }
 };
 
@@ -283,6 +291,8 @@ importStepChordMacro("RagtimeStep%s", ["III^7", "VI^7", "II^7", "V^7"]);
 importStepChordMacro("RomanescaStep%s", ["III+maj", "VII+maj", "i+min", "V+maj", "III+maj", "VII+maj", "i+min", "V+maj", "i+min"]);
 importStepChordMacro("CircleStep%s", ["vi+min", "ii+min", "V+maj", "I+maj"]);
 importStepChordMacro("TurnaroundStep%s", ["V+maj", "IV+maj", "I+maj"]);
+importStepChordMacro("ChromaDescent%s", ["II^7b5", "VII^7", "VII^7b5", "I+add9"]);
+importStepChordMacro("Wandering%s", ["IV+maj7", "ii^9", "III^7b5", "V^9", "I+maj7"]);
 
 
 function importStepChordMacro(name, steps) {
@@ -519,14 +529,20 @@ function updateChordHudDatalist() {
     const possibilities = Object.entries(reverseChordLookup);
     possibilities.reverse();
 
+    const scale = [...gui.acceptedNotes];
+
     for (const chordType of possibilities) {
         if (gui.acceptedNotes && gui.autocorrect !== "OFF" && !chordType[1].notes.isSubsetOf(gui.acceptedNotes)) {
             continue;
         }
 
         const opt = document.createElement("option");
-        opt.value = chordType[0];
+        opt.value = chordType[0];    
         opt.innerText = "Spread: " + chordType[1].range + "; Notes: " + chordType[1].values.length;
+        if (gui.autocorrect !== "OFF") {
+            opt.innerText = (scale.includes(chordType[1].root) ? romanize(((scale.indexOf(chordType[1].root) + 1) % scale.length) + 1) : "")
+                            + " - " +  opt.innerText;
+        }
         datalist.appendChild(opt);
     }
     document.head.appendChild(datalist);
