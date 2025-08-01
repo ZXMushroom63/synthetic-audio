@@ -98,6 +98,14 @@ addEventListener("init", () => {
         gui.acceptedNotes = new Set(accepted);
 
         scaleDisp.innerText = text;
+
+        scaleDisp.innerHTML += "<br><br>";
+        scaleDisp.innerHTML += `<span style="color:lime">Tonic: ${accepted[accepted.length - 1]}</span><br>`;
+        if (accepted.length > 5) {
+            scaleDisp.innerHTML += `<span style="color:lightblue">Subdominant: ${accepted[2]}</span><br>`;
+        }
+        scaleDisp.innerHTML += `<span style="color:red">Dominant: ${accepted[3]}</span>`;
+
         var spp_text = "sp_loopdata::" + JSON.stringify([{
             "conf": {
                 "Text": text.split("\n")[1]
@@ -162,7 +170,28 @@ addEventListener("init", () => {
     });
     function updateLoopHighlight(loop) {
         if (!loop._netIngore && loop.theoryNote) {
-            if ((scaleAutocorrect.value === "OFF") || gui.acceptedNotes.has(loop.theoryNote.substring(0, loop.theoryNote.length - 1))) {
+            const scale = [...gui.acceptedNotes];
+            const note = loop.theoryNoteNormalised;
+            loop.romanNumeral = scale.includes(note) ? romanize(((scale.indexOf(note) + 1) % scale.length) + 1) : "U";
+            const noteDisplay = loop.querySelector(".noteDisplay");
+            if (noteDisplay) {
+                switch (note) {
+                    case scale[3]:
+                        noteDisplay.style.color = "rgba(255, 198, 208, 1)";
+                        break;
+                    case scale[2]:
+                        if (scale.length > 5)
+                            noteDisplay.style.color = "rgba(128, 172, 255, 1)";
+                            break;
+                    case gui.key:
+                        noteDisplay.style.color = "rgb(128,255,128)";
+                        break;
+                    default:
+                        noteDisplay.style.color = "white";
+                        break;
+                }
+            }
+            if ((scaleAutocorrect.value === "OFF") || gui.acceptedNotes.has(note)) {
                 loop.removeAttribute("data-bad-note");
             } else {
                 loop.setAttribute("data-bad-note", "yes");

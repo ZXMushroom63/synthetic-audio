@@ -48,6 +48,7 @@ addBlockType("p_waveform_plus", {
         "SlideOverrideSmoothing": [true, "checkbox"],
         "SlideWavetable": ["(none)", ["(none)"]],
         "SlidePhaseData": ["0", "textarea"],
+        "SlideStateData": ["good", "text"],
         "Absolute": [false, "checkbox"],
         "Multiply": [false, "checkbox"],
         "Sidechain": [false, "checkbox"],
@@ -106,6 +107,7 @@ addBlockType("p_waveform_plus", {
             "SlideWavetable",
             "SlideOverrideSmoothing",
             "SlidePhaseData",
+            "SlideStateData"
         ]
     },
     selectMiddleware: (key) => {
@@ -130,6 +132,10 @@ addBlockType("p_waveform_plus", {
         velocity: "Amplitude",
         zero: ["InternalSemiOffset", "SemitonesOffset"],
         useHitNote: true,
+    },
+    specialAction: (loop) => {
+        loop.conf.IsSlide = !loop.conf.IsSlide;
+        return true;
     },
     zscroll: (loop, value) => {
         loop.conf.InternalSemiOffset += value;
@@ -166,12 +172,10 @@ addBlockType("p_waveform_plus", {
             loop.querySelector("[data-key=Harmonics]").checked = false;
         }
         updateNoteDisplay(loop);
-        if (loop.conf.IsSlide) {
-            try {
-                slideNoteHandler(loop);
-            } catch(e) {
-
-            }
+        try {
+            slideNoteHandler(loop);
+        } catch (e) {
+            //swallow
         }
     },
     guessEndPhase: function (duration) {
@@ -196,7 +200,7 @@ addBlockType("p_waveform_plus", {
 
         const uDetuneHz = _(this.conf.uDetuneHz);
         const uPhase = _(this.conf.uPhase);
-        const semitones = _(this.conf.HarmonicsSemitoneOffset);        
+        const semitones = _(this.conf.HarmonicsSemitoneOffset);
         const finalPhases = new Array(waveCount);
 
         const phaseData = this.conf.SlidePhaseData.split(",").map(x => parseFloat(x));
@@ -458,6 +462,12 @@ addBlockType("p_waveform_plus", {
 });
 function slideNoteHandler(l) {
     if (!l.conf.IsSlide) {
+        if (l.conf.SlideStateData === "reset") {
+            l.conf.Frequency = ":" + l.theoryNote + ":";
+            l.conf.InternalSemiOffset = 0;
+            l.conf.SemitonesOffset = "0";
+            l.conf.SlideStateData === "good";
+        }
         return;
     }
     const slideTarget = findLoops(`.loop:not([data-deleted])[data-editlayer="${l.getAttribute("data-editlayer")}"][data-layer="${l.getAttribute("data-layer")}"][data-start="${parseFloat(l.getAttribute("data-start")) + parseFloat(l.getAttribute("data-duration"))}"]:has(.noteDisplay)`);
@@ -466,6 +476,7 @@ function slideNoteHandler(l) {
         l.conf.SemitonesOffset = "0";
         l.conf.InternalSemiOffset = 0;
         l.conf.Frequency = `:${l.theoryNote}:`;
+        l.conf.SlideStateData = "reset";
         if (oldFreq !== l.conf.Frequency) {
             markLoopDirty(l);
         }
@@ -474,6 +485,7 @@ function slideNoteHandler(l) {
     const oldFreq = l.conf.Frequency;
     l.conf.SemitonesOffset = "0";
     l.conf.InternalSemiOffset = 0;
+    l.conf.SlideStateData = "reset";
     var mapper = l.conf.SlideExponent;
     if (custom_waveforms[l.conf.SlideWavetable]) {
         mapper = "!" + l.conf.SlideWavetable;

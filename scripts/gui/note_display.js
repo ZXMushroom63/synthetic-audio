@@ -13,7 +13,9 @@ function updateNoteDisplay(loop) {
     const note = frequencyToNote(f);
     loop.theoryNote = note;
     loop.midiNote = freq2midi(f);
-    loop.theoryNoteNormalised = note.substring(0, note.length - 1);
+    loop.theoryNoteNormalised = indexToChromatic(loop.midiNote % 12);
+    loop.theoryNoteNormalised ||= "U0";
+    loop.theoryNoteNormalised = loop.theoryNoteNormalised.substring(0, loop.theoryNoteNormalised.length - 1);
     loop.hitFrequency = f;
     loop.querySelector(".noteDisplay").innerText = loop.theoryNote;
 }
