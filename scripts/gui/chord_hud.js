@@ -283,6 +283,10 @@ const chordMacros = {
     SevenResolve: {
         applies: ["VII+7"],
         returns: ["I^7"]
+    },
+    OkieProgressor: {
+        applies: ["II"],
+        returns: ["IV"]
     }
 };
 
@@ -537,11 +541,11 @@ function updateChordHudDatalist() {
         }
 
         const opt = document.createElement("option");
-        opt.value = chordType[0];    
+        opt.value = chordType[0];
         opt.innerText = "Spread: " + chordType[1].range + "; Notes: " + chordType[1].values.length;
         if (gui.autocorrect !== "OFF") {
             opt.innerText = (scale.includes(chordType[1].root) ? romanize(((scale.indexOf(chordType[1].root) + 1) % scale.length) + 1) : "")
-                            + " - " +  opt.innerText;
+                + " - " + opt.innerText;
         }
         datalist.appendChild(opt);
     }
@@ -645,6 +649,9 @@ function drawChordMacros(loop) {
     const chordIndexMap = Object.fromEntries([...gui.acceptedNotes].map((x, i) => {
         return [romanize(((i + 1) % gui.acceptedNotes.size) + 1), x];
     }));
+    const reverseChordIndexMap = Object.fromEntries([...gui.acceptedNotes].map((x, i) => {
+        return [x, romanize(((i + 1) % gui.acceptedNotes.size) + 1)];
+    }));
     Object.entries(chordMacros).filter(ent => {
         return ent[1].applies.reduce((acc, v) => {
             if (acc) {
@@ -691,7 +698,7 @@ function drawChordMacros(loop) {
         });
         const macroBadge = document.createElement("ins");
         macroBadge.classList.add("chordMacro");
-        macroBadge.innerText = ent[0];
+        macroBadge.innerText = `(${reverseChordIndexMap[chord.root]}${chord.values.length}) ` + ent[0];
         macroBadge.addEventListener("mouseover", async (e) => {
             if (macroBadge.processing) {
                 return;

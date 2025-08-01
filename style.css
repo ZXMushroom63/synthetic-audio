@@ -801,7 +801,7 @@ button:hover .addModifierDiv {
 }
 
 ins.chordMacro {
-  width: 9rem;
+  width: 10rem;
   display: block;
   background-color: rgba(255, 255, 255, 0.2);
   position: relative;
