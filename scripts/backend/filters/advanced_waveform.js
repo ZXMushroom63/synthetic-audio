@@ -43,6 +43,7 @@ addBlockType("p_waveform_plus", {
         "uPan": [0.0, "number", 1],
         "uPhase": [0.0, "number", 1],
         "uRandomisePhase": [true, "checkbox"],
+        "uRandomisePan": [false, "checkbox"],
         "IsSlide": [false, "checkbox"],
         "SlideExponent": [9, "number"],
         "SlideOverrideSmoothing": [true, "checkbox"],
@@ -99,7 +100,8 @@ addBlockType("p_waveform_plus", {
             "uDetuneHz",
             "uPan",
             "uPhase",
-            "uRandomisePhase"
+            "uRandomisePhase",
+            "uRandomisePan"
         ],
         "Slide": [
             "IsSlide",
@@ -312,6 +314,11 @@ addBlockType("p_waveform_plus", {
             wcPhases[i] = (cyrb53a_beta("" + i, 0) / 100) % 1;
         });
 
+        const wcPanValues = new Float32Array(waveCount);
+        wcPanValues.forEach((x, i) => {
+            wcPanValues[i] = (cyrb53a_beta("pan" + i, 0) / 100) % 2 - 1;
+        });
+
         const phaseData = this.conf.SlidePhaseData.split(",").map(x => parseFloat(x));
 
         inPcm.forEach((x, i) => {
@@ -365,7 +372,7 @@ addBlockType("p_waveform_plus", {
                     if ((waveCount % 2) === 0 && !this.conf.uAmplitudeConstant) {
                         volumeRatio -= 0.5;
                     }
-                    var panValue = panAmount * Math.trunc(detunePosition);
+                    var panValue = this.conf.uRandomisePan ? wcPanValues[h] * panAmount : (panAmount * Math.trunc(detunePosition));
                     var left = Math.min(1 - panValue, 1);
                     var right = Math.min(1 + panValue, 1);
                     if (channel === 0) {
