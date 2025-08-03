@@ -472,10 +472,6 @@ registerVanillaChords();
 
 const inversionNames = ["", " (1st inv)", " (2nd inv)", " (3rd inv)"];
 function getInversionNotes(rootIndex, formula, inversion, debugType) {
-    const isDebugTarget = inversion === 5 && debugType === "maj13" && rootIndex === 0;
-    if (isDebugTarget) {
-        debugger;
-    }
     const n = formula.length;
     let notes = [];
     let values = [];
@@ -661,7 +657,7 @@ function drawChordMacros(loop) {
     const reverseChordIndexMap = Object.fromEntries([...gui.acceptedNotes].map((x, i) => {
         return [x, romanize(((i + 1) % gui.acceptedNotes.size) + 1)];
     }));
-    Object.entries(chordMacros).filter(ent => {
+    const entries = Object.entries(chordMacros).filter(ent => {
         return ent[1].applies.reduce((acc, v) => {
             if (acc) {
                 return acc;
@@ -674,7 +670,18 @@ function drawChordMacros(loop) {
             }
             return match && searchFn.apply(chordData.type, [parts[1]]);
         }, false)
-    }).forEach((ent) => {
+    });
+
+    const usedNumbers = entries.map(ent => ent[1].returns.length === 1 ? ent[1].returns[0].split("+")[0].split("^")[0] : null).filter(x => !!x);
+    const unusedChords = Object.keys(chordIndexMap);
+    usedNumbers.forEach((n) => {
+        if (unusedChords.includes(n)) {
+            unusedChords.splice(unusedChords.indexOf(n), 1);
+        }
+    });
+    entries.push(...unusedChords.map(x => ["<span style='color:#fe1f6f'>UnstableX</span> from <code>" + loop.romanNumeral.toUpperCase() + "</code>", { applies: [], returns: [x] }]));
+
+    entries.forEach((ent) => {
         const size = chordData.values.length;
         const sizeCutoff = size >= 3 ? 3 : size;
         const chordOptions = Object.values(reverseChordLookup).filter(
@@ -709,7 +716,7 @@ function drawChordMacros(loop) {
         });
         const macroBadge = document.createElement("ins");
         macroBadge.classList.add("chordMacro");
-        macroBadge.innerHTML = `<code>${chord.type}</code> <code>${reverseChordIndexMap[chord.root]}${chord.values.length}</code> ` + ent[0];
+        macroBadge.innerHTML = `<code>${chord.type}</code>${chord.inversion !== 0 ? ` <code>i${chord.inversion}</code>` : ""} <code>${reverseChordIndexMap[chord.root]}</code> <code>${chord.values.length}</code> ` + ent[0];
         macroBadge.addEventListener("mouseover", async (e) => {
             if (macroBadge.processing) {
                 return;
