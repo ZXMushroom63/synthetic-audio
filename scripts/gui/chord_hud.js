@@ -673,7 +673,7 @@ function drawChordMacros(loop) {
     });
 
     const usedNumbers = entries.map(ent => ent[1].returns.length === 1 ? ent[1].returns[0].split("+")[0].split("^")[0] : null).filter(x => !!x);
-    const unusedChords = Object.keys(chordIndexMap);
+    const unusedChords = Object.keys(chordIndexMap).filter(x => x.toUpperCase() !== loop.romanNumeral.toUpperCase());
     usedNumbers.forEach((n) => {
         if (unusedChords.includes(n)) {
             unusedChords.splice(unusedChords.indexOf(n), 1);
