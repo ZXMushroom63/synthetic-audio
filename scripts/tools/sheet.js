@@ -184,8 +184,8 @@ addEventListener("init", () => {
     function renderSheet() {
         const parsedNotes = sheetTargets.map(x => ({
             midi: chromaticToIndex(x.theoryNote) + 12,
-            startTime: quantise(x.start / audio.beatSize, 0.125),
-            duration: quantise(x.duration / audio.beatSize, 0.125),
+            startTime: timeQuantise(x.start / audio.beatSize, 0.125),
+            duration: timeQuantise(x.duration / audio.beatSize, 0.125),
             name: x.theoryNote
         }));
         parsedNotes.sort((a, b) => a.startTime - b.startTime);

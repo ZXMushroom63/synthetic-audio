@@ -72,9 +72,9 @@ function serialiseNode(node, forRender, forMultiplayer) {
     } else {
         delete out.conf.uuid;
     }
-    out.start = parseFloat(node.getAttribute("data-start")) || 0;
-    out.duration = parseFloat(node.getAttribute("data-duration")) || 0;
-    out.end = out.start + out.duration;
+    out.start = timeQuantise(parseFloat(node.getAttribute("data-start"))) || 0;
+    out.duration = timeQuantise(parseFloat(node.getAttribute("data-duration"))) || 0;
+    out.end = timeQuantise(out.start + out.duration);
     out.layer = parseFloat(node.getAttribute("data-layer")) || 0;
     out.file = node.getAttribute("data-file") || "";
     out.type = node.getAttribute("data-type");
