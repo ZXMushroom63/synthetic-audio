@@ -29,7 +29,7 @@ addBlockType("autotune", {
         const modulatorPcm = inPcm;
         const frameSize = this.conf.FFTSize;
         const hopSize = this.conf.HopSize;
-        
+
 
         const fft = new FFTJS(frameSize);
         const out = new Float32Array(modulatorPcm.length);
@@ -42,10 +42,12 @@ addBlockType("autotune", {
 
         const modComplex = fft.createComplexArray();
         const timeDomain = fft.createComplexArray();
+        const previousPhases = new Float32Array(frameSize / 2);
+        const expectedPhaseAdvance = 2 * Math.PI * hopSize / frameSize;
         for (let pos = 0; pos + frameSize <= modulatorPcm.length; pos += hopSize) {
             const noteFreq = _(this.conf.Note)(pos, inPcm);
             const modFrameRaw = modulatorPcm.slice(pos, pos + frameSize).map((v, i) => v * window[i]);
-            
+
             fft.realTransform(modComplex, modFrameRaw);
             fft.completeSpectrum(modComplex);
             let maxMagnitude = 0;
@@ -64,10 +66,34 @@ addBlockType("autotune", {
 
 
             const fundamental = fundamentalBinIndex * frequencyResolution;
-            const delta = noteFreq - fundamental;
-            rotateArray(modComplex, Math.floor(delta / frequencyResolution) * 2, true);
-            
-            fft.inverseTransform(timeDomain, modComplex);
+            const delta = noteFreq / fundamental / 2;
+
+
+            const shiftedComplex = fft.createComplexArray();
+            for (let i = 1; i < frameSize / 2; i++) {
+                const srcReal = modComplex[2 * i];
+                const srcImag = modComplex[2 * i + 1];
+
+                const dstBinFloat = i * delta;
+                const dstBinFloor = Math.floor(dstBinFloat);
+                const dstBinCeil = Math.ceil(dstBinFloat);
+                const weightCeil = dstBinFloat - dstBinFloor;
+                const weightFloor = 1 - weightCeil;
+
+                if (dstBinFloor < frameSize / 2) {
+                    shiftedComplex[2 * dstBinFloor] += srcReal * weightFloor;
+                    shiftedComplex[2 * dstBinFloor + 1] += srcImag * weightFloor;
+                }
+                if (dstBinCeil < frameSize / 2) {
+                    shiftedComplex[2 * dstBinCeil] += srcReal * weightCeil;
+                    shiftedComplex[2 * dstBinCeil + 1] += srcImag * weightCeil;
+                }
+            }
+
+
+            //rotateArray(modComplex, Math.floor(delta / frequencyResolution) * 2, true);
+
+            fft.inverseTransform(timeDomain, shiftedComplex);
             const real = fft.fromComplexArray(timeDomain);
 
 
