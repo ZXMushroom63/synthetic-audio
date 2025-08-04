@@ -2,6 +2,9 @@ function pickupLoop(loop, natural = false) {
     if (loop.classList.contains("deactivated") || loop.hasAttribute("data-deleted")) {
         return;
     }
+    if (document.activeElement instanceof HTMLElement) {
+        document.activeElement.blur();
+    }
     loop.classList.add("active");
     loop.setAttribute("data-new-layer", loop.getAttribute("data-layer"));
     loop.setAttribute("data-new-start", loop.getAttribute("data-start"));
