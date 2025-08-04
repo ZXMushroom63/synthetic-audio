@@ -683,7 +683,7 @@ function drawChordMacros(loop) {
             unusedChords.splice(unusedChords.indexOf(n), 1);
         }
     });
-    entries.push(...unusedChords.map(x => ["<span style='color:#fe1f6f'>UnstableX</span> from <code>" + loop.romanNumeral.toUpperCase() + "</code>", { applies: [], returns: [x] }]));
+    entries.push(...unusedChords.map(x => [`<span style='color:#fe1f6f'>${x.toUpperCase() === loop.romanNumeral.toUpperCase() ? "InvertX" : "UnstableX"}</span> from <code>` + loop.romanNumeral.toUpperCase() + "</code>", { applies: [], returns: [x] }]));
 
     const octaveOffset = 12 * (Math.min(...loop.relatedChord.map(x => getChromaticOctave(x.theoryNote))));
 
