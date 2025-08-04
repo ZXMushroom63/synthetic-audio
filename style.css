@@ -227,7 +227,7 @@ html[data-libsettings-OpaqueLayers="true"] .loop.deactivated {
 
 .loopInternal span.handleLeft {
   left: 0;
-  z-index: 0;
+  z-index: 2;
   border-radius: 0.5rem 0px 0px 0.5rem;
 }
 
