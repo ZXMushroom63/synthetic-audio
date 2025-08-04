@@ -608,6 +608,7 @@ function getChordStack(loop, allowAtonal) {
 }
 
 function chordProcess(loop, chordArray) {
+    [...loop.querySelectorAll("ins.chordMacro")].forEach(e => e.remove());
     if (!chordArray) {
         var loops = getChordStack(loop);
         loop.relatedChord = loops;
@@ -722,6 +723,7 @@ function drawChordMacros(loop) {
             return //console.warn("Missing chord for ", ent);
         }
         const template = serialiseNode(loop.relatedChord[0]);
+        template.start += template.duration;
 
         rendereableMacros.push({
             side: "right",
