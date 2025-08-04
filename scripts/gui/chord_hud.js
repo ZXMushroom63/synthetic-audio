@@ -508,6 +508,7 @@ function generateChordTable() {
                     root: root,
                     type: chordType,
                     inversion: inversion,
+                    uninvertedHash: cyrb53(root + ";" + chordType),
                     notes: new Set(chordNotes.notes),
                     values: chordNotes.values,
                     range: Math.max(...chordNotes.values) - Math.min(...chordNotes.values)
@@ -646,7 +647,6 @@ function drawChordMacros(loop) {
     }
     addEventListener("mousedown", unfocusHandler);
     [...document.querySelectorAll("ins.chordMacro")].forEach(e => e.remove());
-    const rightHandle = loop.querySelector(".loopInternal span.handleRight");
     const chordData = getChordTypeFromStack(loop.relatedChord);
     if (!chordData) {
         return;
@@ -657,6 +657,10 @@ function drawChordMacros(loop) {
     const reverseChordIndexMap = Object.fromEntries([...gui.acceptedNotes].map((x, i) => {
         return [x, romanize(((i + 1) % gui.acceptedNotes.size) + 1)];
     }));
+
+    const rightHandle = loop.querySelector(".loopInternal span.handleRight");
+    const leftHandle = loop.querySelector(".loopInternal span.handleLeft");
+
     const entries = Object.entries(chordMacros).filter(ent => {
         return ent[1].applies.reduce((acc, v) => {
             if (acc) {
@@ -673,7 +677,7 @@ function drawChordMacros(loop) {
     });
 
     const usedNumbers = entries.map(ent => ent[1].returns.length === 1 ? ent[1].returns[0].split("+")[0].split("^")[0] : null).filter(x => !!x);
-    const unusedChords = Object.keys(chordIndexMap).filter(x => x.toUpperCase() !== loop.romanNumeral.toUpperCase());
+    const unusedChords = Object.keys(chordIndexMap);
     usedNumbers.forEach((n) => {
         if (unusedChords.includes(n)) {
             unusedChords.splice(unusedChords.indexOf(n), 1);
@@ -681,11 +685,24 @@ function drawChordMacros(loop) {
     });
     entries.push(...unusedChords.map(x => ["<span style='color:#fe1f6f'>UnstableX</span> from <code>" + loop.romanNumeral.toUpperCase() + "</code>", { applies: [], returns: [x] }]));
 
+    const octaveOffset = 12 * (Math.min(...loop.relatedChord.map(x => getChromaticOctave(x.theoryNote))));
+
+    const rendereableMacros = [];
+    /*
+    {
+        side: "left"|"right",
+        chord: ChordData,
+        text: string,
+        template: SerialisedLoop
+    }
+    */
+
     entries.forEach((ent) => {
         const size = chordData.values.length;
         const sizeCutoff = size >= 3 ? 3 : size;
         const chordOptions = Object.values(reverseChordLookup).filter(
             x => x.notes.isSubsetOf(gui.acceptedNotes)
+                && (x.uninvertedHash !== chordData.uninvertedHash || x.inversion !== chordData.inversion)
                 && ent[1].returns.reduce((acc, v) => {
                     if (acc) {
                         return acc;
@@ -704,9 +721,35 @@ function drawChordMacros(loop) {
         if (!chord) {
             return //console.warn("Missing chord for ", ent);
         }
-        const octaveOffset = 12 * (Math.min(...loop.relatedChord.map(x => getChromaticOctave(x.theoryNote))));
         const template = serialiseNode(loop.relatedChord[0]);
-        template.start += template.duration;
+
+        rendereableMacros.push({
+            side: "right",
+            chord: chord,
+            text: `<code>${chord.type}</code>${chord.inversion !== 0 ? ` <code>i${chord.inversion}</code>` : ""} <code>${reverseChordIndexMap[chord.root]}</code> <code>${chord.values.length}</code> ` + ent[0],
+            template: template,
+            octaveOffset: octaveOffset
+        });
+    });
+
+    const loopChordHash = chordData.uninvertedHash;
+    const invertedChords = Object.entries(reverseChordLookup).filter(ent => ent[1].uninvertedHash === loopChordHash).sort((a, b) => a[1].inversion - b[1].inversion).sort((a, b) => a[1].range - b[1].range);
+    invertedChords.forEach((ent, i) => {
+        const template = serialiseNode(loop.relatedChord[0]);
+
+        const chord = ent[1];
+        rendereableMacros.push({
+            side: "left",
+            chord: chord,
+            text: `<code>${reverseChordIndexMap[chord.root]}</code> <code>${chord.range}</code> ${chord.inversion === 0 ? "<span style='color:skyblue'>OriginalX</span>" : "InversionX " + chord.inversion} ${i === 0 ? " (Smallest)" : ""}`,
+            template: template,
+            octaveOffset: octaveOffset
+        });
+    });
+
+
+    rendereableMacros.forEach(renderData => {
+        const { text, template, octaveOffset, chord, side } = renderData;
         const unrealisedChords = chord.values.map((v, i) => {
             const dt = structuredClone(template);
             var freq = `:${indexToChromatic(octaveOffset + v)}:`;
@@ -716,7 +759,7 @@ function drawChordMacros(loop) {
         });
         const macroBadge = document.createElement("ins");
         macroBadge.classList.add("chordMacro");
-        macroBadge.innerHTML = `<code>${chord.type}</code>${chord.inversion !== 0 ? ` <code>i${chord.inversion}</code>` : ""} <code>${reverseChordIndexMap[chord.root]}</code> <code>${chord.values.length}</code> ` + ent[0];
+        macroBadge.innerHTML = text;
         macroBadge.addEventListener("mouseover", async (e) => {
             if (macroBadge.processing) {
                 return;
@@ -743,13 +786,16 @@ function drawChordMacros(loop) {
             e.stopPropagation();
             e.preventDefault();
 
+            if (side === "left") {
+                loop.relatedChord.forEach(deleteLoop);
+            }
             unrealisedChords.forEach((dt) => {
                 const newLoop = deserialiseNode(dt, true);
                 hydrateLoopPosition(newLoop);
             });
             unfocusHandler();
         });
-        rightHandle.appendChild(macroBadge);
+        (side === "left" ? leftHandle : rightHandle).appendChild(macroBadge);
     });
 }
 function chordDisplayEdit(display, e, loop) {

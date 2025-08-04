@@ -821,6 +821,12 @@ ins.chordMacro {
   z-index: 1200;
 }
 
+.handleLeft ins.chordMacro {
+  width: 10rem;
+  right: 10.75rem;
+  left: unset;
+}
+
 .noteDisplay,
 .genericDisplay {
   font: bold 2.5rem monospace;
