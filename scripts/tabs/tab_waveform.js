@@ -800,6 +800,14 @@ addEventListener("init", () => {
     });
 
     addEventListener("preserialisenode", (e) => {
+        if ((e.detail.node.getAttribute("data-type") === "gzsynth")) {
+            for (i = 0; i < gz_synth_voicecount; i++) {
+                if (e.detail.node.conf[`Voice${i + 1}UseCustomWaveform`] && custom_waveforms[e.detail.node.conf[`Voice${i + 1}WaveformAsset`]]?.dirty) {
+                    forceLoopDirty(e.detail.node);
+                    return;
+                }
+            }
+        }
         if ((e.detail.node.getAttribute("data-type") === "p_waveform_plus") && e.detail.node.conf.UseCustomWaveform && (custom_waveforms[e.detail.node.conf.WaveformAsset]?.dirty || custom_waveforms[e.detail.node.conf.WaveformAsset2]?.dirty)) {
             forceLoopDirty(e.detail.node);
             return;

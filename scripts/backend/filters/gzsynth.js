@@ -1,5 +1,5 @@
+const gz_synth_voicecount = 4;
 (function GzSynth() {
-    const gz_synth_voicecount = 4;
     const adsr_dynamic_keys = [];
     const gzsynth = {
         color: "rgba(0, 255, 255, 0.3)",
@@ -54,7 +54,12 @@
                     const panVal = panLFO(i, inPcm);
                     const panVolMult = (channel === 0) ? (1 - Math.max(0, panVal)) : (1 + Math.min(0, panVal));
                     time[v] += dt * freq * Math.pow(2, semiLFO(i, inPcm) / 12);
-                    out[i] += waveforms[this.conf[`Voice${v + 1}WaveType`]](time[v]) * drive * adsr * decay * panVolMult;
+                    time[v] %= 1;
+                    if (this.conf[`Voice${v + 1}UseCustomWaveform`]) {
+                        out[i] += -1 * custom_waveforms[this.conf[`Voice${v + 1}WaveformAsset`]].calculated[Math.floor((time[v]) * WAVEFORM_RES) % WAVEFORM_RES] * drive * adsr * decay * panVolMult;
+                    } else {
+                        out[i] += waveforms[this.conf[`Voice${v + 1}WaveType`]](time[v]) * drive * adsr * decay * panVolMult;
+                    }
                 }
             });
             const self = this;
@@ -102,6 +107,11 @@
         initMiddleware: (loop) => {
             initNoteDisplay(loop);
             addChordDisplay(loop);
+        },
+        selectMiddleware: (key) => {
+            if (key.endsWith("WaveformAsset")) {
+                return ["(none)", ...Object.keys(custom_waveforms)];
+            }
         },
         updateMiddleware: (loop) => {
             updateNoteDisplay(loop);
@@ -174,7 +184,9 @@
         gzsynth.configs[`Voice${i + 1}WaveType`] = ["sin", ["sin", "triangle", "sawtooth", "square"]];
         gzsynth.configs[`Voice${i + 1}SemiOffset`] = [0, "number", 1];
         gzsynth.configs[`Voice${i + 1}Pan`] = [0, "number", 1];
-        gzsynth.dropdowns[`Voice${i + 1}`] = ["Drive", "WaveType", "SemiOffset", "Pan"].map(x => `Voice${i + 1}` + x);
+        gzsynth.configs[`Voice${i + 1}UseCustomWaveform`] = [false, "checkbox"];
+        gzsynth.configs[`Voice${i + 1}WaveformAsset`] = ["(none)", ["(none)"]];
+        gzsynth.dropdowns[`Voice${i + 1}`] = ["Drive", "WaveType", "SemiOffset", "Pan", "UseCustomWaveform", "WaveformAsset"].map(x => `Voice${i + 1}` + x);
     }
     gzsynth.configs.Filter = [false, "checkbox"];
     gzsynth.configs.FilterType = ["lowpass", ["lowpass", "highpass", "lowshelf", "bandpass", "highshelf", "peaking", "notch", "allpass"]];
