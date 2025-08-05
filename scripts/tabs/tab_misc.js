@@ -169,11 +169,11 @@ addEventListener("init", () => {
         updateScales();
     });
     function updateLoopHighlight(loop) {
-        if (!loop._netIngore && loop.theoryNote) {
+        const noteDisplay = loop.querySelector(".noteDisplay");
+        const note = loop.theoryNoteNormalised;
+        if (!loop._netIngore && noteDisplay && (gui.autocorrect !== "OFF")) {
             const scale = [...gui.acceptedNotes];
-            const note = loop.theoryNoteNormalised;
             loop.romanNumeral = scale.includes(note) ? romanize(((scale.indexOf(note) + 1) % scale.length) + 1) : "U";
-            const noteDisplay = loop.querySelector(".noteDisplay");
             if (noteDisplay) {
                 switch (note) {
                     case scale[3]:
@@ -182,7 +182,7 @@ addEventListener("init", () => {
                     case scale[2]:
                         if (scale.length > 5)
                             noteDisplay.style.color = "rgba(128, 172, 255, 1)";
-                            break;
+                        break;
                     case gui.key:
                         noteDisplay.style.color = "rgb(128,255,128)";
                         break;
@@ -191,11 +191,16 @@ addEventListener("init", () => {
                         break;
                 }
             }
-            if ((scaleAutocorrect.value === "OFF") || gui.acceptedNotes.has(note)) {
-                loop.removeAttribute("data-bad-note");
-            } else {
-                loop.setAttribute("data-bad-note", "yes");
+        }
+        if ((gui.autocorrect === "OFF") || gui.acceptedNotes.has(note)) {
+            loop.removeAttribute("data-bad-note");
+            if (noteDisplay && (gui.autocorrect === "OFF")) {
+                loop.querySelector(".noteDisplay").style.color = "white";
             }
+        } else if (noteDisplay) {
+            loop.setAttribute("data-bad-note", "yes");
+        } else {
+            loop.removeAttribute("data-bad-note");
         }
     }
 
@@ -406,7 +411,7 @@ addEventListener("init", () => {
     const remoteMultiplayerConnect = document.createElement("button");
     remoteMultiplayerConnect.innerText = "Connect";
     registerSetting("AutoReconnect", true);
-    
+
     if (!params.has("multiplayer")) {
         remoteMultiplayerConnect.addEventListener("click", () => {
             var server = prompt("Specify the SYNTHETIC Audio server to connect to: ", "http://my-server.hosting-service.com");
@@ -563,7 +568,7 @@ addEventListener("init", () => {
             });
             entryItem.appendChild(suffixInput);
             entryItem.appendChild(document.createElement("br"));
-            
+
             label = document.createElement("label");
             label.innerText = "Semitone Offsets: ";
             entryItem.appendChild(label);
