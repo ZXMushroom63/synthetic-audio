@@ -340,16 +340,16 @@ function addBlock(type, start, duration, title, layer = 0, data = {}, editorValu
                 if (keymap["Shift"]) {
                     bpmInterval = 0.001;
                 }
-                pos = quantise(pos / 100 * audio.duration, bpmInterval);
+                pos = timeQuantise(pos / 100 * audio.duration, bpmInterval);
                 var newDuration = ((pos - originalStart) * 1) + originalDuration;
-                var endPos = quantise(originalStart + newDuration, bpmInterval);
+                var endPos = timeQuantise(originalStart + newDuration, bpmInterval);
 
                 newDuration = endPos - originalStart;
                 var internalWidth = newDuration * gui.zoomConstant;
                 internal.style.width = internalWidth + "vw";
                 backgroundSvg.style.width = internalWidth + "vw";
                 handleRight.style.right = `calc(-${internalWidth}vw - 1.5px)`;
-                loop.setAttribute("data-duration", newDuration);
+                loop.setAttribute("data-duration", timeQuantise(newDuration));
                 if (!multiplayer.isHooked && multiplayer.on && !loop._netIngore) {
                     multiplayer.patchLoop(loop);
                 }
@@ -365,7 +365,7 @@ function addBlock(type, start, duration, title, layer = 0, data = {}, editorValu
                     bpmInterval = 0.001;
                 }
 
-                pos = quantise(
+                pos = timeQuantise(
                     Math.min(
                         pos / 100 * audio.duration,
                         originalStart + originalDuration
@@ -374,14 +374,14 @@ function addBlock(type, start, duration, title, layer = 0, data = {}, editorValu
                 ) / audio.duration * 100;
 
                 loop.style.left = pos + "%";
-                pos = quantise(pos / 100 * audio.duration, bpmInterval);
+                pos = timeQuantise(pos / 100 * audio.duration, bpmInterval);
                 loop.setAttribute("data-start", pos);
                 var newDuration = Math.max(((originalStart - pos) * 1) + originalDuration, 0);
                 var internalWidth = newDuration * gui.zoomConstant;
                 internal.style.width = internalWidth + "vw";
                 backgroundSvg.style.width = internalWidth + "vw";
                 handleRight.style.right = `calc(-${internalWidth}vw - 1.5px)`;
-                loop.setAttribute("data-duration", newDuration);
+                loop.setAttribute("data-duration", timeQuantise(newDuration));
                 if (!multiplayer.isHooked && multiplayer.on && !loop._netIngore) {
                     multiplayer.patchLoop(loop);
                 }
@@ -418,8 +418,8 @@ function addBlock(type, start, duration, title, layer = 0, data = {}, editorValu
         //loop._ignore = true;
     }
 
-    loop.setAttribute("data-start", start);
-    loop.setAttribute("data-duration", duration);
+    loop.setAttribute("data-start", timeQuantise(start));
+    loop.setAttribute("data-duration", timeQuantise(duration));
     loop.setAttribute("data-layer", layer);
     loop.setAttribute("data-file", title);
     loop.setAttribute("data-editlayer", editorValue);
@@ -499,9 +499,9 @@ function addBlock(type, start, duration, title, layer = 0, data = {}, editorValu
                     bpmInterval = 0.001;
                 }
                 if (!loop.horizontalBlocked) {
-                    pos = quantise(pos / 100 * audio.duration, bpmInterval) / audio.duration * 100;
+                    pos = timeQuantise(pos / 100 * audio.duration, bpmInterval) / audio.duration * 100;
                     loop.style.left = pos + "%";
-                    pos = quantise(pos / 100 * audio.duration, bpmInterval);
+                    pos = timeQuantise(pos / 100 * audio.duration, bpmInterval);
                     loop.setAttribute("data-start", pos);
                 }
                 if (!loop.verticalBlocked) {

@@ -252,7 +252,7 @@ addEventListener("init", () => {
     });
     function animateMidiNote(note, node) {
         noteAnimationMap[note] = setInterval(() => {
-            node.setAttribute("data-duration", (Date.now() * midiTimescale - noteTimeMap[note]) / 1000);
+            node.setAttribute("data-duration", timeQuantise((Date.now() * midiTimescale - noteTimeMap[note]) / 1000));
             hydrateLoopPosition(node);
             hydrateLoopDecoration(node);
         }, 1000 / 15);
@@ -292,7 +292,7 @@ addEventListener("init", () => {
             if (!midiSnappingEnabled) {
                 bpmInterval = 0.01;
             }
-            ser.start = quantise(ser.start, bpmInterval);
+            ser.start = timeQuantise(ser.start, bpmInterval);
             ser.duration = 0.01;
             insertionBaseLayer = ser.layer;
 
@@ -310,7 +310,7 @@ addEventListener("init", () => {
             if (!midiSnappingEnabled) {
                 bpmInterval = 0.01;
             }
-            ser.start = quantise(ser.start, bpmInterval);
+            ser.start = timeQuantise(ser.start, bpmInterval);
             ser.layer = insertionBaseLayer + concurrentNotes;
             ser.duration = 0.01;
             lastInsertionTime = Date.now();
@@ -334,8 +334,8 @@ addEventListener("init", () => {
         if (!midiSnappingEnabled) {
             bpmInterval = 0.01;
         }
-        len = quantise(len, bpmInterval) || (audio.beatSize / gui.substepping);
-        noteMap[note].setAttribute("data-duration", len);
+        len = timeQuantise(len, bpmInterval) || (audio.beatSize / gui.substepping);
+        noteMap[note].setAttribute("data-duration", timeQuantise(len));
         hydrateLoopPosition(noteMap[note]);
         hydrateLoopDecoration(noteMap[note]);
         markLoopDirty(noteMap[note]); //trigger update to any handlers.

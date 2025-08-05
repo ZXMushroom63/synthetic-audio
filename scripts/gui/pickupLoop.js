@@ -22,9 +22,9 @@ function pickupLoop(loop, natural = false) {
         if (keymap["Shift"]) {
             bpmInterval = 0.001;
         }
-        pos = quantise(pos / 100 * audio.duration, bpmInterval) / audio.duration * 100;
+        pos = timeQuantise(pos / 100 * audio.duration, bpmInterval) / audio.duration * 100;
         loop.style.left = pos + "%";
-        pos = quantise(pos / 100 * audio.duration, bpmInterval);
+        pos = timeQuantise(pos / 100 * audio.duration, bpmInterval);
         loop.setAttribute("data-new-start", pos);
         var layer = 0;
         if (natural) {

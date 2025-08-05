@@ -61,6 +61,8 @@ addEventListener("init", () => {
                 entry.start *= audio.beatSize;
                 entry.duration *= audio.beatSize;
             }
+            entry.start = timeQuantise(entry.start, 0, true);
+            entry.duration = timeQuantise(entry.duration, 0, true);
         });
         minimisePosition(data);
         var pastedLoops = [];
