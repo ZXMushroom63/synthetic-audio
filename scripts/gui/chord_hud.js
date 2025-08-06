@@ -631,7 +631,7 @@ function chordProcess(loop, chordArray) {
 registerSetting("ChordMacros", true);
 registerSetting("ChordMacrosStability", 100);
 addEventListener("keydown", (e) => {
-    if ((e.key === "`" || e.key === "~") && settings.ChordMacros && !e.altKey && !e.metaKey && !e.repeat) {
+    if ((e.key === "`" || e.key === "~") && settings.ChordMacros && !e.altKey && !e.metaKey && !e.repeat && (e.target.tagName !== "INPUT") && (e.target.contentEditable !== "true") && (CURRENT_TAB === "TIMELINE")) {
         e.preventDefault();
         const targetLoop = document.elementFromPoint(mouse.x, mouse.y)?.closest(".loop");
         drawChordMacros(targetLoop, e.shiftKey);
