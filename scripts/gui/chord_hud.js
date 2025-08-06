@@ -639,7 +639,13 @@ addEventListener("keydown", (e) => {
 });
 function drawChordMacros(loop) {
     loop = getChordStack(loop)[0];
+    if (!loop) {
+        return;
+    }
     function unfocusHandler(event) {
+        if (!loop) {
+            removeEventListener("mousedown", unfocusHandler);
+        }
         if (event && loop.contains(event.target)) {
             return;
         }
