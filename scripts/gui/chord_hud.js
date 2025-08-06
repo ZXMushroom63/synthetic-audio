@@ -707,7 +707,8 @@ function drawChordMacros(loop, inversionsOnly) {
     if (!inversionsOnly) {
         entries.forEach((ent) => {
             const size = chordData.values.length;
-            const sizeCutoff = size >= 3 ? 3 : size;
+            const sizeCutoffMin = size >= 3 ? 3 : size;
+            const sizeCutoffMax = size >= 3 ? Infinity : size;
             const chordOptions = Object.values(reverseChordLookup).filter(
                 x => x.notes.isSubsetOf(gui.acceptedNotes)
                     && (x.uninvertedHash !== chordData.uninvertedHash || x.inversion !== chordData.inversion)
@@ -723,7 +724,7 @@ function drawChordMacros(loop, inversionsOnly) {
                         }
                         return match && searchFn.apply(x.type, [parts[1]]);
                     }, false)
-                    && x.values.length >= sizeCutoff
+                    && x.values.length >= sizeCutoffMin && x.values.length <= sizeCutoffMax
             ).reverse();
             const chord = chordOptions?.[Math.floor(Math.pow(Math.classicRandom(), settings.ChordMacrosStability) * chordOptions.length)];
             if (!chord) {
