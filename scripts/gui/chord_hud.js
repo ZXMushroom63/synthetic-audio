@@ -631,13 +631,13 @@ function chordProcess(loop, chordArray) {
 registerSetting("ChordMacros", true);
 registerSetting("ChordMacrosStability", 100);
 addEventListener("keydown", (e) => {
-    if ((e.key === "`" || e.key === "~") && settings.ChordMacros && !e.altKey && !e.shiftKey && !e.metaKey && !e.repeat) {
+    if ((e.key === "`" || e.key === "~") && settings.ChordMacros && !e.altKey && !e.metaKey && !e.repeat) {
         e.preventDefault();
         const targetLoop = document.elementFromPoint(mouse.x, mouse.y)?.closest(".loop");
-        drawChordMacros(targetLoop);
+        drawChordMacros(targetLoop, e.shiftKey);
     };
 });
-function drawChordMacros(loop) {
+function drawChordMacros(loop, inversionsOnly) {
     loop = getChordStack(loop)[0];
     if (!loop) {
         return;
@@ -704,41 +704,44 @@ function drawChordMacros(loop) {
     }
     */
 
-    entries.forEach((ent) => {
-        const size = chordData.values.length;
-        const sizeCutoff = size >= 3 ? 3 : size;
-        const chordOptions = Object.values(reverseChordLookup).filter(
-            x => x.notes.isSubsetOf(gui.acceptedNotes)
-                && (x.uninvertedHash !== chordData.uninvertedHash || x.inversion !== chordData.inversion)
-                && ent[1].returns.reduce((acc, v) => {
-                    if (acc) {
-                        return acc;
-                    }
-                    const searchFn = v.includes("+") ? String.prototype.startsWith : String.prototype.includes;
-                    const parts = v.includes("+") ? v.split("+") : v.split("^");
-                    const match = x.root === chordIndexMap[parts[0].toUpperCase()];
-                    if (parts.length === 1) {
-                        return match;
-                    }
-                    return match && searchFn.apply(x.type, [parts[1]]);
-                }, false)
-                && x.values.length >= sizeCutoff
-        ).reverse();
-        const chord = chordOptions?.[Math.floor(Math.pow(Math.classicRandom(), settings.ChordMacrosStability) * chordOptions.length)];
-        if (!chord) {
-            return //console.warn("Missing chord for ", ent);
-        }
-        const template = serialiseNode(loop.relatedChord[0]);
-        template.start += template.duration;
+    if (!inversionsOnly) {
+        entries.forEach((ent) => {
+            const size = chordData.values.length;
+            const sizeCutoff = size >= 3 ? 3 : size;
+            const chordOptions = Object.values(reverseChordLookup).filter(
+                x => x.notes.isSubsetOf(gui.acceptedNotes)
+                    && (x.uninvertedHash !== chordData.uninvertedHash || x.inversion !== chordData.inversion)
+                    && ent[1].returns.reduce((acc, v) => {
+                        if (acc) {
+                            return acc;
+                        }
+                        const searchFn = v.includes("+") ? String.prototype.startsWith : String.prototype.includes;
+                        const parts = v.includes("+") ? v.split("+") : v.split("^");
+                        const match = x.root === chordIndexMap[parts[0].toUpperCase()];
+                        if (parts.length === 1) {
+                            return match;
+                        }
+                        return match && searchFn.apply(x.type, [parts[1]]);
+                    }, false)
+                    && x.values.length >= sizeCutoff
+            ).reverse();
+            const chord = chordOptions?.[Math.floor(Math.pow(Math.classicRandom(), settings.ChordMacrosStability) * chordOptions.length)];
+            if (!chord) {
+                return //console.warn("Missing chord for ", ent);
+            }
+            const template = serialiseNode(loop.relatedChord[0]);
+            template.start += template.duration;
 
-        rendereableMacros.push({
-            side: "right",
-            chord: chord,
-            text: `<code>${chord.type}</code>${chord.inversion !== 0 ? ` <code>i${chord.inversion}</code>` : ""} <code>${reverseChordIndexMap[chord.root]}</code> <code>${chord.values.length}</code> ` + ent[0],
-            template: template,
-            octaveOffset: octaveOffset
+            rendereableMacros.push({
+                side: "right",
+                chord: chord,
+                text: `<code>${chord.type}</code>${chord.inversion !== 0 ? ` <code>i${chord.inversion}</code>` : ""} <code>${reverseChordIndexMap[chord.root]}</code> <code>${chord.values.length}</code> ` + ent[0],
+                template: template,
+                octaveOffset: octaveOffset
+            });
         });
-    });
+    }
+
 
     const loopChordHash = chordData.uninvertedHash;
     const invertedChords = Object.entries(reverseChordLookup).filter(ent => ent[1].uninvertedHash === loopChordHash).sort((a, b) => a[1].inversion - b[1].inversion).sort((a, b) => a[1].range - b[1].range);
@@ -747,7 +750,7 @@ function drawChordMacros(loop) {
 
         const chord = ent[1];
         rendereableMacros.push({
-            side: "left",
+            side: inversionsOnly ? "right" : "left",
             chord: chord,
             text: `<code>${reverseChordIndexMap[chord.root]}</code> <code>${chord.range}</code> ${chord.inversion === 0 ? "<span style='color:skyblue'>OriginalX</span>" : "InversionX " + chord.inversion} ${i === 0 ? " (Smallest)" : ""}`,
             template: template,
@@ -794,7 +797,7 @@ function drawChordMacros(loop) {
             e.stopPropagation();
             e.preventDefault();
 
-            if (side === "left") {
+            if (side === "left" || inversionsOnly) {
                 loop.relatedChord.forEach(deleteLoop);
             }
             unrealisedChords.forEach((dt) => {
