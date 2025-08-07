@@ -1,4 +1,5 @@
-function pickupLoop(loop, natural = false) {
+var cachedTrackBB = null;
+function pickupLoop(loop, natural = false, useCache = false) {
     if (loop.classList.contains("deactivated") || loop.hasAttribute("data-deleted")) {
         return;
     }
@@ -59,7 +60,8 @@ function pickupLoop(loop, natural = false) {
     }
     dropHandlers.push(mouseUp);
     loopMoveHandlers.push(mouseMove);
-    var trackBB = document.querySelector("#trackInternal").getBoundingClientRect();
+    var trackBB = (useCache && cachedTrackBB) ? cachedTrackBB : document.querySelector("#trackInternal").getBoundingClientRect();
+    cachedTrackBB = trackBB;
     var originalBB = loop.querySelector(".loopInternal").getBoundingClientRect();
     document.addEventListener("mousemove", mouseMove);
     document.addEventListener("mouseup", mouseUp);

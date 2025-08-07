@@ -1,8 +1,8 @@
 addEventListener("init", () => {
     registerTool("Move", (nodes) => {
         if (!nodes) { return };
-        nodes.forEach(node => {
-            pickupLoop(node, true);
+        nodes.forEach((node, i) => {
+            pickupLoop(node, true, i !== 0);
         });
     }, true);
 });

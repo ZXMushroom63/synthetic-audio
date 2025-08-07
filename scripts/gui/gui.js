@@ -249,6 +249,7 @@ function hydrateLoopBackground(elem) {
 }
 
 registerSetting("OpaqueLayers", false);
+registerSetting("LDMLoopInteraction", false);
 function hydrateLoopSpecificLayer(elem) {
     if (elem.noEditorLayer || (parseInt(elem.getAttribute("data-editlayer")) === gui.layer) || (gui.layer === MAX_LAYER)) {
         elem.classList.remove("deactivated");

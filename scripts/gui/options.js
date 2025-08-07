@@ -127,7 +127,7 @@ function createOptionsMenu(loop, definition) {
             }
         });
     };
-    optionsMenu.addEventListener("mousedown", (e) => { e.stopPropagation(); document.querySelector(".multiEditMenu")?.remove(); });
+    optionsMenu.addEventListener("mousedown", (e) => { e.stopPropagation(); document.querySelector(".multiEditMenu")?.saveAndClose(); });
 
     return optionsMenu;
 }
@@ -138,8 +138,13 @@ function createMultiEditMenu(initData, editingTargets, propDefs, dropDownDefs) {
     const selectMiddleware = getSelectMiddleware(editingTargets);
     const updateMiddleware = getGenericMiddleware(editingTargets, "updateMiddleware");
     const setProp = getPropertySetter(editingTargets);
+    const saveTrigger = getDirtySetter(editingTargets);
     const optionsMenu = document.createElement("div");
     optionsMenu.classList.add("loopOptionsMenu");
+    optionsMenu.saveAndClose = () => {
+        saveTrigger();
+        optionsMenu.remove();
+    }
     var dropdowns = dropDownDefs || {};
     var dropdownsMap = Object.fromEntries(Object.keys(dropdowns).map(x => {
         var detail = document.createElement("details");
@@ -191,7 +196,7 @@ function createMultiEditMenu(initData, editingTargets, propDefs, dropDownDefs) {
             s.innerHTML = opts.flatMap((a) => { return `<option${a === value[0] ? " selected" : ""}>${a}</option>` }).join("");
             s.addEventListener("input", () => {
                 offload("#trackInternal");
-                setProp(key, s.value, true);
+                setProp(key, s.value, false);
                 value[0] = s.value;
                 updateMiddleware();
                 reflow("#trackInternal");
@@ -215,16 +220,14 @@ function createMultiEditMenu(initData, editingTargets, propDefs, dropDownDefs) {
             input.setAttribute("data-key", key);
             input.checked = value[0];
             input.addEventListener("input", () => {
-                offload("#trackInternal");
                 if (value[1] === "checkbox") {
-                    setProp(key, input.checked, true);
+                    setProp(key, input.checked, false);
                 } else if (value[1] === "number" && value[2] !== 1) {
-                    setProp(key, parseFloat(input.value), true);
+                    setProp(key, parseFloat(input.value), false);
                 } else {
-                    setProp(key, input.value, true);
+                    setProp(key, input.value, false);
                 }
                 updateMiddleware();
-                reflow("#trackInternal");
             });
             target.appendChild(input);
         }
@@ -260,6 +263,19 @@ function getPropertySetter(editingTargets) {
                 }
             }
         });
+    }
+}
+function getDirtySetter(editingTargets) {
+    return function () {
+        //offload("#trackInternal");
+        editingTargets.forEach(targ => {
+            hydrateLoopDecoration(targ.loop);
+            markLoopDirty(targ.loop);
+            if (!multiplayer.isHooked && multiplayer.on && !targ.loop._ignore) {
+                multiplayer.patchLoop(targ.loop);
+            }
+        });
+        //reflow("#trackInternal");
     }
 }
 function getGenericMiddleware(editingTargets, key) {

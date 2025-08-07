@@ -162,7 +162,11 @@ h4 {
   opacity: 0.15;
 }
 
-html[data-libsettings-OpaqueLayers="true"] .loop.deactivated {
+html[data-libsettings-OpaqueLayers] .loop.deactivated {
+  display: none;
+}
+
+html[data-libsettings-LDMLoopInteraction] .loop.active .loopInternal>* {
   display: none;
 }
 
@@ -199,7 +203,7 @@ html[data-libsettings-OpaqueLayers="true"] .loop.deactivated {
   border: 1px solid rgb(199, 199, 255);
 }
 
-.loopInternal span.name {
+.loopInternal .name {
   display: block;
   transition: text-decoration 0.5s;
   text-decoration: underline;
@@ -325,12 +329,9 @@ select:focus {
   border-radius: 0rem 0rem 0rem 0.4rem;
 }
 
-#addstuff details summary {
+#addstuff summary {
   user-select: none;
   cursor: pointer;
-}
-
-#addstuff summary {
   list-style-type: "+ ";
 }
 
@@ -1030,6 +1031,8 @@ code:hover {
 div:has(#samplepacks_tree) {
   padding: 0 !important;
 }
+
+
 
 div:has(#samplepacks_tree) code {
   display: inline-block;

@@ -229,6 +229,7 @@ addEventListener("init", () => {
     var midiSnappingEnabled = false;
     var midiCooldownSize = 2000;
     var midiTimescale = 1;
+    var caretLoop = null;
     const midiModule = mkModule("MIDI Insertion");
     midiModule.innerHTML += `
     <button id="midi_access">Grant MIDI Access</button><br>
@@ -359,8 +360,11 @@ addEventListener("init", () => {
         if (ev.detail.loop._ignore) {
             return;
         }
-        document.querySelectorAll(".caret").forEach(loop => loop.classList.remove("caret"));
+        if (caretLoop) {
+            caretLoop.classList.remove("caret");
+        }
         ev.detail.loop.classList.add("caret");
+        caretLoop = ev.detail.loop;
     });
     var midiHookmapper = {};
     var outputPorts = {};

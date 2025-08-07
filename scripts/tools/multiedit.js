@@ -30,7 +30,7 @@ addEventListener("init", () => {
         menu.style.color = "white";
         menu.style.fontFamily = "sans-serif";
         function mouseRelease() {
-            menu.remove();
+            menu.saveAndClose();
             removeEventListener("mousedown", mouseRelease);
         }
         addEventListener("mousedown", mouseRelease);
