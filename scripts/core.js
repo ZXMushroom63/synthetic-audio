@@ -620,7 +620,7 @@ async function render() {
                             }
 
                             initialPcm.set(newPcm, startTime);
-                            await wait(1 / 240);
+                            await wait(0);
                         }
                         if (!layerCache[abstractLayerMaps.layerId]) {
                             layerCache[abstractLayerMaps.layerId] = [null, null];
