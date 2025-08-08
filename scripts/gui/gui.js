@@ -708,6 +708,7 @@ function init() {
     });
     var zoomActuatorDebouncer = null;
     function actuateZoom() {
+        zoomActuatorDebouncer = null;
         document.querySelector("#trackInternal").style.willChange = "";
         hydrateZoom(true);
         hydrateDecorations();
@@ -727,6 +728,12 @@ function init() {
             zoomActuatorDebouncer = setTimeout(actuateZoom, 500);
         }
     }, { passive: false });
+    addEventListener("keyup", (e)=>{
+        if (e.key === "Control" && zoomActuatorDebouncer) {
+            clearTimeout(zoomActuatorDebouncer);
+            actuateZoom();
+        }
+    })
     registerSetting("ZoomScale", 1);
     document.querySelector("audio#loopsample").addEventListener("ended", (e) => {
         URL.revokeObjectURL(e.target.src);
