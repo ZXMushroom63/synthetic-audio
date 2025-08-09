@@ -624,6 +624,13 @@ addEventListener("init", async () => {
             loadingScreenModMenu.closeModMenu();
         }, 100);
     } else {
+        if (location.href.includes("discord")) {
+            logToLoader(`Integrating with Discord...`);
+            ocument.querySelector("#renderProgress").innerText = `Integrating with Discord...`;
+            while (!location.search.includes("instance_id")) {
+                await wait(0.5);
+            }
+        }
         logToLoader(`Multiplayer supported! Loading multiplayer system...`);
         document.querySelector("#renderProgress").innerText = `Initialising multiplayer system...`;
         const socketio = document.createElement("script");
