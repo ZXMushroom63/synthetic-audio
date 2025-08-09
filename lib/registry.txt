@@ -5,3 +5,4 @@ abcjs-basic.js|https://raw.githubusercontent.com/paulrosen/abcjs/refs/heads/main
 cyrb53.js|https://raw.githubusercontent.com/bryc/code/refs/heads/master/jshash/experimental/cyrb53.js
 fft.js|https://raw.githubusercontent.com/indutny/fft.js/refs/heads/master/dist/fft.js
 embedded-app-sdk.js|https://cdn.jsdelivr.net/npm/@discord/embedded-app-sdk@latest/+esm
+ffmpeg.min.js|https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@latest/dist/ffmpeg.min.js
