@@ -7,6 +7,7 @@ var customBufferedMessagesByUUIDTimers = {};
 const multiplayer = {
     isHooked: false,
     on: false,
+    instanceId: "default",
     hook: function () {
 
     },
@@ -15,7 +16,8 @@ const multiplayer = {
     },
     sync: function () {
         const urlParams = new URLSearchParams(location.search);
-        socket.emit('sync', urlParams.get("instance_id") || "default");
+        multiplayer.instanceId = urlParams.get("instance_id") || "default";
+        socket.emit('sync', multiplayer.instanceId);
         console.log("Requesting sync...");
     },
     _patchLoop: function (target, res) {
@@ -35,6 +37,8 @@ const multiplayer = {
         hydrateLoopDecoration(target);
     },
     enable: function (socket) {
+        const urlParams = new URLSearchParams(location.search);
+        multiplayer.instanceId = urlParams.get("instance_id") || "default";
         multiplayer.on = true;
         const syncBtn = document.querySelector("[data-convert-to-sync]");
         syncBtn.innerText = "Sync";

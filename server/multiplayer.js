@@ -52,9 +52,9 @@ function multiplayer_support(server, debugMode) {
         socket.join("")
         console.log('a user connected: ' + socket.id);
         socket.on("sync", (instanceId) => {
-            socket.instanceId = instanceId;
-            socket.roomCode = "room/" + instanceId;
-            socket.join("room/" + instanceId);
+            socket.instanceId = instanceId || "default";
+            socket.roomCode = "room/" + (instanceId || "default");
+            socket.join("room/" + socket.roomCode);
             console.log("Replying to sync message");
             socket.emit("deserialise", JSON.stringify(getStateById(socket.instanceId)));
         });

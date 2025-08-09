@@ -449,6 +449,13 @@ addEventListener("init", () => {
     }
     remoteMultiplayerModule.appendChild(remoteMultiplayerConnect);
 
+    const remoteMultiplayerDebugInstanceId = document.createElement("button");
+    remoteMultiplayerDebugInstanceId.innerText = "Chk Instance";
+    remoteMultiplayerDebugInstanceId.addEventListener("click", ()=>{
+        document.querySelector("#renderProgress").innerText = "InstID: " + multiplayer.instanceId;
+    });
+    remoteMultiplayerModule.appendChild(remoteMultiplayerDebugInstanceId);
+
     const harmonics = new Float32Array(50);
     harmonics[0] = 1;
     const harmonicsWaveform = new Float32Array(WAVEFORM_RES);
