@@ -4,3 +4,4 @@ jszip.min.js|https://raw.githubusercontent.com/Stuk/jszip/refs/heads/main/dist/j
 abcjs-basic.js|https://raw.githubusercontent.com/paulrosen/abcjs/refs/heads/main/dist/abcjs-basic-min.js
 cyrb53.js|https://raw.githubusercontent.com/bryc/code/refs/heads/master/jshash/experimental/cyrb53.js
 fft.js|https://raw.githubusercontent.com/indutny/fft.js/refs/heads/master/dist/fft.js
+embedded-app-sdk.js|https://cdn.jsdelivr.net/npm/@discord/embedded-app-sdk@latest/+esm

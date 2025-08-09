@@ -14,7 +14,8 @@ const multiplayer = {
         socket.emit('global_write', data);
     },
     sync: function () {
-        socket.emit('sync');
+        const urlParams = new URLSearchParams(location.search);
+        socket.emit('sync', urlParams.get("instance_id") || "default");
         console.log("Requesting sync...");
     },
     _patchLoop: function (target, res) {

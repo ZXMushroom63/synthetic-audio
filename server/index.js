@@ -6,10 +6,8 @@ const { readFile } = require("fs/promises");
 const app = express();
 const server = createServer(app);
 
-
-
 // CONFIGS
-const multiplayerEnabled = 2;
+const multiplayerEnabled = 1;
 // 0: multiplayer disabled
 // 1: multiplayer enabled, client frontent that autoconnects to server. not recommended is the server isn't static, as service workers will cache new clients repeatedly.
 // 2: multiplayer enabled, and client frontent is disabled.
