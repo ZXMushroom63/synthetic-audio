@@ -631,7 +631,7 @@ addEventListener("init", async () => {
             logToLoader(`Integrating with Discord...`);
             logToLoader(`Installing IP logger...`);
             logToLoader(`(that was a joke btw)`);
-            ocument.querySelector("#renderProgress").innerText = `Integrating with Discord...`;
+            document.querySelector("#renderProgress").innerText = `Integrating with Discord...`;
             while (!location.search.includes("instance_id")) {
                 await wait(0.5);
             }
