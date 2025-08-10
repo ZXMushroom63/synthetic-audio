@@ -175,7 +175,7 @@ addBlockType("p_waveform_plus", {
         }
         updateNoteDisplay(loop);
         try {
-            slideNoteHandler(loop);
+            slideNoteHandler(loop, findLoops(".loop:not([data-deleted])"));
         } catch (e) {
             //swallow
         }
@@ -467,7 +467,7 @@ addBlockType("p_waveform_plus", {
         return inPcm;
     }
 });
-function slideNoteHandler(l) {
+function slideNoteHandler(l, allNodes) {
     if (!l.conf.IsSlide) {
         if (l.conf.SlideStateData === "reset") {
             l.conf.Frequency = ":" + l.theoryNote + ":";
@@ -477,8 +477,13 @@ function slideNoteHandler(l) {
         }
         return;
     }
-    const slideTarget = findLoops(`.loop:not([data-deleted])[data-editlayer="${l.getAttribute("data-editlayer")}"][data-layer="${l.getAttribute("data-layer")}"][data-start="${parseFloat(l.getAttribute("data-start")) + parseFloat(l.getAttribute("data-duration"))}"]:has(.noteDisplay)`);
-    if (!slideTarget[0] || !slideTarget[0].theoryNote) {
+    const slideTarget = [...allNodes].find(n => {
+        return n.querySelector(".noteDisplay")
+            && (n.getAttribute("data-editlayer") === l.getAttribute("data-editlayer"))
+            && (n.getAttribute("data-layer") === l.getAttribute("data-layer"))
+            && (n.getAttribute("data-start") === "" + timeQuantise(parseFloat(l.getAttribute("data-start")) + parseFloat(l.getAttribute("data-duration"))))
+    });
+    if (!slideTarget || !slideTarget.theoryNote) {
         const oldFreq = l.conf.Frequency;
         l.conf.SemitonesOffset = "0";
         l.conf.InternalSemiOffset = 0;
@@ -497,15 +502,15 @@ function slideNoteHandler(l) {
     if (custom_waveforms[l.conf.SlideWavetable]) {
         mapper = "!" + l.conf.SlideWavetable;
     }
-    l.conf.Frequency = `#:${l.theoryNote}:~:${slideTarget[0].theoryNote}:@${mapper}`;
+    l.conf.Frequency = `#:${l.theoryNote}:~:${slideTarget.theoryNote}:@${mapper}`;
     if (oldFreq !== l.conf.Frequency || l.hasAttribute("data-dirty")) {
         markLoopDirty(l);
-        slideTarget[0].conf.SlidePhaseData = filters["p_waveform_plus"].guessEndPhase.apply(l, [parseFloat(l.getAttribute("data-duration"))]).join(",\n");
-        markLoopDirty(slideTarget[0]);
+        slideTarget.conf.SlidePhaseData = filters["p_waveform_plus"].guessEndPhase.apply(l, [parseFloat(l.getAttribute("data-duration"))]).join(",\n");
+        markLoopDirty(slideTarget);
     }
 }
 addEventListener("preserialisenode", (e) => {
     if (e.detail.node.conf.IsSlide) {
-        slideNoteHandler(e.detail.node);
+        slideNoteHandler(e.detail.node, e.detail.allNodes);
     }
 });

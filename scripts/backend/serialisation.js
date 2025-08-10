@@ -53,7 +53,7 @@ function serialise(forRender, forMultiplayer) {
         ]
     );
     var x = Array.prototype.flatMap.apply(hNodes, [(node => {
-        return serialiseNode(node, forRender, forMultiplayer);
+        return serialiseNode(node, forRender, forMultiplayer, hNodes);
     })]);
     var out = getProjectMeta();
     out.nodes = x;
@@ -63,8 +63,11 @@ function serialise(forRender, forMultiplayer) {
 function hashNode(node) {
     return cyrb53(JSON.stringify(serialiseNode(node)));
 }
-function serialiseNode(node, forRender, forMultiplayer) {
-    customEvent("preserialisenode", { node: node });
+function serialiseNode(node, forRender, forMultiplayer, allNodes) {
+    if (allNodes) {
+        customEvent("preserialisenode", { node: node, allNodes: allNodes });
+    }
+    
     var out = {};
     out.conf = node.conf;
     if (forMultiplayer) {
