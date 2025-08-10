@@ -52,13 +52,19 @@ function multiplayer_support(server, debugMode) {
         socket.join("")
         console.log('a user connected: ' + socket.id);
         socket.on("sync", (instanceId) => {
-            socket.instanceId = instanceId || "default";
-            socket.roomCode = "room/" + (instanceId || "default");
-            socket.join("room/" + socket.roomCode);
+            if (!instanceId) {
+                return socket.disconnect();
+            }
+            socket.instanceId = instanceId;
+            socket.roomCode = "room/" + instanceId;
+            socket.join(socket.roomCode);
             console.log("Replying to sync message");
             socket.emit("deserialise", JSON.stringify(getStateById(socket.instanceId)));
         });
         socket.on("global_write", (data) => {
+            if (!socket.instanceId) {
+                return;
+            }
             try {
                 setStateById(socket.instanceId, JSON.parse(data));
                 getStateById(socket.instanceId).nodes ||= [];
@@ -71,12 +77,18 @@ function multiplayer_support(server, debugMode) {
             }
         });
         socket.on("add_loop", (data) => {
+            if (!socket.instanceId) {
+                return;
+            }
             const res = JSON.parse(data);
             getStateById(socket.instanceId).nodes.push(res);
             socket.broadcast.to(socket.roomCode).emit("add_loop", data);
             debugWriteState(socket);
         });
         socket.on("delete_loop", (uuid) => {
+            if (!socket.instanceId) {
+                return;
+            }
             const target = getStateById(socket.instanceId).nodes.find(x => x.conf.uuid === uuid);
             if (target) {
                 getStateById(socket.instanceId).nodes.splice(getStateById(socket.instanceId).nodes.indexOf(target), 1);
@@ -85,9 +97,15 @@ function multiplayer_support(server, debugMode) {
             debugWriteState(socket);
         });
         socket.on("dirty_loop", (data) => {
+            if (!socket.instanceId) {
+                return;
+            }
             io.to(socket.roomCode).emit("dirty_loop", data);
         });
         socket.on("patch_loop", (data) => {
+            if (!socket.instanceId) {
+                return;
+            }
             const loop = JSON.parse(data);
             const target = getStateById(socket.instanceId).nodes.find(x => x.conf.uuid === loop.conf.uuid);
             if (target) {
@@ -101,15 +119,24 @@ function multiplayer_support(server, debugMode) {
             debugWriteState(socket);
         });
         socket.on("modify_prop", (data) => {
+            if (!socket.instanceId) {
+                return;
+            }
             const res = JSON.parse(data);
             getStateById(socket.instanceId)[res.key] = res.value;
             socket.broadcast.to(socket.roomCode).emit("modify_prop", data);
             debugWriteState(socket);
         });
         socket.on("custom", (data) => {
+            if (!socket.instanceId) {
+                return;
+            }
             socket.broadcast.to(socket.roomCode).emit("custom", data);
         });
         socket.on("write_path", (data) => {
+            if (!socket.instanceId) {
+                return;
+            }
             const res = JSON.parse(data);
             try {
                 const path = res.path.split(".");
@@ -128,6 +155,9 @@ function multiplayer_support(server, debugMode) {
             debugWriteState(socket);
         });
         socket.on("delete_path", (data) => {
+            if (!socket.instanceId) {
+                return;
+            }
             const res = JSON.parse(data);
             try {
                 const path = res.path.split(".");
