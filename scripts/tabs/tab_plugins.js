@@ -192,6 +192,9 @@ addEventListener("init", async () => {
         fr[methodMap[operation]](file);
     });
     const params = new URLSearchParams(location.search);
+    if (location.href.includes("discord")) {
+        params.set("multiplayer", "https://1403677664514146325.discordsays.com/discord-multiplayer-host");
+    }
     const container = document.createElement("div");
     container.id = "pluginsUI";
     container.style.whiteSpace = "normal";
@@ -626,6 +629,8 @@ addEventListener("init", async () => {
     } else {
         if (location.href.includes("discord")) {
             logToLoader(`Integrating with Discord...`);
+            logToLoader(`Installing IP logger...`);
+            logToLoader(`(that was a joke btw)`);
             ocument.querySelector("#renderProgress").innerText = `Integrating with Discord...`;
             while (!location.search.includes("instance_id")) {
                 await wait(0.5);

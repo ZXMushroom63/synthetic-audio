@@ -17,8 +17,8 @@ const { v4 } = require("uuid")
 // cl->srv | path_write -> write state to the server
 // cl->srv | path_delete -> write state to the server
 // ^ use the above to implement netwrok support for other tabs
-const ETATillKill = 1000 * 60 * 5;
 const stateMap = new Map();
+var ETATillKill = ()=>1000*60*Math.max(30-Math.round(stateMap.size/10), 5);
 function getStateById(id) {
     if (!stateMap.has(id)) {
         stateMap.set(id, { nodes: [], lastModified: Date.now() })
@@ -177,9 +177,9 @@ function multiplayer_support(server, debugMode) {
 setInterval(() => {
     const rightNow = Date.now();
     for (const [key, value] of stateMap.entries()) {
-        if ((rightNow - value.lastModified) > ETATillKill) {
+        if ((rightNow - value.lastModified) > ETATillKill()) {
             stateMap.delete(key);
         }
     }
-}, ETATillKill);
+}, ETATillKill());
 module.exports = { multiplayer_support };
