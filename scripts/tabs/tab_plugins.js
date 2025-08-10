@@ -639,7 +639,7 @@ addEventListener("init", async () => {
         logToLoader(`Multiplayer supported! Loading multiplayer system...`);
         document.querySelector("#renderProgress").innerText = `Initialising multiplayer system...`;
         const socketio = document.createElement("script");
-        socketio.src = params.has("multiplayer") ? "https://cdn.jsdelivr.net/npm/socket.io-client@latest/dist/socket.io.min.js" : "/socket.io/socket.io.js";
+        socketio.src = params.has("multiplayer") ? "lib/socket.io.js" : "/socket.io/socket.io.js";
         socketio.addEventListener("load", () => {
             logToLoader(`Socket.IO loaded...`);
             document.querySelector("#renderProgress").innerText = `Multiplayer system initialised! Connecting to server...`;

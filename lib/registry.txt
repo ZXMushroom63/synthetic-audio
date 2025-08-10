@@ -6,3 +6,4 @@ cyrb53.js|https://raw.githubusercontent.com/bryc/code/refs/heads/master/jshash/e
 fft.js|https://raw.githubusercontent.com/indutny/fft.js/refs/heads/master/dist/fft.js
 embedded-app-sdk.js|https://cdn.jsdelivr.net/npm/@discord/embedded-app-sdk@latest/+esm
 ffmpeg.min.js|https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@latest/dist/ffmpeg.min.js
+socket.io.js|https://cdn.jsdelivr.net/npm/socket.io-client@latest/dist/socket.io.min.js
