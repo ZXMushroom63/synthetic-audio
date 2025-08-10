@@ -12,7 +12,7 @@ const multiplayerEnabled = 2;
 // 1: multiplayer enabled, client frontent that autoconnects to server. not recommended if the server isn't static, as service workers will cache new clients repeatedly.
 // 2: multiplayer enabled, and client frontent is disabled.
 
-const port = 80;
+const port = 4152;
 const logging = false;
 
 
@@ -23,7 +23,7 @@ if (multiplayerEnabled !== 2) {
         res.status(200).send(await readFile("./server/multiplayer_notice.html", {encoding: "utf8"}));
     });
 }
-app.use(cors({ origin: "*" }))
+app.use(cors({ origin: process.env.SYNTHETIC_CORS || "*" }))
 
 
 const blacklistMiddleware = (req, res, next) => {

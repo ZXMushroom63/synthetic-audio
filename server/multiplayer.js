@@ -43,8 +43,9 @@ function multiplayer_support(server, debugMode) {
         writeFile("./debug_state.json", JSON.stringify(getStateById(socket.instanceId), null, 2));
     }
     const io = new Server(server, {
+        path: process.env.SYNTHETIC_MULTI_ROOT || "/socket.io/",
         cors: {
-            origin: "*",
+            origin: process.env.SYNTHETIC_CORS || "*",
             methods: ["GET", "POST", "OPTIONS", "PUT", "DELETE"]
         }
     });
