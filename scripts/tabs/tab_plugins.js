@@ -640,7 +640,7 @@ addEventListener("init", async () => {
         socketio.addEventListener("load", () => {
             logToLoader(`Socket.IO loaded...`);
             document.querySelector("#renderProgress").innerText = `Multiplayer system initialised! Connecting to server...`;
-            const socket = globalThis.socket = location.href.includes("discord") ? io("https://1403677664514146325.discordsays.com/discord-multiplayer-host", { transports: ["websocket"] }) : io(params.get("multiplayer"), {transports: ["websocket"]});
+            const socket = globalThis.socket = location.href.includes("discord") ? io("https://1403677664514146325.discordsays.com/discord-multiplayer-host", { path: "/discord-multiplayer-host/socket.io/" }) : io(params.get("multiplayer"));
             multiplayer.enable(socket);
             socket.on('connect', () => {
                 logToLoader(`Connected to server.`);
