@@ -51,8 +51,38 @@ function multiplayer_support(server, debugMode) {
         },
         perMessageDeflate: false
     });
+    const BUCKET_DELAY_MILLIS = 50;
+    const BUCKET_KICK_THRESHOLD = 25;
     io.on("connection", (socket) => {
-        socket.join("")
+        const bucket = [];
+        const oldOn = socket.on;
+        var lastReq = Date.now();
+        const handlers = new Map();
+        socket.on = function name(ev, handler) {
+            handlers.set(ev, handler);
+            return oldOn.apply(socket, [ev, function (e) {
+                if (bucket.length > BUCKET_KICK_THRESHOLD) {
+                    socket.disconnect(true);
+                    return;
+                }
+                if (Date.now() - lastReq > BUCKET_DELAY_MILLIS) {
+                    bucket.push([ev, e]);
+                    return;
+                }
+                lastReq = Date.now()
+                return handler(e);
+            }]);
+        }
+        var bucketTimer = setInterval(()=>{
+            lastReq = Date.now();
+            handlers.get(bucket[0][0])(bucket[0][1]);
+            bucket.splice(0, 1);
+        }, BUCKET_DELAY_MILLIS);
+        socket.on("disconnect", ()=>{
+            clearInterval(bucketTimer);
+            bucket.splice(0, bucket.length);
+            handlers.clear();
+        });
         console.log('a user connected: ' + socket.id);
         socket.on("sync", (instanceId) => {
             if (!instanceId) {
