@@ -12,6 +12,9 @@ const multiplayer = {
 
     },
     write: function (data) {
+        document.body.style.pointerEvents = "none";
+        document.querySelector("#renderProgress").innerText = `Sending project file to server...`;
+        logToLoader(`Sending project file to server...`);
         socket.emit('global_write', data);
     },
     sync: function () {
@@ -29,7 +32,7 @@ const multiplayer = {
         target.setAttribute("data-editlayer", res.editorLayer);
         target.querySelector(".loopInternal .name").innerText = res.file;
         target.classList.remove("selected");
-        customEvent("loopmoved", {loop: target});
+        customEvent("loopmoved", { loop: target });
         if (filters[target.getAttribute("data-type")]?.updateMiddleware) {
             filters[target.getAttribute("data-type")].updateMiddleware(target);
         }
@@ -48,6 +51,9 @@ const multiplayer = {
             multiplayer.sync();
         });
         socket.on('deserialise', (data) => {
+            document.body.style.pointerEvents = "all";
+            document.querySelector("#renderProgress").innerText = `Received new project file!`;
+            logToLoader(`Deserialised project file from server.`);
             multiplayer.isHooked = true;
             deserialise(data);
             multiplayer.isHooked = false;
@@ -96,7 +102,7 @@ const multiplayer = {
             if (target.type === "checkbox") {
                 target.checked = res.value;
             } else if (target instanceof HTMLSelectElement) {
-                target.selectedIndex = [...target.options].findIndex(x=>x.value === res.value);
+                target.selectedIndex = [...target.options].findIndex(x => x.value === res.value);
             } else {
                 target.value = res.value;
             }
@@ -175,7 +181,7 @@ const multiplayer = {
         }, 200);
     },
     listen: function (ev, listener) {
-        addEventListener("netcode:"+ev, listener);
+        addEventListener("netcode:" + ev, listener);
     }
 }
 globalThis.multiplayer = multiplayer;
