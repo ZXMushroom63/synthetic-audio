@@ -14,7 +14,6 @@ const multiplayer = {
     write: function (data) {
         document.body.style.pointerEvents = "none";
         document.querySelector("#renderProgress").innerText = `Sending project file to server...`;
-        logToLoader(`Sending project file to server...`);
         socket.emit('global_write', data);
     },
     sync: function () {
@@ -56,7 +55,6 @@ const multiplayer = {
         socket.on('deserialise', (data) => {
             document.body.style.pointerEvents = "all";
             document.querySelector("#renderProgress").innerText = `Received new project file!`;
-            logToLoader(`Deserialised project file from server.`);
             multiplayer.isHooked = true;
             deserialise(data);
             multiplayer.isHooked = false;
