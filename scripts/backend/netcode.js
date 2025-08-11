@@ -50,6 +50,9 @@ const multiplayer = {
         socket.on('connect', () => {
             multiplayer.sync();
         });
+        socket.on('disconnect', () => {
+            document.querySelector("#renderProgress").innerText = `Disconnected from server.`;
+        });
         socket.on('deserialise', (data) => {
             document.body.style.pointerEvents = "all";
             document.querySelector("#renderProgress").innerText = `Received new project file!`;

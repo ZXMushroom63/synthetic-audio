@@ -52,17 +52,24 @@ function multiplayer_support(server, debugMode) {
         perMessageDeflate: false
     });
     const BUCKET_DELAY_MILLIS = 50;
-    const BUCKET_KICK_THRESHOLD = 150;
+    const BUCKET_KICK_THRESHOLD = 5000;
+    const BUCKET_DROP_THRESHOLD = 400;
     io.on("connection", (socket) => {
         const bucket = [];
         const oldOn = socket.on;
         var lastReq = Date.now();
+        let bucketOverfilling = 0;
         const handlers = new Map();
         socket.on = function name(ev, handler) {
             handlers.set(ev, handler);
             return oldOn.apply(socket, [ev, function (e) {
-                if (bucket.length > BUCKET_KICK_THRESHOLD) {
+                console.log(ev + " " + socket.id);
+                if ((bucket.length + bucketOverfilling) > BUCKET_KICK_THRESHOLD) {
                     socket.disconnect(true);
+                    return;
+                }
+                if ((bucket.length + bucketOverfilling) > BUCKET_DROP_THRESHOLD) {
+                    bucketOverfilling++;
                     return;
                 }
                 if (Date.now() - lastReq > BUCKET_DELAY_MILLIS) {
@@ -78,6 +85,7 @@ function multiplayer_support(server, debugMode) {
             }]);
         }
         var bucketTimer = setInterval(()=>{
+            bucketOverfilling = Math.max(0, bucketOverfilling - 1);
             if (bucket.length === 0) {
                 return;
             }
