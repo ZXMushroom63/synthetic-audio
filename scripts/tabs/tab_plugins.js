@@ -640,13 +640,19 @@ addEventListener("init", async () => {
         socketio.addEventListener("load", () => {
             logToLoader(`Socket.IO loaded...`);
             document.querySelector("#renderProgress").innerText = `Multiplayer system initialised! Connecting to server...`;
-            const socket = globalThis.socket = location.href.includes("discord") ? io("https://1403677664514146325.discordsays.com/discord-multiplayer-host", { path: "/discord-multiplayer-host/socket.io/", withCredentials: true }) : io(params.get("multiplayer"), { withCredentials: true });
+            const socket = globalThis.socket = 
+            location.href.includes("discord") 
+                ? io("https://1403677664514146325.discordsays.com/discord-multiplayer-host", { path: "/discord-multiplayer-host/socket.io/", withCredentials: true })
+                : io(params.get("multiplayer"), { withCredentials: true });
             multiplayer.enable(socket);
             socket.on('connect', () => {
                 logToLoader(`Connected to server.`);
                 document.querySelector("#renderProgress").innerText = `Welcome to SYNTHETIC Audio! Press the 'Help' button for the manual. (Connected as ${socket.id})`;
                 document.body.style.pointerEvents = "all";
                 loadingScreenModMenu.closeModMenu();
+            });
+            socket.on("error", (err)=>{
+                console.error(err);
             });
         });
         document.body.appendChild(socketio);
