@@ -142,7 +142,7 @@ addEventListener("init", async () => {
                 const key = filename.replace("wt/", "").replaceAll(".wav", "");
 
                 WAVETABLES[key] = buffer;
-                
+
             }
         }
     }
@@ -640,7 +640,7 @@ addEventListener("init", async () => {
         socketio.addEventListener("load", () => {
             logToLoader(`Socket.IO loaded...`);
             document.querySelector("#renderProgress").innerText = `Multiplayer system initialised! Connecting to server...`;
-            const socket = globalThis.socket = location.href.includes("discord") ? io("https://1403677664514146325.discordsays.com/discord-multiplayer-host", { path: "/discord-multiplayer-host/socket.io/" }) : io(params.get("multiplayer"));
+            const socket = globalThis.socket = location.href.includes("discord") ? io("https://1403677664514146325.discordsays.com/discord-multiplayer-host", { path: "/discord-multiplayer-host/socket.io/", withCredentials: true }) : io(params.get("multiplayer"), { withCredentials: true });
             multiplayer.enable(socket);
             socket.on('connect', () => {
                 logToLoader(`Connected to server.`);

@@ -46,8 +46,10 @@ function multiplayer_support(server, debugMode) {
         path: process.env.SYNTHETIC_MULTI_ROOT || "/socket.io/",
         cors: {
             origin: process.env.SYNTHETIC_CORS || "*",
-            methods: ["GET", "POST", "OPTIONS", "PUT", "DELETE"]
-        }
+            methods: ["GET", "POST", "OPTIONS", "PUT", "DELETE"],
+            credentials: true
+        },
+        perMessageDeflate: false
     });
     io.on("connection", (socket) => {
         socket.join("")
