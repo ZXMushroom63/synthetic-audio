@@ -237,10 +237,16 @@ addEventListener("init", async () => {
         return button;
     }
     function patchSoundFont(sf, prefix = "") {
-        return sf
+        const split = sf
             .replace("if (typeof(MIDI) === 'undefined') var MIDI = {};", "")
             .replace("if (typeof(MIDI.Soundfont) === 'undefined') MIDI.Soundfont = {};", "")
-            .replace("MIDI.Soundfont.", "SFREGISTRY." + prefix);
+            .trim()
+            .replace("MIDI.Soundfont.", prefix)
+            .replace(" = ", "")
+            .replace("=", "")
+            .replace("{", "\n{")
+            .split("\n");
+        return split[0].trim() + "\n" + split.slice(1).join("").replaceAll("\n").trim().replace(",}", "}");
     }
     mkBtn("Upload hvcc (.js)", () => {
         var f = document.createElement("input");
@@ -485,13 +491,22 @@ addEventListener("init", async () => {
     var modList = await getMods();
     for (let i = 0; i < modList.length; i++) {
         document.querySelector("#renderProgress").innerText = `Loading plugins (${(i / (modList.length) * 100).toFixed(1)}%)`;
-        if (modList[i].endsWith(".js")) {
+        if (modList[i].endsWith(".sf.js")) {
+            logToLoader(`Loading soundfont: ${modList[i]}`);
+            const mod = await getMod(modList[i]);
+            const data = mod.split("\n").map(x => x.trim());
+            try {
+                SFREGISTRY[data[0]] = JSON.parse(data[1]);
+            } catch(e) {
+                logToLoader("Failed to parse " + modList[i]);
+            }
+        } else if (modList[i].endsWith(".js")) {
             logToLoader(`Loading mod: ${modList[i]}`);
             const mod = await getMod(modList[i]);
             try {
                 (new Function(await mod)).apply(globalThis, []);
             } catch (error) {
-                console.error("Failed to load " + modList[i]);
+                logToLoader("Failed to load " + modList[i]);
             }
         } else if (modList[i].startsWith("wt/") && modList[i].endsWith(".wt.zip")) { //wavetable pack
             logToLoader(`Queuing wavetable pack: ${modList[i]}`);
