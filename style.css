@@ -375,6 +375,10 @@ select:focus {
   font-family: sans-serif;
 }
 
+#renderOut {
+  filter: invert(95%);
+}
+
 .timePosMarker {
   position: relative;
   display: inline-block;
