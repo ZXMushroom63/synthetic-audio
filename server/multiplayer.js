@@ -52,7 +52,7 @@ function multiplayer_support(server, debugMode) {
         perMessageDeflate: false
     });
     const BUCKET_DELAY_MILLIS = 50;
-    const BUCKET_KICK_THRESHOLD = 25;
+    const BUCKET_KICK_THRESHOLD = 150;
     io.on("connection", (socket) => {
         const bucket = [];
         const oldOn = socket.on;
