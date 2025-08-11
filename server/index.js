@@ -23,7 +23,7 @@ if (multiplayerEnabled !== 2) {
         res.status(200).send(await readFile("./server/multiplayer_notice.html", {encoding: "utf8"}));
     });
 }
-app.use(cors({ origin: process.env.SYNTHETIC_CORS || "*", credentials: true }))
+app.use(cors({ origin: process.env.SYNTHETIC_CORS || "*", credentials: !!process.env.SYNTHETIC_CORS }))
 
 
 const blacklistMiddleware = (req, res, next) => {

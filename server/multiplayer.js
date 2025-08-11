@@ -47,7 +47,7 @@ function multiplayer_support(server, debugMode) {
         cors: {
             origin: process.env.SYNTHETIC_CORS || "*",
             methods: ["GET", "POST", "OPTIONS", "PUT", "DELETE"],
-            credentials: true
+            credentials: !!process.env.SYNTHETIC_CORS
         },
         perMessageDeflate: false
     });
