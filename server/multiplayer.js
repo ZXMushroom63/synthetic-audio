@@ -70,12 +70,23 @@ function multiplayer_support(server, debugMode) {
                     return;
                 }
                 lastReq = Date.now()
-                return handler(e);
+                try {
+                    handler(e);
+                } catch(e) {
+                    //swallow
+                }
             }]);
         }
         var bucketTimer = setInterval(()=>{
+            if (bucket.length === 0) {
+                return;
+            }
             lastReq = Date.now();
-            handlers.get(bucket[0][0])(bucket[0][1]);
+            try {
+                handlers.get(bucket[0][0])(bucket[0][1]);
+            } catch (error) {
+                //swallow
+            }
             bucket.splice(0, 1);
         }, BUCKET_DELAY_MILLIS);
         socket.on("disconnect", ()=>{
