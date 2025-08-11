@@ -376,7 +376,7 @@ select:focus {
 }
 
 #renderOut {
-  filter: invert(95%);
+  color-scheme: dark;
 }
 
 .timePosMarker {
