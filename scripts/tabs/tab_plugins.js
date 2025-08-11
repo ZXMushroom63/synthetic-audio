@@ -642,7 +642,7 @@ addEventListener("init", async () => {
             document.querySelector("#renderProgress").innerText = `Multiplayer system initialised! Connecting to server...`;
             const socket = globalThis.socket = 
             location.href.includes("discord") 
-                ? io("https://1403677664514146325.discordsays.com/discord-multiplayer-host", { path: "/discord-multiplayer-host/socket.io/", withCredentials: true })
+                ? io("https://1403677664514146325.discordsays.com", { path: "/discord-multiplayer-host/socket.io/", withCredentials: true })
                 : io(params.get("multiplayer"), { withCredentials: true });
             multiplayer.enable(socket);
             socket.on('connect', () => {
