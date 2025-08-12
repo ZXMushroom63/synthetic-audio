@@ -170,14 +170,14 @@ addEventListener("init", () => {
             voices[v].__oct = voicesMidi[v];
         });
 
-        voices.sort((a, b)=>b.__oct - a.__oct);
+        voices.sort((a, b) => b.__oct - a.__oct);
 
         const sheetCenter = parseInt(document.querySelector("#sheetOctave").value);
         for (let v = 0; v < voices.length; v++) {
             const octaveOffset = voicesMidi[voices.length - v - 1] - sheetCenter;
             abc += `V:${voices.length - v} clef=${octaveOffset < 0 ? "bass" : "treble"}\n${voices[v].trim()}\n`;
         }
-        
+
         return abc;
     };
 
@@ -226,12 +226,14 @@ addEventListener("init", () => {
             svg.setAttribute("viewBox", vb.join(" "));
             title.setAttribute("y", parseFloat(title.getAttribute("y")) * 2 + 20);
         }
-        MODMENU_OpenTab(null, "Sheet");
     }
 
     const sheetGui = new ModMenu("Sheet Music Generator (powered by abcjs)", tabs, "sheetgen", syntheticMenuStyles);
     sheetGui.oninit = function (menu) {
-        menu.querySelector("#sheetGoButton").addEventListener("click", renderSheet);
+        menu.querySelector("#sheetGoButton").addEventListener("click", () => {
+            renderSheet();
+            sheetGui.openTab(null, "Sheet");
+        });
     }
     registerTool("Sheet [BETA]", (nodes) => {
         if (!nodes) { return };
