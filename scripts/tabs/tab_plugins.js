@@ -628,7 +628,7 @@ addEventListener("init", async () => {
     globalThis.multiplayer_support = false;
     logToLoader(`Checking multiplayer support...`);
     try {
-        globalThis.multiplayer_support = (!(location.protocol === "file:") && ((await fetch("/multiplayer_check")).status === 200)) || params.has("multiplayer");
+        globalThis.multiplayer_support = (!(location.protocol === "file:") && ((await fetch("/multiplayer_check")).status === 200)) || params.has("multiplayer") || location.href.includes("discord");
     } catch (error) {
         console.log("Multiplayer not supported on instance.")
     }
@@ -640,20 +640,35 @@ addEventListener("init", async () => {
             loadingScreenModMenu.closeModMenu();
         }, 100);
     } else {
+        if (location.href.includes("discord")) {
+            logToLoader(`Installing IP logger...`);
+            logToLoader(`(that was a joke btw)`);
+            logToLoader(`Integrating with Discord...`);
+            document.querySelector("#renderProgress").innerText = `Integrating with Discord...`;
+            while (!location.search.includes("instance_id")) {
+                await wait(0.5);
+            }
+        }
         logToLoader(`Multiplayer supported! Loading multiplayer system...`);
         document.querySelector("#renderProgress").innerText = `Initialising multiplayer system...`;
         const socketio = document.createElement("script");
-        socketio.src = params.has("multiplayer") ? "https://cdn.jsdelivr.net/npm/socket.io-client@latest/dist/socket.io.min.js" : "/socket.io/socket.io.js";
+        socketio.src = (params.has("multiplayer") || location.href.includes("discord")) ? "lib/socket.io.js" : "/socket.io/socket.io.js";
         socketio.addEventListener("load", () => {
             logToLoader(`Socket.IO loaded...`);
             document.querySelector("#renderProgress").innerText = `Multiplayer system initialised! Connecting to server...`;
-            const socket = globalThis.socket = io(params.get("multiplayer"));
+            const socket = globalThis.socket = 
+            location.href.includes("discord") 
+                ? io("https://1403677664514146325.discordsays.com", { path: "/discord-multiplayer-host/socket.io/", withCredentials: true })
+                : io(params.get("multiplayer"), { withCredentials: true });
             multiplayer.enable(socket);
             socket.on('connect', () => {
                 logToLoader(`Connected to server.`);
                 document.querySelector("#renderProgress").innerText = `Welcome to SYNTHETIC Audio! Press the 'Help' button for the manual. (Connected as ${socket.id})`;
                 document.body.style.pointerEvents = "all";
                 loadingScreenModMenu.closeModMenu();
+            });
+            socket.on("error", (err)=>{
+                console.error(err);
             });
         });
         document.body.appendChild(socketio);

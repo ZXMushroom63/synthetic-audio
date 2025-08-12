@@ -110,7 +110,7 @@ async function convertToFileBlob(float32Arrays, channels, sampleRate, bRate, for
     startTiming("encode");
     var blob;
 
-    if (audio.format !== "wav" && !forceWav) {
+    if (audio.format !== "wav" && !forceWav && "ffmpeg" in window) {
         if (ffmpeg.isLoaded()) {
             ffmpeg.exit();
         }

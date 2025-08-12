@@ -7,14 +7,19 @@ var customBufferedMessagesByUUIDTimers = {};
 const multiplayer = {
     isHooked: false,
     on: false,
+    instanceId: "default",
     hook: function () {
 
     },
     write: function (data) {
+        document.body.style.pointerEvents = "none";
+        document.querySelector("#renderProgress").innerText = `Sending project file to server...`;
         socket.emit('global_write', data);
     },
     sync: function () {
-        socket.emit('sync');
+        const urlParams = new URLSearchParams(location.search);
+        multiplayer.instanceId = urlParams.get("instance_id") || "default";
+        socket.emit('sync', multiplayer.instanceId);
         console.log("Requesting sync...");
     },
     _patchLoop: function (target, res) {
@@ -26,7 +31,7 @@ const multiplayer = {
         target.setAttribute("data-editlayer", res.editorLayer);
         target.querySelector(".loopInternal .name").innerText = res.file;
         target.classList.remove("selected");
-        customEvent("loopmoved", {loop: target});
+        customEvent("loopmoved", { loop: target });
         if (filters[target.getAttribute("data-type")]?.updateMiddleware) {
             filters[target.getAttribute("data-type")].updateMiddleware(target);
         }
@@ -34,15 +39,22 @@ const multiplayer = {
         hydrateLoopDecoration(target);
     },
     enable: function (socket) {
+        const urlParams = new URLSearchParams(location.search);
+        multiplayer.instanceId = urlParams.get("instance_id") || "default";
         multiplayer.on = true;
         const syncBtn = document.querySelector("[data-convert-to-sync]");
         syncBtn.innerText = "Sync";
-        syncBtn.removeAttribute("onclick");
-        syncBtn.onclick = multiplayer.sync;
+        syncBtn.removeEventListener("click", loadAutosave);
+        syncBtn.addEventListener("click", multiplayer.sync);
         socket.on('connect', () => {
             multiplayer.sync();
         });
+        socket.on('disconnect', () => {
+            document.querySelector("#renderProgress").innerText = `Disconnected from server.`;
+        });
         socket.on('deserialise', (data) => {
+            document.body.style.pointerEvents = "all";
+            document.querySelector("#renderProgress").innerText = `Received new project file!`;
             multiplayer.isHooked = true;
             deserialise(data);
             multiplayer.isHooked = false;
@@ -91,7 +103,7 @@ const multiplayer = {
             if (target.type === "checkbox") {
                 target.checked = res.value;
             } else if (target instanceof HTMLSelectElement) {
-                target.selectedIndex = [...target.options].findIndex(x=>x.value === res.value);
+                target.selectedIndex = [...target.options].findIndex(x => x.value === res.value);
             } else {
                 target.value = res.value;
             }
@@ -170,7 +182,7 @@ const multiplayer = {
         }, 200);
     },
     listen: function (ev, listener) {
-        addEventListener("netcode:"+ev, listener);
+        addEventListener("netcode:" + ev, listener);
     }
 }
 globalThis.multiplayer = multiplayer;

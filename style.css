@@ -410,6 +410,10 @@ select:focus {
   font-family: sans-serif;
 }
 
+#renderOut {
+  color-scheme: dark;
+}
+
 .timePosMarker {
   position: relative;
   display: inline-block;

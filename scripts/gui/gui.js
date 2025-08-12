@@ -96,6 +96,9 @@ function updateLOD() {
 
 function markLoopDirty(loop, wasMoved) {
     wakatimeInteraction();
+    if (loop.hasAttribute("data-dirty")) {
+        return;
+    }
     if (!multiplayer.isHooked && multiplayer.on && !loop._netIngore) {
         customEvent("loopchangedcli", { loop: loop });
         return multiplayer.markLoopDirty(JSON.stringify({
