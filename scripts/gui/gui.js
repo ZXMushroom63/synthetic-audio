@@ -96,7 +96,6 @@ function updateLOD() {
 
 function markLoopDirty(loop, wasMoved) {
     wakatimeInteraction();
-    customEvent("loopchangedcli", { loop: loop });
     if (!multiplayer.isHooked && multiplayer.on && !loop._netIngore && (
         (!loop.hasAttribute("data-dirty"))
         || (wasMoved && (!loop.hasAttribute("data-wasMovedSinceRender")))
@@ -112,6 +111,7 @@ function markLoopDirty(loop, wasMoved) {
         loop.setAttribute("data-wasMovedSinceRender", "yes");
     }
     customEvent("loopchanged", { loop: loop });
+    customEvent("loopchangedcli", { loop: loop });
 }
 function hydrateBeatMarkers() {
     updateLOD();
