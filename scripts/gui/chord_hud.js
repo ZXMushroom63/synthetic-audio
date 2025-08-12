@@ -761,7 +761,7 @@ function drawChordMacros(loop, inversionsOnly) {
         rendereableMacros.push({
             side: inversionsOnly ? "right" : "left",
             chord: chord,
-            text: `${(gui.autocorrect === "OFF")?"":`<code>${reverseChordIndexMap[chord.root]}</code>`} <code>${chord.range}</code> ${chord.inversion === 0 ? "<span style='color:skyblue'>OriginalX</span>" : "InversionX " + chord.inversion} ${i === 0 ? " (Smallest)" : ""}`,
+            text: `${(!reverseChordIndexMap[chord.root]) ? "" : `<code>${reverseChordIndexMap[chord.root]}</code>`} <code>${chord.range}</code> ${chord.inversion === 0 ? "<span style='color:skyblue'>OriginalX</span>" : "InversionX " + chord.inversion} ${i === 0 ? " (Smallest)" : ""}`,
             template: template,
             octaveOffset: octaveOffset
         });
