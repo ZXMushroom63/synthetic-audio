@@ -389,7 +389,7 @@ addEventListener("init", async () => {
         document.querySelector("#renderProgress").innerText = `Downloaded SYNTHETIC Devtools.`;
     }, "dldev");
     mkBtn("Download FluidR3-GM fonts (148MB)", async () => {
-        var fontList = await (await fetch(soundFontRepo + "names.json?plugin=true")).json();
+        var fontList = await (await fetch(soundFontRepo + "FluidR3_GM/names.json?plugin=true")).json();
         for (let i = 0; i < fontList.length; i++) {
             const font = fontList[i];
             document.querySelector("#renderProgress").innerText = `Downloading FluidR3-GM sound fonts: (${(i / (fontList.length) * 100).toFixed(1)}%); current: ${font}`;
