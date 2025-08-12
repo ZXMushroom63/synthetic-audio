@@ -96,10 +96,11 @@ function updateLOD() {
 
 function markLoopDirty(loop, wasMoved) {
     wakatimeInteraction();
-    if (loop.hasAttribute("data-dirty")) {
-        return;
-    }
-    if (!multiplayer.isHooked && multiplayer.on && !loop._netIngore) {
+    customEvent("loopchangedcli", { loop: loop });
+    if (!multiplayer.isHooked && multiplayer.on && !loop._netIngore && (
+        (!loop.hasAttribute("data-dirty"))
+        || (wasMoved && (!loop.hasAttribute("data-wasMovedSinceRender")))
+    )) {
         customEvent("loopchangedcli", { loop: loop });
         return multiplayer.markLoopDirty(JSON.stringify({
             uuid: loop.getAttribute("data-uuid"),
@@ -111,7 +112,6 @@ function markLoopDirty(loop, wasMoved) {
         loop.setAttribute("data-wasMovedSinceRender", "yes");
     }
     customEvent("loopchanged", { loop: loop });
-    customEvent("loopchangedcli", { loop: loop });
 }
 function hydrateBeatMarkers() {
     updateLOD();
@@ -731,7 +731,7 @@ function init() {
             zoomActuatorDebouncer = setTimeout(actuateZoom, 500);
         }
     }, { passive: false });
-    addEventListener("keyup", (e)=>{
+    addEventListener("keyup", (e) => {
         if (e.key === "Control" && zoomActuatorDebouncer) {
             clearTimeout(zoomActuatorDebouncer);
             actuateZoom();
