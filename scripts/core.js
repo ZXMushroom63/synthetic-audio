@@ -41,7 +41,7 @@ function frequencyToNote(frequency, useFlats) {
     const notes = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
     const notesFlat = ['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B'];
     let noteNumber = 12 * (Math.log(frequency / A4) / Math.log(2)) + 57;
-    let noteIndex = (Math.round(noteNumber) + 12*(Math.floor(-noteNumber / 12) + 2)) % 12;
+    let noteIndex = (Math.round(noteNumber) + 12 * (Math.floor(-noteNumber / 12) + 2)) % 12;
     let octave = Math.floor(Math.round(noteNumber) / 12);
 
     return ((useFlats ? notesFlat : notes)[noteIndex] + octave) || "U0";
@@ -277,8 +277,12 @@ async function decodeSoundFonts(ax) {
         for (const note in instrument) {
             j++;
             document.querySelector("#renderProgress").innerText = `Decoding font PCM Data... (${((i / 88) * 100).toFixed(1)}%)`;
-            const arraybuffer = await (await fetch(instrument[note])).arrayBuffer();
-            SFCACHE[instrumentName][note] = await ax.decodeAudioData(arraybuffer);
+            try {
+                const arraybuffer = await (await fetch(instrument[note])).arrayBuffer();
+                SFCACHE[instrumentName][note] = await ax.decodeAudioData(arraybuffer);
+            } catch (e) {
+                //
+            }
         }
     }
 }
