@@ -25,7 +25,7 @@ addBlockType("warp", {
             if (this.conf.AntiAlias) {
                 out[i] = lerp(inPcm[Math.floor(position)] || 0, inPcm[Math.ceil(position)] || 0, position % 1) || 0;
             } else {
-                out[i] = inPcm[chunkBase + Math.round()] || 0;
+                out[i] = inPcm[chunkBase + Math.round(position)] || 0;
             }
         });
         return out;
