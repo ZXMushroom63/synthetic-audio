@@ -669,8 +669,8 @@ async function render() {
     processRendering = false;
     document.querySelector("#renderBtn").disabled = false;
 
-    findLoops(".loop").forEach(hydrateLoopDecoration);
     currentlyRenderedLoop = null;
+    findLoops(".loop").forEach(hydrateLoopDecoration);
 }
 
 function undirtyRenderTreeNode(node) {
@@ -683,3 +683,13 @@ function undirtyRenderTreeNode(node) {
     node.ref.endOld = node.end;
     node.ref.renderHash = hashNode(node.ref);
 }
+
+addEventListener("error", () => {
+    if (!processRendering) {return}
+    document.querySelector("#renderBtn").removeAttribute("disabled");
+
+    processRendering = false;
+    document.querySelector("#renderBtn").disabled = false;
+
+    currentlyRenderedLoop = null
+});
