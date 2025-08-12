@@ -3,8 +3,9 @@
 //.sf2 support   https://danigb.github.io/soundfont-player/
 // TODO: Add separate Unison node
 // https://gleitz.github.io/midi-js-soundfonts/FluidR3_GM/names.json
-// https://gleitz.github.io/midi-js-soundfonts/FluidR3_GM/{id}-ogg.js
+// FluidR3_GM/{id}-ogg.js
 addEventListener("init", async () => {
+    const soundFontRepo = IS_DISCORD ? "https://1403677664514146325.discordsays.com/gleitzsf2/" : "https://gleitz.github.io/midi-js-soundfonts/";
     function getRootFolders(zip) {
         let paths = [];
         for (const relativePath in zip.files) {
@@ -142,7 +143,7 @@ addEventListener("init", async () => {
                 const key = filename.replace("wt/", "").replaceAll(".wav", "");
 
                 WAVETABLES[key] = buffer;
-                
+
             }
         }
     }
@@ -388,11 +389,11 @@ addEventListener("init", async () => {
         document.querySelector("#renderProgress").innerText = `Downloaded SYNTHETIC Devtools.`;
     }, "dldev");
     mkBtn("Download FluidR3-GM fonts (148MB)", async () => {
-        var fontList = await (await fetch("https://gleitz.github.io/midi-js-soundfonts/FluidR3_GM/names.json?plugin=true")).json();
+        var fontList = await (await fetch(soundFontRepo + "names.json?plugin=true")).json();
         for (let i = 0; i < fontList.length; i++) {
             const font = fontList[i];
             document.querySelector("#renderProgress").innerText = `Downloading FluidR3-GM sound fonts: (${(i / (fontList.length) * 100).toFixed(1)}%); current: ${font}`;
-            await addFileMod(font + ".sf.js", patchSoundFont(await (await fetch("https://gleitz.github.io/midi-js-soundfonts/FluidR3_GM/" + font + "-ogg.js?plugin=true")).text()));
+            await addFileMod(font + ".sf.js", patchSoundFont(await (await fetch(soundFontRepo + "FluidR3_GM/" + font + "-ogg.js?plugin=true")).text()));
             await drawModArray();
         }
         document.querySelector("#renderProgress").innerText = `Downloaded FluidR3-GM sound fonts.`;
@@ -401,11 +402,11 @@ addEventListener("init", async () => {
         if (!await confirm("The MusyngKite soundfont is nearly identical to FluidR3-GM, but with better audio quality and a much larger file size (1.75GB). Are you sure you want to download it?", "Download Soundfonts")) {
             return;
         }
-        var fontList = await (await fetch("https://gleitz.github.io/midi-js-soundfonts/MusyngKite/names.json?plugin=true")).json();
+        var fontList = await (await fetch(soundFontRepo + "MusyngKite/names.json?plugin=true")).json();
         for (let i = 0; i < fontList.length; i++) {
             const font = fontList[i];
             document.querySelector("#renderProgress").innerText = `Downloading MusyngKite sound fonts: (${(i / (fontList.length) * 100).toFixed(1)}%); current: ${font}`;
-            await addFileMod("musyng_" + font + ".sf.js", patchSoundFont(await (await fetch("https://gleitz.github.io/midi-js-soundfonts/MusyngKite/" + font + "-ogg.js?plugin=true")).text(), "musyng_"));
+            await addFileMod("musyng_" + font + ".sf.js", patchSoundFont(await (await fetch(soundFontRepo + "MusyngKite/" + font + "-ogg.js?plugin=true")).text(), "musyng_"));
             await drawModArray();
         }
         document.querySelector("#renderProgress").innerText = `Downloaded MusyngKite sound fonts.`;
@@ -497,7 +498,7 @@ addEventListener("init", async () => {
             const data = mod.split("\n").map(x => x.trim());
             try {
                 SFREGISTRY[data[0]] = JSON.parse(data[1]);
-            } catch(e) {
+            } catch (e) {
                 logToLoader("Failed to parse " + modList[i]);
             }
         } else if (modList[i].endsWith(".js")) {
