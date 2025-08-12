@@ -309,7 +309,12 @@ Just remember to be careful to not accidentally destroy your ear drums.
 `);
 helpContent.addTab("Misc Tab", "(coming soon)");
 helpContent.addTab("Multiplayer", "(coming soon)");
-
+helpContent.addTab("ToS", 
+`
+[Terms of Use](terms_of_use.html)
+[Privacy Policy](privacy_policy.html)
+`
+);
 
 
 
