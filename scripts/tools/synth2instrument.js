@@ -1,6 +1,6 @@
 
 addEventListener("init", () => {
-    registerTool("Synth Conv", (nodes) => {
+    registerTool("Synth Conv", async (nodes) => {
         if (!nodes) { return };
 
         const valid_types = Object.entries(filters)
@@ -17,7 +17,7 @@ addEventListener("init", () => {
         }
         if (!foundValidType) { return }
 
-        var targetIdx = parseInt(prompt(`Select conversion target: ${valid_types.map((x, i) => "\n" + (i + 1) + " - " + filters[x].title).join("")}`, "1")) - 1;
+        var targetIdx = parseInt(await prompt(`Select conversion target: ${valid_types.map((x, i) => "\n" + (i + 1) + " - " + filters[x].title).join("")}`, "1", "Synth Converter")) - 1;
         if (!valid_types[targetIdx]) {
             return;
         }

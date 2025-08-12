@@ -5,6 +5,7 @@ addBlockType("warp", {
     configs: {
         "ChunkSize": [0, "number"],
         "Position": ["#0~1", "number", 1],
+        "AntiAlias": [false, "checkbox"],
     },
     functor: function (inPcm, channel, data) {
         var pos = _(this.conf.Position, inPcm.length);
@@ -17,9 +18,15 @@ addBlockType("warp", {
         } else {
             chunkPcm = new Float32Array(chunk);
         }
-        out.forEach((x, i)=>{
+        out.forEach((x, i) => {
             var chunkBase = Math.floor(i / chunk) * chunk;
-            out[i] = inPcm[chunkBase + Math.round(chunk * pos(i%chunk, chunkPcm))] || 0;
+            const position = chunk * pos(i % chunk, chunkPcm);
+
+            if (this.conf.AntiAlias) {
+                out[i] = lerp(inPcm[Math.floor(position)] || 0, inPcm[Math.ceil(position)] || 0, position % 1) || 0;
+            } else {
+                out[i] = inPcm[chunkBase + Math.round(position)] || 0;
+            }
         });
         return out;
     }

@@ -36,7 +36,7 @@ addBlockType("sculpt", {
                 formula += `(${x}-${this.conf.λ})²`;
             }
             navigator.clipboard.writeText(formula);
-            alert("Copied: \n" + formula);
+            toast("Copied: \n" + formula, 1.5);
         },
     },
     functor: function (inPcm, channel, data) {

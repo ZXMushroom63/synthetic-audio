@@ -106,8 +106,8 @@ addEventListener("init", () => {
 
     const makeNewWaveform = document.createElement("button");
     makeNewWaveform.innerText = "New";
-    makeNewWaveform.addEventListener("click", (e) => {
-        var newWaveformName = cleanString(prompt("Waveform name: ", "new waveform 1"));
+    makeNewWaveform.addEventListener("click", async (e) => {
+        var newWaveformName = cleanString(await prompt("Waveform name: ", "new waveform 1", "Waveforms Engine"));
         if (!newWaveformName) {
             return;
         }
@@ -466,6 +466,7 @@ addEventListener("init", () => {
         "adsr": "ADSR",
         "sculpt": "Sculpt",
         "randomwalk": "Walk",
+        "center": "Center"
     };
 
     const addModifierBtn = document.createElement("button");
@@ -691,8 +692,8 @@ addEventListener("init", () => {
             const renameBtn = document.createElement("button");
             renameBtn.classList.add("smallBtn");
             renameBtn.innerText = "✏️";
-            renameBtn.addEventListener("click", (e) => {
-                var newId = cleanString(prompt("Rename to: ", id));
+            renameBtn.addEventListener("click", async (e) => {
+                var newId = cleanString(await prompt("Rename to: ", id, "Waveforms Engine"));
                 if (!newId) {
                     return;
                 }
@@ -726,8 +727,8 @@ addEventListener("init", () => {
             const duplicateBtn = document.createElement("button");
             duplicateBtn.classList.add("smallBtn");
             duplicateBtn.innerText = "📋";
-            duplicateBtn.addEventListener("click", (e) => {
-                var newId = cleanString(prompt("Copy waveform to: ", id + " clone"));
+            duplicateBtn.addEventListener("click", async (e) => {
+                var newId = cleanString(await prompt("Copy waveform to: ", id + " clone", "Waveforms Engine"));
                 if (!newId) {
                     return;
                 }

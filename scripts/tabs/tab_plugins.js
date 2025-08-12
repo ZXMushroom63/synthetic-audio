@@ -3,8 +3,9 @@
 //.sf2 support   https://danigb.github.io/soundfont-player/
 // TODO: Add separate Unison node
 // https://gleitz.github.io/midi-js-soundfonts/FluidR3_GM/names.json
-// https://gleitz.github.io/midi-js-soundfonts/FluidR3_GM/{id}-ogg.js
+// FluidR3_GM/{id}-ogg.js
 addEventListener("init", async () => {
+    const soundFontRepo = IS_DISCORD ? "https://1403677664514146325.discordsays.com/gleitzsf2/" : "https://gleitz.github.io/midi-js-soundfonts/";
     function getRootFolders(zip) {
         let paths = [];
         for (const relativePath in zip.files) {
@@ -237,10 +238,16 @@ addEventListener("init", async () => {
         return button;
     }
     function patchSoundFont(sf, prefix = "") {
-        return sf
+        const split = sf
             .replace("if (typeof(MIDI) === 'undefined') var MIDI = {};", "")
             .replace("if (typeof(MIDI.Soundfont) === 'undefined') MIDI.Soundfont = {};", "")
-            .replace("MIDI.Soundfont.", "SFREGISTRY." + prefix);
+            .trim()
+            .replace("MIDI.Soundfont.", prefix)
+            .replace(" = ", "")
+            .replace("=", "")
+            .replace("{", "\n{")
+            .split("\n");
+        return split[0].trim() + "\n" + split.slice(1).join("").replaceAll("\n").trim().replace(",}", "}");
     }
     mkBtn("Upload hvcc (.js)", () => {
         var f = document.createElement("input");
@@ -382,24 +389,24 @@ addEventListener("init", async () => {
         document.querySelector("#renderProgress").innerText = `Downloaded SYNTHETIC Devtools.`;
     }, "dldev");
     mkBtn("Download FluidR3-GM fonts (148MB)", async () => {
-        var fontList = await (await fetch("https://gleitz.github.io/midi-js-soundfonts/FluidR3_GM/names.json?plugin=true")).json();
+        var fontList = await (await fetch(soundFontRepo + "names.json?plugin=true")).json();
         for (let i = 0; i < fontList.length; i++) {
             const font = fontList[i];
             document.querySelector("#renderProgress").innerText = `Downloading FluidR3-GM sound fonts: (${(i / (fontList.length) * 100).toFixed(1)}%); current: ${font}`;
-            await addFileMod(font + ".sf.js", patchSoundFont(await (await fetch("https://gleitz.github.io/midi-js-soundfonts/FluidR3_GM/" + font + "-ogg.js?plugin=true")).text()));
+            await addFileMod(font + ".sf.js", patchSoundFont(await (await fetch(soundFontRepo + "FluidR3_GM/" + font + "-ogg.js?plugin=true")).text()));
             await drawModArray();
         }
         document.querySelector("#renderProgress").innerText = `Downloaded FluidR3-GM sound fonts.`;
     }, "dl_fluidr3");
     mkBtn("Download MusyngKite fonts (1.75GB)", async () => {
-        if (!confirm("The MusyngKite soundfont is nearly identical to FluidR3-GM, but with better audio quality and a much larger file size (1.75GB). Are you sure you want to download it?")) {
+        if (!await confirm("The MusyngKite soundfont is nearly identical to FluidR3-GM, but with better audio quality and a much larger file size (1.75GB). Are you sure you want to download it?", "Download Soundfonts")) {
             return;
         }
-        var fontList = await (await fetch("https://gleitz.github.io/midi-js-soundfonts/MusyngKite/names.json?plugin=true")).json();
+        var fontList = await (await fetch(soundFontRepo + "MusyngKite/names.json?plugin=true")).json();
         for (let i = 0; i < fontList.length; i++) {
             const font = fontList[i];
             document.querySelector("#renderProgress").innerText = `Downloading MusyngKite sound fonts: (${(i / (fontList.length) * 100).toFixed(1)}%); current: ${font}`;
-            await addFileMod("musyng_" + font + ".sf.js", patchSoundFont(await (await fetch("https://gleitz.github.io/midi-js-soundfonts/MusyngKite/" + font + "-ogg.js?plugin=true")).text(), "musyng_"));
+            await addFileMod("musyng_" + font + ".sf.js", patchSoundFont(await (await fetch(soundFontRepo + "MusyngKite/" + font + "-ogg.js?plugin=true")).text(), "musyng_"));
             await drawModArray();
         }
         document.querySelector("#renderProgress").innerText = `Downloaded MusyngKite sound fonts.`;
@@ -485,13 +492,22 @@ addEventListener("init", async () => {
     var modList = await getMods();
     for (let i = 0; i < modList.length; i++) {
         document.querySelector("#renderProgress").innerText = `Loading plugins (${(i / (modList.length) * 100).toFixed(1)}%)`;
-        if (modList[i].endsWith(".js")) {
+        if (modList[i].endsWith(".sf.js")) {
+            logToLoader(`Loading soundfont: ${modList[i]}`);
+            const mod = await getMod(modList[i]);
+            const data = mod.split("\n").map(x => x.trim());
+            try {
+                SFREGISTRY[data[0]] = JSON.parse(data[1]);
+            } catch (e) {
+                logToLoader("Failed to parse " + modList[i]);
+            }
+        } else if (modList[i].endsWith(".js")) {
             logToLoader(`Loading mod: ${modList[i]}`);
             const mod = await getMod(modList[i]);
             try {
                 (new Function(await mod)).apply(globalThis, []);
             } catch (error) {
-                console.error("Failed to load " + modList[i]);
+                logToLoader("Failed to load " + modList[i]);
             }
         } else if (modList[i].startsWith("wt/") && modList[i].endsWith(".wt.zip")) { //wavetable pack
             logToLoader(`Queuing wavetable pack: ${modList[i]}`);

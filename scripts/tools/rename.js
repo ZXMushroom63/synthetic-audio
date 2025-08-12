@@ -1,8 +1,8 @@
 
 addEventListener("init", ()=>{
-    registerTool("Rename", (nodes)=>{
+    registerTool("Rename", async (nodes)=>{
         if (!nodes) {return};
-        var newName = prompt("Rename loops to: ", nodes[0].getAttribute("data-file"));
+        var newName = await prompt("Rename loops to: ", nodes[0].getAttribute("data-file"), "Rename Loops");
         if (!newName) {
             return;
         }

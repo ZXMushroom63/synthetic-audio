@@ -417,12 +417,12 @@ addEventListener("init", () => {
     registerSetting("AutoReconnect", true);
 
     if (!params.has("multiplayer")) {
-        remoteMultiplayerConnect.addEventListener("click", () => {
-            var server = prompt("Specify the SYNTHETIC Audio server to connect to: ", "http://my-server.hosting-service.com");
+        remoteMultiplayerConnect.addEventListener("click", async () => {
+            var server = await prompt("Specify the SYNTHETIC Audio server to connect to: ", "http://my-server.hosting-service.com", "Remote Multiplayer");
             if (!server) {
                 return;
             }
-            var conf = confirm("Connect to " + server + "?");
+            var conf = confirm("Connect to " + server + "?", "Remote Multiplayer");
             if (!conf) {
                 return;
             }

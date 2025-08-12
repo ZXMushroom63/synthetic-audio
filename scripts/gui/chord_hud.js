@@ -573,7 +573,7 @@ function getChordTypeFromStack(loops) {
 }
 
 function getChordStack(loop, allowAtonal) {
-    if (loop.hasAttribute("data-deleted")) {
+    if (!loop || loop.hasAttribute("data-deleted")) {
         return [];
     }
     var combiner = allowAtonal ? "" : ":has(.chordDisplay)";
@@ -638,6 +638,7 @@ addEventListener("keydown", (e) => {
     };
 });
 function drawChordMacros(loop, inversionsOnly) {
+    inversionsOnly ||= (gui.autocorrect === "OFF")
     loop = getChordStack(loop)[0];
     if (!loop) {
         return;
@@ -670,6 +671,9 @@ function drawChordMacros(loop, inversionsOnly) {
 
     const entries = Object.entries(chordMacros).filter(ent => {
         return ent[1].applies.reduce((acc, v) => {
+            if (gui.autocorrect === "OFF") {
+                return false;
+            }
             if (acc) {
                 return acc;
             }
@@ -683,14 +687,18 @@ function drawChordMacros(loop, inversionsOnly) {
         }, false)
     });
 
-    const usedNumbers = entries.map(ent => ent[1].returns.length === 1 ? ent[1].returns[0].split("+")[0].split("^")[0] : null).filter(x => !!x);
-    const unusedChords = Object.keys(chordIndexMap);
-    usedNumbers.forEach((n) => {
-        if (unusedChords.includes(n)) {
-            unusedChords.splice(unusedChords.indexOf(n), 1);
-        }
-    });
-    entries.push(...unusedChords.map(x => [`<span style='color:#fe1f6f'>${x.toUpperCase() === loop.romanNumeral.toUpperCase() ? "InvertX" : "UnstableX"}</span> from <code>` + loop.romanNumeral.toUpperCase() + "</code>", { applies: [], returns: [x] }]));
+
+    if (gui.autocorrect !== "OFF") {
+        const usedNumbers = entries.map(ent => ent[1].returns.length === 1 ? ent[1].returns[0].split("+")[0].split("^")[0] : null).filter(x => !!x);
+        const unusedChords = Object.keys(chordIndexMap);
+        usedNumbers.forEach((n) => {
+            if (unusedChords.includes(n)) {
+                unusedChords.splice(unusedChords.indexOf(n), 1);
+            }
+        });
+        entries.push(...unusedChords.map(x => [`<span style='color:#fe1f6f'>${x.toUpperCase() === loop.romanNumeral.toUpperCase() ? "InvertX" : "UnstableX"}</span> from <code>` + loop.romanNumeral.toUpperCase() + "</code>", { applies: [], returns: [x] }]));
+    }
+
 
     const octaveOffset = 12 * (Math.min(...loop.relatedChord.map(x => getChromaticOctave(x.theoryNote))));
 
@@ -753,7 +761,7 @@ function drawChordMacros(loop, inversionsOnly) {
         rendereableMacros.push({
             side: inversionsOnly ? "right" : "left",
             chord: chord,
-            text: `<code>${reverseChordIndexMap[chord.root]}</code> <code>${chord.range}</code> ${chord.inversion === 0 ? "<span style='color:skyblue'>OriginalX</span>" : "InversionX " + chord.inversion} ${i === 0 ? " (Smallest)" : ""}`,
+            text: `${(!reverseChordIndexMap[chord.root]) ? "" : `<code>${reverseChordIndexMap[chord.root]}</code>`} <code>${chord.range}</code> ${chord.inversion === 0 ? "<span style='color:skyblue'>OriginalX</span>" : "InversionX " + chord.inversion} ${i === 0 ? " (Smallest)" : ""}`,
             template: template,
             octaveOffset: octaveOffset
         });

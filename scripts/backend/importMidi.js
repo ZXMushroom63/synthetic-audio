@@ -4,9 +4,9 @@ function midi2freq(i) {
 function freq2midi(f) {
     return 69 + 12*Math.log2(f/A4);
 }
-function processMidiImport(midiData) {
-    var doQuantise = confirm("! MIDI IMPORT !\nQuantise timings?");
-    var speedMult = 4*parseFloat(prompt("! MIDI IMPORT !\nChoose a speed multiplier:", 1));
+async function processMidiImport(midiData) {
+    var doQuantise = await confirm("Quantise timings?", "Midi Importer");
+    var speedMult = 4*parseFloat(await prompt("Choose a speed multiplier:", 1, "Midi Importer"));
     if (!speedMult) {
         return;
     }

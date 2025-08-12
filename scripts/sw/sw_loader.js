@@ -12,7 +12,7 @@ if ('serviceWorker' in navigator) {
 function updateApp() {
     if (sw?.active?.postMessage) {
         sw.active.postMessage({cmd: "CLEARCACHE"});
-        alert("Updating, please wait...");
+        toast("Updating, please wait...", 1.5);
         setTimeout(()=>{
             window.location.reload();
         }, 500);
