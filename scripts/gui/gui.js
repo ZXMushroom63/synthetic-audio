@@ -99,6 +99,7 @@ function markLoopDirty(loop, wasMoved) {
     if (!multiplayer.isHooked && multiplayer.on && !loop._netIngore && (
         (!loop.hasAttribute("data-dirty"))
         || (wasMoved && (!loop.hasAttribute("data-wasMovedSinceRender")))
+        || (parseInt(loop.getAttribute("data-lastsynchash")) !== hashNode(loop))
     )) {
         customEvent("loopchangedcli", { loop: loop });
         return multiplayer.markLoopDirty(JSON.stringify({
@@ -110,7 +111,6 @@ function markLoopDirty(loop, wasMoved) {
     if (wasMoved) {
         loop.setAttribute("data-wasMovedSinceRender", "yes");
     }
-    customEvent("loopchanged", { loop: loop });
     customEvent("loopchangedcli", { loop: loop });
 }
 function hydrateBeatMarkers() {

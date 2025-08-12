@@ -32,6 +32,7 @@ const multiplayer = {
         target.querySelector(".loopInternal .name").innerText = res.file;
         target.classList.remove("selected");
         customEvent("loopmoved", { loop: target });
+        customEvent("loopchanged", { loop: target });
         if (filters[target.getAttribute("data-type")]?.updateMiddleware) {
             filters[target.getAttribute("data-type")].updateMiddleware(target);
         }
@@ -128,7 +129,9 @@ const multiplayer = {
     },
     patchLoop: function (loop) {
         const uuid = loop.getAttribute("data-uuid");
-        const message = JSON.stringify(serialiseNode(loop, false, true));
+        const serialised = serialiseNode(loop, false, true);
+        loop.setAttribute("data-lastsynchash", hashSerialisedNode(serialised));
+        const message = JSON.stringify(serialised);
         if (patchMessagesByUUIDTimers[uuid]) {
             clearTimeout(patchMessagesByUUIDTimers[uuid]);
         }

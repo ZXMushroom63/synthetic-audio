@@ -60,8 +60,11 @@ function serialise(forRender, forMultiplayer) {
     customEvent("serialise", { data: out });
     return out;
 }
+function hashSerialisedNode(node) {
+    return cyrb53(JSON.stringify(node));
+}
 function hashNode(node) {
-    return cyrb53(JSON.stringify(serialiseNode(node)));
+    return hashSerialisedNode(serialiseNode(node, false, true));
 }
 function serialiseNode(node, forRender, forMultiplayer, allNodes) {
     if (allNodes) {
