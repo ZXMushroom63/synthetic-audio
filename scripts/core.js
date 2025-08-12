@@ -684,12 +684,14 @@ function undirtyRenderTreeNode(node) {
     node.ref.renderHash = hashNode(node.ref);
 }
 
-addEventListener("error", () => {
+addEventListener("error", (e) => {
     if (!processRendering) {return}
     document.querySelector("#renderBtn").removeAttribute("disabled");
 
     processRendering = false;
     document.querySelector("#renderBtn").disabled = false;
 
-    currentlyRenderedLoop = null
+    currentlyRenderedLoop = null;
+
+    document.querySelector("#renderProgress").innerText = "Error while rendering: " + e.message;
 });
