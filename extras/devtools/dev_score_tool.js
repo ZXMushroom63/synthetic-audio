@@ -21,7 +21,7 @@ registerTool("[Dev] 2score", (nodes) => {
             beatsDuration: parseFloat(node.getAttribute("data-duration")) / audio.beatSize
         });
     });
-    const scoreName = prompt("name: ", dev2score_lastName);
+    const scoreName = prompt("name: ", dev2score_lastName, "Dev2Score");
     if (!scoreName) {
         return;
     }

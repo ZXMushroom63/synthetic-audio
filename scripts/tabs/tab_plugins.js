@@ -398,7 +398,7 @@ addEventListener("init", async () => {
         document.querySelector("#renderProgress").innerText = `Downloaded FluidR3-GM sound fonts.`;
     }, "dl_fluidr3");
     mkBtn("Download MusyngKite fonts (1.75GB)", async () => {
-        if (!confirm("The MusyngKite soundfont is nearly identical to FluidR3-GM, but with better audio quality and a much larger file size (1.75GB). Are you sure you want to download it?")) {
+        if (!await confirm("The MusyngKite soundfont is nearly identical to FluidR3-GM, but with better audio quality and a much larger file size (1.75GB). Are you sure you want to download it?", "Download Soundfonts")) {
             return;
         }
         var fontList = await (await fetch("https://gleitz.github.io/midi-js-soundfonts/MusyngKite/names.json?plugin=true")).json();

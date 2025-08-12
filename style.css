@@ -170,6 +170,41 @@ html[data-libsettings-LDMLoopInteraction] .loop.active .loopInternal>* {
   display: none;
 }
 
+.toast {
+  position: fixed;
+  bottom: 20vh;
+  font-size: 1rem;
+  line-height: 2rem;
+  height: 2rem;
+  left: 50%;
+  background-color: rgba(199, 199, 199, 0.35);
+  color: white;
+  padding-left: 0.75rem;
+  transform: translateX(-50%);
+  border-radius: 1rem;
+  display: block;
+  padding-right: 0.75rem;
+  margin-right: auto;
+  user-select: none;
+}
+
+.fadeout {
+  animation-name: fadeanim;
+  animation-timing-function: linear;
+  animation-duration: 1s;
+  animation-iteration-count: 1;
+  animation-fill-mode: forwards;
+}
+
+@keyframes fadeanim {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
 .loopInternal {
   user-select: none;
   overflow-x: hidden;
