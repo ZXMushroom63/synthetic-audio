@@ -710,7 +710,9 @@ function init() {
         keymap = {};
     });
     var zoomActuatorDebouncer = null;
+    var prezoomLeftVal = null;
     function actuateZoom() {
+        prezoomLeftVal = null;
         zoomActuatorDebouncer = null;
         document.querySelector("#trackInternal").style.willChange = "";
         hydrateZoom(true);
@@ -721,10 +723,15 @@ function init() {
             e.preventDefault();
             e.stopImmediatePropagation();
             e.stopPropagation();
+            if (!prezoomLeftVal) {
+                prezoomLeftVal = document.querySelector("#track").scrollLeft + innerWidth/2;
+            }
             gui.zoom += e.deltaY * (keymap["Shift"] ? settings.ZoomScale * 0.05 : settings.ZoomScale);
             gui.zoom = Math.max(100, gui.zoom);
-            document.querySelector("#trackInternal").style.willChange = "transform";
-            document.querySelector("#trackInternal").style.transform = `scaleX(${gui.zoom / gui.lastHydratedZoom})`;
+            document.querySelector("#track").style.willChange = "scroll-position, transform";
+            const factor = gui.zoom / gui.lastHydratedZoom;
+            document.querySelector("#trackInternal").style.transform = `scaleX(${factor})`;
+            document.querySelector("#track").scrollLeft = prezoomLeftVal * factor - innerWidth/2;
             if (zoomActuatorDebouncer) {
                 clearTimeout(zoomActuatorDebouncer);
             }

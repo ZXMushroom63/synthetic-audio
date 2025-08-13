@@ -232,7 +232,7 @@ addBlockType("p_waveform_plus", {
                     }
                 }
                 t[h] += harmonicFrequency * dt;
-                t[h] %= 1;
+                t[h] = t[h] - (t[h] | 0);
                 finalPhases[h] = (t[h] + wavePhaseOffset) % 1;
             }
         });
@@ -320,16 +320,18 @@ addBlockType("p_waveform_plus", {
         });
 
         const phaseData = this.conf.SlidePhaseData.split(",").map(x => parseFloat(x));
-
+        const values = Object.fromEntries(keys.map(k => {
+            return [k, 0];
+        }));
         inPcm.forEach((x, i) => {
-            var absoluteTime = i / audio.samplerate;
-            var denominator = Math.max(...keys.flatMap((k) => { return underscores[k](i, inPcm) })) || 1;
+            const absoluteTime = i / audio.samplerate;
+            const denominator = Math.max(...keys.map((k) => { return underscores[k](i, inPcm) })) || 1;
             var total = 0;
-            var values = Object.fromEntries(keys.flatMap(k => {
-                var x = underscores[k](i, inPcm) / denominator;
+            for (const k in values) {
+                const x = underscores[k](i, inPcm) / denominator;
                 total += Math.abs(x);
-                return [[k, x]];
-            }));
+                values[k] = x;
+            }
             if (this.conf.BadSine && (i % badsineinterval) === 0) {
                 badsineamount = 2 * (Math.random() - 0.5);
             }
@@ -390,7 +392,7 @@ addBlockType("p_waveform_plus", {
                     }
                 }
                 t[h] += harmonicFrequency * dt;
-                t[h] %= 1;
+                t[h] = t[h] - (t[h] | 0);
                 var waveformTime = t[h];
 
 

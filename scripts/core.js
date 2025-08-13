@@ -243,7 +243,7 @@ function wait(s) {
 }
 async function decodeAudioFiles(ax) {
     document.querySelector("#renderProgress").innerText = "Decoding loop PCM Data...";
-    var usedAudioFiles = Array.prototype.flatMap.apply(document.querySelectorAll("div.loop[data-type=audio]"), [((x) => { return x.getAttribute("data-file") })]);
+    var usedAudioFiles = Array.prototype.map.apply(document.querySelectorAll("div.loop[data-type=audio]"), [((x) => { return x.getAttribute("data-file") })]);
     usedAudioFiles = [...new Set(usedAudioFiles)];
     for (let i = 0; i < usedAudioFiles.length; i++) {
         const fileName = usedAudioFiles[i];
@@ -277,12 +277,8 @@ async function decodeSoundFonts(ax) {
         for (const note in instrument) {
             j++;
             document.querySelector("#renderProgress").innerText = `Decoding font PCM Data... (${((i / 88) * 100).toFixed(1)}%)`;
-            try {
-                const arraybuffer = await (await fetch(instrument[note])).arrayBuffer();
-                SFCACHE[instrumentName][note] = await ax.decodeAudioData(arraybuffer);
-            } catch (e) {
-                //
-            }
+            const arraybuffer = await (await fetch(instrument[note])).arrayBuffer();
+            SFCACHE[instrumentName][note] = await ax.decodeAudioData(arraybuffer);
         }
     }
 }
@@ -316,6 +312,7 @@ function normaliseFloat32Arrays(arrays) {
         }
     }
 }
+
 var layerCache = {};
 function constructAbstractLayerMapsForLevel(nodes, usedLayers) {
     var abstractLayerMaps = [];
@@ -558,12 +555,13 @@ async function render() {
     if (document.querySelector("#renderOut").src) {
         URL.revokeObjectURL(document.querySelector("#renderOut").src);
     }
-    var output = [];
-    startTiming("render");
-    var data = serialise(true);
-    var channels = data.stereo ? 2 : 1;
 
-    var ax = new OfflineAudioContext(channels, audio.length, audio.samplerate);
+    startTiming("render");
+    const data = serialise(true);
+    const channels = data.stereo ? 2 : 1;
+    const output = new Array(channels);
+
+    const ax = new OfflineAudioContext(channels, audio.length, audio.samplerate);
 
     document.querySelector("#renderBtn").setAttribute("disabled", "true");
     await decodeAudioFiles(ax);
@@ -580,10 +578,10 @@ async function render() {
     var processedNodeCount = 0;
     try {
         for (let c = 0; c < channels; c++) {
-            var channelPcms = [];
+            const channelPcms = [];
             for (let q = 0; q < renderDataArray.length; q++) {
                 const abstractLayerMaps = renderDataArray[q];
-                var initialPcm = layerCache[abstractLayerMaps.layerId]?.[c] || new Float32Array(audio.length);
+                const initialPcm = layerCache[abstractLayerMaps.layerId]?.[c] || new Float32Array(audio.length);
 
                 if (abstractLayerMaps.needsUpdating) {
                     for (let l = 0; l < abstractLayerMaps.length; l++) {
@@ -603,8 +601,8 @@ async function render() {
                                 node.ref.cache = [null, null];
                             }
 
-                            var startTime = Math.floor(node.start * audio.samplerate);
-                            var endTime = Math.floor((node.start + node.duration) * audio.samplerate);
+                            const startTime = Math.floor(node.start * audio.samplerate);
+                            const endTime = Math.floor((node.start + node.duration) * audio.samplerate);
 
                             if (!node.ref.cache[c]) {
                                 currentlyRenderedLoop = node;
@@ -619,12 +617,12 @@ async function render() {
                                 if (calculatedNodeCount % 5 === 0) {
                                     document.querySelector("#renderProgress").innerText = `Processing layers... (${Math.floor(calculatedNodeCount / (1 + audio.stereo))}/${dirtyNodeTotal})`;
                                 }
+                                await wait(0);
                             } else {
                                 newPcm = node.ref.cache[c];
                             }
 
                             initialPcm.set(newPcm, startTime);
-                            await wait(0);
                         }
                         if (!layerCache[abstractLayerMaps.layerId]) {
                             layerCache[abstractLayerMaps.layerId] = [null, null];
@@ -640,7 +638,7 @@ async function render() {
                     channelPcms.push(initialPcm);
                 }
             }
-            output.push(sumFloat32Arrays(channelPcms));
+            output[c] = sumFloat32Arrays(channelPcms);
         }
         customEvent("render");
         if (audio.normalise) {
@@ -648,6 +646,7 @@ async function render() {
         }
         var renderTime = stopTiming("render");
         document.querySelector("#renderProgress").innerText = "Encoding...";
+        console.log("Encode queued.");
         var blob = await convertToFileBlob(output, channels, audio.samplerate, audio.bitrate);
     } catch (error) {
         stopTiming("render");
@@ -669,8 +668,8 @@ async function render() {
     processRendering = false;
     document.querySelector("#renderBtn").disabled = false;
 
-    currentlyRenderedLoop = null;
     findLoops(".loop").forEach(hydrateLoopDecoration);
+    currentlyRenderedLoop = null;
 }
 
 function undirtyRenderTreeNode(node) {
@@ -683,15 +682,3 @@ function undirtyRenderTreeNode(node) {
     node.ref.endOld = node.end;
     node.ref.renderHash = hashNode(node.ref);
 }
-
-addEventListener("error", (e) => {
-    if (!processRendering) {return}
-    document.querySelector("#renderBtn").removeAttribute("disabled");
-
-    processRendering = false;
-    document.querySelector("#renderBtn").disabled = false;
-
-    currentlyRenderedLoop = null;
-
-    document.querySelector("#renderProgress").innerText = "Error while rendering: " + e.message;
-});
