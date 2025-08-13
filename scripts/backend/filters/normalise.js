@@ -13,10 +13,7 @@ addBlockType("normalise", {
             inPcm.forEach((x, i) => {
                 const avgAlpha = Math.min(1, getMvgAvg(i, inPcm) * inverseSamplerate);
                 peak = lerp(peak, Math.abs(x), avgAlpha);
-                if (i % 2048 === 0) {
-                    console.log(peak);
-                }
-                inPcm[i] = x / peak;
+                inPcm[i] = x / (peak * 2);
             });
             return inPcm;
         } else {
