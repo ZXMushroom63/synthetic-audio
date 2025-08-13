@@ -615,12 +615,12 @@ async function render() {
                                 if (calculatedNodeCount % 5 === 0) {
                                     document.querySelector("#renderProgress").innerText = `Processing layers... (${Math.floor(calculatedNodeCount / (1 + audio.stereo))}/${dirtyNodeTotal})`;
                                 }
+                                await wait(0);
                             } else {
                                 newPcm = node.ref.cache[c];
                             }
 
                             initialPcm.set(newPcm, startTime);
-                            await wait(0);
                         }
                         if (!layerCache[abstractLayerMaps.layerId]) {
                             layerCache[abstractLayerMaps.layerId] = [null, null];
