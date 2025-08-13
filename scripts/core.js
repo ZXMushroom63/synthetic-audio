@@ -277,52 +277,38 @@ async function decodeSoundFonts(ax) {
         for (const note in instrument) {
             j++;
             document.querySelector("#renderProgress").innerText = `Decoding font PCM Data... (${((i / 88) * 100).toFixed(1)}%)`;
-            try {
-                const arraybuffer = await (await fetch(instrument[note])).arrayBuffer();
-                SFCACHE[instrumentName][note] = await ax.decodeAudioData(arraybuffer);
-            } catch (e) {
-                //
-            }
+            const arraybuffer = await (await fetch(instrument[note])).arrayBuffer();
+            SFCACHE[instrumentName][note] = await ax.decodeAudioData(arraybuffer);
         }
     }
 }
 function sumFloat32Arrays(arrays) {
     if (arrays.length === 0) return new Float32Array(0);
     const length = arrays[0].length;
-    const result = arrays[0]; //start with the first array, loop on from i=0
+    const result = new Float32Array(length);
 
-    for (const array of arrays) {
-        for (let i = 1; i < length; i++) {
+    for (let i = 0; i < length; i++) {
+        for (let array of arrays) {
             result[i] += array[i];
         }
     }
 
-    return arrays[0];
+    return result;
 }
-
-
 function normaliseFloat32Arrays(arrays) {
-    const numArrays = arrays.length;
-    if (numArrays === 0) {
-        return;
-    }
+    if (arrays.length === 0) return [];
+    var largestsample = 0.001;
+    const length = arrays[0].length;
 
-    let largestSample = 0.0;
-    for (const array of arrays) {
-        for (const sample of array) {
-            const absSample = Math.abs(sample);
-            if (absSample > largestSample) {
-                largestSample = absSample;
-            }
+    for (let i = 0; i < length; i++) {
+        for (let array of arrays) {
+            largestsample = Math.max(largestsample, Math.abs(array[i]));
         }
     }
 
-    if (largestSample > 0) {
-        const scalingFactor = 1.0 / largestSample;
-        for (const array of arrays) {
-            for (let i = 0; i < array.length; i++) {
-                array[i] *= scalingFactor;
-            }
+    for (let i = 0; i < length; i++) {
+        for (let array of arrays) {
+            array[i] /= largestsample;
         }
     }
 }
@@ -682,8 +668,8 @@ async function render() {
     processRendering = false;
     document.querySelector("#renderBtn").disabled = false;
 
-    currentlyRenderedLoop = null;
     findLoops(".loop").forEach(hydrateLoopDecoration);
+    currentlyRenderedLoop = null;
 }
 
 function undirtyRenderTreeNode(node) {
@@ -696,15 +682,3 @@ function undirtyRenderTreeNode(node) {
     node.ref.endOld = node.end;
     node.ref.renderHash = hashNode(node.ref);
 }
-
-addEventListener("error", (e) => {
-    if (!processRendering) {return}
-    document.querySelector("#renderBtn").removeAttribute("disabled");
-
-    processRendering = false;
-    document.querySelector("#renderBtn").disabled = false;
-
-    currentlyRenderedLoop = null;
-
-    document.querySelector("#renderProgress").innerText = "Error while rendering: " + e.message;
-});
