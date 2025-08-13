@@ -1,7 +1,8 @@
 ![SYNTHETIC Audio Logo](public/logo.png)
 # A feature-rich web-based DAW
 SYNTHETIC Audio is a DAW made from scratch, with almost no inspiration from other softwares. Almost everything is implemented in a different and unique way.\
-[Try it here](https://zxmushroom63.github.io/synthetic-audio/)
+[Try it here](https://zxmushroom63.github.io/synthetic-audio/)\
+[As multiplayer discord activity](https://discord.com/oauth2/authorize?client_id=1403677664514146325)
 
 <img alt="Editor Screenshot #1" src="public/screenshot-wide.png" width=512px>
 <img alt="Editor Screenshot #2" src="public/screenshot-wide-2.png" width=512px>
@@ -16,7 +17,7 @@ You can find demo files in the [demos folder](/demos/).
 - Multiplayer support!
 - Timeline
 - Powerful Chord Editor
-- MIDI I/O
+- MIDI I/Os
 - The Fl Studio Arpeggiator
 - Soundfonts (MIDI.js format)
 - Use audio samples, with pitch-sampling support
