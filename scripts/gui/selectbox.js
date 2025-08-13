@@ -32,10 +32,10 @@ addEventListener("init", () => {
         selectBox.style.display = "none";
         selectBox.style.top = a.y + "px";
         selectBox.style.left = a.x + "px";
-        selectBox.style.bottom = b.y + "px";
-        selectBox.style.right = b.x + "px";
-        
-        document.querySelector("#trackInternal").appendChild(selectBox);
+        selectBox.style.width = (b.y - a.y) + "px";
+        selectBox.style.right = (b.x - a.x) + "px";
+
+        document.body.appendChild(selectBox);
         window.oncontextmenu = (e) => { e.preventDefault() };
         window.onmousemove = function (e) {
             e.preventDefault();
@@ -56,11 +56,11 @@ addEventListener("init", () => {
                 x: Math.max(a.x - scrollDx, b.x),
                 y: Math.max(a.y - scrollDy, b.y)
             }
-            
+
             selectBox.style.top = pos1.y + "px";
             selectBox.style.left = pos1.x + "px";
-            selectBox.style.bottom = (window.innerHeight - pos2.y) + "px";
-            selectBox.style.right = (window.innerWidth - pos2.x + 8) + "px";
+            selectBox.style.width = (pos2.x - pos1.x) + "px";
+            selectBox.style.height = (pos2.y - pos1.y) + "px";
         }
         window.onmouseup = function (e) {
             e.preventDefault();

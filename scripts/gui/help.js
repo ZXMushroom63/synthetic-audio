@@ -78,8 +78,9 @@ helpContent.addTab("Keybinds", `
 - ~ALT + 2~ = Split selected node in two
 - ~ALT + 3~ = Split selected node in three
 - ~ALT + 4~ = Split selected node in four
-- ~\`~ while hovering over a node = See potential chord progression options + inversions
-- ~\~~ while hovering over a node = See potential chord inversions, on right side
+- ~KEY_BACKTICK~ = while hovering over a node = See potential chord progression options + inversions
+- ~KEY_TILDE~ = while hovering over a node = See potential chord inversions, on right side
+- ~TAB~ = on bottom note of chord, open chord editor
 `);
 
 helpContent.addTab("Programmable Fields", `
