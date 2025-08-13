@@ -298,22 +298,31 @@ function sumFloat32Arrays(arrays) {
 
 
 function normaliseFloat32Arrays(arrays) {
-    if (arrays.length === 0) return [];
-    var largestsample = 0.001;
-    const length = arrays[0].length;
+    const numArrays = arrays.length;
+    if (numArrays === 0) {
+        return;
+    }
 
-    for (let i = 0; i < length; i++) {
-        for (let array of arrays) {
-            largestsample = Math.max(largestsample, Math.abs(array[i]));
+    let largestSample = 0.0;
+    for (const array of arrays) {
+        for (const sample of array) {
+            const absSample = Math.abs(sample);
+            if (absSample > largestSample) {
+                largestSample = absSample;
+            }
         }
     }
 
-    for (let i = 0; i < length; i++) {
-        for (let array of arrays) {
-            array[i] /= largestsample;
+    if (largestSample > 0) {
+        const scalingFactor = 1.0 / largestSample;
+        for (const array of arrays) {
+            for (let i = 0; i < array.length; i++) {
+                array[i] *= scalingFactor;
+            }
         }
     }
 }
+
 var layerCache = {};
 function constructAbstractLayerMapsForLevel(nodes, usedLayers) {
     var abstractLayerMaps = [];
