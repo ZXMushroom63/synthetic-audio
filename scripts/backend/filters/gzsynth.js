@@ -54,7 +54,7 @@ const gz_synth_voicecount = 4;
                     const panVal = panLFO(i, inPcm);
                     const panVolMult = (channel === 0) ? (1 - Math.max(0, panVal)) : (1 + Math.min(0, panVal));
                     time[v] += dt * freq * Math.pow(2, semiLFO(i, inPcm) / 12);
-                    time[v] %= 1;
+                    time[v] = time[v] - (time[v] | 0);
                     if (this.conf[`Voice${v + 1}UseCustomWaveform`]) {
                         out[i] += -1 * custom_waveforms[this.conf[`Voice${v + 1}WaveformAsset`]].calculated[Math.floor((time[v]) * WAVEFORM_RES) % WAVEFORM_RES] * drive * adsr * decay * panVolMult;
                     } else {
