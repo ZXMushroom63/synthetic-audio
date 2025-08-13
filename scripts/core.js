@@ -41,7 +41,7 @@ function frequencyToNote(frequency, useFlats) {
     const notes = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
     const notesFlat = ['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B'];
     let noteNumber = 12 * (Math.log(frequency / A4) / Math.log(2)) + 57;
-    let noteIndex = (Math.round(noteNumber) + 12*(Math.floor(-noteNumber / 12) + 2)) % 12;
+    let noteIndex = (Math.round(noteNumber) + 12 * (Math.floor(-noteNumber / 12) + 2)) % 12;
     let octave = Math.floor(Math.round(noteNumber) / 12);
 
     return ((useFlats ? notesFlat : notes)[noteIndex] + octave) || "U0";
@@ -285,16 +285,18 @@ async function decodeSoundFonts(ax) {
 function sumFloat32Arrays(arrays) {
     if (arrays.length === 0) return new Float32Array(0);
     const length = arrays[0].length;
-    const result = new Float32Array(length);
+    const result = arrays[0]; //start with the first array, loop on from i=0
 
-    for (let i = 0; i < length; i++) {
-        for (let array of arrays) {
+    for (const array of arrays) {
+        for (let i = 1; i < length; i++) {
             result[i] += array[i];
         }
     }
 
-    return result;
+    return arrays[0];
 }
+
+
 function normaliseFloat32Arrays(arrays) {
     if (arrays.length === 0) return [];
     var largestsample = 0.001;
@@ -554,7 +556,7 @@ async function render() {
     if (document.querySelector("#renderOut").src) {
         URL.revokeObjectURL(document.querySelector("#renderOut").src);
     }
-    
+
     startTiming("render");
     const data = serialise(true);
     const channels = data.stereo ? 2 : 1;
