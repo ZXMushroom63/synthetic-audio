@@ -323,12 +323,12 @@ addBlockType("p_waveform_plus", {
 
         inPcm.forEach((x, i) => {
             var absoluteTime = i / audio.samplerate;
-            var denominator = Math.max(...keys.flatMap((k) => { return underscores[k](i, inPcm) })) || 1;
+            var denominator = Math.max(...keys.map((k) => { return underscores[k](i, inPcm) })) || 1;
             var total = 0;
-            var values = Object.fromEntries(keys.flatMap(k => {
+            var values = Object.fromEntries(keys.map(k => {
                 var x = underscores[k](i, inPcm) / denominator;
                 total += Math.abs(x);
-                return [[k, x]];
+                return [k, x];
             }));
             if (this.conf.BadSine && (i % badsineinterval) === 0) {
                 badsineamount = 2 * (Math.random() - 0.5);
