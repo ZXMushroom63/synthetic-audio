@@ -204,6 +204,9 @@ addEventListener("init", () => {
         }
     }
 
+    addEventListener('loopchanged', (e) => {
+        updateLoopHighlight(e.detail.loop);
+    });
     addEventListener('loopchangedcli', (e) => {
         updateLoopHighlight(e.detail.loop);
     });
@@ -356,7 +359,7 @@ addEventListener("init", () => {
             midiNoteOff(note, velocity);
         }
     }
-    addEventListener("loopchanged", (ev) => {
+    function loopChangedHandler(ev) {
         if (ev.detail.loop._ignore) {
             return;
         }
@@ -365,7 +368,9 @@ addEventListener("init", () => {
         }
         ev.detail.loop.classList.add("caret");
         caretLoop = ev.detail.loop;
-    });
+    }
+    addEventListener("loopchanged", loopChangedHandler);
+    addEventListener("loopchangedcli", loopChangedHandler);
     var midiHookmapper = {};
     var outputPorts = {};
     globalThis.sendMidiMessage = function sendMidiMessage(status, midiNote, vel) {
@@ -451,7 +456,7 @@ addEventListener("init", () => {
 
     const remoteMultiplayerDebugInstanceId = document.createElement("button");
     remoteMultiplayerDebugInstanceId.innerText = "Chk Instance";
-    remoteMultiplayerDebugInstanceId.addEventListener("click", ()=>{
+    remoteMultiplayerDebugInstanceId.addEventListener("click", () => {
         document.querySelector("#renderProgress").innerText = "InstID: " + multiplayer.instanceId;
     });
     remoteMultiplayerModule.appendChild(remoteMultiplayerDebugInstanceId);

@@ -389,7 +389,7 @@ addEventListener("init", async () => {
         document.querySelector("#renderProgress").innerText = `Downloaded SYNTHETIC Devtools.`;
     }, "dldev");
     mkBtn("Download FluidR3-GM fonts (148MB)", async () => {
-        var fontList = await (await fetch(soundFontRepo + "names.json?plugin=true")).json();
+        var fontList = await (await fetch(soundFontRepo + "FluidR3_GM/names.json?plugin=true")).json();
         for (let i = 0; i < fontList.length; i++) {
             const font = fontList[i];
             document.querySelector("#renderProgress").innerText = `Downloading FluidR3-GM sound fonts: (${(i / (fontList.length) * 100).toFixed(1)}%); current: ${font}`;
@@ -628,7 +628,7 @@ addEventListener("init", async () => {
     globalThis.multiplayer_support = false;
     logToLoader(`Checking multiplayer support...`);
     try {
-        globalThis.multiplayer_support = (!(location.protocol === "file:") && ((await fetch("/multiplayer_check")).status === 200)) || params.has("multiplayer") || location.href.includes("discord");
+        globalThis.multiplayer_support = (!(location.protocol === "file:") && ((await fetch("/multiplayer_check")).status === 200)) || params.has("multiplayer") || IS_DISCORD;
     } catch (error) {
         console.log("Multiplayer not supported on instance.")
     }
@@ -640,7 +640,7 @@ addEventListener("init", async () => {
             loadingScreenModMenu.closeModMenu();
         }, 100);
     } else {
-        if (location.href.includes("discord")) {
+        if (IS_DISCORD) {
             logToLoader(`Installing IP logger...`);
             logToLoader(`(that was a joke btw)`);
             logToLoader(`Integrating with Discord...`);
@@ -652,12 +652,12 @@ addEventListener("init", async () => {
         logToLoader(`Multiplayer supported! Loading multiplayer system...`);
         document.querySelector("#renderProgress").innerText = `Initialising multiplayer system...`;
         const socketio = document.createElement("script");
-        socketio.src = (params.has("multiplayer") || location.href.includes("discord")) ? "lib/socket.io.js" : "/socket.io/socket.io.js";
+        socketio.src = (params.has("multiplayer") || IS_DISCORD) ? "lib/socket.io.js" : "/socket.io/socket.io.js";
         socketio.addEventListener("load", () => {
             logToLoader(`Socket.IO loaded...`);
             document.querySelector("#renderProgress").innerText = `Multiplayer system initialised! Connecting to server...`;
             const socket = globalThis.socket = 
-            location.href.includes("discord") 
+            IS_DISCORD
                 ? io("https://1403677664514146325.discordsays.com", { path: "/discord-multiplayer-host/socket.io/", withCredentials: true })
                 : io(params.get("multiplayer"), { withCredentials: true });
             multiplayer.enable(socket);

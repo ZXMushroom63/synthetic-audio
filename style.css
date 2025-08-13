@@ -399,6 +399,10 @@ select:focus {
   color: white;
 }
 
+.dowrap * {
+  white-space: normal;
+}
+
 #loopsample,
 #loopmeta {
   display: none;

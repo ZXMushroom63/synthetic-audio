@@ -30,7 +30,7 @@ syntheticPopupStyles.setTextColor("white");
 globalThis.alert = function (name, text) {
     return new Promise((resolve, reject) => {
         const helpContent = new ModMenuTabList();
-        helpContent.addTab(name, text.replaceAll("\n", "<br>"));
+        helpContent.addTab(name, `<div class="dowrap">${text.replaceAll("\n", "<br>")}</div>`);
         const helpMenu = new ModMenu(name, helpContent, "modalert_" + cyrb53(name), syntheticPopupStyles);
         helpMenu.init({
             onclose: () => resolve()
@@ -42,9 +42,9 @@ globalThis.prompt = function (text, defaultText, name) {
     return new Promise((resolve, reject) => {
         const helpContent = new ModMenuTabList();
         helpContent.addTab(name, `
-        <span>${text.replaceAll("\n", "<br>")}</span><br><br>
+        <div class="dowrap"><span>${text.replaceAll("\n", "<br>")}</span><br><br>
         <input class="inputStyles" value="${defaultText}"><br>
-        <button class="cancelBtn">Cancel</button><button class="okBtn">Ok</button>
+        <button class="cancelBtn">Cancel</button><button class="okBtn">Ok</button></div>
         `);
         const helpMenu = new ModMenu(name, helpContent, "modprompt_" + cyrb53(name), syntheticPopupStyles);
         var resVal = null;
@@ -73,8 +73,8 @@ globalThis.confirm = function (text, name) {
     return new Promise((resolve, reject) => {
         const helpContent = new ModMenuTabList();
         helpContent.addTab(name, `
-        <span>${text.replaceAll("\n", "<br>")}</span><br><br>
-        <button class="cancelBtn">No</button><button class="okBtn">Yes</button>
+        <div class="dowrap"><span>${text.replaceAll("\n", "<br>")}</span><br><br>
+        <button class="cancelBtn">No</button><button class="okBtn">Yes</button></div>
         `);
         const helpMenu = new ModMenu(name, helpContent, "modconfirm_" + cyrb53(name), syntheticPopupStyles);
         var resVal = false;

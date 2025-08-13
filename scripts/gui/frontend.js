@@ -18,3 +18,16 @@ addEventListener("init", () => {
         render();
     });
 });
+(async function ToSCheck() {
+    if (localStorage.getItem("ToS") !== "yes") {
+        await alert("ToS & Privacy Policy",
+            `<span style="white-space: normal">By using SYNTHETIC Audio you agree to the following:</span>
+
+<a target="_blank" href="terms_of_use.html">Terms of Use</a>
+<a target="_blank" href="privacy_policy.html">Privacy Policy</a>
+
+<span style="white-space: normal">If you do not agree to these terms, please close this tab/window.<span>`
+        );
+        localStorage.setItem("ToS", "yes");
+    }
+})();

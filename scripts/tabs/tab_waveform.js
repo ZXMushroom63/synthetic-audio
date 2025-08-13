@@ -789,8 +789,7 @@ addEventListener("init", () => {
 
         e.detail.data.waveforms = out;
     });
-
-    addEventListener("loopchanged", (e) => {
+    function loopChanged(e) {
         if (e.detail.loop.isWaveformLoop) {
             loadModifiersToTarget();
             if (!multiplayer.isHooked) {
@@ -798,7 +797,9 @@ addEventListener("init", () => {
             }
             drawWaveform(true);
         }
-    });
+    }
+    addEventListener("loopchanged", loopChanged);
+    addEventListener("loopchangedcli", loopChanged);
 
     addEventListener("preserialisenode", (e) => {
         if ((e.detail.node.getAttribute("data-type") === "gzsynth")) {

@@ -277,8 +277,12 @@ async function decodeSoundFonts(ax) {
         for (const note in instrument) {
             j++;
             document.querySelector("#renderProgress").innerText = `Decoding font PCM Data... (${((i / 88) * 100).toFixed(1)}%)`;
-            const arraybuffer = await (await fetch(instrument[note])).arrayBuffer();
-            SFCACHE[instrumentName][note] = await ax.decodeAudioData(arraybuffer);
+            try {
+                const arraybuffer = await (await fetch(instrument[note])).arrayBuffer();
+                SFCACHE[instrumentName][note] = await ax.decodeAudioData(arraybuffer);
+            } catch (e) {
+                //
+            }
         }
     }
 }
@@ -678,8 +682,8 @@ async function render() {
     processRendering = false;
     document.querySelector("#renderBtn").disabled = false;
 
-    findLoops(".loop").forEach(hydrateLoopDecoration);
     currentlyRenderedLoop = null;
+    findLoops(".loop").forEach(hydrateLoopDecoration);
 }
 
 function undirtyRenderTreeNode(node) {
@@ -692,3 +696,15 @@ function undirtyRenderTreeNode(node) {
     node.ref.endOld = node.end;
     node.ref.renderHash = hashNode(node.ref);
 }
+
+addEventListener("error", (e) => {
+    if (!processRendering) {return}
+    document.querySelector("#renderBtn").removeAttribute("disabled");
+
+    processRendering = false;
+    document.querySelector("#renderBtn").disabled = false;
+
+    currentlyRenderedLoop = null;
+
+    document.querySelector("#renderProgress").innerText = "Error while rendering: " + e.message;
+});

@@ -101,7 +101,7 @@ addEventListener("init", () => {
             span.addEventListener("click", (e) => {
                 path = id;
                 updateTreeView();
-                MODMENU_OpenTab(null, "Tree View");
+                samplepackMenu.openTab(null, "Tree View");
             });
 
             container.appendChild(span);

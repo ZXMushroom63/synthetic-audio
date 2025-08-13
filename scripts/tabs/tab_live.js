@@ -314,6 +314,11 @@ addEventListener("init", () => {
             loadModifiersToTarget();
         }
     });
+    addEventListener("loopchangedcli", (e) => {
+        if (e.detail.loop.isLivesetLoop) {
+            loadModifiersToTarget();
+        }
+    });
     addEventListener("loopdeleted", (e) => {
         if (e.detail.loop.isLivesetLoop) {
             loadModifiersToTarget();
