@@ -23,12 +23,12 @@ addBlockType("p_waveform", {
     },
     functor: function (inPcm, channel, data) {
         var keys = ["Sine", "Square", "Sawtooth", "Triangle"];
-        var denominator = Math.max(...keys.flatMap((k) => { return this.conf[k] })) || 1;
+        var denominator = Math.max(...keys.map((k) => { return this.conf[k] })) || 1;
         var total = 0;
-        var values = Object.fromEntries(keys.flatMap(k => {
+        var values = Object.fromEntries(keys.map(k => {
             var x = this.conf[k] / denominator;
             total += Math.abs(x);
-            return [[k, x]];
+            return [k, x];
         }));
         inPcm.forEach((x, i) => {
             var t = i / audio.samplerate;

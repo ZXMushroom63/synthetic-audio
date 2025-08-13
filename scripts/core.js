@@ -243,7 +243,7 @@ function wait(s) {
 }
 async function decodeAudioFiles(ax) {
     document.querySelector("#renderProgress").innerText = "Decoding loop PCM Data...";
-    var usedAudioFiles = Array.prototype.flatMap.apply(document.querySelectorAll("div.loop[data-type=audio]"), [((x) => { return x.getAttribute("data-file") })]);
+    var usedAudioFiles = Array.prototype.map.apply(document.querySelectorAll("div.loop[data-type=audio]"), [((x) => { return x.getAttribute("data-file") })]);
     usedAudioFiles = [...new Set(usedAudioFiles)];
     for (let i = 0; i < usedAudioFiles.length; i++) {
         const fileName = usedAudioFiles[i];

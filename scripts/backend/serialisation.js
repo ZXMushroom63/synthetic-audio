@@ -52,7 +52,7 @@ function serialise(forRender, forMultiplayer) {
             }
         ]
     );
-    var x = Array.prototype.flatMap.apply(hNodes, [(node => {
+    var x = Array.prototype.map.apply(hNodes, [(node => {
         return serialiseNode(node, forRender, forMultiplayer, hNodes);
     })]);
     var out = getProjectMeta();
