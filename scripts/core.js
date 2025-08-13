@@ -554,12 +554,13 @@ async function render() {
     if (document.querySelector("#renderOut").src) {
         URL.revokeObjectURL(document.querySelector("#renderOut").src);
     }
-    var output = [];
+    
     startTiming("render");
-    var data = serialise(true);
-    var channels = data.stereo ? 2 : 1;
+    const data = serialise(true);
+    const channels = data.stereo ? 2 : 1;
+    const output = new Array(channels);
 
-    var ax = new OfflineAudioContext(channels, audio.length, audio.samplerate);
+    const ax = new OfflineAudioContext(channels, audio.length, audio.samplerate);
 
     document.querySelector("#renderBtn").setAttribute("disabled", "true");
     await decodeAudioFiles(ax);
@@ -576,10 +577,10 @@ async function render() {
     var processedNodeCount = 0;
     try {
         for (let c = 0; c < channels; c++) {
-            var channelPcms = [];
+            const channelPcms = [];
             for (let q = 0; q < renderDataArray.length; q++) {
                 const abstractLayerMaps = renderDataArray[q];
-                var initialPcm = layerCache[abstractLayerMaps.layerId]?.[c] || new Float32Array(audio.length);
+                const initialPcm = layerCache[abstractLayerMaps.layerId]?.[c] || new Float32Array(audio.length);
 
                 if (abstractLayerMaps.needsUpdating) {
                     for (let l = 0; l < abstractLayerMaps.length; l++) {
@@ -599,8 +600,8 @@ async function render() {
                                 node.ref.cache = [null, null];
                             }
 
-                            var startTime = Math.floor(node.start * audio.samplerate);
-                            var endTime = Math.floor((node.start + node.duration) * audio.samplerate);
+                            const startTime = Math.floor(node.start * audio.samplerate);
+                            const endTime = Math.floor((node.start + node.duration) * audio.samplerate);
 
                             if (!node.ref.cache[c]) {
                                 currentlyRenderedLoop = node;
@@ -636,7 +637,7 @@ async function render() {
                     channelPcms.push(initialPcm);
                 }
             }
-            output.push(sumFloat32Arrays(channelPcms));
+            output[c] = sumFloat32Arrays(channelPcms);
         }
         customEvent("render");
         if (audio.normalise) {
@@ -644,6 +645,7 @@ async function render() {
         }
         var renderTime = stopTiming("render");
         document.querySelector("#renderProgress").innerText = "Encoding...";
+        console.log("Encode queued.");
         var blob = await convertToFileBlob(output, channels, audio.samplerate, audio.bitrate);
     } catch (error) {
         stopTiming("render");
