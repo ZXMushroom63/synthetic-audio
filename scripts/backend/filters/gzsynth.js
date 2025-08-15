@@ -39,7 +39,7 @@ const gz_synth_voicecount = 4;
                     adsrMap.SustainLevel,
                     [this.conf.ReleaseSeconds, adsrMap.ReleaseExp],
                     i,
-                    inPcm.length
+                    inPcm
                 ) : 1;
                 const decay = Math.exp(-decayFn(i, inPcm) * (i / audio.samplerate));
                 const freq = note(i, inPcm);
@@ -71,7 +71,7 @@ const gz_synth_voicecount = 4;
                         adsrMap.FilterSustainLevel,
                         [self.conf.FilterReleaseSeconds, adsrMap.FilterReleaseExp],
                         i,
-                        inPcm.length
+                        inPcm
                     ));
             }
             let res = null;
@@ -151,10 +151,9 @@ const gz_synth_voicecount = 4;
         adsr_dynamic_keys.push(...["AttackExp", "DecayExp", "SustainLevel", "ReleaseExp"].map(x => prefix + x));
     }
 
-    function findADSR(a, d, _s, r, sample, pcmLen) {
+    function findADSR(a, d, _s, r, sample, mprPcm) {
         const time = sample / audio.samplerate;
-        const len = pcmLen / audio.samplerate;
-        const mprPcm = new Float32Array(pcmLen);
+        const len = mprPcm.length / audio.samplerate;
         const s = _s(sample, mprPcm);
         a[0] = Math.min(a[0], len);
         d[0] = Math.min(d[0], len - a[0]);
