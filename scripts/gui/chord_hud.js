@@ -289,9 +289,13 @@ const chordMacros = {
         applies: ["II"],
         returns: ["IV"]
     },
-    Flatten: {
-        applies: ["I+sus"],
+    Sharpen: {
+        applies: ["I"],
         returns: ["VII+m#5"]
+    },
+    Flatten: {
+        applies: ["I"],
+        returns: ["VII^b5"]
     }
 };
 
