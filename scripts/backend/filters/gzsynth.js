@@ -84,7 +84,7 @@ const gz_synth_voicecount = 4;
             const AmpSmoothingStart = Math.floor(audio.samplerate * this.conf.AmplitudeSmoothing);
             const AmpSmoothingEnd = res.length - AmpSmoothingStart;
 
-            res.map((x, i) => {
+            res.forEach((x, i) => {
                 var ampSmoothingFactor = 1;
                 if (i < AmpSmoothingStart) {
                     ampSmoothingFactor *= i / AmpSmoothingStart;
