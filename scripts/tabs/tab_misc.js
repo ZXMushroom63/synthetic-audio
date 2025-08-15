@@ -57,6 +57,12 @@ addEventListener("init", () => {
         <option value="2,2,1,2,2,3">Major (Hexatonic)</option>
         <option value="3,2,1,1,3,2">Blues</option>
         <option value="2,1,2,2,1,3,1">Harmonic Minor</option>
+        <option value="1,2,2,1,3,1,2">Locrian ♭6</option>
+        <option value="2,2,1,3,1,2,1">Ionian #5</option>
+        <option value="2,1,3,1,2,1,2">Ionian #5</option>
+        <option value="1,3,1,2,1,2,2">Phrygian Dominant</option>
+        <option value="3,1,2,1,2,2,1">Lydian #2</option>
+        <option value="1,2,1,2,2,1,3">Super Locrian ♭♭7</option>
         <option value="2,1,2,2,2,2,1">Melodic Minor Ascending</option>
     </select><br>
     <span class="scaleout">(trigger a change)</span><br>
