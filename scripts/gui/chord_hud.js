@@ -258,15 +258,16 @@ const chordMacros = {
         applies: ["V"],
         returns: ["II+min"]
     },
+    
+    ResolveIrregular: {
+        applies: ["V+7", "V+dim7"],
+        returns: ["II", "III", "IV", "VI", "VII"]
+    },
 
     // -- CUSTOM ONES I MADE LMAO ---
     ToTheII: {
         applies: ["VII"],
         returns: ["II"]
-    },
-    ResolveIrregular: {
-        applies: ["V^7"],
-        returns: ["III^7"]
     },
     SnazzyA: {
         applies: ["IV+maj"],
@@ -294,7 +295,7 @@ const chordMacros = {
     }
 };
 
-importStepChordMacro("MontgomeryWardStep%s", ["I+maj", "IV+maj", "II+min", "V+maj"]);
+importStepChordMacro("MontgomeryWardStep%s", ["I+maj", "IV+maj", "II", "V"]);
 importStepChordMacro("RagtimeStep%s", ["III^7", "VI^7", "II^7", "V^7"]);
 importStepChordMacro("RomanescaStep%s", ["III+maj", "VII+maj", "i+min", "V+maj", "III+maj", "VII+maj", "i+min", "V+maj", "i+min"]);
 importStepChordMacro("CircleStep%s", ["vi+min", "ii+min", "V+maj", "I+maj"]);
