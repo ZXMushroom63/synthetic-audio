@@ -70,7 +70,7 @@ function serialiseNode(node, forRender, forMultiplayer, allNodes) {
     if (allNodes) {
         customEvent("preserialisenode", { node: node, allNodes: allNodes });
     }
-    
+
     var out = {};
     out.conf = node.conf;
     if (forMultiplayer) {
@@ -216,9 +216,24 @@ function writeAutosave() {
 addEventListener("beforeunload", () => {
     writeAutosave();
 });
+const saveTabs = new ModMenuTabList();
+saveTabs.addTab("Save", 
+    `
+    Copy this save code and paste it somewhere safe!<br>
+    <textarea id="saveCopyBox">loading...</textarea>
+    `
+);
+const saveMenu = new ModMenu("Save Popup", saveTabs, "menu_save", syntheticMenuStyles);
+saveMenu.oninit = function (menu) {
+    menu.querySelector("textarea").value = LZString.compressToEncodedURIComponent(JSON.stringify(serialise()));
+}
 function save() {
-    saveAs(new Blob([JSON.stringify(serialise())], { type: 'application/vnd.synthetic.project' }), globalThis.lastEditedFile);
-    document.querySelector("#renderProgress").innerText = "Writing! " + (new Date).toTimeString();
+    if (IS_DISCORD) {
+        saveMenu.init();
+    } else {
+        saveAs(new Blob([JSON.stringify(serialise())], { type: 'application/vnd.synthetic.project' }), globalThis.lastEditedFile);
+        document.querySelector("#renderProgress").innerText = "Writing! " + (new Date).toTimeString();
+    }
 }
 addEventListener("keydown", (e) => {
     if (e.key === "s" && !e.shiftKey && e.ctrlKey && !e.altKey && !e.metaKey) {

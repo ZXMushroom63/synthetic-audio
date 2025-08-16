@@ -24,7 +24,7 @@ function minimisePosition(loopArr) {
 addEventListener("init", () => {
     addEventListener("keydown", (e) => {
         if (e.ctrlKey && ((e.key.toLowerCase() === "c") || (e.key.toLowerCase() === "x")) && (CURRENT_TAB === "TIMELINE")) {
-            if ((e.target.tagName === "INPUT") || (e.target.contentEditable === "true")) {
+            if ((e.target.tagName === "INPUT") || (e.target.contentEditable === "true") || (e.target.tagName === "TEXTAREA")) {
                 return;
             }
             e.preventDefault();
