@@ -285,10 +285,11 @@ async function decodeSoundFonts(ax) {
 function sumFloat32Arrays(arrays) {
     if (arrays.length === 0) return new Float32Array(0);
     const length = arrays[0].length;
-    const result = new Float32Array(length);
+    const result = arrays[0].slice();
 
-    for (let i = 0; i < length; i++) {
-        for (let array of arrays) {
+    for (let j = 1; j < arrays.length; j++) {
+        const array = arrays[j];
+        for (let i = 0; i < length; i++) {
             result[i] += array[i];
         }
     }
@@ -300,14 +301,13 @@ function normaliseFloat32Arrays(arrays) {
     var largestsample = 0.001;
     const length = arrays[0].length;
 
-    for (let i = 0; i < length; i++) {
-        for (let array of arrays) {
+    for (let array of arrays) {
+        for (let i = 0; i < length; i++) {
             largestsample = Math.max(largestsample, Math.abs(array[i]));
         }
     }
-
-    for (let i = 0; i < length; i++) {
-        for (let array of arrays) {
+    for (let array of arrays) {
+        for (let i = 0; i < length; i++) {
             array[i] /= largestsample;
         }
     }
