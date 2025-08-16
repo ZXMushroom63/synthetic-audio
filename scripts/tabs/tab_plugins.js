@@ -244,7 +244,6 @@ addEventListener("init", async () => {
             .trim()
             .replace("MIDI.Soundfont.", prefix)
             .replace(" = ", "")
-            .replace("=", "")
             .replace("{", "\n{")
             .split("\n");
         return split[0].trim() + "\n" + split.slice(1).join("").replaceAll("\n").trim().replace(",}", "}");
