@@ -656,10 +656,10 @@ addEventListener("init", async () => {
         socketio.addEventListener("load", () => {
             logToLoader(`Socket.IO loaded...`);
             document.querySelector("#renderProgress").innerText = `Multiplayer system initialised! Connecting to server...`;
-            const socket = globalThis.socket = 
-            IS_DISCORD
-                ? io("https://1403677664514146325.discordsays.com", { path: "/discord-multiplayer-host/socket.io/", withCredentials: true })
-                : io(params.get("multiplayer"), { withCredentials: true });
+            const socket = globalThis.socket =
+                IS_DISCORD
+                    ? io("https://1403677664514146325.discordsays.com", { path: "/discord-multiplayer-host/socket.io/", withCredentials: true })
+                    : io(params.get("multiplayer"), { withCredentials: true });
             multiplayer.enable(socket);
             socket.on('connect', () => {
                 logToLoader(`Connected to server.`);
@@ -667,7 +667,9 @@ addEventListener("init", async () => {
                 document.body.style.pointerEvents = "all";
                 loadingScreenModMenu.closeModMenu();
             });
-            socket.on("error", (err)=>{
+            socket.on('connect_error', err => logToLoader("There seems to be an error with the multiplayer server?"));
+            socket.on('connect_failed', err => logToLoader("There seems to be an error with the multiplayer server?"));
+            socket.on("error", (err) => {
                 console.error(err);
             });
         });
