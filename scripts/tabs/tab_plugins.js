@@ -249,62 +249,64 @@ addEventListener("init", async () => {
             .split("\n");
         return split[0].trim() + "\n" + split.slice(1).join("").replaceAll("\n").trim().replace(",}", "}");
     }
-    mkBtn("Upload hvcc (.js)", () => {
-        var f = document.createElement("input");
-        f.type = "file";
-        f.accept = ".js";
-        f.multiple = true;
-        f.addEventListener("input", () => {
-            var files = [...f.files].filter(x => x.name.endsWith(".js"));
-            if (files.length !== 2) {
-                document.querySelector("#renderProgress").innerText = `Wrong number of .js files selected (${files.length}, expected 2)`;
-                return;
-            }
-            var audioLibWorklet = files.find(x => x.name.endsWith("_AudioLibWorklet.js"));
-            if (!audioLibWorklet) {
-                document.querySelector("#renderProgress").innerText = `Cannot find AudioLibWorklet module in selected files!`;
-                return;
-            }
-            var wrapperModule = files.find(x => !x.name.endsWith("_AudioLibWorklet.js"));
-            if (!wrapperModule) {
-                document.querySelector("#renderProgress").innerText = `Cannot find wrapper module in selected files!`;
-                return;
-            }
+    if (!IS_DISCORD) {
+        mkBtn("Upload hvcc (.js)", () => {
+            var f = document.createElement("input");
+            f.type = "file";
+            f.accept = ".js";
+            f.multiple = true;
+            f.addEventListener("input", () => {
+                var files = [...f.files].filter(x => x.name.endsWith(".js"));
+                if (files.length !== 2) {
+                    document.querySelector("#renderProgress").innerText = `Wrong number of .js files selected (${files.length}, expected 2)`;
+                    return;
+                }
+                var audioLibWorklet = files.find(x => x.name.endsWith("_AudioLibWorklet.js"));
+                if (!audioLibWorklet) {
+                    document.querySelector("#renderProgress").innerText = `Cannot find AudioLibWorklet module in selected files!`;
+                    return;
+                }
+                var wrapperModule = files.find(x => !x.name.endsWith("_AudioLibWorklet.js"));
+                if (!wrapperModule) {
+                    document.querySelector("#renderProgress").innerText = `Cannot find wrapper module in selected files!`;
+                    return;
+                }
 
-            var wrapperContent = "";
-            var libWorkletData = "";
-            var fr = new FileReader();
-            fr.onload = () => {
-                libWorkletData = "data:text/js;base64," + btoa(fr.result)
-                fr.onload = async () => {
-                    wrapperContent = fr.result;
-                    wrapperContent = wrapperContent.replace("var ", "this.HVCC_MODULES.");
-                    wrapperContent = wrapperContent.replace(audioLibWorklet.name, libWorkletData);
-                    wrapperContent = wrapperContent.replace("audioWorkletSupported=", "audioWorkletSupported=false&&"); //SYNTHETIC runs in one thread for everything else, and I do not intend to upload data to the service worker just to satisfy some stupid CORS restrictions in order to use a mediocre new technology.
-                    await addFileMod(wrapperModule.name.replace(".js", ".pd.js"), wrapperContent);
+                var wrapperContent = "";
+                var libWorkletData = "";
+                var fr = new FileReader();
+                fr.onload = () => {
+                    libWorkletData = "data:text/js;base64," + btoa(fr.result)
+                    fr.onload = async () => {
+                        wrapperContent = fr.result;
+                        wrapperContent = wrapperContent.replace("var ", "this.HVCC_MODULES.");
+                        wrapperContent = wrapperContent.replace(audioLibWorklet.name, libWorkletData);
+                        wrapperContent = wrapperContent.replace("audioWorkletSupported=", "audioWorkletSupported=false&&"); //SYNTHETIC runs in one thread for everything else, and I do not intend to upload data to the service worker just to satisfy some stupid CORS restrictions in order to use a mediocre new technology.
+                        await addFileMod(wrapperModule.name.replace(".js", ".pd.js"), wrapperContent);
+                        await drawModArray();
+                    }
+                    fr.readAsText(wrapperModule);
+                };
+                fr.readAsText(audioLibWorklet);
+            });
+            f.click();
+        }, "uhvcc");
+        mkBtn("Upload generic (.js)", () => {
+            var f = document.createElement("input");
+            f.type = "file";
+            f.accept = ".js";
+            f.multiple = true;
+            f.addEventListener("input", async () => {
+                var files = [...f.files].filter(x => x.name.endsWith(".js"));
+                for (file of files) {
+                    const text = await readFile(file, "text");
+                    await addFileMod(file.name, text);
                     await drawModArray();
                 }
-                fr.readAsText(wrapperModule);
-            };
-            fr.readAsText(audioLibWorklet);
-        });
-        f.click();
-    }, "uhvcc");
-    mkBtn("Upload generic (.js)", () => {
-        var f = document.createElement("input");
-        f.type = "file";
-        f.accept = ".js";
-        f.multiple = true;
-        f.addEventListener("input", async () => {
-            var files = [...f.files].filter(x => x.name.endsWith(".js"));
-            for (file of files) {
-                const text = await readFile(file, "text");
-                await addFileMod(file.name, text);
-                await drawModArray();
-            }
-        });
-        f.click();
-    }, "ujs");
+            });
+            f.click();
+        }, "ujs");
+    }
     mkBtn("Upload sound font (.js)", () => {
         var f = document.createElement("input");
         f.type = "file";
@@ -362,32 +364,34 @@ addEventListener("init", async () => {
         });
         f.click();
     }, "usamples");
-    mkBtn("Download SYNTHETIC Extras", async () => {
-        var modList = (await (await fetch("https://zxmushroom63.github.io/synthetic-audio/extras/list.txt?plugin=true")).text()).split("\n").filter(x => !!x);
-        for (let i = 0; i < modList.length; i++) {
-            const mod = modList[i];
-            if (!mod.endsWith(".js")) {
-                continue;
+    if (!IS_DISCORD) {
+        mkBtn("Download SYNTHETIC Extras", async () => {
+            var modList = (await (await fetch("https://zxmushroom63.github.io/synthetic-audio/extras/list.txt?plugin=true")).text()).split("\n").filter(x => !!x);
+            for (let i = 0; i < modList.length; i++) {
+                const mod = modList[i];
+                if (!mod.endsWith(".js")) {
+                    continue;
+                }
+                document.querySelector("#renderProgress").innerText = `Downloading SYNTHETIC Extras (${(i / (modList.length) * 100).toFixed(1)}%)`;
+                await addFileMod(mod, await (await fetch("https://zxmushroom63.github.io/synthetic-audio/extras/data/" + mod + "?plugin=true")).text())
+                await drawModArray();
             }
-            document.querySelector("#renderProgress").innerText = `Downloading SYNTHETIC Extras (${(i / (modList.length) * 100).toFixed(1)}%)`;
-            await addFileMod(mod, await (await fetch("https://zxmushroom63.github.io/synthetic-audio/extras/data/" + mod + "?plugin=true")).text())
-            await drawModArray();
-        }
-        document.querySelector("#renderProgress").innerText = `Downloaded SYNTHETIC Extras.`;
-    }, "dlsn");
-    mkBtn("Download Devtools", async () => {
-        var modList = (await (await fetch("https://zxmushroom63.github.io/synthetic-audio/extras/developer.txt?plugin=true")).text()).split("\n").filter(x => !!x);
-        for (let i = 0; i < modList.length; i++) {
-            const mod = modList[i];
-            if (!mod.endsWith(".js")) {
-                continue;
+            document.querySelector("#renderProgress").innerText = `Downloaded SYNTHETIC Extras.`;
+        }, "dlsn");
+        mkBtn("Download Devtools", async () => {
+            var modList = (await (await fetch("https://zxmushroom63.github.io/synthetic-audio/extras/developer.txt?plugin=true")).text()).split("\n").filter(x => !!x);
+            for (let i = 0; i < modList.length; i++) {
+                const mod = modList[i];
+                if (!mod.endsWith(".js")) {
+                    continue;
+                }
+                document.querySelector("#renderProgress").innerText = `Downloading devtools (${(i / (modList.length) * 100).toFixed(1)}%)`;
+                await addFileMod(mod, await (await fetch("https://zxmushroom63.github.io/synthetic-audio/extras/devtools/" + mod + "?plugin=true")).text())
+                await drawModArray();
             }
-            document.querySelector("#renderProgress").innerText = `Downloading devtools (${(i / (modList.length) * 100).toFixed(1)}%)`;
-            await addFileMod(mod, await (await fetch("https://zxmushroom63.github.io/synthetic-audio/extras/devtools/" + mod + "?plugin=true")).text())
-            await drawModArray();
-        }
-        document.querySelector("#renderProgress").innerText = `Downloaded SYNTHETIC Devtools.`;
-    }, "dldev");
+            document.querySelector("#renderProgress").innerText = `Downloaded SYNTHETIC Devtools.`;
+        }, "dldev");
+    }
     mkBtn("Download FluidR3-GM fonts (148MB)", async () => {
         var fontList = await (await fetch(soundFontRepo + "FluidR3_GM/names.json?plugin=true")).json();
         for (let i = 0; i < fontList.length; i++) {
