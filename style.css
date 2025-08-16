@@ -186,6 +186,7 @@ html[data-libsettings-LDMLoopInteraction] .loop.active .loopInternal>* {
   padding-right: 0.75rem;
   margin-right: auto;
   user-select: none;
+  z-index: 2001;
 }
 
 .fadeout {

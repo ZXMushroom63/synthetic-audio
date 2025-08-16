@@ -178,7 +178,46 @@ function deserialise(serialisedStr) {
     reflow("#trackInternal");
 }
 globalThis.lastEditedFile = "mysong.sm";
-function load() {
+const loadTabs = new ModMenuTabList();
+loadTabs.addTab("From Code", 
+    `
+    Copy this save code and paste it somewhere safe!<br>
+    <textarea id="loadPasteBox" placeholder="Save code here"></textarea><br>
+    <button id="btnLoadFromCode">Load</button>
+    `
+);
+loadTabs.addTab("From File", 
+    `
+    <button id="btnLoadFromFile">Open File</button>
+    `
+);
+const loadMenu = new ModMenu("Load Popup", loadTabs, "menu_load", syntheticMenuStyles);
+loadMenu.oninit = function (menu) {
+    menu.querySelector("#btnLoadFromCode").addEventListener("click", ()=>{
+        const decompressed = LZString.decompressFromEncodedURIComponent(menu.querySelector("#loadPasteBox").value.replace(/[\s\n\r]/gm, ""));
+        if (!decompressed) {
+            toast("Invalid save code!");
+            return;
+        }
+        try {
+            deserialise(decompressed);
+            loadMenu.closeModMenu();
+        } catch(e) {
+            toast(e.toString());
+        }
+    });
+    menu.querySelector("#btnLoadFromFile").addEventListener("click", ()=>{
+        load(null, true);
+    });
+}
+function discordLoadPopup() {
+    loadMenu.init();
+}
+function load(ev, forceFileLoad) {
+    if ((IS_DISCORD) && !forceFileLoad) {
+        discordLoadPopup();
+        return;
+    }
     var x = document.createElement("input");
     x.type = "file";
     x.accept = ".sm,.mid";
