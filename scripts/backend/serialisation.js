@@ -70,7 +70,7 @@ function serialiseNode(node, forRender, forMultiplayer, allNodes) {
     if (allNodes) {
         customEvent("preserialisenode", { node: node, allNodes: allNodes });
     }
-    
+
     var out = {};
     out.conf = node.conf;
     if (forMultiplayer) {
@@ -178,7 +178,46 @@ function deserialise(serialisedStr) {
     reflow("#trackInternal");
 }
 globalThis.lastEditedFile = "mysong.sm";
-function load() {
+const loadTabs = new ModMenuTabList();
+loadTabs.addTab("From Code", 
+    `
+    Copy this save code and paste it somewhere safe!<br>
+    <textarea id="loadPasteBox" placeholder="Save code here"></textarea><br>
+    <button id="btnLoadFromCode">Load</button>
+    `
+);
+loadTabs.addTab("From File", 
+    `
+    <button id="btnLoadFromFile">Open File</button>
+    `
+);
+const loadMenu = new ModMenu("Load Popup", loadTabs, "menu_load", syntheticMenuStyles);
+loadMenu.oninit = function (menu) {
+    menu.querySelector("#btnLoadFromCode").addEventListener("click", ()=>{
+        const decompressed = LZString.decompressFromEncodedURIComponent(menu.querySelector("#loadPasteBox").value.replace(/[\s\n\r]/gm, ""));
+        if (!decompressed) {
+            toast("Invalid save code!");
+            return;
+        }
+        try {
+            deserialise(decompressed);
+            loadMenu.closeModMenu();
+        } catch(e) {
+            toast(e.toString());
+        }
+    });
+    menu.querySelector("#btnLoadFromFile").addEventListener("click", ()=>{
+        load(null, true);
+    });
+}
+function discordLoadPopup() {
+    loadMenu.init();
+}
+function load(ev, forceFileLoad) {
+    if ((IS_DISCORD) && !forceFileLoad) {
+        discordLoadPopup();
+        return;
+    }
     var x = document.createElement("input");
     x.type = "file";
     x.accept = ".sm,.mid";
@@ -216,9 +255,24 @@ function writeAutosave() {
 addEventListener("beforeunload", () => {
     writeAutosave();
 });
+const saveTabs = new ModMenuTabList();
+saveTabs.addTab("Save", 
+    `
+    Copy this save code and paste it somewhere safe!<br>
+    <textarea id="saveCopyBox">loading...</textarea>
+    `
+);
+const saveMenu = new ModMenu("Save Popup", saveTabs, "menu_save", syntheticMenuStyles);
+saveMenu.oninit = function (menu) {
+    menu.querySelector("textarea").value = LZString.compressToEncodedURIComponent(JSON.stringify(serialise()));
+}
 function save() {
-    saveAs(new Blob([JSON.stringify(serialise())], { type: 'application/vnd.synthetic.project' }), globalThis.lastEditedFile);
-    document.querySelector("#renderProgress").innerText = "Writing! " + (new Date).toTimeString();
+    if (IS_DISCORD) {
+        saveMenu.init();
+    } else {
+        saveAs(new Blob([JSON.stringify(serialise())], { type: 'application/vnd.synthetic.project' }), globalThis.lastEditedFile);
+        document.querySelector("#renderProgress").innerText = "Writing! " + (new Date).toTimeString();
+    }
 }
 addEventListener("keydown", (e) => {
     if (e.key === "s" && !e.shiftKey && e.ctrlKey && !e.altKey && !e.metaKey) {

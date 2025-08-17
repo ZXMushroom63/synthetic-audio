@@ -297,7 +297,9 @@ addEventListener("init", () => {
         liveFunctorStack = liveSetModifiers.map(x => filters[x.type].functor);
     }
 
-    registerTab("Live", container, false, () => { setTimeout(drawModifierStack, 150); });
+    if (!IS_DISCORD) {
+        registerTab("Live", container, false, () => { setTimeout(drawModifierStack, 150); });
+    }
 
     addEventListener('projinit', (e) => {
         liveSetModifiers = e.detail.data.liveSet || [];

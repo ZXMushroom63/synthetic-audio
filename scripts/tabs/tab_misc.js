@@ -240,6 +240,7 @@ addEventListener("init", () => {
     var midiTimescale = 1;
     var caretLoop = null;
     const midiModule = mkModule("MIDI Insertion");
+    midiModule.style.display = IS_DISCORD ? "none" : "inline-block";
     midiModule.innerHTML += `
     <button id="midi_access">Grant MIDI Access</button><br>
     <label>Snapping: </label><input type="checkbox" id="midi_snapping"><br>
@@ -423,6 +424,7 @@ addEventListener("init", () => {
 
 
     const remoteMultiplayerModule = mkModule("Remote Multiplayer");
+    remoteMultiplayerModule.style.display = IS_DISCORD ? "none" : "inline-block";
     const remoteMultiplayerConnect = document.createElement("button");
     remoteMultiplayerConnect.innerText = "Connect";
     registerSetting("AutoReconnect", true);
