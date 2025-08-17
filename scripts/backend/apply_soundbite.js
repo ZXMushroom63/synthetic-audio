@@ -51,7 +51,7 @@ function applySoundbiteToPcmSidechain(reverse, looping, currentData, inPcm, dura
     });
     const LOOKUPTABLE_PERSAMPLE = new Float32Array(currentData.length);
     LOOKUPTABLE_PERSAMPLE.forEach((x, i) => {
-        LOOKUPTABLE_PERSAMPLE[i] = lerp(LOOKUPTABLE[Math.floor(i / PCMBINSIZE)] || 0, LOOKUPTABLE[Math.ceil(i / PCMBINSIZE)] || 0, (i % PCMBINSIZE) / PCMBINSIZE);
+        LOOKUPTABLE_PERSAMPLE[i] = lerp(LOOKUPTABLE[Math.floor(i / PCMBINSIZE)] || 0, LOOKUPTABLE[Math.ceil(i / PCMBINSIZE)] || 0, (i % PCMBINSIZE) / PCMBINSIZE) || 0;
     });
     const AmpSmoothingStart = Math.floor(audio.samplerate * 0.01);
     const AmpSmoothingEnd = inPcm.length - AmpSmoothingStart;
