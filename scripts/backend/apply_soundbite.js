@@ -49,7 +49,7 @@ function applySoundbiteToPcmSidechain(reverse, looping, currentData, inPcm, dura
         LOOKUPTABLE[i] = (sum / PCMBINSIZE) * 2;
     });
     const LOOKUPTABLE_PERSAMPLE = new Float32Array(currentData.length);
-    LOOKUPTABLE_PERSAMPLE.forEach((x, i)=>{
+    LOOKUPTABLE_PERSAMPLE.forEach((x, i) => {
         LOOKUPTABLE_PERSAMPLE[i] = lerp(LOOKUPTABLE[Math.floor(i / PCMBINSIZE)] || 0, LOOKUPTABLE[Math.ceil(i / PCMBINSIZE)] || 0, (i % PCMBINSIZE) / PCMBINSIZE);
     });
     const AmpSmoothingStart = Math.floor(audio.samplerate * 0.01);
@@ -57,15 +57,15 @@ function applySoundbiteToPcmSidechain(reverse, looping, currentData, inPcm, dura
     if (looping) {
         for (let i = 0; i < inPcm.length; i++) {
             var sideChain = sideChainRaw;
+            var sidechainCoefficient = Math.pow(1 - Math.max(Math.min(1, LOOKUPTABLE_PERSAMPLE[Math.floor(idx)] || 0), 0), Math.abs(sideChain)) || 0;
             if (i < AmpSmoothingStart) {
-                sideChain *= i / AmpSmoothingStart;
+                sidechainCoefficient = lerp(1, sidechainCoefficient, i / AmpSmoothingStart);
             }
 
             if (i > AmpSmoothingEnd) {
-                sideChain *= 1 - ((i - AmpSmoothingEnd) / AmpSmoothingStart);
+                sidechainCoefficient = lerp(1, sidechainCoefficient, 1 - ((i - AmpSmoothingEnd) / AmpSmoothingStart));
             }
             var idx = (i * speed(i, inPcm) + offsetValue) % duration;
-            var sidechainCoefficient = Math.pow(1 - Math.max(Math.min(1, LOOKUPTABLE_PERSAMPLE[Math.floor(idx)] || 0), 0), Math.abs(sideChain)) || 0;
             var y = (lerp(currentData[Math.floor(idx)] || 0, currentData[Math.ceil(idx)], idx % 1) || 0) * volume;
             if (sideChain < 0) {
                 y *= sidechainCoefficient;
@@ -79,25 +79,25 @@ function applySoundbiteToPcmSidechain(reverse, looping, currentData, inPcm, dura
     } else {
         for (let i = 0; i < inPcm.length; i++) {
             var sideChain = sideChainRaw;
+            var sidechainCoefficient = Math.pow(1 - Math.max(Math.min(1, LOOKUPTABLE_PERSAMPLE[Math.floor(idx)]), 0), Math.abs(sideChain)) || 0;
             if (i < AmpSmoothingStart) {
-                sideChain *= i / AmpSmoothingStart;
+                sidechainCoefficient = lerp(1, sidechainCoefficient, i / AmpSmoothingStart);
             }
 
             if (i > AmpSmoothingEnd) {
-                sideChain *= 1 - ((i - AmpSmoothingEnd) / AmpSmoothingStart);
+                sidechainCoefficient = lerp(1, sidechainCoefficient, 1 - ((i - AmpSmoothingEnd) / AmpSmoothingStart));
             }
+
             var idx = i * speed(i, inPcm) + offsetValue;
-            var sidechainCoefficient = Math.pow(1 - Math.max(Math.min(1, LOOKUPTABLE_PERSAMPLE[Math.floor(idx)]), 0), Math.abs(sideChain)) || 0;
-            
             var y = (lerp(currentData[Math.floor(idx)], currentData[Math.ceil(idx)], idx % 1) || 0) * volume;
-            
+
 
             if (sideChain < 0) {
                 y *= sidechainCoefficient;
             } else {
                 inPcm[i] *= sidechainCoefficient;
             }
-            
+
             if (!silent) {
                 inPcm[i] += y;
             }
