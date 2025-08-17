@@ -46,7 +46,8 @@ function applySoundbiteToPcmSidechain(reverse, looping, currentData, inPcm, dura
         const end = (i + 1) * PCMBINSIZE;
         const pcmData = currentData.subarray(start, end);
         const sum = pcmData.reduce((acc, x) => acc + Math.abs(x));
-        LOOKUPTABLE[i] = (sum / PCMBINSIZE) * 2;
+        const out = (sum / PCMBINSIZE) * 2;
+        LOOKUPTABLE[i] = isFinite(out) ? out : 0;
     });
     const LOOKUPTABLE_PERSAMPLE = new Float32Array(currentData.length);
     LOOKUPTABLE_PERSAMPLE.forEach((x, i) => {
