@@ -63,7 +63,7 @@ function applySoundbiteToPcmSidechain(reverse, looping, currentData, inPcm, dura
             }
 
             if (i > AmpSmoothingEnd) {
-                sidechainCoefficient = lerp(1, sidechainCoefficient, 1 - ((i - AmpSmoothingEnd) / AmpSmoothingStart));
+                sidechainCoefficient = lerp(1, sidechainCoefficient, ((i - AmpSmoothingEnd) / AmpSmoothingStart));
             }
             var idx = (i * speed(i, inPcm) + offsetValue) % duration;
             var y = (lerp(currentData[Math.floor(idx)] || 0, currentData[Math.ceil(idx)], idx % 1) || 0) * volume;
@@ -85,7 +85,7 @@ function applySoundbiteToPcmSidechain(reverse, looping, currentData, inPcm, dura
             }
 
             if (i > AmpSmoothingEnd) {
-                sidechainCoefficient = lerp(1, sidechainCoefficient, 1 - ((i - AmpSmoothingEnd) / AmpSmoothingStart));
+                sidechainCoefficient = lerp(1, sidechainCoefficient, ((i - AmpSmoothingEnd) / AmpSmoothingStart));
             }
 
             var idx = i * speed(i, inPcm) + offsetValue;
