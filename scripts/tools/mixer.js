@@ -74,7 +74,7 @@ addEventListener("init", () => {
             panSlider.value = values.Pan;
             panSlider.setAttribute("data-panslider", "");
             panSlider.addEventListener("input", () => {
-                values.Pan = Math.pow(parseFloat(panSlider.value), 2);
+                values.Pan = Math.sign(parseFloat(panSlider.value)) * Math.pow(parseFloat(panSlider.value), 2);
                 triggerUpdate(x, values);
             });
             pan.appendChild(panSlider);
