@@ -77,6 +77,9 @@ function createOptionsMenu(loop, definition) {
                 input.classList.add("modifyable");
                 input.type = "text";
             }
+            if (value[2] === 2) {
+                input.readOnly = true;
+            }
             input.value = value[0];
             input.setAttribute("data-key", key);
             input.checked = value[0];
@@ -215,6 +218,9 @@ function createMultiEditMenu(initData, editingTargets, propDefs, dropDownDefs) {
             if (value[2] === 1) {
                 input.classList.add("modifyable");
                 input.type = "text";
+            }
+            if (value[2] === 2) {
+                input.readOnly = true;
             }
             input.value = value[0];
             input.setAttribute("data-key", key);

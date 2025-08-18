@@ -188,7 +188,6 @@ html[data-libsettings-LDMLoopInteraction] .loop.active .loopInternal>* {
   user-select: none;
   z-index: 2001;
 }
-
 .fadeout {
   animation-name: fadeanim;
   animation-timing-function: linear;
@@ -1187,4 +1186,11 @@ a[href]:hover {
     left: 0 !important;
     background-color: white;
   }
+}
+
+input[type=range] {
+  cursor: grab;
+}
+input[type=range]:active {
+  cursor: grabbing;
 }

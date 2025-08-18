@@ -2,7 +2,7 @@ function getMixerChannelIds() {
     return [...new Set([...document.querySelectorAll("[data-mixerid]")].map(x => x.getAttribute("data-mixerid")))];
 }
 function mixerChannelHandler(loop) {
-    const name = toTitleCase(loop.conf.Identifier);
+    const name = toTitleCase(cleanString(loop.conf.Identifier).replaceAll("_", " "));
     loop.setAttribute("data-mixerid", name);
     var newTitle = name + " - Mixer Channel";
     loop.setAttribute("data-file", newTitle);
@@ -15,8 +15,8 @@ addBlockType("mixer_channel", {
     directRefs: ["mix", "mixer"],
     configs: {
         "Identifier": ["Lead", "text"],
-        "Volume": [1, "number"],
-        "Pan": [0, "number"],
+        "Volume": [1, "number", 2],
+        "Pan": [0, "number", 2],
     },
     initMiddleware: (loop) => {
         initGenericDisplay(loop, "MIXER");

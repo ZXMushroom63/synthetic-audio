@@ -565,12 +565,19 @@ function addBlock(type, start, duration, title, layer = 0, data = {}, editorValu
         definition.initMiddleware(loop);
     }
 
+    if (!multiplayer.isHooked) {
+        customEvent("loopinit", {
+            loop: loop
+        });
+    }
+
     if (!noTimeline) {
         (
             document.querySelector("#trackInternal .loop:last-of-type") ||
             document.querySelector("#time")
         ).after(loop);
     }
+
     if (!multiplayer.isHooked && multiplayer.on && !loop._netIngore) {
         multiplayer.addBlock(JSON.stringify(serialiseNode(loop, false, true)));
     }
@@ -724,14 +731,14 @@ function init() {
             e.stopImmediatePropagation();
             e.stopPropagation();
             if (!prezoomLeftVal) {
-                prezoomLeftVal = document.querySelector("#track").scrollLeft + innerWidth/2;
+                prezoomLeftVal = document.querySelector("#track").scrollLeft + innerWidth / 2;
             }
             gui.zoom += e.deltaY * (keymap["Shift"] ? settings.ZoomScale * 0.05 : settings.ZoomScale);
             gui.zoom = Math.max(100, gui.zoom);
             document.querySelector("#track").style.willChange = "scroll-position, transform";
             const factor = gui.zoom / gui.lastHydratedZoom;
             document.querySelector("#trackInternal").style.transform = `scaleX(${factor})`;
-            document.querySelector("#track").scrollLeft = prezoomLeftVal * factor - innerWidth/2;
+            document.querySelector("#track").scrollLeft = prezoomLeftVal * factor - innerWidth / 2;
             if (zoomActuatorDebouncer) {
                 clearTimeout(zoomActuatorDebouncer);
             }
