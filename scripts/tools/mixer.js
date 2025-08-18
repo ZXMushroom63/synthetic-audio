@@ -133,7 +133,9 @@ addEventListener("init", () => {
     addEventListener("preserialisenode", (e) => {
         if ((e.detail.node.getAttribute("data-type") === "mixer_channel")) {
             Object.assign(e.detail.node.conf, valueMap[e.detail.node.getAttribute("data-mixerid")] || {});
-            markLoopDirty(e.detail.node);
+            if (hashNode(e.detail.node) === e.detail.node.renderHash) {
+                markLoopDirty(e.detail.node);
+            }
         }
     });
 });
