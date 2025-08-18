@@ -48,7 +48,7 @@ addEventListener("init", () => {
             row.style.listStyle = "none";
 
             const volume = document.createElement("label");
-            volume.innerText = `Vol (${quantise(values.Volume, 0.05)}): `;
+            volume.innerText = `Vol (${quantise(values.Volume, 0.01)}): `;
             volume.style.display = "inline-block";
             volume.style.width = "5rem";
             const volumeSlider = document.createElement("input");
@@ -62,14 +62,14 @@ addEventListener("init", () => {
             volumeSlider.setAttribute("data-volumeslider", "");
             volumeSlider.addEventListener("input", () => {
                 values.Volume = parseFloat(volumeSlider.value);
-                volume.innerText = `Vol (${quantise(values.Volume, 0.05)}): `;
+                volume.innerText = `Vol (${quantise(values.Volume, 0.01)}): `;
                 triggerUpdate(x, values);
             });
             row.appendChild(volume);
             row.appendChild(volumeSlider);
 
             const pan = document.createElement("label");
-            pan.innerText = `Pan (${values.Pan}): `;
+            pan.innerText = `Pan (${quantise(values.Pan, 0.01)}): `;
             pan.style.display = "inline-block";
             pan.style.width = "5rem";
             const panSlider = document.createElement("input");
@@ -82,7 +82,7 @@ addEventListener("init", () => {
             panSlider.setAttribute("data-panslider", "");
             panSlider.addEventListener("input", () => {
                 values.Pan = parseFloat(panSlider.value);
-                pan.innerText = `Pan (${quantise(values.Pan, 0.1)}): `;
+                pan.innerText = `Pan (${quantise(values.Pan, 0.01)}): `;
                 triggerUpdate(x, values);
             });
             row.appendChild(pan);
