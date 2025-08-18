@@ -291,6 +291,9 @@ function hydrate() {
     reflow("#trackInternal");
 }
 function addBlock(type, start, duration, title, layer = 0, data = {}, editorValue = Math.min(gui.layer, MAX_LAYER - 1), noTimeline) {
+    if (!multiplayer.isHooked && gui.layer === MAX_LAYER) {
+        return null;
+    }
     var definition = window.filters[type];
     function resizeBlock(e) {
         e.preventDefault();
@@ -587,6 +590,9 @@ function addBlock(type, start, duration, title, layer = 0, data = {}, editorValu
 function addIgnoredBlock(type, start, duration, title, layer = 0, data = {}, editorValue = Math.min(gui.layer, MAX_LAYER - 1)) {
     multiplayer.isHooked = true;
     var loop = addBlock(type, start, duration, title, layer, data, editorValue, true);
+    if (!loop) {
+        return null;
+    }
     loop._ignore = true;
     loop._netIgnore = true;
     multiplayer.isHooked = false;
