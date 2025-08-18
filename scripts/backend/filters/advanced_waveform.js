@@ -164,7 +164,7 @@ addBlockType("p_waveform_plus", {
             playSample(blob);
         },
         "Dbg": function () {
-            console.log(filters["p_waveform_plus"].guessEndPhase.apply(this, [parseFloat(this.getAttribute("data-duration"))]));
+            alert("Phase Data", filters["p_waveform_plus"].guessEndPhase.apply(this, [parseFloat(this.getAttribute("data-duration"))]).join(";\n"));
         }
     },
     wavtableUser: true,
