@@ -177,7 +177,7 @@ html[data-libsettings-LDMLoopInteraction] .loop.active .loopInternal>* {
   line-height: 2rem;
   height: 2rem;
   left: 50%;
-  background-color: rgba(117, 117, 117, 0.35);
+  background-color: rgba(71, 71, 71, 0.5);
   color: white;
   padding-left: 0.75rem;
   transform: translateX(-50%);
