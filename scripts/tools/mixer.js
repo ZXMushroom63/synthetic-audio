@@ -50,7 +50,7 @@ addEventListener("init", () => {
             const volume = document.createElement("label");
             volume.innerText = `Vol (${quantise(values.Volume, 0.05)}): `;
             volume.style.display = "inline-block";
-            volume.style.width = "4rem";
+            volume.style.width = "5rem";
             const volumeSlider = document.createElement("input");
             volumeSlider.type = "range";
             volumeSlider.style.display = "inline-block";
@@ -65,14 +65,13 @@ addEventListener("init", () => {
                 volume.innerText = `Vol (${quantise(values.Volume, 0.05)}): `;
                 triggerUpdate(x, values);
             });
-            volume.style.marginRight = "1rem";
             row.appendChild(volume);
             row.appendChild(volumeSlider);
 
             const pan = document.createElement("label");
             pan.innerText = `Pan (${values.Pan}): `;
             pan.style.display = "inline-block";
-            pan.style.width = "4rem";
+            pan.style.width = "5rem";
             const panSlider = document.createElement("input");
             panSlider.type = "range";
             panSlider.style.display = "inline-block";
