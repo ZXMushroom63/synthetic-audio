@@ -48,9 +48,13 @@ addEventListener("init", () => {
             row.style.listStyle = "none";
 
             const volume = document.createElement("label");
-            volume.innerText = "Volume: ";
+            volume.innerText = `Vol (${values.Volume}): `;
+            volume.style.display = "inline-block";
+            volume.style.width = "4rem";
             const volumeSlider = document.createElement("input");
             volumeSlider.type = "range";
+            volumeSlider.style.display = "inline-block";
+            volumeSlider.style.marginRight = "2rem";
             volumeSlider.min = 0;
             volumeSlider.max = 1;
             volumeSlider.step = 0.05;
@@ -58,27 +62,32 @@ addEventListener("init", () => {
             volumeSlider.setAttribute("data-volumeslider", "");
             volumeSlider.addEventListener("input", () => {
                 values.Volume = parseFloat(volumeSlider.value);
+                volume.innerText = `Vol (${values.Volume}): `;
                 triggerUpdate(x, values);
             });
             volume.style.marginRight = "1rem";
-            volume.appendChild(volumeSlider);
             row.appendChild(volume);
+            row.appendChild(volumeSlider);
 
             const pan = document.createElement("label");
-            pan.innerText = "Pan: ";
+            pan.innerText = `Pan (${values.Pan}): `;
+            pan.style.display = "inline-block";
+            pan.style.width = "4rem";
             const panSlider = document.createElement("input");
             panSlider.type = "range";
+            panSlider.style.display = "inline-block";
             panSlider.min = -1;
             panSlider.max = 1;
-            panSlider.step = 0.2;
+            panSlider.step = 0.1;
             panSlider.value = values.Pan;
             panSlider.setAttribute("data-panslider", "");
             panSlider.addEventListener("input", () => {
-                values.Pan = Math.sign(parseFloat(panSlider.value)) * Math.pow(parseFloat(panSlider.value), 2);
+                values.Pan = parseFloat(panSlider.value);
+                pan.innerText = `Pan (${values.Pan}): `;
                 triggerUpdate(x, values);
             });
-            pan.appendChild(panSlider);
             row.appendChild(pan);
+            row.appendChild(panSlider);
 
             mixerContainer.appendChild(row);
         });
