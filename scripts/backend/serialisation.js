@@ -213,8 +213,9 @@ loadMenu.oninit = function (menu) {
 function discordLoadPopup() {
     loadMenu.init();
 }
+registerSetting("SaveCodes", false);
 function load(ev, forceFileLoad) {
-    if ((IS_DISCORD) && !forceFileLoad) {
+    if ((IS_DISCORD || settings.SaveCodes) && !forceFileLoad) {
         discordLoadPopup();
         return;
     }
@@ -259,15 +260,18 @@ const saveTabs = new ModMenuTabList();
 saveTabs.addTab("Save", 
     `
     Copy this save code and paste it somewhere safe!<br>
-    <textarea id="saveCopyBox">loading...</textarea>
+    <textarea id="saveCopyBox">loading...</textarea><br><br>
+
+    <button id="svToFile">Try to save to file</button>
     `
 );
 const saveMenu = new ModMenu("Save Popup", saveTabs, "menu_save", syntheticMenuStyles);
 saveMenu.oninit = function (menu) {
     menu.querySelector("textarea").value = LZString.compressToEncodedURIComponent(JSON.stringify(serialise()));
+    menu.querySelector("#svToFile").onclick = ()=>save(null, true);
 }
-function save() {
-    if (IS_DISCORD) {
+function save(ev, forceFile) {
+    if ((IS_DISCORD || settings.SaveCodes) && !forceFile) {
         saveMenu.init();
     } else {
         saveAs(new Blob([JSON.stringify(serialise())], { type: 'application/vnd.synthetic.project' }), globalThis.lastEditedFile);
