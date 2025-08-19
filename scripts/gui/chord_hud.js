@@ -497,6 +497,8 @@ function getInversionNotes(rootIndex, formula, inversion, debugType) {
 }
 function generateChordTable() {
     const chordTable = {};
+    const normalisedChordTable = {};
+    const uninvertedNormalisedChords = {};
     const reverseChordLookup = {};
     const uninvertedChords = {};
     for (const chordType of chordFormulas.keys()) {
@@ -507,6 +509,7 @@ function generateChordTable() {
             for (let inversion = formula.length - 1; inversion >= 0; inversion--) {
                 const chordNotes = getInversionNotes(rootIndex % 12, formula, inversion, chordType);
                 const key = chordNotes.values.sort((a, b) => a - b).join(",");
+                const keyNormalised = [...new Set(chordNotes.values.map(x => x % 12).sort((a, b) => a - b))].join(",");
                 const chordName = root + chordType + (inversionNames[inversion] ?? ` (${inversion + 1}th inv)`);
                 const result = {
                     display: chordName,
@@ -520,18 +523,21 @@ function generateChordTable() {
                 };
                 if (inversion === 0) { //inversion === 0
                     uninvertedChords[key] = result;
+                    uninvertedNormalisedChords[keyNormalised] = result;
                 } else {
                     chordTable[key] = result;
+                    normalisedChordTable[keyNormalised] = result;
                 }
                 reverseChordLookup[chordName.trim()] = result;
             }
         }
     }
     Object.assign(chordTable, uninvertedChords);
-    return { chordDictionary: chordTable, reverseChordLookup: reverseChordLookup };
+    Object.assign(normalisedChordTable, uninvertedNormalisedChords);
+    return { chordDictionary: chordTable, reverseChordLookup: reverseChordLookup, backupChordDictionary: normalisedChordTable };
 }
 
-var { chordDictionary, reverseChordLookup } = generateChordTable();
+var { chordDictionary, reverseChordLookup, backupChordDictionary } = generateChordTable();
 
 Set.prototype.isSubsetOf ||= () => false; //quick polyfill
 
@@ -574,6 +580,12 @@ function getChordTypeFromStack(loops) {
 
     if (chordDictionary[key]) {
         return chordDictionary[key];
+    }
+
+    const backupKey = [...new Set(midiNotes.map(x => x % 12).sort((a, b) => a - b))].join(",");
+
+    if (backupChordDictionary[backupKey]) {
+        return backupChordDictionary[backupKey];
     }
 }
 

@@ -653,6 +653,7 @@ addEventListener("init", () => {
         registerVanillaChords();
         const calcs = generateChordTable();
         chordDictionary = calcs.chordDictionary;
+        backupChordDictionary = calcs.backupChordDictionary;
         reverseChordLookup = calcs.reverseChordLookup;
         findLoops(".loop:has(.noteDisplay):has(.chordDisplay)").forEach(chordComponentEdited);
         updateChordHudDatalist();
