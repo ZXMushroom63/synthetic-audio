@@ -21,7 +21,7 @@ addEventListener("init", () => {
         }
         const shiftMode = nodes.length === 1;
         const mapper = shiftMode ? soloScaleMap : scaleMap;
-        const dir = mapper[e.key];
+        const dir = (shiftMode && keymap["Shift"]) ? mapper[e.key] * 5 : mapper[e.key];
         globalThis.zscrollisInternal = false;
         let absoluteStart = Infinity;
         [...nodes].forEach(n => {
@@ -32,7 +32,7 @@ addEventListener("init", () => {
             const start = parseFloat(node.getAttribute(`data-start`));
             const duration = parseFloat(node.getAttribute(`data-duration`));
             if (shiftMode) {
-                const newDuration = Math.max((audio.beatSize / gui.substepping), duration + (audio.beatSize / gui.substepping * dir));
+                const newDuration = Math.min(Math.max((audio.beatSize / gui.substepping), duration + (audio.beatSize / gui.substepping * dir)), audio.duration - start);
                 node.setAttribute(`data-duration`, newDuration);
             } else {
                 const newStart = dir * (start - absoluteStart) + absoluteStart;
@@ -49,7 +49,7 @@ addEventListener("init", () => {
                 multiplayer.patchLoop(node);
             }
         });
-    }, false, (e) => !e.shiftKey && !e.altKey && !e.ctrlKey && !e.metaKey && Object.keys(scaleMap).includes(e.key));
+    }, false, (e) => !e.altKey && !e.ctrlKey && !e.metaKey && Object.keys(scaleMap).includes(e.key));
 });
 registerHelp(".tool[data-tool=SCALE]",
     `
