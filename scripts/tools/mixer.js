@@ -99,6 +99,7 @@ addEventListener("init", () => {
             return;
         }
         mixerMenu.init();
+        activateTool("MOVE");
     }, false, (e) => e.ctrlKey && !e.shiftKey && !e.metaKey && !e.altKey && e.key === "m");
     addEventListener("loopchanged", (e) => {
         if (e.detail.loop.hasAttribute("data-mixerid")) {

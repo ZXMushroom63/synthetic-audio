@@ -32,5 +32,8 @@ addBlockType("mixer_channel", {
                 : Math.sin(y * Math.PI / 2)
             );
         return inPcm.map(x => x * gain);
+    },
+    customGuiButtons: {
+        "Open Mixer": ()=>TOOL_DATABASE["MIXER"](null, null)
     }
 });
