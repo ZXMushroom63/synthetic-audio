@@ -51,6 +51,11 @@ function createOptionsMenu(loop, definition) {
             }
             s.innerHTML = opts.flatMap((a) => { return `<option${a === value[0] ? " selected" : ""}>${a}</option>` }).join("");
             s.addEventListener("input", () => {
+                commit(new UndoStackEdit(
+                    loop,
+                    key,
+                    loop["conf"][key]
+                ));
                 loop["conf"][key] = s.value;
                 value[0] = s.value;
                 hydrateLoopDecoration(loop);
@@ -84,6 +89,11 @@ function createOptionsMenu(loop, definition) {
             input.setAttribute("data-key", key);
             input.checked = value[0];
             input.addEventListener("input", () => {
+                commit(new UndoStackEdit(
+                    loop,
+                    key,
+                    loop["conf"][key]
+                ));
                 if (value[1] === "checkbox") {
                     loop["conf"][key] = input.checked;
                 } else if (value[1] === "number" && value[2] !== 1) {
@@ -259,6 +269,11 @@ function getPropertySetter(editingTargets) {
         editingTargets.forEach(targ => {
             var c = targ.loop.conf;
             if (key in c) {
+                commit(new UndoStackEdit(
+                    targ.loop,
+                    key,
+                    targ.loop["conf"][key]
+                ));
                 c[key] = value;
                 if (markDirty) {
                     hydrateLoopDecoration(targ.loop);

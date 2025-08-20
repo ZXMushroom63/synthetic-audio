@@ -45,6 +45,7 @@ var audio = {
 }
 
 function deleteLoop(loop) {
+    commit(new UndoStackDelete(serialiseNode(loop)));
     if (!multiplayer.isHooked && multiplayer.on && !loop._netIngore) {
         return multiplayer.deleteLoop(loop.getAttribute("data-uuid"));
     }
@@ -331,6 +332,12 @@ function addBlock(type, start, duration, title, layer = 0, data = {}, editorValu
             });
             return;
         };
+        commit(new UndoStackMove(
+            loop,
+            loop.getAttribute("data-start"),
+            loop.getAttribute("data-layer"),
+            loop.getAttribute("data-duration"),
+        ));
         markLoopDirty(loop, true);
 
         var trackBB = document.querySelector("#trackInternal").getBoundingClientRect();
@@ -492,6 +499,12 @@ function addBlock(type, start, duration, title, layer = 0, data = {}, editorValu
             return;
         }
         e.preventDefault();
+        commit(new UndoStackMove(
+            loop,
+            loop.getAttribute("data-start"),
+            loop.getAttribute("data-layer"),
+            loop.getAttribute("data-duration"),
+        ));
         var trackBB = loop.referenceBB || document.querySelector("#trackInternal").getBoundingClientRect();
         var originalBB = internal.getBoundingClientRect();
         if (ACTIVE_TOOL === "MOVE") {

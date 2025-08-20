@@ -39,7 +39,7 @@ addEventListener("init", () => {
                 node.conf[referenceDef.midiMappings.velocity]
             );
 
-            return addBlock(targetType,
+            const newNode = addBlock(targetType,
                 parseFloat(node.getAttribute("data-start")),
                 parseFloat(node.getAttribute("data-duration")),
                 node.getAttribute("data-file"),
@@ -47,6 +47,8 @@ addEventListener("init", () => {
                 cout,
                 parseInt(node.getAttribute("data-editlayer")),
             );
+            commit(new UndoStackAdd(newNode));
+            return newNode;
         }).forEach(hydrateLoopPosition);
 
         reflow("#trackInternal");

@@ -12,6 +12,7 @@ addEventListener("init", ()=>{
                 var x = document.elementsFromPoint(mouse.x, mouse.y).find(x => !x.classList.contains("deactivated"));
                 if (x && x.closest(".loop")) {
                     var y = deserialiseNode(structuredClone(serialiseNode(x.closest(".loop"))), true);
+                    commit(new UndoStackAdd(y));
                     hydrateLoopPosition(y);
                     hydrateLoopDecoration(y);
                     pickupLoop(y);
@@ -22,6 +23,7 @@ addEventListener("init", ()=>{
                 var dupedLoops = [];
                 targets.forEach(target => {
                     var loop = deserialiseNode(structuredClone(serialiseNode(target)), true);
+                    commit(new UndoStackAdd(loop));
                     dupedLoops.push(loop);
                 });
                 dupedLoops.forEach(loop => {

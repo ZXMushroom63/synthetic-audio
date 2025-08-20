@@ -45,6 +45,12 @@ function pickupLoop(loop, natural = false, useCache = false) {
             if (!loop.getAttribute("data-new-start")) {
                 debugger;
             }
+            commit(new UndoStackMove(
+                loop,
+                loop.getAttribute("data-start"),
+                loop.getAttribute("data-layer"),
+                loop.getAttribute("data-duration"),
+            ));
             loop.setAttribute("data-layer", loop.getAttribute("data-new-layer"));
             loop.setAttribute("data-start", loop.getAttribute("data-new-start"));
         }

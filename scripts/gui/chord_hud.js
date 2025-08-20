@@ -828,6 +828,7 @@ function drawChordMacros(loop, inversionsOnly) {
             }
             unrealisedChords.forEach((dt) => {
                 const newLoop = deserialiseNode(dt, true);
+                commit(new UndoStackAdd(newLoop));
                 hydrateLoopPosition(newLoop);
             });
             unfocusHandler();
@@ -891,6 +892,7 @@ function chordDisplayEdit(display, e, loop) {
             dt.layer += i;
             filters[template.type].applyMidi(dt, freq);
             const newLoop = deserialiseNode(dt, true);
+            commit(new UndoStackAdd(newLoop));
             hydrateLoopPosition(newLoop);
         });
     }

@@ -24,9 +24,14 @@ addEventListener("init", () => {
                 if (typeof b.conf.StartOffset === "number") {
                     b.conf.StartOffset += b.start - a.start;
                 }
+                const resultA = deserialiseNode(a);
+                const resultB = deserialiseNode(b);
 
-                hydrateLoopPosition(deserialiseNode(a));
-                hydrateLoopPosition(deserialiseNode(b));
+                commit(new UndoStackAdd(resultA));
+                commit(new UndoStackAdd(resultB));
+
+                hydrateLoopPosition(resultA);
+                hydrateLoopPosition(resultB);
             });
         } else {
             const splitCount = parseInt(e.key) || 2;
@@ -38,7 +43,9 @@ addEventListener("init", () => {
                     if (typeof a.conf.StartOffset === "number") {
                         a.conf.StartOffset += n / splitCount;
                     }
-                    hydrateLoopPosition(deserialiseNode(a));
+                    const resultA = deserialiseNode(a);
+                    commit(new UndoStackAdd(resultA));
+                    hydrateLoopPosition(resultA);
                 }
             });
         }

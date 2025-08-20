@@ -3,6 +3,7 @@ var loopDurationMap = {};
 function addAudioSampleBlock(file) {
     activateTool("MOVE");
     const loop = addBlock("audio", 0, audio.beatSize, file, 0, {});
+    commit(new UndoStackAdd(loop));
     hydrateLoopPosition(loop);
     hydrateLoopDecoration(loop);
     pickupLoop(loop);
@@ -31,6 +32,7 @@ function loadFiltersAndPrims() {
             y.addEventListener("click", () => {
                 activateTool("MOVE");
                 const loop = addBlock(k, 0, audio.beatSize, filters[k].title, 0, {});
+                commit(new UndoStackAdd(loop));
                 hydrateLoopPosition(loop);
                 hydrateLoopDecoration(loop);
                 pickupLoop(loop);

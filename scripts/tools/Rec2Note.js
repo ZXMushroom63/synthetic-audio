@@ -113,6 +113,7 @@ addEventListener("init", () => {
                 var conf = structuredClone(templateNode.conf);
                 conf.Frequency = ":" + x.note + ":";
                 var noteBlock = addBlock(nodeType, startOffset + x.start, x.duration, "Rec2Note Import", layerOffset + x.elavation, conf, gui.layer, false);
+                commit(new UndoStackDelete(loop));
                 hydrateLoopPosition(noteBlock);
                 //pickupLoop(noteBlock, true);
                 activateTool("MOVE");

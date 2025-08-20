@@ -142,6 +142,7 @@ addEventListener("init", () => {
                 filters[template.type].applyMidi({ conf: conf }, note);
                 conf.noSync = nosync;
                 const b = addBlock(template.type, moddedChord[0].start + scoreNote.beatsStart * audio.beatSize, scoreNote.beatsDuration * audio.beatSize, note + " | " + arpeggiatorPattern, lowestLayer + scoreNote.concurrentNotes, conf, chord[0].editorLayer, false);
+                commit(new UndoStackAdd(loop));
                 hydrateLoopPosition(b);
                 return b;
             });
@@ -152,6 +153,7 @@ addEventListener("init", () => {
                 filters[template.type].applyMidi({ conf: conf }, note);
                 conf.noSync = nosync;
                 const b = addBlock(template.type, moddedChord[0].start + scoreNote.beatsStart * audio.beatSize, scoreNote.beatsDuration * audio.beatSize, note + " | " + arpeggiatorPattern, lowestLayer + scoreNote.concurrentNotes, conf, chord[0].editorLayer, false);
+                commit(new UndoStackAdd(loop));
                 hydrateLoopPosition(b);
                 return b;
             });
