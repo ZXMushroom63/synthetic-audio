@@ -18,7 +18,6 @@ class UndoStackEdit extends UndoStack {
         this.loop = loop;
         this.key = key;
         this.oldValue = oldValue;
-        toast("Action: Edit Loop");
     }
     undo() {
         this.loop.conf[this.key] = this.oldValue;
@@ -37,7 +36,6 @@ class UndoStackMove extends UndoStack {
         this.oldStart = oldStart;
         this.oldLayer = oldLayer;
         this.oldDuration = oldDuration;
-        toast("Action: Position Loop");
     }
     undo() {
         this.loop.setAttribute("data-start", this.oldStart);
@@ -55,7 +53,6 @@ class UndoStackDelete extends UndoStack {
     constructor(serialised) {
         super();
         this.serialised = serialised;
-        toast("Action: Delete Loop");
     }
     undo() {
         const newNode = deserialiseNode(this.serialised, true);
@@ -69,7 +66,6 @@ class UndoStackAdd extends UndoStack {
     constructor(loop) {
         super();
         this.loop = loop;
-        toast("Action: Add Loop");
     }
     undo() {
         deleteLoop(this.loop);
