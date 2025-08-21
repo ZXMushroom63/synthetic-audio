@@ -91,6 +91,9 @@ function undo() {
 }
 registerSetting("UndoStackSize", 50);
 function commit(undoAction) {
+    if (multiplayer.isHooked && multiplayer.on) {
+        return;
+    }
     if (undoLocked) {
         return;
     }
