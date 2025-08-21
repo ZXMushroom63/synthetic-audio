@@ -495,7 +495,7 @@ function addBlock(type, start, duration, title, layer = 0, data = {}, editorValu
         if (!loop.noEditorLayer && (parseInt(loop.getAttribute("data-editlayer")) !== gui.layer)) {
             return;
         }
-        if (loop.classList.has("active")) {
+        if (loop.classList.contains("active")) {
             return;
         }
         if (e.button !== 0) {
