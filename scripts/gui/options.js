@@ -45,7 +45,7 @@ function createOptionsMenu(loop, definition) {
             var s = document.createElement("select");
             s.setAttribute("data-key", key);
             var proxy = definition.selectMiddleware || (() => value[1]);
-            var opts = proxy(key) || value[1];
+            var opts = proxy.apply(loop, [key]) || value[1];
             if (!opts.includes(value[0])) {
                 opts.push(value[0]);
             }
@@ -69,7 +69,7 @@ function createOptionsMenu(loop, definition) {
             });
             s.addEventListener("focus", () => {
                 loop["conf"][key] = s.value;
-                s.innerHTML = (proxy(key) || value[1]).flatMap((a) => { return `<option${a === value[0] ? " selected" : ""}>${a}</option>` }).join("");
+                s.innerHTML = (proxy.apply(loop, [key]) || value[1]).flatMap((a) => { return `<option${a === value[0] ? " selected" : ""}>${a}</option>` }).join("");
             });
             target.appendChild(s);
         } else {
@@ -257,7 +257,7 @@ function getSelectMiddleware(editingTargets) {
     var middlewares = editingTargets.map(x => x.def.selectMiddleware).filter(x => !!x);
     return function (key) {
         for (let i = 0; i < middlewares.length; i++) {
-            var res = middlewares[i](key);
+            var res = middlewares[i].apply(null, [key]);
             if (res) {
                 return res;
             }

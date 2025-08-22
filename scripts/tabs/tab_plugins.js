@@ -59,7 +59,7 @@ addEventListener("init", async () => {
         logToLoader(`Microphone support      -   ${navigator?.mediaDevices?.enumerateDevices ? "YES" : "NO"}`);
         logToLoader(`Storage size queries    -   ${navigator?.storage?.estimate ? "YES" : "NO"}`);
         logToLoader(`Document PiP API        -   ${("documentPictureInPicture" in window) ? "YES" : "NO"}`);
-        logToLoader(`scheduler.yield()        -   ${(globalThis.scheduler?.yield) ? "YES" : "NO"}`);
+        logToLoader(`scheduler.yield()       -   ${(globalThis.scheduler?.yield) ? "YES" : "NO"}`);
         console.log("%cStar the project on github! https://github.com/ZXMushroom63/synthetic-audio", "border: 4px solid black; border-radius: 6px; padding: 0.5rem; font-size: 1.5em; background-color: black; background-image: linear-gradient(140deg,rgba(255, 0, 0, 0.3) 0%,rgba(255, 255, 255, 0) 34%,rgba(0, 255, 187, 0.2) 100%); color: white; font-style: italic;")
     }
     const postInitQueue = [];
@@ -200,6 +200,7 @@ addEventListener("init", async () => {
 
     var typeSymbols = {
         ".sf.js": "[🎸]", //["[🎸]", "[🎻]", "[🎺]", "[🪕]", "[🎷]", "[📯]", "[🪗]"]
+        ".sf2": "[🎹]",
         ".pd.js": "[🎛️]",
         ".arp.js": "[𝄂𝄚]",
         ".wt.wav": "[∿]",
@@ -321,6 +322,20 @@ addEventListener("init", async () => {
         });
         f.click();
     }, "usf");
+    mkBtn("Upload soundfont (.sf2)", () => {
+        var f = document.createElement("input");
+        f.type = "file";
+        f.multiple = true;
+        f.accept = ".sf2";
+        f.addEventListener("input", async () => {
+            var files = [...f.files].filter(x => x.name.endsWith(".sf2"));
+            for (x of files) {
+                await addSample(x.name, x);
+                await drawModArray();
+            }
+        });
+        f.click();
+    }, "usf2");
     mkBtn("Upload sample pack (.zip)", () => {
         var f = document.createElement("input");
         f.type = "file";
@@ -496,7 +511,7 @@ addEventListener("init", async () => {
     for (let i = 0; i < modList.length; i++) {
         document.querySelector("#renderProgress").innerText = `Loading plugins (${(i / (modList.length) * 100).toFixed(1)}%)`;
         if (modList[i].endsWith(".sf.js")) {
-            logToLoader(`Loading soundfont: ${modList[i]}`);
+            logToLoader(`Loading MIDI.js soundfont: ${modList[i]}`);
             const mod = await getMod(modList[i]);
             const data = mod.split("\n").map(x => x.trim());
             try {
@@ -504,6 +519,11 @@ addEventListener("init", async () => {
             } catch (e) {
                 logToLoader("Failed to parse " + modList[i]);
             }
+        } else if (modList[i].endsWith(".sf2")) {
+            logToLoader(`Loading FluidSynth2 soundfont: ${modList[i]}`);
+            const mod = await getSample(modList[i]);
+            const bytes = new Uint8Array(await mod.arrayBuffer());
+            SF2_REGISTRY[modList[i]] = new SoundFont2.SoundFont2(bytes);
         } else if (modList[i].endsWith(".js")) {
             logToLoader(`Loading mod: ${modList[i]}`);
             const mod = await getMod(modList[i]);
