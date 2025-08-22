@@ -456,6 +456,8 @@ function registerVanillaChords() {
     chordFormulas.set("dim5", [0, 6]);
     chordFormulas.set("M3", [0, 4]);
     chordFormulas.set("m3", [0, 3]);
+    chordFormulas.set("2s3", [0, 2]);
+    chordFormulas.set("4s3", [0, 5]);
     chordFormulas.set("5", [0, 7]);
 
     // Triads
