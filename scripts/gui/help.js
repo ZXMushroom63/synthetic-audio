@@ -266,12 +266,16 @@ addBlockType("node_type_id", {
 `);
 helpContent.addTab("Soundfonts", `
 To use instruments such as piano, guitar, etc, you need to install Soundfonts in the plugins tab.
-SYNTHETIC uses the MIDI.js soundfont format.
+SYNTHETIC uses the MIDI.js soundfont format, as well as more recent and slightly unstable support for the standardised .sf2 format.
 
 - In the plugins tab, SYNTHETIC by default has buttons to download the FluidR3-GM and MusyngKite soundfonts, converted to MIDI.js by [@gleitz on GitHub](http://github.com/gleitz).
 - Once the soundfonts have finished downloading, restart the editor. 
 - You can access the soundfonts in editor using an ~Instrument~ node.
 - In the ~Instrument~'s options menu, you can select your desired instrument.
+
+- For .sf2 soundfonts, upload them in the Plugins tab
+- Once uploaded, restart the editor
+- Then, add a SoundFont2 node in the timeline to access the soundfonts
 `);
 helpContent.addTab("Samplepacks", `
 ### Adding samplepacks
