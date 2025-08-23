@@ -8,7 +8,7 @@ addBlockType("fluidknot", {
     directRefs: ["fk", "sf2"],
     configs: {
         "Note": [":A4:", "number", 1],
-        "Velocity": [1, "number"],
+        "Velocity": [1, "number", 1],
         "Volume": [1, "number"],
         "SoundFont": ["(none)", ["(none)"]],
         "Bank": ["(none)", ["(none)"]],
@@ -24,7 +24,7 @@ addBlockType("fluidknot", {
     forcePrimitive: true,
     functor: async function (inPcm, channel, data) {
         const midiNote = freq2midi(_(this.conf.Note)(0, new Float32Array(2)));
-        const velocity = Math.max(1, Math.min(127, Math.floor((this.conf.Velocity || 0) * 128)));
+        const velocity = Math.max(1, Math.min(127, Math.floor((_(this.conf.Velocity)(0, new Float32Array(2)) || 0) * 128)));
 
         const soundFont = SF2_REGISTRY[this.conf.SoundFont];
         if (!soundFont) {
@@ -156,10 +156,9 @@ addBlockType("fluidknot", {
 
         var display = loop.conf.Program.split(":");
         display = display[1] || display[0];
-        display = `SF2 - ${display} - ${loop.conf.SoundFont}`
+        display = `SF2 - ${display} - ${loop.conf.SoundFont}`;
         loop.setAttribute("data-file", display);
         loop.querySelector(".loopInternal .name").innerText = loop.conf.Program;
-        updateNoteDisplay(loop);
     },
     midiMappings: {
         note: "Note",
