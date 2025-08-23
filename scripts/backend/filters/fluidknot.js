@@ -158,7 +158,7 @@ addBlockType("fluidknot", {
         display = display[1] || display[0];
         display = `SF2 - ${display} - ${loop.conf.SoundFont}`;
         loop.setAttribute("data-file", display);
-        loop.querySelector(".loopInternal .name").innerText = loop.conf.Program;
+        loop.querySelector(".loopInternal .name").innerText = display;
     },
     midiMappings: {
         note: "Note",
