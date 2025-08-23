@@ -236,7 +236,7 @@ addEventListener("init", () => {
     var noteTimeMap = {};
     var noteAnimationMap = {};
     var midiSnappingEnabled = false;
-    var midiCooldownSize = 2000;
+    registerSetting("MIDIInsertionMaximumGap", 4);
     var midiTimescale = 1;
     var caretLoop = null;
     const midiModule = mkModule("MIDI Insertion");
@@ -295,7 +295,7 @@ addEventListener("init", () => {
         if (ser.conf.Amplitude) {
             ser.conf.Amplitude = (velocity / 255).toFixed(2);
         }
-        if ((Date.now() * midiTimescale - lastInsertionTime) > midiCooldownSize * midiTimescale) {
+        if ((Date.now() * midiTimescale - lastInsertionTime) > (settings.MIDIInsertionMaximumGap * 1000) * midiTimescale) {
             insertionBaseTime = Date.now() * midiTimescale;
             ser.start += ser.duration;
             insertionBasePos = ser.start;
