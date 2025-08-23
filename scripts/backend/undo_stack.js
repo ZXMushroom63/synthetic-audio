@@ -110,6 +110,7 @@ function commit(undoAction) {
 }
 addEventListener("keydown", (e) => {
     if (e.key === "z" && e.ctrlKey && !((e.target.tagName === "INPUT") || (e.target.contentEditable === "true") || (e.target.tagName === "TEXTAREA"))) {
+        e.preventDefault();
         undo();
     }
 });
