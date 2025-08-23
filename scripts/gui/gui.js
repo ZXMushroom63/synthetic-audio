@@ -701,6 +701,9 @@ function init() {
     });
 
     addEventListener("keydown", (e) => {
+        if (e.key === "Alt") {
+            e.preventDefault();
+        }
         if (e.key === "Shift") {
             if (e.repeat || delayedShiftPress) {
                 return;

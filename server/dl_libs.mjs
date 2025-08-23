@@ -1,6 +1,6 @@
 import fetch from "node-fetch";
 import fs from "fs/promises";
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+//process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 (async function getLibraries() {
     console.log("Updating libraries...");
     const reg = (await fs.readFile("./lib/registry.txt", {encoding: "utf8"})).split("\n").map(x => x.trim().split("|"));

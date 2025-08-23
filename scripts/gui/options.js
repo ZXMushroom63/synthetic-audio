@@ -67,10 +67,12 @@ function createOptionsMenu(loop, definition) {
                     multiplayer.patchLoop(loop);
                 }
             });
-            s.addEventListener("focus", () => {
+            const triggerUpdate = () => {
                 loop["conf"][key] = s.value;
-                s.innerHTML = (proxy.apply(loop, [key]) || value[1]).flatMap((a) => { return `<option${a === value[0] ? " selected" : ""}>${a}</option>` }).join("");
-            });
+                s.innerHTML = (proxy.apply(loop, [key]) || value[1]).flatMap((a) => { return `<option${a === loop["conf"][key] ? " selected" : ""}>${a}</option>` }).join("");
+            ;}
+            s.addEventListener("focus", triggerUpdate);
+            s.triggerUpdate = triggerUpdate;
             target.appendChild(s);
         } else {
             var input = document.createElement((value[1] === "textarea") ? "textarea" : "input");
@@ -202,7 +204,7 @@ function createMultiEditMenu(initData, editingTargets, propDefs, dropDownDefs) {
             var s = document.createElement("select");
             s.setAttribute("data-key", key);
             var proxy = selectMiddleware || (() => value[1]);
-            var opts = proxy(key) || value[1];
+            var opts = proxy.apply(editingTargets[0], [key]) || value[1];
             if (!opts.includes(value[0])) {
                 opts.push(value[0]);
             }
@@ -215,7 +217,7 @@ function createMultiEditMenu(initData, editingTargets, propDefs, dropDownDefs) {
                 reflow("#trackInternal");
             });
             s.addEventListener("focus", () => {
-                s.innerHTML = (proxy(key) || value[1]).flatMap((a) => { return `<option${a === value[0] ? " selected" : ""}>${a}</option>` }).join("");
+                s.innerHTML = (proxy.apply(editingTargets[0], [key]) || value[1]).flatMap((a) => { return `<option${a === value[0] ? " selected" : ""}>${a}</option>` }).join("");
             });
             target.appendChild(s);
         } else {
@@ -257,7 +259,7 @@ function getSelectMiddleware(editingTargets) {
     var middlewares = editingTargets.map(x => x.def.selectMiddleware).filter(x => !!x);
     return function (key) {
         for (let i = 0; i < middlewares.length; i++) {
-            var res = middlewares[i].apply(null, [key]);
+            var res = middlewares[i].apply(this, [key]);
             if (res) {
                 return res;
             }

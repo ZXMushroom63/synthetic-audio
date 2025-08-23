@@ -1,4 +1,3 @@
-sf2-player.js|https://unpkg.com/sf2-player@latest/index.js|UMDPATCH|SoundFont
 marked.js|https://unpkg.com/marked@latest/lib/marked.umd.js
 filesaver.min.js|https://raw.githubusercontent.com/eligrey/FileSaver.js/refs/heads/master/dist/FileSaver.min.js
 jszip.min.js|https://raw.githubusercontent.com/Stuk/jszip/refs/heads/main/dist/jszip.min.js

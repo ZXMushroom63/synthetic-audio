@@ -522,8 +522,8 @@ addEventListener("init", async () => {
         } else if (modList[i].endsWith(".sf2")) {
             logToLoader(`Loading FluidSynth2 soundfont: ${modList[i]}`);
             const mod = await getSample(modList[i]);
-            const bytes = new Uint8Array(await mod.arrayBuffer());
-            SF2_REGISTRY[modList[i]] = new SoundFont2.SoundFont2(bytes);
+            SF2_REGISTRY[modList[i]] = new SoundFont();
+            await SF2_REGISTRY[modList[i]].loadSoundFontFromFile(mod);
         } else if (modList[i].endsWith(".js")) {
             logToLoader(`Loading mod: ${modList[i]}`);
             const mod = await getMod(modList[i]);
