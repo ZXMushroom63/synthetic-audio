@@ -13,6 +13,7 @@ addBlockType("fluidknot", {
         "SoundFont": ["(none)", ["(none)"]],
         "Bank": ["(none)", ["(none)"]],
         "Program": ["(none)", ["(none)"]],
+        "DisableStereo": [false, "checkbox"],
         "EndGap": [0, "number"],
         "Tail": [0.1, "number"],
         "AmplitudeSmoothing": [0.004, "number"]
@@ -54,7 +55,7 @@ addBlockType("fluidknot", {
         }
         soundFont.program = programId;
 
-        soundFont.noteOn(midiNote, velocity, 0, channel);
+        soundFont.noteOn(midiNote, velocity, 0, channel * this.conf.DisableStereo);
 
         const self = this;
 
