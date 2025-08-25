@@ -1,7 +1,13 @@
 function findBestScales(midiNotes, scalePatterns) {
     const pitchClasses = [...new Set(midiNotes.map(n => n % 12))].sort((a, b) => a - b);
-    const matches = [];
 
+    const tonicWeight = Array(12).fill(0);
+    midiNotes.forEach(note => {
+        tonicWeight[note % 12] += 1;
+    });
+    const likelyTonic = tonicWeight.indexOf(Math.max(...tonicWeight));
+
+    const matches = [];
     for (let root = 0; root < 12; root++) {
         scalePatterns.forEach((pattern, idx) => {
             let note = root;
@@ -15,7 +21,8 @@ function findBestScales(midiNotes, scalePatterns) {
             const matchCount = pitchClasses.filter(pc => uniqueScalePCs.includes(pc)).length;
             const extraCount = uniqueScalePCs.filter(pc => !pitchClasses.includes(pc)).length;
 
-            const score = matchCount - extraCount * 0.1;
+            let score = matchCount - extraCount * 0.1;
+            if (root === likelyTonic) score += 0.5;
 
             if (matchCount === pitchClasses.length) {
                 matches.push({
@@ -30,6 +37,7 @@ function findBestScales(midiNotes, scalePatterns) {
 
     return matches.sort((a, b) => b.score - a.score);
 }
+
 const KEYFINDER_DEBOUNCE_PERIOD = 3000;
 function updateKeyfinders() {
     const scales = [...document.querySelector("#scaleModeInput").options].map(scale => scale.value.split(",").map(interval => parseInt(interval)));
@@ -46,13 +54,23 @@ function updateKeyfinders() {
         ).map(x => x.ref.midiNote);
 
         const outScales = findBestScales(midiNotes, scales);
-        if (outScales[0]) {
-            keyfinderNode.ref.conf.CalculatedKey = chromaticScale[outScales[0].root];
-            keyfinderNode.ref.conf.CalculatedScale = outScales[0].scalePCs.join(",");
-            keyfinderNode.ref.conf.CalculatedScaleIdx = outScales[0].patternIndex;
-            keyfinderNode.ref.conf.DisplayText = keyfinderNode.ref.conf.CalculatedKey + " " + scalesDisplay[outScales[0].patternIndex];
+        const largestScore = outScales[0].score;
+        const outScalesFiltered = outScales;//.filter(entry => entry.score === largestScore);
+        const chosenScale = keyfinderNode.conf.UsePrefferedTonic ?
+            (
+                outScalesFiltered.find(
+                    x => keyfinderNode.conf.PrefferedTonic.trim().toLowerCase() === chromaticScale[x.root].toLowerCase()
+                )
+                || outScalesFiltered[0]
+            ) : outScalesFiltered[0];
+        
+        if (chosenScale) {
+            keyfinderNode.ref.conf.CalculatedKey = chromaticScale[chosenScale.root];
+            keyfinderNode.ref.conf.CalculatedScale = chosenScale.scalePCs.join(",");
+            keyfinderNode.ref.conf.CalculatedScaleIdx = chosenScale.patternIndex;
+            keyfinderNode.ref.conf.DisplayText = keyfinderNode.ref.conf.CalculatedKey + " " + scalesDisplay[chosenScale.patternIndex];
             keyfinderNode.ref.querySelector(".genericDisplay").innerText = keyfinderNode.ref.conf.DisplayText;
-            keyfinderNode.ref.conf.Data = JSON.stringify(outScales[0]);
+            keyfinderNode.ref.conf.Data = JSON.stringify(chosenScale);
         } else {
             keyfinderNode.ref.conf.CalculatedKey = "U";
             keyfinderNode.ref.conf.CalculatedScale = "(unknown)";
@@ -66,7 +84,11 @@ function updateKeyfinders() {
 
 let keyfinderDebouncer = null;
 function queueUpdateKeyfinders(changedLoop) {
-    if (!changedLoop.detail.loop.midiNote && !(changedLoop.detail.loop.getAttribute("data-type") === "keyfinder")) {
+    if (
+        changedLoop &&
+        !changedLoop.detail.loop.midiNote
+        && !(changedLoop.detail.loop.getAttribute("data-type") === "keyfinder")
+    ) {
         return;
     }
     if (keyfinderDebouncer) {
@@ -78,8 +100,9 @@ function queueUpdateKeyfinders(changedLoop) {
 addBlockType("keyfinder", {
     color: "rgba(0,255,0,0.3)",
     title: "KeyFinder",
-    wet_and_dry_knobs: true,
     configs: {
+        "UsePrefferedTonic": [false, "checkbox"],
+        "PrefferedTonic": ["A", "text"],
         "DisplayText": ["Unknown Scale", "text", 2],
         "CalculatedKey": ["U", "text", 2],
         "CalculatedScale": ["(uncalculated)", "text", 2],
