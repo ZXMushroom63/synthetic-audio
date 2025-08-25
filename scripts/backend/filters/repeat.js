@@ -3,6 +3,7 @@ addBlockType("repeat", {
     title: "Repeat",
     amplitude_smoothing_knob: true,
     wet_and_dry_knobs: true,
+    directRefs: ["r", "rep", "repeat"],
     configs: {
         "RepeatDuration": [0.1, "number", 1],
         "FromEnd": [false, "checkbox"],
