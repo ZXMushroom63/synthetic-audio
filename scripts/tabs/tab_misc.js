@@ -156,14 +156,14 @@ addEventListener("init", () => {
     }
     scales.addEventListener("input", () => {
         if (!multiplayer.isHooked && multiplayer.on) {
-            multiplayer.modifyProperty("#scaleModeInput", "mode", scales.value);
+            //multiplayer.modifyProperty("#scaleModeInput", "mode", scales.value);
         }
         updateScales();
     });
     scaleAutocorrect.addEventListener("input", updateScales);
     note.addEventListener("input", () => {
         if (!multiplayer.isHooked && multiplayer.on) {
-            multiplayer.modifyProperty("#scaleNoteInput", "key", note.value);
+            //multiplayer.modifyProperty("#scaleNoteInput", "key", note.value);
         }
         updateScales();
     });

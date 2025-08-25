@@ -1,8 +1,8 @@
 registerSetting("ZScrollSensitivity", 4);
 async function execZScroll(loop, value) {
     var def = filters[loop.getAttribute("data-type")];
-    if (def.zscroll && value) {
-        if (def.pitchZscroller && gui.autocorrect === "SNAP") {
+    if (def.zscroll) {
+        if (def.pitchZscroller && gui.autocorrect === "SNAP" && value) {
             globalThis.zscrollIsInternal = true;
             def.zscroll(loop, value);
             markLoopDirty(loop);

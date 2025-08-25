@@ -12,7 +12,8 @@ function stopTiming(name) {
     return dt / 1000;
 }
 function findLoops(selector) {
-    return Array.prototype.filter.apply(document.querySelectorAll(selector), [(x) => !x._ignore]);
+    const track = document.querySelector("#trackInternal");
+    return Array.prototype.filter.apply(track.querySelectorAll(selector), [(x) => !x._ignore]);
 }
 function noteToFrequency(note, octave, accidental = '') {
     const notes = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
