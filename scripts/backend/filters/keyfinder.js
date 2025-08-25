@@ -114,6 +114,9 @@ addBlockType("keyfinder", {
         loop.setAttribute("data-nodirty", "");
         loop.querySelector(".backgroundSvg").remove();
     },
+    customGuiButtons: {
+        "Help": ()=>{alert("KeyFinder Help", "KeyFinder can be used to dynamically find the scale of notes within a range on a layer. You can ALT+CLICK a keyfinder node to apply the settings to the scale autocorrect features of the editor.")}
+    },
     zscroll: (loop, value)=>{
         if (value === 0) {
             const scale = parseInt(loop.conf.CalculatedScaleIdx);
