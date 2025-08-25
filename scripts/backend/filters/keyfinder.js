@@ -54,7 +54,7 @@ function updateKeyfinders() {
         ).map(x => x.ref.midiNote);
 
         const outScales = findBestScales(midiNotes, scales);
-        const largestScore = outScales[0].score;
+        //const largestScore = outScales[0]?.score;
         const outScalesFiltered = outScales;//.filter(entry => entry.score === largestScore);
         const chosenScale = keyfinderNode.conf.UsePrefferedTonic ?
             (
