@@ -204,7 +204,7 @@ function createMultiEditMenu(initData, editingTargets, propDefs, dropDownDefs) {
             var s = document.createElement("select");
             s.setAttribute("data-key", key);
             var proxy = selectMiddleware || (() => value[1]);
-            var opts = proxy.apply(editingTargets[0], [key]) || value[1];
+            var opts = proxy.apply(editingTargets[0].loop, [key]) || value[1];
             if (!opts.includes(value[0])) {
                 opts.push(value[0]);
             }
@@ -217,7 +217,7 @@ function createMultiEditMenu(initData, editingTargets, propDefs, dropDownDefs) {
                 reflow("#trackInternal");
             });
             s.addEventListener("focus", () => {
-                s.innerHTML = (proxy.apply(editingTargets[0], [key]) || value[1]).flatMap((a) => { return `<option${a === value[0] ? " selected" : ""}>${a}</option>` }).join("");
+                s.innerHTML = (proxy.apply(editingTargets[0].loop, [key]) || value[1]).flatMap((a) => { return `<option${a === value[0] ? " selected" : ""}>${a}</option>` }).join("");
             });
             target.appendChild(s);
         } else {
