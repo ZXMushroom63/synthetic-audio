@@ -45,6 +45,7 @@ addEventListener("init", () => {
     scaleGeneratorModule.innerHTML += `
     <input id="scaleNoteInput" class="inputStyles" style="width:4rem" value=":C#:" type="text">
     <select id="scaleModeInput">
+    <optgroup label="Diatonic">
         <option value="2,2,1,2,2,2,1">Major/Ionian (Diatonic)</option>
         <option value="2,1,2,2,1,2,2">Minor/Aeolian (Diatonic)</option>
         <option value="2,1,2,2,2,1,2">Dorian (Diatonic)</option>
@@ -52,18 +53,57 @@ addEventListener("init", () => {
         <option value="1,2,2,2,1,2,2">Phrygian (Diatonic)</option>
         <option value="2,2,2,1,2,2,1">Lydian (Diatonic)</option>
         <option value="2,2,1,2,2,1,2">Mixolydian (Diatonic)</option>
+    </optgroup>
+
+    <optgroup label="Pentatonic">
         <option value="2,2,3,2,3">Major (Pentatonic)</option>
         <option value="3,2,2,3,2">Minor (Pentatonic)</option>
+    </optgroup>
+
+    <optgroup label="Hexatonic">
         <option value="2,2,1,2,2,3">Major (Hexatonic)</option>
+        <option value="2,1,2,2,3,2">Minor (Hexatonic)</option>
+    </optgroup>
+
+    <optgroup label="Blues">
         <option value="3,2,1,1,3,2">Blues</option>
+    </optgroup>
+    <optgroup label="Melodic">
+        <option value="2,1,2,2,2,2,1">Melodic Minor Ascending</option>
+        <option value="1,2,2,2,2,1,2">Dorian ♭2</option>
+        <option value="2,2,2,2,1,2,1">Lydian Augmented</option>
+        <option value="2,2,2,1,2,1,2">Lydian Dominant</option>
+        <option value="2,2,1,2,1,2,2">Mixolydian ♭6</option>
+        <option value="2,1,2,1,2,2,2">Locrian ♯2</option>
+        <option value="1,2,1,2,2,2,2">Altered Scale (Super Locrian)</option>
+    </optgroup>
+    <optgroup label="Harmonic Major">
+        <option value="2,2,1,2,1,3,1">Harmonic Major (Ionian ♭6)</option>
+        <option value="2,1,2,1,3,1,2">Dorian ♭5</option>
+        <option value="1,2,1,3,1,2,2">Phrygian ♭4</option>
+        <option value="2,1,3,1,2,2,1">Lydian ♯3</option>
+        <option value="1,3,1,2,2,1,2">Mixolydian ♭2</option>
+        <option value="3,1,2,2,1,2,1">Lydian Augmented ♯2</option>
+        <option value="1,2,2,1,2,1,3">Locrian ♭♭7</option>
+    </optgroup>
+    <optgroup label="Harmonic Minor">
         <option value="2,1,2,2,1,3,1">Harmonic Minor</option>
-        <option value="1,2,2,1,3,1,2">Locrian ♭6</option>
         <option value="2,2,1,3,1,2,1">Ionian #5</option>
         <option value="2,1,3,1,2,1,2">Dorian #4</option>
         <option value="1,3,1,2,1,2,2">Phrygian Dominant</option>
         <option value="3,1,2,1,2,2,1">Lydian #2</option>
         <option value="1,2,1,2,2,1,3">Super Locrian ♭♭7</option>
-        <option value="2,1,2,2,2,2,1">Melodic Minor Ascending</option>
+        <option value="1,2,2,1,3,1,2">Locrian ♭6</option>
+    </optgroup>
+    <optgroup label="Double Harmonic Major/Minor">
+        <option value="1,3,1,2,1,3,1">Double Harmonic Major</option>
+        <option value="3,1,2,1,3,1,1">Lydian ♯2 ♯6</option>
+        <option value="1,2,1,3,1,1,3">Phrygian ♯3 ♭7</option>
+        <option value="2,1,3,1,1,3,1">Hungarian Minor</option>
+        <option value="1,3,1,1,3,1,2">Oriental</option>
+        <option value="3,1,1,3,1,2,1">Ionian Augmented ♯2</option>
+        <option value="1,1,3,1,2,1,3">Ultraphrygian</option>
+    </optgroup>
     </select><br>
     <span class="scaleout">(trigger a change)</span><br>
     <button id="scaleCopyNote">Copy (note)</button>
