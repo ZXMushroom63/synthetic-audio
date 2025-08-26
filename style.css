@@ -170,6 +170,8 @@ html[data-libsettings-LDMLoopInteraction] .loop.active .loopInternal>* {
   display: none;
 }
 
+
+
 .toast {
   position: fixed;
   bottom: 20vh;
@@ -612,6 +614,10 @@ button:hover {
 select option {
   color: white !important;
   background: black;
+}
+select optgroup {
+  color: white !important;
+  background: rgb(40, 40, 40);
 }
 
 .toolbox {
