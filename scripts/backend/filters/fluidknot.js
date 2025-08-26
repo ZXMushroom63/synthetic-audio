@@ -169,7 +169,7 @@ addBlockType("fluidknot", {
     pitchZscroller: true,
     zscroll: (loop, value) => {
         if (keymap["q"] || keymap["w"]) {
-            loop.conf.Velocity = Math.min(1, Math.max(0, (parseFloat(loop.conf.Velocity) || 1) + value*0.1)).toFixed(2);
+            loop.conf.Velocity = Math.min(1, Math.max(0, (parseFloat(loop.conf.Velocity) || 0) + value*0.1)).toFixed(2);
             hydrateLoopDecoration(loop);
         } else {
             loop.conf.Note = ":" + frequencyToNote(_(loop.conf.Note)(0, new Float32Array(1)) * Math.pow(2, value / 12)) + ":";
