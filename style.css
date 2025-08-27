@@ -619,6 +619,7 @@ button:hover {
   justify-content: flex-start;
   align-content: center;
   align-items: center;
+  transform: translateY(-0.5rem);
 }
 
 .tabHidden {
