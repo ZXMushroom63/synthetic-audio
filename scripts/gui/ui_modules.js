@@ -27,7 +27,7 @@ syntheticPopupStyles.setTabHoverColor("rgb(20,20,20)");
 syntheticPopupStyles.setTabactiveColor("rgb(35,35,35)");
 syntheticPopupStyles.setTextColor("white");
 
-globalThis.alert = function (name, text) {
+globalThis.alert = function (name, text, initHander) {
     return new Promise((resolve, reject) => {
         const helpContent = new ModMenuTabList();
         helpContent.addTab(name, `<div class="dowrap">${text.replaceAll("\n", "<br>")}</div>`);
@@ -35,6 +35,9 @@ globalThis.alert = function (name, text) {
         helpMenu.init({
             onclose: () => resolve()
         });
+        if (initHander) {
+            initHander(helpMenu.rootDiv);
+        }
         helpMenu.rootDiv.querySelector(".modmenutabcontent").style.textAlign = "center";
     });
 }
