@@ -119,11 +119,16 @@ async function convertToFileBlob(float32Arrays, channels, sampleRate, bRate, for
         const codec = codec_registry[audio.format];
         ffmpeg.FS("writeFile", 'input.wav', new Uint8Array(convertToWavData(float32Arrays, channels, sampleRate, bRate)));
         const fname = codec.codec().pop();
+        renderFileName = fname;
+        renderCodec = codec;
         await ffmpeg.run(...codec.codec());
         const data = ffmpeg.FS("readFile", fname);
         blob = new Blob([data.buffer], { type: codec.mime });
         ffmpeg.exit();
     } else {
+        if (processRendering) {
+            renderCodec = codec_registry["wav"];
+        }
         blob = new Blob([convertToWavData(float32Arrays, channels, sampleRate, bRate)], { type: "audio/wav" });
     }
     stopTiming("encode");
@@ -546,6 +551,9 @@ function constructRenderDataArray(data) {
 }
 var processRendering = false;
 var currentlyRenderedLoop = null;
+let renderFileName = "";
+let renderBlob = null;
+let renderCodec = null;
 async function render() {
     if (processRendering) {
         return;
@@ -648,7 +656,7 @@ async function render() {
         var renderTime = stopTiming("render");
         document.querySelector("#renderProgress").innerText = "Encoding...";
         console.log("Encode queued.");
-        var blob = await convertToFileBlob(output, channels, audio.samplerate, audio.bitrate);
+        renderBlob = await convertToFileBlob(output, channels, audio.samplerate, audio.bitrate);
     } catch (error) {
         stopTiming("render");
         console.log(error);
@@ -658,7 +666,7 @@ async function render() {
         ? `Render successful! (${renderTime.toFixed(2)}s, ${calculatedNodeCount / (1 + audio.stereo)} calculated, ${processedNodeCount / (1 + audio.stereo)} processed)`
         : "Render failed.";
     if (success) {
-        document.querySelector("#renderOut").src = URL.createObjectURL(blob);
+        document.querySelector("#renderOut").src = URL.createObjectURL(renderBlob);
     }
 
 

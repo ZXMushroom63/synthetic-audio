@@ -87,6 +87,7 @@
     <script src="scripts/gui/encoders.js"></script>
     <script src="scripts/gui/note_display.js"></script>
     <script src="scripts/gui/chord_hud.js"></script>
+    <script src="scripts/gui/save_music_to_file.js"></script>
 
     <!-- TOOLS -->
     <script src="scripts/tools/move.js"></script>
@@ -207,7 +208,7 @@
     <table class="main">
       <tr>
         <td style="height: 10rem">
-          <h4>
+          <h4 id="topbarWrapper">
             <img id="logo" style="display: none" src="public/logo.png" />
             <canvas width="900" height="450" id="viz"></canvas>
             <button id="renderBtn">
@@ -215,7 +216,8 @@
             </button>
             <audio id="renderOut" controls></audio>
             <div style="display: inline-block">
-              <span>Playback Rate: </span><br />
+              <button class="smallBtn" title="Save as file" id="saveAudioFile">💾</button><br>
+              <span style="font-weight: normal;">&nbsp;Playback Rate: </span><br />
               <input
                 title="Speed: 100%"
                 id="playbackRateSlider"

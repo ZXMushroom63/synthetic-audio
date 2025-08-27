@@ -190,6 +190,7 @@ html[data-libsettings-LDMLoopInteraction] .loop.active .loopInternal>* {
   user-select: none;
   z-index: 2001;
 }
+
 .fadeout {
   animation-name: fadeanim;
   animation-timing-function: linear;
@@ -202,6 +203,7 @@ html[data-libsettings-LDMLoopInteraction] .loop.active .loopInternal>* {
   0% {
     opacity: 1;
   }
+
   100% {
     opacity: 0;
   }
@@ -504,10 +506,34 @@ select:focus {
   height: 75px;
   width: 75px;
   vertical-align: text-bottom;
-  transform: translateY(-0.25rem);
   border: 1px solid white;
   margin-top: 0px;
-  margin-left: 0px;
+  margin-left: 4px;
+  margin-right: 4px;
+}
+
+.dragAndDropTarget {
+  width: 6rem;
+  display: inline-flex;
+  background-color: rgba(0, 125, 255, 0.2);
+  height: 6rem;
+  border: 2px dashed rgba(0, 125, 255, 0.5);
+  color: white;
+  font-family: sans-serif;
+  border-radius: 1rem;
+  transition: background-color 0.5s;
+  cursor: grab;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+}
+
+.dragAndDropTarget:hover {
+  background-color: rgba(0, 125, 255, 0.35);
+}
+
+.dragAndDropTarget:active {
+  cursor: grabbing;
 }
 
 button {
@@ -587,6 +613,14 @@ button:hover {
   cursor: default;
 }
 
+#topbarWrapper {
+  display: flex;
+  height: 75px;
+  justify-content: flex-start;
+  align-content: center;
+  align-items: center;
+}
+
 .tabHidden {
   display: none;
 }
@@ -615,6 +649,7 @@ select option {
   color: white !important;
   background: black;
 }
+
 select optgroup {
   color: white !important;
   background: rgb(40, 40, 40);
@@ -1197,6 +1232,7 @@ a[href]:hover {
 input[type=range] {
   cursor: grab;
 }
+
 input[type=range]:active {
   cursor: grabbing;
 }
