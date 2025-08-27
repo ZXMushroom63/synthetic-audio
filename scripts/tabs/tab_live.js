@@ -299,6 +299,8 @@ addEventListener("init", () => {
 
     if (!IS_DISCORD) {
         registerTab("Live", container, false, () => { setTimeout(drawModifierStack, 150); });
+    } else {
+        container.classList.add("tabHidden");
     }
 
     addEventListener('projinit', (e) => {
