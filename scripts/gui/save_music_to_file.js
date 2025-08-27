@@ -10,7 +10,7 @@ addEventListener("load", () => {
             const dragTarget = container.querySelector(".dragAndDropTarget");
             const mime = renderCodec.mime;
             dragTarget.ondragstart = (e) => {
-                //e.dataTransfer.setData(mime, renderBlob);
+                e.dataTransfer.setData(mime, renderBlob);
                 e.dataTransfer.setData("DownloadURL", mime + ":" + fname + ":" + url);
                 e.dataTransfer.setData("text/plain", "Download Song File");
             };
