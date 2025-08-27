@@ -447,6 +447,8 @@ addEventListener("init", async () => {
     container.appendChild(quotaEstimate);
     container.appendChild(document.createElement("br"));
 
+    const regExp = new RegExp(Object.keys(typeSymbols).map(x=>"(" + x.replaceAll(".", "\\.") + ")?").join("") + "$", "gm");
+console.log(regExp);
     async function drawModArray() {
         if (navigator?.storage?.estimate) {
             const quotaEstimateData = await navigator.storage.estimate();
@@ -454,13 +456,14 @@ addEventListener("init", async () => {
         }
         const scrollPos = container.scrollTop;
         container.querySelectorAll("div").forEach(x => x.remove());
-        var modsArr = (await getMods()).map((x, i) => { var z = Object(/\..+/.exec(x)?.[0] || ""); z.__key = x; z.__idx = i; return z; }).sort();
+        
+        var modsArr = (await getMods()).sort().map((x, i) => { var z = Object(getTypeSymbol(x)); z.__key = x; z.__idx = i; return z; }).sort();
         var idxMap = modsArr.map(z => z.__idx);
-        modsArr = modsArr.map(z => z.__key);
+        modsArr = modsArr.map(z => {const x = Object(z.__key); x.__sym = z; return x;});
         modsArr.forEach((mod, i) => {
             var entry = document.createElement("div");
 
-            entry.innerText = getTypeSymbol(mod) + " " + mod;
+            entry.innerText = mod.__sym + " " + mod;
 
             var remove = document.createElement("a");
             remove.innerText = "❌";
