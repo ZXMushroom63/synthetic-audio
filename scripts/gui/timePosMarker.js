@@ -1,52 +1,53 @@
-var timePosMarkerAnimator = -1;
-var timePosMarkerMidiActuator = {};
-var timePosMarkerLoopPlayback = {};
-// MIDI_NOTE : [RAISE_TIME, [loopArray]]
-function resetMidiSignals() {
-    Object.keys(timePosMarkerMidiActuator).forEach(note => {
-        sendMidiMessage(MIDI_NOTE_OFF, parseInt(note), 0);
-        delete timePosMarkerMidiActuator[note];
-    });
-    timePosMarkerLoopPlayback = {};
-}
-registerSetting("MidiOutput", false);
-function hydrateTimePosMarker(unused, isAnimated) {
-    document.querySelector(".timePosMarker").style.left = gui.marker / audio.duration * 100 + "%";
-    if (isAnimated && settings.MidiOutput) {
-        Object.entries(timePosMarkerMidiActuator).forEach(ent => {
-            if (gui.marker > ent[1][0]) {
-                sendMidiMessage(MIDI_NOTE_OFF, parseInt(ent[0]), 0);
-                delete timePosMarkerMidiActuator[ent[0]];
-            }
+addEventListener("load", () => {
+    const timePosMarker = document.querySelector(".timePosMarker");
+    var timePosMarkerAnimator = -1;
+    var timePosMarkerMidiActuator = {};
+    var timePosMarkerLoopPlayback = {};
+    // MIDI_NOTE : [RAISE_TIME, [loopArray]]
+    function resetMidiSignals() {
+        Object.keys(timePosMarkerMidiActuator).forEach(note => {
+            sendMidiMessage(MIDI_NOTE_OFF, parseInt(note), 0);
+            delete timePosMarkerMidiActuator[note];
         });
-        findLoops(gui.isolate ? `.loop:not(.deactivated):not([data-deleted])` : ".loop:not([data-deleted])").forEach(loop => {
-            if (
-                loop.theoryNote &&
-                !timePosMarkerLoopPlayback[loop.getAttribute("data-uuid")] &&
-                gui.marker > parseFloat(loop.getAttribute("data-start"))
-            ) {
-                const midiId = chromaticToIndex(loop.theoryNote) + 12;
-                timePosMarkerLoopPlayback[loop.getAttribute("data-uuid")] = true;
-                timePosMarkerMidiActuator[midiId] = [parseFloat(loop.getAttribute("data-start")) + parseFloat(loop.getAttribute("data-duration"))];
-                sendMidiMessage(MIDI_NOTE_ON, midiId, Math.floor(127 * (loop.conf.Amplitude || loop.conf.Volume)));
-            }
-        });
+        timePosMarkerLoopPlayback = {};
     }
-}
-addEventListener("hydrate", hydrateTimePosMarker);
-addEventListener("deserialise", () => {
-    gui.marker = 0;
-    hydrateTimePosMarker();
-});
-addEventListener("init", () => {
+    registerSetting("MidiOutput", false);
+    function hydrateTimePosMarker(unused, isAnimated) {
+        timePosMarker.style.left = gui.marker / audio.duration * 100 + "%";
+        if (isAnimated && settings.MidiOutput) {
+            Object.entries(timePosMarkerMidiActuator).forEach(ent => {
+                if (gui.marker > ent[1][0]) {
+                    sendMidiMessage(MIDI_NOTE_OFF, parseInt(ent[0]), 0);
+                    delete timePosMarkerMidiActuator[ent[0]];
+                }
+            });
+            findLoops(gui.isolate ? `.loop:not(.deactivated):not([data-deleted])` : ".loop:not([data-deleted])").forEach(loop => {
+                if (
+                    loop.theoryNote &&
+                    !timePosMarkerLoopPlayback[loop.getAttribute("data-uuid")] &&
+                    gui.marker > parseFloat(loop.getAttribute("data-start"))
+                ) {
+                    const midiId = chromaticToIndex(loop.theoryNote) + 12;
+                    timePosMarkerLoopPlayback[loop.getAttribute("data-uuid")] = true;
+                    timePosMarkerMidiActuator[midiId] = [parseFloat(loop.getAttribute("data-start")) + parseFloat(loop.getAttribute("data-duration"))];
+                    sendMidiMessage(MIDI_NOTE_ON, midiId, Math.floor(127 * (loop.conf.Amplitude || loop.conf.Volume)));
+                }
+            });
+        }
+    }
+    addEventListener("hydrate", hydrateTimePosMarker);
+    addEventListener("deserialise", () => {
+        gui.marker = 0;
+        hydrateTimePosMarker();
+    });
     const renderOut = document.querySelector("#renderOut");
-    document.querySelector(".timePosMarker").addEventListener("mousedown", (e) => {
+    timePosMarker.addEventListener("mousedown", (e) => {
         resetMidiSignals();
         e.preventDefault();
         var bba = document.querySelector("#trackInternal").getBoundingClientRect();
         window.onmousemove = (e) => {
             e.preventDefault();
-            document.querySelector(".timePosMarker").style.left = ((e.clientX - bba.left) / bba.width) * 100 + "%";
+            timePosMarker.style.left = ((e.clientX - bba.left) / bba.width) * 100 + "%";
             gui.marker = ((e.clientX - bba.left) / bba.width) * audio.duration;
             renderOut.currentTime = gui.marker;
         }
@@ -107,7 +108,7 @@ addEventListener("init", () => {
     addEventListener("keydown", (e) => {
         if (e.ctrlKey && e.key.toLowerCase() === "g") {
             e.preventDefault();
-            document.querySelector(".timePosMarker").dispatchEvent(new Event('mousedown'));
+            timePosMarker.dispatchEvent(new Event('mousedown'));
         }
     });
-});
+})
