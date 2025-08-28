@@ -24,6 +24,9 @@ class UndoStackEdit extends UndoStack {
         this.loop.querySelector(`[data-key=${this.key}]`).value = this.oldValue;
         toast("Undo: Edit Loop");
         markLoopDirty(this.loop);
+        if (filters[this.loop.getAttribute("data-type")]?.updateMiddleware) {
+            filters[this.loop.getAttribute("data-type")].updateMiddleware(this.loop);
+        }
         if (!multiplayer.isHooked && multiplayer.on && !this.loop._netIngore) {
             multiplayer.patchLoop(this.loop);
         }
@@ -89,7 +92,7 @@ function undo() {
     }
     undoLocked = false;
 }
-registerSetting("UndoStackSize", 50);
+registerSetting("UndoStackSize", 150);
 function commit(undoAction) {
     if (multiplayer.isHooked && multiplayer.on) {
         return;
