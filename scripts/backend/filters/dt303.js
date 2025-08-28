@@ -96,7 +96,7 @@
             "ClipLevel": [2, "number", 1],
             "Volume": [1, "number", 1],
             "Accent": [0.8, "number"], // Controls envelope intensity, mapped from velocity
-            "Decay": [0.0, "number"], 
+            "Decay": [0.0, "number"],
             "Tune": [0, "number"],
             "Waveform": [0.09, "number"], // 0 = Saw, 1 = Square
             "Cutoff": [0.26, "number"],
@@ -218,6 +218,11 @@
         },
         pitchZscroller: true,
         zscroll: (loop, value) => {
+            commit(new UndoStackEdit(
+                loop,
+                "Note",
+                loop["conf"]["Note"]
+            ));
             // Use z-scrolling (Ctrl+MouseWheel) to adjust the note pitch
             loop.conf.Note = ":" + frequencyToNote(_(loop.conf.Note)(0, new Float32Array(1)) * Math.pow(2, value / 12)) + ":";
             updateNoteDisplay(loop);

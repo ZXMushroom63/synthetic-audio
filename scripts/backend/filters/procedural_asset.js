@@ -60,6 +60,11 @@ addBlockType("p_readasset", {
         if (!loop.querySelector(".noteDisplay")) {
             return;
         }
+        commit(new UndoStackEdit(
+            loop,
+            "Note",
+            loop["conf"]["Note"]
+        ));
         loop.conf.Note = ":" + frequencyToNote(_(loop.conf.Note)(0, new Float32Array(1)) * Math.pow(2, value / 12)) + ":";
         updateNoteDisplay(loop);
 

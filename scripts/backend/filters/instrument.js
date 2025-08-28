@@ -35,6 +35,11 @@ addBlockType("instrument", {
         zero: []
     },
     zscroll: (loop, value) => {
+        commit(new UndoStackEdit(
+            loop,
+            "Note",
+            loop["conf"]["Note"]
+        ));
         loop.conf.Note = ":" + frequencyToNote(_(loop.conf.Note)(0, new Float32Array(1)) * Math.pow(2, value / 12)) + ":";
         updateNoteDisplay(loop);
         //usually would check globalThis.zscrollIsFirst, but `instrument` can play multiple notes at once, so might as well.

@@ -140,6 +140,11 @@ addBlockType("p_waveform_plus", {
         return true;
     },
     zscroll: (loop, value) => {
+        commit(new UndoStackEdit(
+            loop,
+            "InternalSemiOffset",
+            loop["conf"]["InternalSemiOffset"]
+        ));
         loop.conf.InternalSemiOffset += value;
 
         //lets try to keep things seperate
