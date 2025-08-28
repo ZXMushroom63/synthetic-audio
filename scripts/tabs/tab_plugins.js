@@ -448,7 +448,6 @@ addEventListener("init", async () => {
     container.appendChild(document.createElement("br"));
 
     const regExp = new RegExp(Object.keys(typeSymbols).map(x=>"(" + x.replaceAll(".", "\\.") + ")?").join("") + "$", "gm");
-console.log(regExp);
     async function drawModArray() {
         if (navigator?.storage?.estimate) {
             const quotaEstimateData = await navigator.storage.estimate();
