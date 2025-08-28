@@ -55,7 +55,7 @@ addBlockType("fluidknot", {
         }
         soundFont.program = programId;
 
-        soundFont.noteOn(midiNote, velocity, 0, channel * this.conf.DisableStereo);
+        soundFont.noteOn(midiNote, velocity, 0, channel * (!this.conf.DisableStereo));
 
         const self = this;
 
