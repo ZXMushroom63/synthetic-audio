@@ -63,7 +63,8 @@ function updateKeyfinders() {
                 )
                 || outScalesFiltered[0]
             ) : outScalesFiltered[0];
-        
+
+        keyfinderNode.ref.querySelector(".name").innerText = "KeyFinder - " + (new Date());
         if (chosenScale) {
             keyfinderNode.ref.conf.CalculatedKey = chromaticScale[chosenScale.root];
             keyfinderNode.ref.conf.CalculatedScale = chosenScale.scalePCs.join(",");
@@ -115,9 +116,9 @@ addBlockType("keyfinder", {
         loop.querySelector(".backgroundSvg").remove();
     },
     customGuiButtons: {
-        "Help": ()=>{alert("KeyFinder Help", "KeyFinder can be used to dynamically find the scale of notes within a range on a layer. You can ALT+CLICK a keyfinder node to apply the settings to the scale autocorrect features of the editor.")}
+        "Help": () => { alert("KeyFinder Help", "KeyFinder can be used to dynamically find the scale of notes within a range on a layer. You can ALT+CLICK a keyfinder node to apply the settings to the scale autocorrect features of the editor.") }
     },
-    zscroll: (loop, value)=>{
+    zscroll: (loop, value) => {
         if (value === 0) {
             const scale = parseInt(loop.conf.CalculatedScaleIdx);
             if (!isNaN(scale) && isFinite(scale)) {
