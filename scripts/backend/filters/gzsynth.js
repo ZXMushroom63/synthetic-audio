@@ -185,18 +185,20 @@ const gz_synth_voicecount = 4;
         a[0] = Math.min(a[0], len);
         d[0] = Math.min(d[0], len - a[0]);
         r[0] = Math.min(r[0], len - (a[0] + d[0]));
+        const AD = a[0] + d[0];
+        const Rlen = len - r[0];
         var ret = 1;
-        if (time > (d[0] + a[0]) && time <= (len - r[0])) {
+        if (time > (AD) && time <= (Rlen)) {
             ret = s;
         }
         if (time <= a[0]) {
             const val = ((time / a[0]) ** a[1](sample, mprPcm));
             ret *= isNaN(val) ? 1 : val;
         }
-        if (time > a[0] && time <= (d[0] + a[0])) {
+        if (time > a[0] && time <= (AD)) {
             ret = lerp(1, s, ((time - a[0]) / d[0]) ** (1 / d[1](sample, mprPcm))) || s;
         }
-        if (time > (len - r[0])) {
+        if (time > (Rlen)) {
             ret *= (((len - time) / r[0]) ** r[1](sample, mprPcm)) * s || 0;
         }
         return ret;
