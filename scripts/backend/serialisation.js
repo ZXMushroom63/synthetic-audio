@@ -179,21 +179,21 @@ function deserialise(serialisedStr) {
 }
 globalThis.lastEditedFile = "mysong.sm";
 const loadTabs = new ModMenuTabList();
-loadTabs.addTab("From Code", 
+loadTabs.addTab("From Code",
     `
-    Copy this save code and paste it somewhere safe!<br>
+    Load from a save code! <br>
     <textarea id="loadPasteBox" placeholder="Save code here"></textarea><br>
     <button id="btnLoadFromCode">Load</button>
     `
 );
-loadTabs.addTab("From File", 
+loadTabs.addTab("From File",
     `
     <button id="btnLoadFromFile">Open File</button>
     `
 );
 const loadMenu = new ModMenu("Load Popup", loadTabs, "menu_load", syntheticMenuStyles);
 loadMenu.oninit = function (menu) {
-    menu.querySelector("#btnLoadFromCode").addEventListener("click", ()=>{
+    menu.querySelector("#btnLoadFromCode").addEventListener("click", () => {
         const decompressed = LZString.decompressFromEncodedURIComponent(menu.querySelector("#loadPasteBox").value.replace(/[\s\n\r]/gm, ""));
         if (!decompressed) {
             toast("Invalid save code!");
@@ -202,11 +202,11 @@ loadMenu.oninit = function (menu) {
         try {
             deserialise(decompressed);
             loadMenu.closeModMenu();
-        } catch(e) {
+        } catch (e) {
             toast(e.toString());
         }
     });
-    menu.querySelector("#btnLoadFromFile").addEventListener("click", ()=>{
+    menu.querySelector("#btnLoadFromFile").addEventListener("click", () => {
         load(null, true);
     });
 }
@@ -257,18 +257,45 @@ addEventListener("beforeunload", () => {
     writeAutosave();
 });
 const saveTabs = new ModMenuTabList();
-saveTabs.addTab("Save", 
+saveTabs.addTab("Save",
     `
+    <div style="text-align: center;">
     Copy this save code and paste it somewhere safe!<br>
-    <textarea id="saveCopyBox">loading...</textarea><br><br>
+    <textarea id="saveCopyBox" placeholder="(click to view)"></textarea><br><br>
+    <span style="font-decoration:underline;">OR</span><br>
+    Drag this file somewhere safe.<br>
+    <div draggable="true" class="dragAndDropTarget">save.sm</div><br><br>
 
-    <button id="svToFile">Try to save to file</button>
+    <button id="svToFile">Save to file using alternate method</button>
+    </div>
     `
 );
 const saveMenu = new ModMenu("Save Popup", saveTabs, "menu_save", syntheticMenuStyles);
 saveMenu.oninit = function (menu) {
-    menu.querySelector("textarea").value = LZString.compressToEncodedURIComponent(JSON.stringify(serialise()));
-    menu.querySelector("#svToFile").onclick = ()=>save(null, true);
+    const saveCodes = menu.querySelector("textarea");
+    saveCodes.addEventListener("focus", () => {
+        if (saveCodes.calced) {
+            return;
+        }
+        saveCodes.calced = true;
+        saveCodes.value = LZString.compressToEncodedURIComponent(JSON.stringify(serialise()));
+        saveCodes.select();
+    })
+    menu.querySelector("#svToFile").onclick = () => save(null, true);
+    let blobURL = null;
+    menu.querySelector(".dragAndDropTarget").ondragstart = (e) => {
+        URL.revokeObjectURL(blobURL);
+        const blob = new Blob([JSON.stringify(serialise())], { type: 'application/vnd.synthetic.project' });
+        blobURL = URL.createObjectURL(blob);
+        e.dataTransfer.setData("DownloadURL", "application/vnd.synthetic.project:save.sm:" + blobURL);
+        e.dataTransfer.setData("text/uri-list", blobURL);
+        toast("Initiating DataTransfer");
+    };
+    menu.querySelector(".dragAndDropTarget").ondragend = () => {
+        setTimeout(() => {
+            URL.revokeObjectURL(blobURL);
+        }, 1000);
+    }
 }
 function save(ev, forceFile) {
     if ((IS_DISCORD || settings.SaveCodes) && !forceFile) {
