@@ -11,7 +11,7 @@ const gz_synth_voicecount = 4;
             "ClipLevel": [1, "number", 1],
             "Volume": [1, "number", 1],
             "Decay": [0, "number", 1],
-            "AmplitudeSmoothing": [0.006, "number"]
+            "AmplitudeSmoothing": [0.006, "number"],
         },
         forcePrimitive: true,
         dropdowns: {},
@@ -31,8 +31,10 @@ const gz_synth_voicecount = 4;
             const clipLvl = _(this.conf.ClipLevel);
             const filterCapacity = _(this.conf.FilterFrequency);
             const decayFn = _(this.conf.Decay);
+            const vibratoAmount = _(this.conf.VibratoAmountSemis);
 
             out.forEach((x, i) => {
+                const absoluteTime = i / audio.samplerate;
                 const adsr = this.conf.EnvelopeEnabled ? findADSR(
                     [this.conf.AttackSeconds, adsrMap.AttackExp],
                     [this.conf.DecaySeconds, adsrMap.DecayExp],
@@ -41,24 +43,44 @@ const gz_synth_voicecount = 4;
                     i,
                     inPcm
                 ) : 1;
+                const vibratoAdsr = findADSR(
+                    [this.conf.VibratoAttackSeconds, adsrMap.VibratoAttackExp],
+                    [this.conf.VibratoDecaySeconds, adsrMap.VibratoDecayExp],
+                    adsrMap.VibratoSustainLevel,
+                    [this.conf.VibratoReleaseSeconds, adsrMap.VibratoReleaseExp],
+                    i,
+                    inPcm
+                );
+                const pitchAdsr = this.conf.PitchEnvenlopeEnabled ? findADSR(
+                    [this.conf.PitchAttackSeconds, adsrMap.PitchAttackExp],
+                    [this.conf.PitchDecaySeconds, adsrMap.PitchDecayExp],
+                    adsrMap.PitchSustainLevel,
+                    [this.conf.PitchReleaseSeconds, adsrMap.PitchReleaseExp],
+                    i,
+                    inPcm
+                ) : 0;
+                const pitchMod = this.conf.PitchEnvenlopeEnabled ? Math.pow(2, lerp(this.conf.PitchModLowerSemis, this.conf.PitchModUpperSemis, pitchAdsr) / 12) : 1;
+                const vibratoWave = waveforms.sin(this.conf.VibratoRateHz * absoluteTime);
                 const decay = Math.exp(-decayFn(i, inPcm) * (i / audio.samplerate));
-                const freq = note(i, inPcm);
+                const freq = pitchMod * note(i, inPcm) * Math.pow(2, (vibratoWave * vibratoAdsr * vibratoAmount(i, inPcm)) / 12);
+
                 for (let v = 0; v < gz_synth_voicecount; v++) {
-                    const driveLFO = pconfs[`Voice${v + 1}Drive`];
+                    const vDisplay = "" + (v + 1);
+                    const driveLFO = pconfs[`Voice${vDisplay}Drive`];
                     const drive = driveLFO(i, inPcm);
                     if (drive === 0) {
                         continue;
                     }
-                    const semiLFO = pconfs[`Voice${v + 1}SemiOffset`];
-                    const panLFO = pconfs[`Voice${v + 1}Pan`];
+                    const semiLFO = pconfs[`Voice${vDisplay}SemiOffset`];
+                    const panLFO = pconfs[`Voice${vDisplay}Pan`];
                     const panVal = panLFO(i, inPcm);
                     const panVolMult = (channel === 0) ? (1 - Math.max(0, panVal)) : (1 + Math.min(0, panVal));
                     time[v] += dt * freq * Math.pow(2, semiLFO(i, inPcm) / 12);
                     time[v] = time[v] - (time[v] | 0);
-                    if (this.conf[`Voice${v + 1}UseCustomWaveform`]) {
-                        out[i] += -1 * custom_waveforms[this.conf[`Voice${v + 1}WaveformAsset`]].calculated[Math.floor((time[v]) * WAVEFORM_RES) % WAVEFORM_RES] * drive * adsr * decay * panVolMult;
+                    if (this.conf[`Voice${vDisplay}UseCustomWaveform`]) {
+                        out[i] += -1 * custom_waveforms[this.conf[`Voice${vDisplay}WaveformAsset`]].calculated[Math.floor((time[v]) * WAVEFORM_RES) % WAVEFORM_RES] * drive * adsr * decay * panVolMult;
                     } else {
-                        out[i] += waveforms[this.conf[`Voice${v + 1}WaveType`]](time[v]) * drive * adsr * decay * panVolMult;
+                        out[i] += waveforms[this.conf[`Voice${vDisplay}WaveType`]](time[v]) * drive * adsr * decay * panVolMult;
                     }
                 }
             });
@@ -168,14 +190,14 @@ const gz_synth_voicecount = 4;
             ret = s;
         }
         if (time <= a[0]) {
-            const val = Math.pow(time / a[0], a[1](sample, mprPcm));
+            const val = ((time / a[0]) ** a[1](sample, mprPcm));
             ret *= isNaN(val) ? 1 : val;
         }
         if (time > a[0] && time <= (d[0] + a[0])) {
-            ret = lerp(1, s, Math.pow((time - a[0]) / d[0], 1 / d[1](sample, mprPcm))) || s;
+            ret = lerp(1, s, ((time - a[0]) / d[0]) ** (1 / d[1](sample, mprPcm))) || s;
         }
         if (time > (len - r[0])) {
-            ret *= Math.pow(((len - time) / r[0]), r[1](sample, mprPcm)) * s || 0;
+            ret *= (((len - time) / r[0]) ** r[1](sample, mprPcm)) * s || 0;
         }
         return ret;
     }
@@ -185,7 +207,7 @@ const gz_synth_voicecount = 4;
     gzsynth.dropdowns["ADSR"].unshift("EnvelopeEnabled");
     for (let i = 0; i < gz_synth_voicecount; i++) {
         gzsynth.configs[`Voice${i + 1}Drive`] = [i === 0 ? 1 : 0, "number", 1];
-        gzsynth.configs[`Voice${i + 1}WaveType`] = ["sin", ["sin", "triangle", "sawtooth", "square"]];
+        gzsynth.configs[`Voice${i + 1}WaveType`] = ["sin", ["sin", "triangle", "sawtooth", "square", "random0"]];
         gzsynth.configs[`Voice${i + 1}SemiOffset`] = [0, "number", 1];
         gzsynth.configs[`Voice${i + 1}Pan`] = [0, "number", 1];
         gzsynth.configs[`Voice${i + 1}UseCustomWaveform`] = [false, "checkbox"];
@@ -197,6 +219,17 @@ const gz_synth_voicecount = 4;
     gzsynth.configs.FilterFrequency = [900, "number", 1];
     gzsynth.configs.FilterResonance = [1, "number", 1];
     gzsynth.dropdowns[`Filter`] = ["Filter", "FilterType", "FilterFrequency", "FilterResonance"];
+
+    gzsynth.configs.VibratoAmountSemis = [0, "number", 1];
+    gzsynth.configs.VibratoRateHz = [2, "number"];
+    gzsynth.dropdowns[`Vibrato`] = ["VibratoAmountSemis", "VibratoRateHz"];
+    createADSR("Vibrato");
+
+    gzsynth.configs.PitchEnvenlopeEnabled = [false, "checkbox"];
+    gzsynth.configs.PitchModLowerSemis = [-12, "number"];
+    gzsynth.configs.PitchModUpperSemis = [0, "number"];
+    createADSR("Pitch");
+    gzsynth.dropdowns[`PitchADSR`].push("PitchEnvenlopeEnabled", "PitchModLowerSemis", "PitchModUpperSemis");
 
     createADSR("Filter");
 
