@@ -8,6 +8,7 @@ async function execZScroll(loop, value) {
             markLoopDirty(loop);
             var I = 0;
             while (loop.hasAttribute("data-bad-note")) {
+                undoLocked = I !== 0;
                 def.zscroll(loop, value);
                 markLoopDirty(loop);
                 if (I >= 3) {
@@ -17,7 +18,10 @@ async function execZScroll(loop, value) {
             }
             globalThis.zscrollIsInternal = false;
             def.zscroll(loop, 0);
+            undoLocked = false;
         } else {
+            undoLocked = false;
+            globalThis.zscrollIsInternal = false;
             def.zscroll(loop, value);
         }
     } else if (def.customGuiButtons?.Preview && value === 0) {
