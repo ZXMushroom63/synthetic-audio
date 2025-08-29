@@ -12,5 +12,8 @@ const waveforms = {
     },
     triangle: (t) => {
         return 2 * Math.abs(2 * ((t + 0.75) % 1) - 1) - 1;
+    },
+    random0: (t) => {
+        return (floatHash(t, 0) % 201) * 0.01 - 1;
     }
 }
