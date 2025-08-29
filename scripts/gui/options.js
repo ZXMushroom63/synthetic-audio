@@ -63,7 +63,7 @@ function createOptionsMenu(loop, definition) {
                     definition.updateMiddleware(loop);
                 }
                 markLoopDirty(loop);
-                if (!multiplayer.isHooked && multiplayer.on && !loop._netIngore) {
+                if (multiplayer.use(loop)) {
                     multiplayer.patchLoop(loop);
                 }
             });
@@ -108,7 +108,7 @@ function createOptionsMenu(loop, definition) {
                     definition.updateMiddleware(loop);
                 }
                 markLoopDirty(loop);
-                if (!multiplayer.isHooked && multiplayer.on && !loop._netIngore) {
+                if (multiplayer.use(loop)) {
                     multiplayer.patchLoop(loop);
                 }
             });
@@ -280,7 +280,7 @@ function getPropertySetter(editingTargets) {
                 if (markDirty) {
                     hydrateLoopDecoration(targ.loop);
                     markLoopDirty(targ.loop);
-                    if (!multiplayer.isHooked && multiplayer.on && !targ.loop._ignore) {
+                    if (multiplayer.use(targ.loop)) {
                         multiplayer.patchLoop(targ.loop);
                     }
                 }
@@ -294,7 +294,7 @@ function getDirtySetter(editingTargets) {
         editingTargets.forEach(targ => {
             hydrateLoopDecoration(targ.loop);
             markLoopDirty(targ.loop);
-            if (!multiplayer.isHooked && multiplayer.on && !targ.loop._ignore) {
+            if (multiplayer.use(targ.loop)) {
                 multiplayer.patchLoop(targ.loop);
             }
         });

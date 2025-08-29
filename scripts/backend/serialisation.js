@@ -109,7 +109,7 @@ function deserialiseNode(serNode, markDirty) {
     return x;
 }
 function deserialise(serialisedStr) {
-    if (!multiplayer.isHooked && multiplayer.on) {
+    if (multiplayer.use()) {
         return multiplayer.write(serialisedStr);
     }
     if (!serialisedStr) {

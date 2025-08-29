@@ -792,7 +792,7 @@ addEventListener("init", () => {
     function loopChanged(e) {
         if (e.detail.loop.isWaveformLoop) {
             loadModifiersToTarget();
-            if (!multiplayer.isHooked) {
+            if (multiplayer.use()) {
                 net_push_modifiers(target);
             }
             drawWaveform(true);
@@ -837,7 +837,7 @@ addEventListener("init", () => {
     addEventListener("loopdeleted", (e) => {
         if (e.detail.loop.isWaveformLoop) {
             loadModifiersToTarget();
-            if (!multiplayer.isHooked) {
+            if (multiplayer.use()) {
                 net_push_modifiers(target);
             }
             drawWaveform(true);
@@ -847,7 +847,7 @@ addEventListener("init", () => {
     addEventListener("loopmoved", (e) => {
         if (e.detail.loop.isWaveformLoop) {
             loadModifiersToTarget();
-            if (!multiplayer.isHooked) {
+            if (multiplayer.use()) {
                 net_push_modifiers(target);
             }
             drawWaveform(true);

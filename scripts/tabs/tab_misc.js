@@ -195,14 +195,14 @@ addEventListener("init", () => {
         customEvent("theoryscaleupdated");
     }
     scales.addEventListener("input", () => {
-        if (!multiplayer.isHooked && multiplayer.on) {
+        if (multiplayer.use()) {
             //multiplayer.modifyProperty("#scaleModeInput", "mode", scales.value);
         }
         updateScales();
     });
     scaleAutocorrect.addEventListener("input", updateScales);
     note.addEventListener("input", () => {
-        if (!multiplayer.isHooked && multiplayer.on) {
+        if (multiplayer.use()) {
             //multiplayer.modifyProperty("#scaleNoteInput", "key", note.value);
         }
         updateScales();

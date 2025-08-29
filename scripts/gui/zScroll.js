@@ -53,7 +53,7 @@ function zscroll(e) {
                     globalThis.zscrollIsFirst = i === 0;
                     execZScroll(x, -delta);
                     markLoopDirty(x);
-                    if (!multiplayer.isHooked && multiplayer.on && !x._ignore) {
+                    if (multiplayer.use(x)) {
                         multiplayer.patchLoop(x);
                     }
                 });
@@ -63,7 +63,7 @@ function zscroll(e) {
                     globalThis.zscrollIsFirst = true;
                     execZScroll(targetLoop, -delta);
                     markLoopDirty(targetLoop);
-                    if (!multiplayer.isHooked && multiplayer.on && !targetLoop._ignore) {
+                    if (multiplayer.use(targetLoop)) {
                         multiplayer.patchLoop(targetLoop);
                     }
                 }

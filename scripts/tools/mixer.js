@@ -17,9 +17,7 @@ addEventListener("init", () => {
             Object.assign(loop.conf, values);
             if (!noDirty) {
                 markLoopDirty(loop);
-                if (!multiplayer.isHooked && multiplayer.on && !loop._ignore) {
-                    multiplayer.patchLoop(loop);
-                }
+                multiplayer.patchLoop(loop);
             }
         });
     }

@@ -45,9 +45,7 @@ addEventListener("init", () => {
             if (!isNoPickupMode) {
                 pickupLoop(node, true);
             }
-            if (!multiplayer.isHooked && multiplayer.on && !node._ignore) {
-                multiplayer.patchLoop(node);
-            }
+            multiplayer.patchLoop(node);
         });
     }, false, (e) => !e.altKey && !e.ctrlKey && !e.metaKey && Object.keys(scaleMap).includes(e.key));
 });

@@ -1,7 +1,7 @@
 
-addEventListener("init", ()=>{
-    registerTool("Rename", async (nodes)=>{
-        if (!nodes) {return};
+addEventListener("init", () => {
+    registerTool("Rename", async (nodes) => {
+        if (!nodes) { return };
         var newName = await prompt("Rename loops to: ", nodes[0].getAttribute("data-file"), "Rename Loops");
         if (!newName) {
             return;
@@ -12,14 +12,12 @@ addEventListener("init", ()=>{
             }
             node.setAttribute("data-file", newName);
             node.querySelector(".loopInternal .name").innerText = newName;
-            if (!multiplayer.isHooked && multiplayer.on && !loop._netIngore) {
-                multiplayer.patchLoop(loop);
-            }
+            multiplayer.patchLoop(loop);
         });
-    }, false, (e)=>e.key === "F2");
+    }, false, (e) => e.key === "F2");
 });
 registerHelp(".tool[data-tool=RENAME]",
-`
+    `
 *********************
 *  THE RENAME TOOL  *
 *********************

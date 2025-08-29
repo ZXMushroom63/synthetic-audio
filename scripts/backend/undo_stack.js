@@ -27,9 +27,7 @@ class UndoStackEdit extends UndoStack {
         if (filters[this.loop.getAttribute("data-type")]?.updateMiddleware) {
             filters[this.loop.getAttribute("data-type")].updateMiddleware(this.loop);
         }
-        if (!multiplayer.isHooked && multiplayer.on && !this.loop._netIngore) {
-            multiplayer.patchLoop(this.loop);
-        }
+        multiplayer.patchLoop(this.loop);
     }
 }
 class UndoStackMove extends UndoStack {
@@ -46,9 +44,7 @@ class UndoStackMove extends UndoStack {
         this.loop.setAttribute("data-duration", this.oldDuration);
         hydrateLoopPosition(this.loop);
         markLoopDirty(this.loop);
-        if (!multiplayer.isHooked && multiplayer.on && !this.loop._netIngore) {
-            multiplayer.patchLoop(this.loop);
-        }
+        multiplayer.patchLoop(this.loop);
         toast("Undo: Position Loop");
     }
 }

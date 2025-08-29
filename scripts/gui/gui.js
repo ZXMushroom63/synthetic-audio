@@ -46,7 +46,7 @@ var audio = {
 
 function deleteLoop(loop) {
     commit(new UndoStackDelete(serialiseNode(loop)));
-    if (!multiplayer.isHooked && multiplayer.on && !loop._netIngore) {
+    if (multiplayer.use(loop)) {
         return multiplayer.deleteLoop(loop.getAttribute("data-uuid"));
     }
     if (loop.forceDelete) {
@@ -97,7 +97,7 @@ function updateLOD() {
 
 function markLoopDirty(loop, wasMoved) {
     wakatimeInteraction();
-    if (!multiplayer.isHooked && multiplayer.on && !loop._netIngore && (
+    if (multiplayer.use(loop) && (
         (!loop.hasAttribute("data-dirty"))
         || (wasMoved && (!loop.hasAttribute("data-wasMovedSinceRender")))
         || (parseInt(loop.getAttribute("data-lastsynchash")) !== hashNode(loop))
@@ -364,9 +364,7 @@ function addBlock(type, start, duration, title, layer = 0, data = {}, editorValu
                 backgroundSvg.style.width = internalWidth + "vw";
                 handleRight.style.right = `calc(-${internalWidth}vw - 1.5px)`;
                 loop.setAttribute("data-duration", timeQuantise(newDuration));
-                if (!multiplayer.isHooked && multiplayer.on && !loop._netIngore) {
-                    multiplayer.patchLoop(loop);
-                }
+                multiplayer.patchLoop(loop);
             }
             document.addEventListener("mousemove", rightHandler);
         } else {
@@ -396,9 +394,7 @@ function addBlock(type, start, duration, title, layer = 0, data = {}, editorValu
                 backgroundSvg.style.width = internalWidth + "vw";
                 handleRight.style.right = `calc(-${internalWidth}vw - 1.5px)`;
                 loop.setAttribute("data-duration", timeQuantise(newDuration));
-                if (!multiplayer.isHooked && multiplayer.on && !loop._netIngore) {
-                    multiplayer.patchLoop(loop);
-                }
+                multiplayer.patchLoop(loop);
             }
             document.addEventListener("mousemove", leftHandler);
         }
@@ -534,9 +530,7 @@ function addBlock(type, start, duration, title, layer = 0, data = {}, editorValu
                     loop.setAttribute("data-layer", layer);
                 }
                 customEvent("loopmoved", { loop: loop });
-                if (!multiplayer.isHooked && multiplayer.on && !loop._netIngore) {
-                    multiplayer.patchLoop(loop);
-                }
+                multiplayer.patchLoop(loop);
             }
         } else {
             ACTIVE_TOOL_FN([loop]);
@@ -560,9 +554,7 @@ function addBlock(type, start, duration, title, layer = 0, data = {}, editorValu
             }
             hydrateLoopDecoration(loop);
             markLoopDirty(loop);
-            if (!multiplayer.isHooked && multiplayer.on && !loop._ignore) {
-                multiplayer.patchLoop(loop);
-            }
+            multiplayer.patchLoop(loop);
         }
     });
 
@@ -597,7 +589,7 @@ function addBlock(type, start, duration, title, layer = 0, data = {}, editorValu
         ).after(loop);
     }
 
-    if (!multiplayer.isHooked && multiplayer.on && !loop._netIngore) {
+    if (multiplayer.use(loop)) {
         multiplayer.addBlock(JSON.stringify(serialiseNode(loop, false, true)));
     }
     hydrateLoopDecoration(loop);
@@ -660,14 +652,14 @@ function init() {
         }
     });
     document.querySelector("#bpm").addEventListener("input", () => {
-        if (!multiplayer.isHooked && multiplayer.on) {
+        if (multiplayer.use()) {
             multiplayer.modifyProperty("#bpm", "bpm", document.querySelector("#bpm").value);
         }
         hydrateBeatMarkers();
         hydrateDecorations();
     });
     document.querySelector("#loopi").addEventListener("input", () => {
-        if (!multiplayer.isHooked && multiplayer.on) {
+        if (multiplayer.use()) {
             multiplayer.modifyProperty("#loopi", "loopi", document.querySelector("#loopi").value);
         }
         findLoops(".loop[data-type=audio], .loop[data-type=p_readasset]").forEach(x => forceLoopDirty(x) && hydrateLoopDecoration(x));
@@ -678,7 +670,7 @@ function init() {
         gui.substepping = Math.min(8, Math.max(1, parseInt(e.target.value))) || 1;
     });
     document.querySelector("#duration").addEventListener("input", () => {
-        if (!multiplayer.isHooked && multiplayer.on) {
+        if (multiplayer.use()) {
             multiplayer.modifyProperty("#duration", "duration", document.querySelector("#duration").value);
         }
         hydrate();
@@ -783,7 +775,7 @@ function init() {
         URL.revokeObjectURL(e.target.src);
     });
     document.querySelector("#stereobox").addEventListener("input", () => {
-        if (!multiplayer.isHooked && multiplayer.on) {
+        if (multiplayer.use()) {
             multiplayer.modifyProperty("#stereobox", "stereobox", document.querySelector("#stereobox").checked);
         }
         if (document.querySelector("#stereobox").checked) {
@@ -793,7 +785,7 @@ function init() {
         }
     });
     document.querySelector("#normalisebox").addEventListener("input", () => {
-        if (!multiplayer.isHooked && multiplayer.on) {
+        if (multiplayer.use()) {
             multiplayer.modifyProperty("#normalisebox", "normalise", document.querySelector("#normalisebox").checked);
         }
         if (document.querySelector("#normalisebox").checked) {

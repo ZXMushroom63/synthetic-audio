@@ -8,6 +8,13 @@ const multiplayer = {
     isHooked: false,
     on: false,
     instanceId: "default",
+    use: function (loop) {
+        const flag = !multiplayer.isHooked && multiplayer.on;
+        if (loop) {
+            return flag && !loop._netIgnore && !loop._ignore;
+        }
+        return flag;
+    },
     hook: function () {
 
     },
@@ -128,6 +135,9 @@ const multiplayer = {
         socket.emit('dirty_loop', data);
     },
     patchLoop: function (loop) {
+        if (!multiplayer.use(loop)) {
+            return;
+        }
         const uuid = loop.getAttribute("data-uuid");
         const serialised = serialiseNode(loop, false, true);
         loop.setAttribute("data-lastsynchash", hashSerialisedNode(serialised));
