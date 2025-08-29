@@ -560,9 +560,11 @@ async function render() {
     }
     processRendering = true;
     currentlyRenderedLoop = null;
-    document.querySelector("#renderBtn").disabled = true;
-    if (document.querySelector("#renderOut").src) {
-        URL.revokeObjectURL(document.querySelector("#renderOut").src);
+    const renderBtn = document.querySelector("#renderBtn");
+    const renderOut = document.querySelector("#renderOut");
+    renderBtn.disabled = true;
+    if (renderOut.src) {
+        URL.revokeObjectURL(renderOut.src);
     }
 
     startTiming("render");
@@ -570,9 +572,11 @@ async function render() {
     const channels = data.stereo ? 2 : 1;
     const output = new Array(channels);
 
+    const renderProgress = document.querySelector("#renderProgress");
+
     const ax = new OfflineAudioContext(channels, audio.length, audio.samplerate);
 
-    document.querySelector("#renderBtn").setAttribute("disabled", "true");
+    renderBtn.setAttribute("disabled", "true");
     await decodeAudioFiles(ax);
     await decodeSoundFonts(ax);
 
@@ -581,7 +585,7 @@ async function render() {
     const dirtyNodeTotal = data.nodes.filter(x => x.dirty).length;
     stopTiming("data_construction");
 
-    document.querySelector("#renderProgress").innerText = "Processing layers...";
+    renderProgress.innerText = "Processing layers...";
     var success = true;
     var calculatedNodeCount = 0;
     var processedNodeCount = 0;
@@ -624,7 +628,7 @@ async function render() {
                                 }
                                 calculatedNodeCount++;
                                 if (calculatedNodeCount % 5 === 0) {
-                                    document.querySelector("#renderProgress").innerText = `Processing layers... (${Math.floor(calculatedNodeCount / (1 + audio.stereo))}/${dirtyNodeTotal})`;
+                                    renderProgress.innerText = `Processing layers... (${Math.floor(calculatedNodeCount / (1 + audio.stereo))}/${dirtyNodeTotal})`;
                                 }
                                 await wait(0);
                             } else {
@@ -654,7 +658,7 @@ async function render() {
             normaliseFloat32Arrays(output);
         }
         var renderTime = stopTiming("render");
-        document.querySelector("#renderProgress").innerText = "Encoding...";
+        renderProgress.innerText = "Encoding...";
         console.log("Encode queued.");
         renderBlob = await convertToFileBlob(output, channels, audio.samplerate, audio.bitrate);
     } catch (error) {
@@ -662,20 +666,20 @@ async function render() {
         console.log(error);
         success = false;
     }
-    document.querySelector("#renderProgress").innerText = success
+    renderProgress.innerText = success
         ? `Render successful! (${renderTime.toFixed(2)}s, ${calculatedNodeCount / (1 + audio.stereo)} calculated, ${processedNodeCount / (1 + audio.stereo)} processed)`
         : "Render failed.";
     if (success) {
-        document.querySelector("#renderOut").src = URL.createObjectURL(renderBlob);
+        renderOut.src = URL.createObjectURL(renderBlob);
     }
 
 
     findLoops(".loop[data-deleted]").forEach(x => x.remove());
 
-    document.querySelector("#renderBtn").removeAttribute("disabled");
+    renderBtn.removeAttribute("disabled");
 
     processRendering = false;
-    document.querySelector("#renderBtn").disabled = false;
+    renderBtn.disabled = false;
 
     findLoops(".loop").forEach(hydrateLoopDecoration);
     currentlyRenderedLoop = null;
