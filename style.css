@@ -567,6 +567,7 @@ button,
 }
 
 #trackInternal {
+  user-select: none;
   transform-origin: left;
 }
 
