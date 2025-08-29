@@ -653,7 +653,7 @@ async function render() {
             }
             output[c] = sumFloat32Arrays(channelPcms);
         }
-        customEvent("render");
+        
         if (audio.normalise) {
             normaliseFloat32Arrays(output);
         }
@@ -666,6 +666,7 @@ async function render() {
         console.log(error);
         success = false;
     }
+    
     renderProgress.innerText = success
         ? `Render successful! (${renderTime.toFixed(2)}s, ${calculatedNodeCount / (1 + audio.stereo)} calculated, ${processedNodeCount / (1 + audio.stereo)} processed)`
         : "Render failed.";
@@ -683,6 +684,8 @@ async function render() {
 
     findLoops(".loop").forEach(hydrateLoopDecoration);
     currentlyRenderedLoop = null;
+
+    customEvent("render");
 }
 
 function undirtyRenderTreeNode(node) {
