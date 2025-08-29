@@ -17,7 +17,7 @@ addEventListener("load", () => {
                 const url = document.querySelector("#renderOut").src;
                 const mime = renderCodec.mime;
                 //e.dataTransfer.setData(mime, renderBlob);
-                e.dataTransfer.setData("DownloadURL", mime + ":" + fname + ":" + url);
+                e.dataTransfer.setData("DownloadURL", mime + ":" + (renderFileName || "song.wav") + ":" + url);
                 e.dataTransfer.setData("text/uri-list", url);
                 toast("Initiating DataTransfer");
             };
