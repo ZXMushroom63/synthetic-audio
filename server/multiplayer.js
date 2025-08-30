@@ -18,10 +18,11 @@ const { v4 } = require("uuid")
 // cl->srv | path_delete -> write state to the server
 // ^ use the above to implement netwrok support for other tabs
 const stateMap = new Map();
-var ETATillKill = ()=>1000*60*Math.max(30-Math.round(stateMap.size/10), 5);
+const ETATillKill = () => 1000 * 60 * Math.max(30 - Math.round(stateMap.size / 10), 5);
+const BPM_VALUES = [120, 70, 80, 100, 128, 116, 156];
 function getStateById(id) {
     if (!stateMap.has(id)) {
-        stateMap.set(id, { nodes: [], lastModified: Date.now() })
+        stateMap.set(id, { nodes: [], lastModified: Date.now(), bpm: BPM_VALUES[Math.floor(Math.random() * BPM_VALUES.length)] })
     }
     return stateMap.get(id);
 }
@@ -79,12 +80,12 @@ function multiplayer_support(server, debugMode) {
                 lastReq = Date.now()
                 try {
                     handler(e);
-                } catch(e) {
+                } catch (e) {
                     //swallow
                 }
             }]);
         }
-        var bucketTimer = setInterval(()=>{
+        var bucketTimer = setInterval(() => {
             bucketOverfilling = Math.max(0, bucketOverfilling - 1);
             if (bucket.length === 0) {
                 return;
@@ -97,7 +98,7 @@ function multiplayer_support(server, debugMode) {
             }
             bucket.splice(0, 1);
         }, BUCKET_DELAY_MILLIS);
-        socket.on("disconnect", ()=>{
+        socket.on("disconnect", () => {
             clearInterval(bucketTimer);
             bucket.splice(0, bucket.length);
             handlers.clear();

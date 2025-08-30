@@ -108,6 +108,7 @@ function deserialiseNode(serNode, markDirty) {
     customEvent("deserialisenode", { node: x, data: serNode });
     return x;
 }
+const BPM_VALUES = [120, 70, 80, 100, 128, 116, 156];
 function deserialise(serialisedStr) {
     if (multiplayer.use()) {
         return multiplayer.write(serialisedStr);
@@ -122,7 +123,7 @@ function deserialise(serialisedStr) {
     ser.nodes ||= [];
     ser.duration ||= 10;
     ser.zoom ||= 100;
-    ser.bpm ||= 120;
+    ser.bpm ||= BPM_VALUES[Math.floor(Math.classicRandom() * BPM_VALUES.length)];
     ser.loopInterval ||= 0.001;
     ser.editorLayer ||= 0;
     ser.substepping ||= 1;
