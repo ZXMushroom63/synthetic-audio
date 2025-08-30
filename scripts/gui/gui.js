@@ -625,11 +625,11 @@ function loadAutosave() {
         fr.onload = () => {
             globalThis.lastEditedFile = launchFile.name;
             document.querySelector("title").innerText = launchFile.name;
-            deserialise(fr.result);
+            deserialise(JSON.parse(fr.result));
         };
         fr.readAsText(launchFile);
     } else {
-        deserialise(localStorage.getItem("synthetic/save"));
+        deserialise(JSON.parse(localStorage.getItem("synthetic/save")));
     }
 }
 function init() {

@@ -21,7 +21,7 @@ const multiplayer = {
     write: function (data) {
         document.body.style.pointerEvents = "none";
         document.querySelector("#renderProgress").innerText = `Sending project file to server...`;
-        socket.emit('global_write', data);
+        socket.emit('global_write', JSON.stringify(data));
     },
     sync: function () {
         const urlParams = new URLSearchParams(location.search);
@@ -64,10 +64,11 @@ const multiplayer = {
             document.body.style.pointerEvents = "all";
             document.querySelector("#renderProgress").innerText = `Received new project file!`;
             multiplayer.isHooked = true;
-            deserialise(data);
+            const parsed = JSON.parse(data);
+            deserialise(parsed);
             multiplayer.isHooked = false;
-            if (!JSON.parse(data).nodes) {
-                multiplayer.write(JSON.stringify(serialise(false, true)));
+            if (!parsed.nodes) {
+                multiplayer.write(serialise(false, true));
             }
         });
         socket.on('add_loop', (data) => {

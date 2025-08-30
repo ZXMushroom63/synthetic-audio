@@ -119,7 +119,7 @@ addEventListener("init", () => {
                 } else if (file.name.endsWith(".sm")) {
                     const fr = new FileReader();
                     fr.onload = () => {
-                        deserialise(fr.result);
+                        deserialise(JSON.parse(fr.result));
                     };
                     fr.readAsText(file);
                 }

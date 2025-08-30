@@ -6,7 +6,7 @@ addEventListener("init", () => {
     });
     document.querySelector("#btnSave").addEventListener("click", save);
     document.querySelector("#btnLoad").addEventListener("click", load);
-    document.querySelector("#btnClear").addEventListener("click", () => deserialise('{}'));
+    document.querySelector("#btnClear").addEventListener("click", () => deserialise({}));
     document.querySelector("#btnHelp").addEventListener("click", viewHelp);
     document.querySelector("#btnUpdate").addEventListener("click", updateApp);
     document.querySelector("#btnBackup").addEventListener("click", writeAutosave);
