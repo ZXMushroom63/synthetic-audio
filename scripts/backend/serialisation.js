@@ -9,7 +9,8 @@ function getProjectMeta() {
         sampleRate: audio.samplerate,
         bitRate: audio.bitrate,
         normalise: audio.normalise,
-        substepping: gui.substepping
+        substepping: gui.substepping,
+        saveFormat: CURRENT_SAVE_FORMAT
     };;
 }
 function serialise(forRender, forMultiplayer) {
