@@ -684,7 +684,7 @@ addEventListener("init", async () => {
             const socket = globalThis.socket =
                 IS_DISCORD
                     ? io("https://1403677664514146325.discordsays.com", { path: "/discord-multiplayer-host/socket.io/", withCredentials: true })
-                    : io(params.get("multiplayer"), { withCredentials: true });
+                    : io(params.get("multiplayer"), { withCredentials: false });
             multiplayer.enable(socket);
             socket.on('connect', () => {
                 logToLoader(`Connected to server.`);

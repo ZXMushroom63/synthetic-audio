@@ -10,7 +10,7 @@ async function processMidiImport(midiData) {
     if (!speedMult) {
         return;
     }
-    deserialise('{}');
+    deserialise({});
     var layerbase = 0;
     var longestDuration = 0;
     midiData.tracks.forEach((track, trackIdx) => {

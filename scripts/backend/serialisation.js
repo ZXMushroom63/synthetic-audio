@@ -9,7 +9,8 @@ function getProjectMeta() {
         sampleRate: audio.samplerate,
         bitRate: audio.bitrate,
         normalise: audio.normalise,
-        substepping: gui.substepping
+        substepping: gui.substepping,
+        saveFormat: CURRENT_SAVE_FORMAT
     };;
 }
 function serialise(forRender, forMultiplayer) {
@@ -108,21 +109,24 @@ function deserialiseNode(serNode, markDirty) {
     customEvent("deserialisenode", { node: x, data: serNode });
     return x;
 }
-function deserialise(serialisedStr) {
-    if (multiplayer.use()) {
-        return multiplayer.write(serialisedStr);
+const BPM_VALUES = [120, 70, 80, 100, 128, 116, 156];
+function deserialise(ser) {
+    if (!multiplayer.isHooked) {
+        patchSave(ser);
     }
-    if (!serialisedStr) {
+    if (multiplayer.use()) {
+        return multiplayer.write(ser);
+    }
+    if (!ser) {
         return hydrate();
     }
     offload("#trackInternal");
     layerCache = {};
-    var ser = JSON.parse(serialisedStr);
     findLoops(".loop").forEach(x => { x.remove() });
     ser.nodes ||= [];
     ser.duration ||= 10;
     ser.zoom ||= 100;
-    ser.bpm ||= 120;
+    ser.bpm ||= BPM_VALUES[Math.floor(Math.classicRandom() * BPM_VALUES.length)];
     ser.loopInterval ||= 0.001;
     ser.editorLayer ||= 0;
     ser.substepping ||= 1;
@@ -200,7 +204,7 @@ loadMenu.oninit = function (menu) {
             return;
         }
         try {
-            deserialise(decompressed);
+            deserialise(JSON.parse(decompressed));
             loadMenu.closeModMenu();
         } catch (e) {
             toast(e.toString());
@@ -236,7 +240,7 @@ function load(ev, forceFileLoad) {
                 if (isMidi) {
                     openMidi(fr.result);
                 } else {
-                    deserialise(fr.result);
+                    deserialise(JSON.parse(fr.result));
                 }
             };
             if (x.files[0].name.endsWith(".mid")) {
