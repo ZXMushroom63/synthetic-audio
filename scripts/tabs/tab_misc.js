@@ -317,6 +317,15 @@ addEventListener("init", () => {
         if (noteMap[note]) {
             return;
         }
+
+        var activeNode = document.querySelector(".loop.active");
+        if (activeNode) {
+            const def = filters[activeNode.getAttribute("data-type")];
+            def.applyMidi(activeNode, note, velocity);
+            markLoopDirty(activeNode);
+            multiplayer.patchLoop(activeNode);
+            return;
+        }
         var caretNode = document.querySelector(".loop.caret:not([data-deleted])");
         if (!caretNode) {
             return;
@@ -391,18 +400,26 @@ addEventListener("init", () => {
         hydrateLoopDecoration(noteMap[note]);
         markLoopDirty(noteMap[note]); //trigger update to any handlers.
         clearInterval(noteAnimationMap[note]);
+        multiplayer.patchLoop(noteMap[note]);
         delete noteAnimationMap[note];
         delete noteMap[note];
         delete noteTimeMap[note];
 
         lastInsertionTime = Date.now() * midiTimescale;
     }
+    function isNoteOn(statusByte) {
+        return (statusByte & 0xF0) === 0x90; // 0xF0 is the hex value for 11110000
+    }
+
+    function isNoteOff(statusByte) {
+        return (statusByte & 0xF0) === 0x80; // 0x80 is the hex value for 10000000
+    }
     function midiDataHandler(event) {
         const [status, note, velocity] = event.data;
 
-        if (status === MIDI_NOTE_ON && velocity > 0) {
+        if (isNoteOn(status) && velocity > 0) {
             midiNoteOn(note, velocity);
-        } else if (status === MIDI_NOTE_OFF || (status === MIDI_NOTE_ON && velocity === 0)) {
+        } else if (isNoteOff(status) || (isNoteOn(status) && velocity === 0)) {
             midiNoteOff(note, velocity);
         }
     }
