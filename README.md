@@ -31,7 +31,7 @@ You can find demo files in the [demos folder](/demos/).
 - Cool logo
 - More LFOs than you know what to do with
 - ffmpeg transcoding - export as wav, mp3, m4a, flac, opus & ogg
-- Soundfonts (plugins tab & instrument node & souindfont2 node, supports MIDI.js and .sf2) - Use up to 127 instruments, more if you find plugins
+- Soundfonts (plugins tab & instrument node & soundfont2 node, supports MIDI.js and .sf2) - Use up to 127 instruments, more if you find plugins
 - HVCC patch support - Load puredata (.pd) patches compiled with [my fork of hvcc](https://github.com/ZXMushroom63/hvcc)
 - WakaTime integration (check settings menu)
 
