@@ -6,9 +6,10 @@ function intersect(rect1, rect2) {
         rect1.bottom > rect2.top
     );
 }
+let selectBoxGlobal;
 addEventListener("init", () => {
     document.querySelector("#track").addEventListener("scroll", () => {
-        if (document.querySelector(".selectbox")) {
+        if (selectBoxGlobal) {
             window.onmousemove(window.lastScrollEvent);
         }
     });
@@ -36,6 +37,7 @@ addEventListener("init", () => {
         selectBox.style.right = (b.x - a.x) + "px";
 
         document.body.appendChild(selectBox);
+        selectBoxGlobal = selectBox;
         window.oncontextmenu = (e) => { e.preventDefault() };
         window.onmousemove = function (e) {
             e.preventDefault();
@@ -97,6 +99,7 @@ addEventListener("init", () => {
             if (keymap["Alt"]) {
                 activateTool(oldActiveTool)
             }
+            selectBoxGlobal = null;
         }
     });
     document.querySelector("#trackInternal").addEventListener("contextmenu", (e) => { e.preventDefault() });

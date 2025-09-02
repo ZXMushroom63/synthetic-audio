@@ -11,7 +11,7 @@ function getProjectMeta() {
         normalise: audio.normalise,
         substepping: gui.substepping,
         saveFormat: CURRENT_SAVE_FORMAT
-    };;
+    };
 }
 function serialise(forRender, forMultiplayer) {
     var hNodes = findLoops(".loop");
