@@ -124,12 +124,26 @@ function hydrateBeatMarkers() {
 
     var trueBPM = audio.bpm;
     trueBPM = trueBPM / gui.LOD;
-    var beatCount = Math.floor(audio.duration / 60 * trueBPM);
+    var beatCount = Math.round(audio.duration / 60 * trueBPM);
     for (let i = 0; i < beatCount; i++) {
         const marker = document.createElement("span");
         marker.classList.add("beatMarker");
         marker.style.left = `calc(${((i * (60 / trueBPM)) / audio.duration * 100)}% - 4px)`;
         track.appendChild(marker);
+    }
+
+    var timeRibbon = document.querySelector("#time");
+    timeRibbon.innerHTML = "";
+    for (let time = 0; time <= (audio.beatSize * (Math.round(audio.duration / audio.beatSize))); time += (gui.intervals * gui.LOD * audio.beatSize)) {
+        const marker = document.createElement("span");
+        marker.classList.add("timeMarker");
+        marker.innerText = Math.round(time / audio.beatSize) + "";
+        marker.style.left = ((time) / audio.duration * 100) + "%";
+        marker.addEventListener("click", () => {
+            gui.marker = time;
+            document.querySelector("#renderOut").currentTime = gui.marker;
+        });
+        timeRibbon.appendChild(marker);
     }
 }
 
@@ -269,21 +283,7 @@ function hydrateEditorLayer() {
 function hydrate() {
     offload("#trackInternal");
     updateLOD();
-    audio.duration = parseFloat(document.querySelector("#duration").value);
-    audio.length = audio.duration * audio.samplerate;
-    var timeRibbon = document.querySelector("#time");
-    timeRibbon.innerHTML = "";
-    for (let time = 0; time <= audio.duration; time += (gui.intervals * gui.LOD)) {
-        const marker = document.createElement("span");
-        marker.classList.add("timeMarker");
-        marker.innerText = time + "s";
-        marker.style.left = (time / audio.duration * 100) + "%";
-        marker.addEventListener("click", () => {
-            gui.marker = time;
-            document.querySelector("#renderOut").currentTime = gui.marker;
-        });
-        timeRibbon.appendChild(marker);
-    }
+
     customEvent("hydrate");
     hydrateBeatMarkers();
     hydrateZoom();
@@ -673,7 +673,10 @@ function init() {
         if (multiplayer.use()) {
             multiplayer.modifyProperty("#duration", "duration", document.querySelector("#duration").value);
         }
-        hydrate();
+        audio.duration = parseFloat(document.querySelector("#duration").value);
+        audio.length = audio.duration * audio.samplerate;
+        hydrateBeatMarkers();
+        hydrateZoom();
     });
     addEventListener("mousemove", (e) => {
         mouse.x = e.x;
@@ -771,7 +774,7 @@ function init() {
         }
     })
     registerSetting("ZoomScale", 1);
-    document.querySelector("audio#loopsample").addEventListener("ended", (e) => {
+    document.querySelector("#loopsample").addEventListener("ended", (e) => {
         URL.revokeObjectURL(e.target.src);
     });
     document.querySelector("#stereobox").addEventListener("input", () => {
@@ -828,12 +831,12 @@ function init() {
         }
     });
 
-    // document.querySelector("audio#loopsample").addEventListener("timeupdate", (e)=>{
+    // document.querySelector("#loopsample").addEventListener("timeupdate", (e)=>{
     //     if (e.target.currentTime > 32) {
     //         stopSample();
     //     }
     // });
-    document.querySelector("audio#loopsample").addEventListener("ended", stopSample);
+    document.querySelector("#loopsample").addEventListener("ended", stopSample);
 }
 let stopPlayingTimer = null;
 function playSample(file, volume, speed, timeOffset) {
@@ -843,7 +846,7 @@ function playSample(file, volume, speed, timeOffset) {
     speed ??= 1;
     volume ??= 1;
     volume = Math.min(1, Math.max(0, volume));
-    const sample = document.querySelector("audio#loopsample");
+    const sample = document.querySelector("#loopsample");
     if (sample.src) {
         URL.revokeObjectURL(sample.src);
     }
@@ -859,7 +862,7 @@ function playSample(file, volume, speed, timeOffset) {
     document.querySelector("#renderProgress").innerText = "Preview successful!";
 }
 function stopSample() {
-    const sample = document.querySelector("audio#loopsample");
+    const sample = document.querySelector("#loopsample");
     if (sample.src) {
         URL.revokeObjectURL(sample.src);
     }
