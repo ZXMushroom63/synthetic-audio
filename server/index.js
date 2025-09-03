@@ -14,6 +14,7 @@ const multiplayerEnabled = 2;
 
 const port = 4152;
 const logging = false;
+const statKeeper = {}; // or null to disable
 
 
 if (multiplayerEnabled !== 2) {
@@ -43,8 +44,16 @@ app.get('/multiplayer_check', (req, res) => {
     }
 });
 
+app.get('/statkeeper.json', (req, res) => {
+    if (statKeeper) {
+        res.status(200).type("text/json").send(JSON.stringify(statKeeper, null, 2));
+    } else {
+        res.status(404).send('statkeeper disabled');
+    }
+});
+
 if (multiplayerEnabled !== 0) {
-    multiplayer_support(server, logging);
+    multiplayer_support(server, logging, statKeeper);
 }
 
 app.use(blacklistMiddleware);
@@ -53,6 +62,7 @@ server.listen(port, () => {
     console.log(`http://localhost:${port}`);
     console.log(`Multiplayer Mode: ${multiplayerEnabled}`);
     console.log(`Logging: ${logging}`);
+    console.log(`StatKeeper: ${!!statKeeper}`);
 
     if (Math.random() < 0.1) {
         console.log(`Like this project? Consider starring on GitHub: https://github.com/ZXMushroom63/synthetic-audio`);

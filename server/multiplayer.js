@@ -18,8 +18,10 @@ const { v4 } = require("uuid")
 // cl->srv | path_delete -> write state to the server
 // ^ use the above to implement netwrok support for other tabs
 const stateMap = new Map();
-const ETATillKill = () => 1000 * 60 * Math.max(30 - Math.round(stateMap.size / 10), 5);
+const ETATillKill = () => 1000 * 60 * Math.max(30 - Math.round(stateMap.size / 7.5), 5);
 const BPM_VALUES = [120, 70, 80, 100, 128, 116, 156];
+let sessionTotalUsers = 0;
+let sessionHistoricUsers = 0;
 function getStateById(id) {
     if (!stateMap.has(id)) {
         stateMap.set(id, { nodes: [], lastModified: Date.now(), bpm: BPM_VALUES[Math.floor(Math.random() * BPM_VALUES.length)] })
@@ -32,16 +34,27 @@ function setStateById(id, val) {
     }
     return stateMap.set(id, val);
 }
-function multiplayer_support(server, debugMode) {
+
+function multiplayer_support(server, debugMode, statKeeper) {
+    function runStatKeeper() {
+        if (!statKeeper) {
+            return;
+        }
+        Object.assign(statKeeper, {
+            "currentSessions": stateMap.size,
+            "currentUsers": sessionTotalUsers,
+            "historicUsers": sessionHistoricUsers,
+            "memusage": (process.memoryUsage.rss() / (1024 ** 2)).toFixed(2) + " MB",
+        });
+    }
     function debugWriteState(socket) {
         if (!socket.instanceId) {
             return;
         }
         getStateById(socket.instanceId).lastModified = Date.now();
-        if (!debugMode) {
-            return;
+        if (debugMode) {
+            writeFile("./debug_state.json", JSON.stringify(getStateById(socket.instanceId), null, 2));
         }
-        writeFile("./debug_state.json", JSON.stringify(getStateById(socket.instanceId), null, 2));
     }
     const io = new Server(server, {
         path: process.env.SYNTHETIC_MULTI_ROOT || "/socket.io/",
@@ -65,6 +78,8 @@ function multiplayer_support(server, debugMode) {
         if ((populationByIp[socket.handshake.address] || 0) >= MAX_CONNECTIONS_BY_IP) {
             return socket.disconnect(true);
         }
+        sessionTotalUsers++;
+        sessionHistoricUsers++;
         populationByIp[socket.handshake.address] ||= 0;
         populationByIp[socket.handshake.address]++;
         const bucket = [];
@@ -120,6 +135,8 @@ function multiplayer_support(server, debugMode) {
             populationByInstance[socket.roomCode] ||= 0;
             populationByInstance[socket.roomCode]--;
             populationByIp[socket.handshake.address]--;
+            sessionTotalUsers--;
+            runStatKeeper();
         });
         console.log('a user connected: ' + socket.id);
         socket.on("sync", (instanceId) => {
@@ -143,6 +160,7 @@ function multiplayer_support(server, debugMode) {
             socket.join(socket.roomCode);
             console.log("Replying to sync message");
             socket.emit("deserialise", JSON.stringify(getStateById(socket.instanceId)));
+            runStatKeeper();
         });
         socket.on("global_write", (data) => {
             if (!socket.instanceId) {
