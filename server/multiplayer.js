@@ -52,9 +52,11 @@ function multiplayer_support(server, debugMode) {
         },
         perMessageDeflate: false
     });
-    const BUCKET_DELAY_MILLIS = 50;
+    const TPS = 120;
+    const BUCKET_DELAY_MILLIS = 1000 / TPS;
     const BUCKET_KICK_THRESHOLD = 5000;
     const BUCKET_DROP_THRESHOLD = 400;
+    const PRIORITY_PACKETS = ["patch_loop", "add_loop"];
     io.on("connection", (socket) => {
         const bucket = [];
         const oldOn = socket.on;
@@ -74,7 +76,11 @@ function multiplayer_support(server, debugMode) {
                     return;
                 }
                 if (Date.now() - lastReq > BUCKET_DELAY_MILLIS) {
-                    bucket.push([ev, e]);
+                    if (PRIORITY_PACKETS.includes(ev)) {
+                        bucket.unshift([ev, e]);
+                    } else {
+                        bucket.push([ev, e]);
+                    }
                     return;
                 }
                 lastReq = Date.now()
