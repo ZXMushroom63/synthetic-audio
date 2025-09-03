@@ -30,13 +30,14 @@ function applySoundbiteToPcm(reverse, looping, currentData, inPcm, duration, spe
         }
     }
 }
-function applySoundbiteToPcmSidechain(reverse, looping, currentData, inPcm, duration, speed, volume, offset, sideChainRaw, silent) {
+function applySoundbiteToPcmSidechain(reverse, looping, currentData, inPcm, duration, speed, volume, offset, sideChainRaw, silent, sidechainFreq) {
+    sidechainFreq ||= 32;
     var offsetValue = Math.floor(offset * audio.samplerate);
     if (typeof speed !== "function") {
         var oldSpeed = speed;
         speed = () => { return oldSpeed };
     }
-    const PCMBINSIZE = 1 / 32 * audio.samplerate;
+    const PCMBINSIZE = 1 / sidechainFreq * audio.samplerate;
     const LOOKUPTABLE = new Array(Math.floor(currentData.length / PCMBINSIZE)).fill(0);
     if (reverse) {
         currentData = currentData.toReversed();

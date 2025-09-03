@@ -12,6 +12,7 @@ addBlockType("instrument", {
         "Speed": [1, "number"],
         "Sidechain": [false, "checkbox"],
         "SidechainPower": [2, "number"],
+        "SidechainRMSFreq": [31, "number"],
         "Instrument": ["(none)", ["(none)"]]
     },
     selectMiddleware: (key) => {
@@ -90,7 +91,7 @@ addBlockType("instrument", {
         });
         var duration = Math.floor(Math.round((((currentData.length / audio.samplerate) || 0) + 0.0) / data.loopInterval) * data.loopInterval * audio.samplerate);
         if (this.conf.Sidechain) {
-            applySoundbiteToPcmSidechain(this.conf.Reverse, this.conf.Looping, currentData, inPcm, duration, this.conf.Speed, volume, 0, this.conf.SidechainPower, false);
+            applySoundbiteToPcmSidechain(this.conf.Reverse, this.conf.Looping, currentData, inPcm, duration, this.conf.Speed, volume, 0, this.conf.SidechainPower, false, this.conf.SidechainRMSFreq);
         } else {
             applySoundbiteToPcm(this.conf.Reverse, this.conf.Looping, currentData, inPcm, duration, this.conf.Speed, volume, 0);
         }

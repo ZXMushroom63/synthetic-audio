@@ -13,6 +13,7 @@ addBlockType("audio", {
         "Speed": [1, "number", 1],
         "Sidechain": [false, "checkbox"],
         "SidechainPower": [2, "number"],
+        "SidechainRMSFreq": [31, "number"],
         "Silent": [false, "checkbox"],
     },
     dropdowns: { "Sampler": ["SamplerEnabled", "ReferenceNote"] },
@@ -36,7 +37,7 @@ addBlockType("audio", {
         const samplerEnabled = this.conf.SamplerEnabled;
         const speed = (i, inPcm) => samplerEnabled ? (_speed(i, inPcm) * (hitNote(i, inPcm) / refNote(i, inPcm))) : _speed(i, inPcm);
         if (this.conf.Sidechain) {
-            applySoundbiteToPcmSidechain(this.conf.Reverse, this.conf.Looping, currentData, inPcm, duration, speed, this.conf.Volume, this.conf.StartOffset, this.conf.SidechainPower, this.conf.Silent);
+            applySoundbiteToPcmSidechain(this.conf.Reverse, this.conf.Looping, currentData, inPcm, duration, speed, this.conf.Volume, this.conf.StartOffset, this.conf.SidechainPower, this.conf.Silent, this.conf.SidechainRMSFreq);
         } else {
             applySoundbiteToPcm(this.conf.Reverse, this.conf.Looping, currentData, inPcm, duration, speed, this.conf.Volume, this.conf.StartOffset);
         }

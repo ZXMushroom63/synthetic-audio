@@ -10,6 +10,7 @@ addBlockType("distribute", {
         "Speed": [1, "number"],
         "Sidechain": [false, "checkbox"],
         "SidechainPower": [2, "number"],
+        "SidechainRMSFreq": [31, "number"],
         "Silent": [false, "checkbox"],
     },
     selectMiddleware: (key) => {
@@ -43,7 +44,7 @@ addBlockType("distribute", {
         }
 
         if (this.conf.Sidechain) {
-            applySoundbiteToPcmSidechain(false, false, out, inPcm, inPcm.length / audio.samplerate, 1, 1, 0, this.conf.SidechainPower, this.conf.Silent);
+            applySoundbiteToPcmSidechain(false, false, out, inPcm, inPcm.length / audio.samplerate, 1, 1, 0, this.conf.SidechainPower, this.conf.Silent, this.conf.SidechainRMSFreq);
         } else {
             applySoundbiteToPcm(false, false, out, inPcm, inPcm.length / audio.samplerate, 1, 1, 0);
         }
