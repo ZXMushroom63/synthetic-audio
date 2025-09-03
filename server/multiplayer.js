@@ -56,8 +56,17 @@ function multiplayer_support(server, debugMode) {
     const BUCKET_DELAY_MILLIS = 1000 / TPS;
     const BUCKET_KICK_THRESHOLD = 5000;
     const BUCKET_DROP_THRESHOLD = 400;
+    const MAX_ROOM_SIZE = 5;
+    const populationByInstance = {};
+    const populationByIp = {};
+    const MAX_CONNECTIONS_BY_IP = 10;
     const PRIORITY_PACKETS = ["patch_loop", "add_loop"];
     io.on("connection", (socket) => {
+        if ((populationByIp[socket.handshake.address] || 0) >= MAX_CONNECTIONS_BY_IP) {
+            return socket.disconnect(true);
+        }
+        populationByIp[socket.handshake.address] ||= 0;
+        populationByIp[socket.handshake.address]++;
         const bucket = [];
         const oldOn = socket.on;
         var lastReq = Date.now();
@@ -108,6 +117,9 @@ function multiplayer_support(server, debugMode) {
             clearInterval(bucketTimer);
             bucket.splice(0, bucket.length);
             handlers.clear();
+            populationByInstance[socket.roomCode] ||= 0;
+            populationByInstance[socket.roomCode]--;
+            populationByIp[socket.handshake.address]--;
         });
         console.log('a user connected: ' + socket.id);
         socket.on("sync", (instanceId) => {
@@ -115,7 +127,13 @@ function multiplayer_support(server, debugMode) {
                 return socket.disconnect();
             }
             socket.instanceId = instanceId;
+            
             socket.roomCode = "room/" + instanceId;
+            populationByInstance[socket.roomCode] ||= 0;
+            if (populationByInstance[socket.roomCode] >= MAX_ROOM_SIZE) {
+                socket.disconnect(true);
+            }
+            populationByInstance[socket.roomCode]++;
             socket.join(socket.roomCode);
             console.log("Replying to sync message");
             socket.emit("deserialise", JSON.stringify(getStateById(socket.instanceId)));
