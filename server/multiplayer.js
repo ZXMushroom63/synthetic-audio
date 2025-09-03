@@ -60,7 +60,7 @@ function multiplayer_support(server, debugMode) {
     const populationByInstance = {};
     const populationByIp = {};
     const MAX_CONNECTIONS_BY_IP = 10;
-    const PRIORITY_PACKETS = ["patch_loop", "add_loop"];
+    const PRIORITY_PACKETS = ["patch_loop", "add_loop", "modify_prop"];
     io.on("connection", (socket) => {
         if ((populationByIp[socket.handshake.address] || 0) >= MAX_CONNECTIONS_BY_IP) {
             return socket.disconnect(true);
@@ -124,10 +124,16 @@ function multiplayer_support(server, debugMode) {
         console.log('a user connected: ' + socket.id);
         socket.on("sync", (instanceId) => {
             if (!instanceId) {
-                return socket.disconnect();
+                return socket.disconnect(true);
             }
+            bucket.splice(0, bucket.length);
             socket.instanceId = instanceId;
-            
+
+            if (socket.roomCode) {
+                socket.leave(socket.roomCode);
+                populationByInstance[socket.roomCode]--;
+            }
+
             socket.roomCode = "room/" + instanceId;
             populationByInstance[socket.roomCode] ||= 0;
             if (populationByInstance[socket.roomCode] >= MAX_ROOM_SIZE) {
