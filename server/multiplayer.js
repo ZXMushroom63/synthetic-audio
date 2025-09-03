@@ -275,12 +275,15 @@ function multiplayer_support(server, debugMode, statKeeper) {
         });
     });
 }
-setInterval(() => {
+function garbageCollect() {
     const rightNow = Date.now();
     for (const [key, value] of stateMap.entries()) {
         if ((rightNow - value.lastModified) > ETATillKill()) {
             stateMap.delete(key);
+            console.log("Garbage collected session ID: ", key);
         }
     }
-}, ETATillKill());
+    setTimeout(garbageCollect, ETATillKill());
+}
+garbageCollect();
 module.exports = { multiplayer_support };
