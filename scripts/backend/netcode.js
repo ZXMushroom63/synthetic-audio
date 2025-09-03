@@ -39,10 +39,10 @@ const multiplayer = {
         target.querySelector(".loopInternal .name").innerText = res.file;
         target.classList.remove("selected");
         customEvent("loopmoved", { loop: target });
-        customEvent("loopchanged", { loop: target });
         if (filters[target.getAttribute("data-type")]?.updateMiddleware) {
             filters[target.getAttribute("data-type")].updateMiddleware(target);
         }
+        customEvent("loopchanged", { loop: target });
         hydrateLoopPosition(target);
         hydrateLoopDecoration(target);
     },
