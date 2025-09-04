@@ -139,9 +139,11 @@ function hydrateBeatMarkers() {
         marker.classList.add("timeMarker");
         marker.innerText = Math.round(time / audio.beatSize) + "";
         marker.style.left = ((time) / audio.duration * 100) + "%";
+        marker.title = time.toFixed(2) + "s";
         marker.addEventListener("click", () => {
             gui.marker = time;
             document.querySelector("#renderOut").currentTime = gui.marker;
+            toast(`Teleported to ${time.toFixed(2)}s. (Beat #${marker.innerText})`);
         });
         timeRibbon.appendChild(marker);
     }
