@@ -614,8 +614,8 @@ async function render() {
                                 node.ref.cache = [null, null];
                             }
 
-                            const startTime = Math.floor(node.start * audio.samplerate);
-                            const endTime = Math.floor((node.start + node.duration) * audio.samplerate);
+                            const startTime = Math.round(node.start * audio.samplerate);
+                            const endTime = Math.round((node.start + node.duration) * audio.samplerate);
 
                             if (!node.ref.cache[c]) {
                                 currentlyRenderedLoop = node;
