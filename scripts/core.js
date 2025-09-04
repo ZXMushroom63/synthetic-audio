@@ -506,13 +506,13 @@ function constructRenderDataArray(data) {
 
             dirtyNodes.forEach((x) => {
                 editorLayer.needsUpdating = true;
-                const startIndex = Math.floor(x.start * audio.samplerate);
+                const startIndex = Math.round(x.start * audio.samplerate);
 
                 if (startIndex < 0) {
                     return;
                 }
 
-                const durationSamples = Math.floor(x.duration * audio.samplerate) + 1; //'+1' = TypedArray.set being a pain
+                const durationSamples = Math.round(x.duration * audio.samplerate); //'+1' = TypedArray.set being a pain
                 const endIndex = durationSamples + startIndex;
                 const clippedDuration = Math.min(endIndex, audio.length) - startIndex;
 
