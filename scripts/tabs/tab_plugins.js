@@ -447,7 +447,7 @@ addEventListener("init", async () => {
     container.appendChild(quotaEstimate);
     container.appendChild(document.createElement("br"));
 
-    const regExp = new RegExp(Object.keys(typeSymbols).map(x=>"(" + x.replaceAll(".", "\\.") + ")?").join("") + "$", "gm");
+    const regExp = new RegExp(Object.keys(typeSymbols).map(x => "(" + x.replaceAll(".", "\\.") + ")?").join("") + "$", "gm");
     async function drawModArray() {
         if (navigator?.storage?.estimate) {
             const quotaEstimateData = await navigator.storage.estimate();
@@ -455,10 +455,10 @@ addEventListener("init", async () => {
         }
         const scrollPos = container.scrollTop;
         container.querySelectorAll("div").forEach(x => x.remove());
-        
+
         var modsArr = (await getMods()).sort().map((x, i) => { var z = Object(getTypeSymbol(x)); z.__key = x; z.__idx = i; return z; }).sort();
         var idxMap = modsArr.map(z => z.__idx);
-        modsArr = modsArr.map(z => {const x = Object(z.__key); x.__sym = z; return x;});
+        modsArr = modsArr.map(z => { const x = Object(z.__key); x.__sym = z; return x; });
         modsArr.forEach((mod, i) => {
             var entry = document.createElement("div");
 
@@ -511,6 +511,9 @@ addEventListener("init", async () => {
     logDiagnostics();
     var modList = await getMods();
     for (let i = 0; i < modList.length; i++) {
+        if (keymap["Shift"]) {
+            break;
+        }
         document.querySelector("#renderProgress").innerText = `Loading plugins (${(i / (modList.length) * 100).toFixed(1)}%)`;
         if (modList[i].endsWith(".sf.js")) {
             logToLoader(`Loading MIDI.js soundfont: ${modList[i]}`);
@@ -578,6 +581,9 @@ addEventListener("init", async () => {
         var tables = [];
         const meta = { selectData: {}, selectMapping: {}, tables: [], ignore: [] };
         for (param in blankLibLoader.paramsIn) {
+            if (keymap["Shift"]) {
+                break;
+            }
             if (param.startsWith("tlen_")) {
                 meta.ignore.push(param);
                 continue;
@@ -628,6 +634,9 @@ addEventListener("init", async () => {
     }
 
     for (pattern in ARPEGGIATOR_SCORES) {
+        if (keymap["Shift"]) {
+            break;
+        }
         logToLoader(`Realising arp pattern: ${pattern}`);
         const offsetsSet = new Set();
         const score = ARPEGGIATOR_SCORES[pattern];
