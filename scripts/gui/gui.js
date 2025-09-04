@@ -651,11 +651,58 @@ function init() {
             e.preventDefault();
         }
     });
+    let oldBPM = -1;
+    document.querySelector("#bpm").addEventListener("focus", ()=>{
+        oldBPM = audio.bpm;
+    });
     document.querySelector("#bpm").addEventListener("input", () => {
         if (multiplayer.use()) {
             multiplayer.modifyProperty("#bpm", "bpm", document.querySelector("#bpm").value);
         }
         hydrateBeatMarkers();
+        hydrateDecorations();
+    });
+    document.querySelector("#bpm").addEventListener("blur", async () => {
+        if (oldBPM === audio.bpm) {
+            return;
+        }
+        const cBpm = audio.bpm;
+        const res = await confirm(`Retarget to ${cBpm} BPM?<br>
+            <small>Preview:</small>
+            <audio controls src="${document.querySelector('#renderOut').src}" style="width:80%"></audio>
+        `, "BPM Retargetter", (div)=>{
+            div.querySelector("audio").playbackRate = cBpm / audio.bpm;
+            div.querySelector("audio").preservesPitch = false;
+        });
+        if (!res) {
+            return;
+        }
+        if (cBpm !== audio.bpm) {
+            toast("Error: BPM has changed since popup created.");
+            return;
+        }
+
+        const ratio = oldBPM / cBpm;
+        if (!ratio) {
+            toast("Error: New or old BPM value is 0.");
+            return;
+        }
+        if (oldBPM === -1) {
+            return;
+        }
+
+        findLoops(".loop:not([data-deleted])").forEach(x => {
+            const start = parseFloat(x.getAttribute("data-start"));
+            const dur = parseFloat(x.getAttribute("data-duration"));
+
+            x.setAttribute("data-start", timeQuantise(start * ratio));
+            x.setAttribute("data-duration", timeQuantise(dur * ratio));
+
+            hydrateLoopPosition(x, true);
+            multiplayer.patchLoop(x);
+            markLoopDirty(x);
+        });
+
         hydrateDecorations();
     });
     document.querySelector("#loopi").addEventListener("input", () => {
@@ -677,6 +724,7 @@ function init() {
         audio.length = audio.duration * audio.samplerate;
         hydrateBeatMarkers();
         hydrateZoom();
+        hydrateDecorations();
     });
     addEventListener("mousemove", (e) => {
         mouse.x = e.x;
