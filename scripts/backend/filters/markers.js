@@ -3,7 +3,7 @@ addBlockType("marker_bpm", {
     title: "Bar Marker",
     configs: {
         "BarLength": [4, "number"],
-        "Swing": [0.5, "number"],
+        "Swing": [0.0, "number"],
     },
     functor: function (inPcm, channel, data) {
         return inPcm;
