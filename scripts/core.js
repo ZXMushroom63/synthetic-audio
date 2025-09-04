@@ -562,6 +562,7 @@ async function render() {
     currentlyRenderedLoop = null;
     const renderBtn = document.querySelector("#renderBtn");
     const renderOut = document.querySelector("#renderOut");
+    audio.length = audio.samplerate * audio.duration;
     renderBtn.disabled = true;
     if (renderOut.src) {
         URL.revokeObjectURL(renderOut.src);
