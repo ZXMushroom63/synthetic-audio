@@ -16,12 +16,23 @@ const { v4 } = require("uuid")
 // custom_broadcast -> broadcast to other clients
 // cl->srv | path_write -> write state to the server
 // cl->srv | path_delete -> write state to the server
-// ^ use the above to implement netwrok support for other tabs
+// ^ use the above to implement network support for other tabs
 const stateMap = new Map();
 const ETATillKill = () => 1000 * 60 * Math.max(30 - Math.round(stateMap.size / 7.5), 5);
 const BPM_VALUES = [120, 70, 80, 100, 128, 116, 156];
 let sessionTotalUsers = 0;
 let sessionHistoricUsers = 0;
+
+const TPS = 120;
+const BUCKET_DELAY_MILLIS = 1000 / TPS;
+const BUCKET_KICK_THRESHOLD = 5000;
+const BUCKET_DROP_THRESHOLD = 1500;
+const MAX_ROOM_SIZE = 5;
+const populationByInstance = {};
+const populationByIp = {};
+const MAX_CONNECTIONS_BY_IP = 10;
+const PRIORITY_PACKETS = ["patch_loop", "add_loop", "modify_prop"];
+
 function getStateById(id) {
     if (!stateMap.has(id)) {
         stateMap.set(id, { nodes: [], lastModified: Date.now(), bpm: BPM_VALUES[Math.floor(Math.random() * BPM_VALUES.length)] })
@@ -65,15 +76,6 @@ function multiplayer_support(server, debugMode, statKeeper) {
         },
         perMessageDeflate: false
     });
-    const TPS = 120;
-    const BUCKET_DELAY_MILLIS = 1000 / TPS;
-    const BUCKET_KICK_THRESHOLD = 5000;
-    const BUCKET_DROP_THRESHOLD = 400;
-    const MAX_ROOM_SIZE = 5;
-    const populationByInstance = {};
-    const populationByIp = {};
-    const MAX_CONNECTIONS_BY_IP = 10;
-    const PRIORITY_PACKETS = ["patch_loop", "add_loop", "modify_prop"];
     io.on("connection", (socket) => {
         if ((populationByIp[socket.handshake.address] || 0) >= MAX_CONNECTIONS_BY_IP) {
             return socket.disconnect(true);
