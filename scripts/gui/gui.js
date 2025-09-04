@@ -165,11 +165,12 @@ function hydrateLoopDecoration(loop) {
     var elemType = loop.getAttribute("data-type");
     var trueDuration = (parseFloat(loopDurationMap[loop.getAttribute("data-file")]) + 0.0) || ((elemType !== "distribute") * (proceduralAssets.get(loop.conf.Asset)?.[0]?.length / audio.samplerate)) || 0;
     trueDuration = (Math.round(trueDuration / loopi) * loopi) / (loop.conf.Speed || 1);
+    trueDuration = [trueDuration];
     var def = filters[loop.getAttribute("data-type")];
     if (def.findLoopMarker) {
         const loopProvided = def.findLoopMarker(loop);
         if (loopProvided) {
-            trueDuration = loopProvided;
+            trueDuration = Array.isArray(loopProvided) ? loopProvided : [loopProvided];
         }
     }
     var startOffset = loop.conf.StartOffset || 0;
@@ -181,11 +182,24 @@ function hydrateLoopDecoration(loop) {
     }
     var loopInternal = loop.querySelector(".loopInternal");
     loopInternal.style.backgroundColor = def.getColorDynamic ? def.getColorDynamic(loop) : def.color;
-    if (!trueDuration) {
+    if (trueDuration.length === 0 || !trueDuration[0]) {
         return;
     }
-    var trueWidth = trueDuration * gui.zoomConstant;
-    loopInternal.style.backgroundImage = `repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.0), rgba(255, 255, 255, 0.0) ${trueWidth - 0.15}vw, rgba(255, 255, 255, 1) ${trueWidth - 0.15}vw, rgba(255, 255, 255, 1) ${trueWidth + 0.0}vw)`;
+    var trueWidth = trueDuration.map(x => x * gui.zoomConstant);
+    var drawCommand = "";
+    var cumulativeWidth = 0;
+    trueWidth.forEach((x, i) => {
+        cumulativeWidth += x;
+        drawCommand += `
+        transparent ${cumulativeWidth - x}vw,
+        transparent ${cumulativeWidth - 0.15}vw,
+        white ${cumulativeWidth - 0.15}vw,
+        white ${cumulativeWidth + 0.0}vw${i===trueWidth.length-1?"":","}
+        `;
+    });
+    loopInternal.style.backgroundImage = `repeating-linear-gradient(90deg,
+        ${drawCommand}
+    )`;
     loopInternal.style.backgroundPositionX = `-${startOffset * gui.zoomConstant}vw`;
 }
 function hydrateDecorations() {

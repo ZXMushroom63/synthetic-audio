@@ -3,12 +3,15 @@ addBlockType("marker_bpm", {
     title: "Bar Marker",
     configs: {
         "BarLength": [4, "number"],
+        "Swing": [0.5, "number"],
     },
     functor: function (inPcm, channel, data) {
         return inPcm;
     },
     findLoopMarker: function (loop) {
-        return loop.conf.BarLength / audio.bpm * 60;
+        const barWidth = loop.conf.BarLength / audio.bpm * 60;
+        const swing = (loop.conf.Swing * barWidth);
+        return [barWidth - swing, barWidth + swing];
     },
     noRender: true,
     noMultiEdit: true,
