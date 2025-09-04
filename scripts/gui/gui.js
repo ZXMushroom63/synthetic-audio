@@ -683,6 +683,10 @@ function init() {
             return;
         }
         const cBpm = audio.bpm;
+        const nodes = findLoops(".loop:not([data-deleted])");
+        if (nodes.length === 0) {
+            return;
+        }
         const res = await confirm(`Retarget to ${cBpm} BPM?<br>
             <small>Preview:</small>
             <audio id="bpm_retarget_data" controls src="${document.querySelector('#renderOut').src}" style="width:80%"></audio>
