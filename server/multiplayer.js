@@ -278,7 +278,7 @@ function multiplayer_support(server, debugMode, statKeeper) {
 function garbageCollect() {
     const rightNow = Date.now();
     for (const [key, value] of stateMap.entries()) {
-        if ((rightNow - value.lastModified) > ETATillKill()) {
+        if (((rightNow - value.lastModified) > ETATillKill()) || (!value.lastModified)) {
             stateMap.delete(key);
             console.log("Garbage collected session ID: ", key);
         }
