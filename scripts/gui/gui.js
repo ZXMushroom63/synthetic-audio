@@ -712,7 +712,7 @@ function init() {
             return;
         }
 
-        let newSongDur = 0;
+        let newSongDur = 10;
 
         findLoops(".loop:not([data-deleted])").forEach(x => {
             const start = parseFloat(x.getAttribute("data-start"));
