@@ -72,7 +72,7 @@ globalThis.prompt = function (text, defaultText, name) {
         });
     });
 }
-globalThis.confirm = function (text, name) {
+globalThis.confirm = function (text, name, initHandler) {
     return new Promise((resolve, reject) => {
         const helpContent = new ModMenuTabList();
         helpContent.addTab(name, `
@@ -91,5 +91,8 @@ globalThis.confirm = function (text, name) {
             helpMenu.closeModMenu();
         });
         helpMenu.rootDiv.querySelector(".modmenutabcontent").style.textAlign = "center";
+        if (initHandler) {
+            initHandler(helpMenu.rootDiv);
+        }
     });
 }
