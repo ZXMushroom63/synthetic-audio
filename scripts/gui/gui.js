@@ -654,7 +654,7 @@ function init() {
         }
     });
     let oldBPM = -1;
-    document.querySelector("#bpm").addEventListener("focus", ()=>{
+    document.querySelector("#bpm").addEventListener("focus", () => {
         oldBPM = audio.bpm;
     });
     document.querySelector("#bpm").addEventListener("input", () => {
@@ -671,10 +671,11 @@ function init() {
         const cBpm = audio.bpm;
         const res = await confirm(`Retarget to ${cBpm} BPM?<br>
             <small>Preview:</small>
-            <audio controls src="${document.querySelector('#renderOut').src}" style="width:80%"></audio>
-        `, "BPM Retargetter", (div)=>{
-            div.querySelector("audio").playbackRate = cBpm / audio.bpm;
-            div.querySelector("audio").preservesPitch = false;
+            <audio id="bpm_retarget_data" controls src="${document.querySelector('#renderOut').src}" style="width:80%"></audio>
+            Note: This will change the song's duration to fit.
+        `, "BPM Retargetter", (div) => {
+            div.querySelector("#bpm_retarget_data").playbackRate = cBpm / oldBPM;
+            div.querySelector("#bpm_retarget_data").preservesPitch = true;
         });
         if (!res) {
             return;
@@ -693,19 +694,35 @@ function init() {
             return;
         }
 
+        let newSongDur = 0;
+
         findLoops(".loop:not([data-deleted])").forEach(x => {
             const start = parseFloat(x.getAttribute("data-start"));
             const dur = parseFloat(x.getAttribute("data-duration"));
 
-            x.setAttribute("data-start", timeQuantise(start * ratio));
-            x.setAttribute("data-duration", timeQuantise(dur * ratio));
+            const newStart = timeQuantise(start * ratio);
+            const newDur = timeQuantise(dur * ratio);
+
+            x.setAttribute("data-start", newStart);
+            x.setAttribute("data-duration", newDur);
+
+            const newEnd = newStart + newDur;
+            newSongDur = Math.max(newSongDur, Math.floor(newEnd) + 1);
+
+            if ((x.getAttribute("data-type") === "repeat")) {
+                const repeatDuration = parseFloat(x.conf.RepeatDuration);
+                if (repeatDuration) {
+                    x.conf.RepeatDuration = "" + repeatDuration * ratio;
+                }
+            }
 
             hydrateLoopPosition(x, true);
             multiplayer.patchLoop(x);
             markLoopDirty(x);
         });
 
-        hydrateDecorations();
+        document.querySelector("#duration").value = newSongDur;
+        document.querySelector("#duration").dispatchEvent(new Event('input', { bubbles: true }));
     });
     document.querySelector("#loopi").addEventListener("input", () => {
         if (multiplayer.use()) {
