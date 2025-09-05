@@ -736,7 +736,7 @@ function init() {
 
             hydrateLoopPosition(x, true);
             multiplayer.patchLoop(x);
-            markLoopDirty(x);
+            markLoopDirty(x, true);
         });
 
         document.querySelector("#duration").value = newSongDur;
