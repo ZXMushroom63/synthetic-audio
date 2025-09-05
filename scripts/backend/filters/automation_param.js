@@ -15,6 +15,16 @@ addBlockType("automation_parameter", {
     configs: {
         "Identifier": ["Param", "text"],
         "Value": ["#0~1", "number", 1],
+        "ReaderMode": [false, "checkbox"],
+        "ReaderRMSFreq": [31, "number"],
+        "ReaderMapping": ["#0~1", "number", 1],
+    },
+    dropdowns: {
+        "Reader": [
+            "ReaderMode",
+            "ReaderRMSFreq",
+            "ReaderMapping"
+        ]
     },
     clearCache: (self, info, layer) => {
         if (!self.ref.hasAttribute("data-lastrenparam")) {
@@ -36,6 +46,9 @@ addBlockType("automation_parameter", {
     },
     updateMiddleware: automationParamHandler,
     functor: function (inPcm, channel, data) {
+        const renderMapping = _(this.conf.ReaderMapping);
+        const blankPcm = new Float32Array(2048);
+
         this.ref.setAttribute("data-lastrenparam", this.conf.Identifier);
         var val = _(this.conf.Value);
         const internalId = "@__params::" + this.conf.Identifier.toUpperCase();
@@ -48,8 +61,18 @@ addBlockType("automation_parameter", {
             proceduralAssets.set(internalId, paramPcm);
         }
         const offset = Math.floor(this.start * audio.samplerate);
+
+        let volumeCurve = null;
+        if (this.conf.ReaderMode) {
+            volumeCurve = extractVolumeCurveFromPcm(inPcm, this.conf.ReaderRMSFreq);
+        }
+
         inPcm.forEach((x, i) => {
-            paramPcm[offset + i] = val(i, inPcm);
+            if (this.conf.ReaderMode) {
+                paramPcm[offset + i] = renderMapping(Math.round(volumeCurve[i] * 2048), blankPcm);
+            } else {
+                paramPcm[offset + i] = val(i, inPcm);
+            }
         });
         return inPcm;
     }

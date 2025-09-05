@@ -30,18 +30,12 @@ function applySoundbiteToPcm(reverse, looping, currentData, inPcm, duration, spe
         }
     }
 }
-function applySoundbiteToPcmSidechain(reverse, looping, currentData, inPcm, duration, speed, volume, offset, sideChainRaw, silent, sidechainFreq) {
+function extractVolumeCurveFromPcm(currentData, sidechainFreq) {
     sidechainFreq ||= 32;
-    var offsetValue = Math.floor(offset * audio.samplerate);
-    if (typeof speed !== "function") {
-        var oldSpeed = speed;
-        speed = () => { return oldSpeed };
-    }
+
     const PCMBINSIZE = 1 / sidechainFreq * audio.samplerate;
-    const LOOKUPTABLE = new Array(Math.floor(currentData.length / PCMBINSIZE)).fill(0);
-    if (reverse) {
-        currentData = currentData.toReversed();
-    }
+    const LOOKUPTABLE = new Float32Array(Math.floor(currentData.length / PCMBINSIZE)).fill(0);
+
     LOOKUPTABLE.forEach((x, i) => {
         const start = i * PCMBINSIZE;
         const end = (i + 1) * PCMBINSIZE;
@@ -50,10 +44,28 @@ function applySoundbiteToPcmSidechain(reverse, looping, currentData, inPcm, dura
         const out = (sum / PCMBINSIZE) * 2;
         LOOKUPTABLE[i] = isFinite(out) ? out : 0;
     });
+
     const LOOKUPTABLE_PERSAMPLE = new Float32Array(currentData.length);
     LOOKUPTABLE_PERSAMPLE.forEach((x, i) => {
         LOOKUPTABLE_PERSAMPLE[i] = lerp(LOOKUPTABLE[Math.floor(i / PCMBINSIZE)] || 0, LOOKUPTABLE[Math.ceil(i / PCMBINSIZE)] || 0, (i % PCMBINSIZE) / PCMBINSIZE) || 0;
     });
+
+    return LOOKUPTABLE_PERSAMPLE;
+}
+function applySoundbiteToPcmSidechain(reverse, looping, currentData, inPcm, duration, speed, volume, offset, sideChainRaw, silent, sidechainFreq) {
+    sidechainFreq ||= 32;
+    var offsetValue = Math.floor(offset * audio.samplerate);
+    if (typeof speed !== "function") {
+        var oldSpeed = speed;
+        speed = () => { return oldSpeed };
+    }
+
+    if (reverse) {
+        currentData = currentData.toReversed();
+    }
+
+    const LOOKUPTABLE_PERSAMPLE = extractVolumeCurveFromPcm(currentData, sidechainFreq);
+    
     const AmpSmoothingStart = Math.floor(audio.samplerate * 0.01);
     const AmpSmoothingEnd = inPcm.length - AmpSmoothingStart;
     if (looping) {
