@@ -20,7 +20,6 @@ You can find demo files in the [demos folder](/demos/).
 - Powerful Chord Editor
 - MIDI I/Os
 - The Fl Studio Arpeggiator
-- Soundfonts (MIDI.js format)
 - Use audio samples, with pitch-sampling support
 - Synths (subtractive & wavetable)
 - Editor layers
