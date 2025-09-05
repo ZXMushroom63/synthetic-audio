@@ -39,7 +39,7 @@ addEventListener("init", () => {
                 node.setAttribute(`data-start`, newStart);
                 node.setAttribute(`data-duration`, duration * dir);
             }
-            markLoopDirty(node);
+            markLoopDirty(node, true);
             hydrateLoopPosition(node);
             hydrateLoopDecoration(node);
             if (!isNoPickupMode) {
