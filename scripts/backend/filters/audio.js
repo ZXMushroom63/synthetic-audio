@@ -69,6 +69,7 @@ addBlockType("audio", {
     },
     zscroll: (loop, value) => {
         if (!loop.querySelector(".noteDisplay")) {
+            filters["audio"].customGuiButtons.Preview.apply(loop, []);
             return;
         }
         commit(new UndoStackEdit(
