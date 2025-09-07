@@ -68,7 +68,7 @@ function pickupLoop(loop, natural = false, useCache = false) {
     loopMoveHandlers.push(mouseMove);
     var trackBB = (useCache && cachedTrackBB) ? cachedTrackBB : document.querySelector("#trackInternal").getBoundingClientRect();
     cachedTrackBB = trackBB;
-    var originalBB = loop.querySelector(".loopInternal").getBoundingClientRect();
+    var originalBB = loop.internalContainer.getBoundingClientRect();
     document.addEventListener("mousemove", mouseMove);
     document.addEventListener("mouseup", mouseUp);
     if (!natural) {

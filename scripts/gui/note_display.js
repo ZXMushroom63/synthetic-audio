@@ -20,7 +20,7 @@ function updateNoteDisplay(loop) {
     loop.querySelector(".noteDisplay").innerText = loop.theoryNote;
 }
 function initNoteDisplay(loop) {
-    var internal = loop.querySelector(".loopInternal");
+    var internal = loop.internalContainer;
     var txt = document.createElement("span");
     txt.classList.add("noteDisplay");
     txt.innerText = "U0";
@@ -28,7 +28,7 @@ function initNoteDisplay(loop) {
     updateNoteDisplay(loop);
 }
 function initGenericDisplay(loop, text) {
-    var internal = loop.querySelector(".loopInternal");
+    var internal = loop.internalContainer;
     var txt = document.createElement("span");
     txt.classList.add("genericDisplay");
     txt.innerText = text;

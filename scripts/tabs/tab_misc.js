@@ -304,8 +304,8 @@ addEventListener("init", () => {
     function animateMidiNote(note, node) {
         noteAnimationMap[note] = setInterval(() => {
             node.setAttribute("data-duration", timeQuantise((Date.now() * midiTimescale - noteTimeMap[note]) / 1000));
-            hydrateLoopPosition(node);
-            hydrateLoopDecoration(node);
+            hydrateLoopPosition(node, true);
+            //hydrateLoopDecoration(node);
         }, 1000 / 15);
     }
     function tryPreviewMidi(node) {

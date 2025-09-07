@@ -14,7 +14,7 @@ addBlockType("note", {
     noRender: true,
     noMultiEdit: true,
     initMiddleware: function (loop) {
-        var internal = loop.querySelector(".loopInternal");
+        var internal = loop.internalContainer;
         var txt = document.createElement("span");
         txt.classList.add("noteTextContent");
         txt.innerText = processNoteText(loop.conf.Text);

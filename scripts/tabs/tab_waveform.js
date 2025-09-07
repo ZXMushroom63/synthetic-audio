@@ -639,7 +639,7 @@ addEventListener("init", () => {
             modifier.querySelector(".handleLeft").remove();
             modifier.style.top = mod.layer * 3 + "rem";
             modifier.querySelector(".handleRight").remove();
-            modifier.querySelector(".loopInternal").style.width = "calc(20vw - 0.5rem)";
+            modifier.internalContainer.style.width = "calc(20vw - 0.5rem)";
             modifier.referenceBB = right.getBoundingClientRect();
             modifier.horizontalBlocked = true;
             modifier.isWaveformLoop = true;

@@ -6,7 +6,7 @@ addBlockType("hussein", {
     },
     noRender: true,
     initMiddleware: (loop)=>{
-        const internal = loop.querySelector(".loopInternal");
+        const internal = loop.internalContainer;
         internal.style.backgroundImage = "url(public/saddam.png)";
         internal.style.backgroundRepeat = "no-repeat";
         internal.style.backgroundSize = "100% 100%";

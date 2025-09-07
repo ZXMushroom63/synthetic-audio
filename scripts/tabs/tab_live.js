@@ -278,7 +278,7 @@ addEventListener("init", () => {
             modifier.querySelector(".handleLeft").remove();
             modifier.style.top = mod.layer * 3 + "rem";
             modifier.querySelector(".handleRight").remove();
-            modifier.querySelector(".loopInternal").style.width = "calc(25vw - 4px)";
+            modifier.internalContainer.style.width = "calc(25vw - 4px)";
             modifier.referenceBB = rightCol.getBoundingClientRect();
             modifier.horizontalBlocked = true;
             modifier.isLivesetLoop = true;

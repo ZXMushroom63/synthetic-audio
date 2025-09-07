@@ -180,7 +180,7 @@ function hydrateLoopDecoration(loop) {
             startOffset = loopProvided;
         }
     }
-    var loopInternal = loop.querySelector(".loopInternal");
+    var loopInternal = loop.internalContainer;
     loopInternal.style.backgroundColor = def.getColorDynamic ? def.getColorDynamic(loop) : def.color;
     if (trueDuration.length === 0 || !trueDuration[0]) {
         return;
@@ -218,7 +218,7 @@ function hydrateLoopPosition(elem, lean) {
     var nInternalWidth = (duration * gui.zoomConstant);
     elem._nInternalWidth = nInternalWidth;
     var internalWidth = nInternalWidth + "vw";
-    var loopInternal = elem.querySelector(".loopInternal");
+    var loopInternal = elem.internalContainer;
     if (!lean) {
         loopInternal.setAttribute("title", `Type: ${elem.getAttribute("data-type")
             }\nDuration: ${duration.toFixed(2)
@@ -454,6 +454,8 @@ function addBlock(type, start, duration, title, layer = 0, data = {}, editorValu
     const internal = document.createElement("div");
     internal.style.backgroundColor = definition.color;
     internal.classList.add("loopInternal");
+
+    loop.internalContainer = internal;
 
     loop["conf"] = structuredClone(data);
 
