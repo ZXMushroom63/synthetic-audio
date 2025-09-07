@@ -311,6 +311,7 @@ addEventListener("init", () => {
         }, 1000 / 15);
     }
     function tryPreviewMidi(node) {
+        return;
         if (filters[node.getAttribute('data-type')]?.customGuiButtons?.Preview) {
             filters[node.getAttribute('data-type')].customGuiButtons.Preview.apply(node, []);
         }
@@ -336,7 +337,10 @@ addEventListener("init", () => {
         var activeNode = document.querySelector(".loop.active");
         if (activeNode) {
             const def = filters[activeNode.getAttribute("data-type")];
-            def.applyMidi(activeNode, note, velocity);
+            def.applyMidi(activeNode, note, quantise(velocity / 127, 0.01));
+            if (def.updateMiddleware) {
+                def.updateMiddleware(activeNode);
+            }
             markLoopDirty(activeNode);
             multiplayer.patchLoop(activeNode);
             return;

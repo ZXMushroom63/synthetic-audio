@@ -227,7 +227,7 @@ function addBlockType(id, data) {
         data.applyMidi = function (loop, note, vel) {
             let calculatedNote = note;
             if (typeof calculatedNote === "number") {
-                note = ":" + indexToChromatic(note - 12) + ":";
+                calculatedNote = ":" + indexToChromatic(note - 12) + ":";
             }
             loop.conf[data.midiMappings.note] = calculatedNote;
             if (typeof vel === "number") {
