@@ -376,7 +376,8 @@ addEventListener("init", () => {
             //register note into layer map
             getLayerOffsetByNote(note);
 
-            const node = deserialiseNode(ser, true);
+            const node = deserialiseNode(ser);
+            node.suppressChordDisplay = true;
             hydrateLoopPosition(node);
             hydrateLoopDecoration(node);
             noteMap[note] = node;
@@ -394,7 +395,8 @@ addEventListener("init", () => {
             ser.layer = insertionBaseLayer + getLayerOffsetByNote(note);
             ser.duration = 0.01;
             lastInsertionTime = Date.now();
-            const node = deserialiseNode(ser, true);
+            const node = deserialiseNode(ser);
+            node.suppressChordDisplay = true;
             hydrateLoopPosition(node);
             hydrateLoopDecoration(node);
             noteMap[note] = node;

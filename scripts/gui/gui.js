@@ -307,7 +307,7 @@ function hydrate() {
     hydrateEditorLayer();
     reflow("#trackInternal");
 }
-function addBlock(type, start, duration, title, layer = 0, data = {}, editorValue = Math.min(gui.layer, MAX_LAYER - 1), noTimeline) {
+function addBlock(type, start, duration, title, layer = 0, data = {}, editorValue = Math.min(gui.layer, MAX_LAYER - 1), noTimeline, noDirty) {
     if (!multiplayer.isHooked && gui.layer === MAX_LAYER) {
         return null;
     }
@@ -424,7 +424,7 @@ function addBlock(type, start, duration, title, layer = 0, data = {}, editorValu
         document.addEventListener("mouseup", mouseUpHandler);
     }
     const loop = document.createElement("div");
-    if (!noTimeline) {
+    if (!noTimeline && !noDirty) {
         markLoopDirty(loop);
     }
     loop.setAttribute("data-type", type);

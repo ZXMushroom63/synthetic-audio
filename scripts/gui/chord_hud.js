@@ -933,6 +933,9 @@ function addChordDisplay(loop) {
     loop.appendChild(chordDisplay);
 
     setTimeout(() => {
+        if (loop.suppressChordDisplay) {
+            return;
+        }
         chordProcess(loop);
     }, 50);
 }

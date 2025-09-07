@@ -102,7 +102,7 @@ function deserialiseNode(serNode, markDirty) {
         console.log("Unknown node: " + serNode.type);
         return null;
     }
-    var x = addBlock(serNode.type, serNode.start, serNode.duration, serNode.file, serNode.layer, serNode.conf, serNode.editorLayer || 0);
+    var x = addBlock(serNode.type, serNode.start, serNode.duration, serNode.file, serNode.layer, serNode.conf, serNode.editorLayer || 0, false, true);
     if (markDirty) {
         markLoopDirty(x);
     }
