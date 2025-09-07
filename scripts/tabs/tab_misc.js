@@ -272,6 +272,7 @@ addEventListener("init", () => {
     var insertionBaseTime = 0;
     var insertionBaseLayer = 0;
     var concurrentNotes = 0;
+    var midiInsertionOffsets = [];
     var noteMap = {};
     var noteTimeMap = {};
     var noteAnimationMap = {};
@@ -300,6 +301,7 @@ addEventListener("init", () => {
         insertionBasePos = 0;
         insertionBaseTime = 0;
         insertionBaseLayer = 0;
+        midiInsertionOffsets = [];
     });
     function animateMidiNote(note, node) {
         noteAnimationMap[note] = setInterval(() => {
@@ -312,6 +314,19 @@ addEventListener("init", () => {
         if (filters[node.getAttribute('data-type')]?.customGuiButtons?.Preview) {
             filters[node.getAttribute('data-type')].customGuiButtons.Preview.apply(node, []);
         }
+    }
+    function getLayerOffsetByNote(midiNote) {
+        if (midiInsertionOffsets.indexOf(midiNote) !== -1) {
+            return midiInsertionOffsets.indexOf(midiNote);
+        }
+        for (let n = 0; n < midiInsertionOffsets.length; n++) {
+            if (midiInsertionOffsets[n] === null) {
+                midiInsertionOffsets[n] = midiNote;
+                return n;
+            }
+        }
+        midiInsertionOffsets.push(midiNote);
+        return midiInsertionOffsets.length - 1;
     }
     function midiNoteOn(note, velocity) {
         if (noteMap[note]) {
@@ -354,7 +369,12 @@ addEventListener("init", () => {
             }
             ser.start = timeQuantise(ser.start, bpmInterval);
             ser.duration = 0.01;
+
             insertionBaseLayer = ser.layer;
+            midiInsertionOffsets = [];
+
+            //register note into layer map
+            getLayerOffsetByNote(note);
 
             const node = deserialiseNode(ser, true);
             hydrateLoopPosition(node);
@@ -371,7 +391,7 @@ addEventListener("init", () => {
                 bpmInterval = 0.01;
             }
             ser.start = timeQuantise(ser.start, bpmInterval);
-            ser.layer = insertionBaseLayer + concurrentNotes;
+            ser.layer = insertionBaseLayer + getLayerOffsetByNote(note);
             ser.duration = 0.01;
             lastInsertionTime = Date.now();
             const node = deserialiseNode(ser, true);
@@ -404,6 +424,7 @@ addEventListener("init", () => {
         delete noteAnimationMap[note];
         delete noteMap[note];
         delete noteTimeMap[note];
+        midiInsertionOffsets.splice(midiInsertionOffsets.indexOf(note), 1);
 
         lastInsertionTime = Date.now() * midiTimescale;
     }
