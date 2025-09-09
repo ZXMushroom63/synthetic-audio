@@ -320,7 +320,7 @@ addEventListener("init", () => {
             node.setAttribute("data-duration", timeQuantise((Date.now() * midiTimescale - noteTimeMap[note]) / 1000));
             hydrateLoopPosition(node, true);
             //hydrateLoopDecoration(node);
-        }, 1000 / 15);
+        }, 1000 / 6);
     }
     function tryPreviewMidi(node) {
         return;
