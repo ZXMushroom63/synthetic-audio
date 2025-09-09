@@ -362,19 +362,10 @@ addEventListener("init", () => {
             return;
         }
         const ser = structuredClone(serialiseNode(caretNode));
-        const freq = ":" + frequencyToNote(midi2freq(note + 12)) + ":"; //my notes are one octave off
-        if (ser.conf.Frequency) {
-            ser.conf.Frequency = freq;
-        }
-        if (ser.conf.Note) {
-            ser.conf.Note = freq;
-        }
-        if (ser.conf.Volume) {
-            ser.conf.Volume = (velocity / 255).toFixed(2);
-        }
-        if (ser.conf.Amplitude) {
-            ser.conf.Amplitude = (velocity / 255).toFixed(2);
-        }
+
+        const def = filters[caretNode.getAttribute("data-type")];
+        def.applyMidi(ser, note, quantise(velocity / 127, 0.01));
+        
         if ((Date.now() * midiTimescale - lastInsertionTime) > (settings.MIDIInsertionMaximumGap * 1000) * midiTimescale) {
             insertionBaseTime = Date.now() * midiTimescale;
             ser.start += ser.duration;
