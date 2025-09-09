@@ -120,6 +120,7 @@ addEventListener("init", () => {
     const scaleBtn = scaleGeneratorModule.querySelector("#scaleCopyNote");
     const scaleCopyDemo = scaleGeneratorModule.querySelector("#scaleCopyDemo");
     const scaleAutocorrect = scaleGeneratorModule.querySelector("#scaleAutocorrect");
+    let scaleMidiMapping = new Uint8Array(128);
     function updateScales() {
         var startingPitch = _(note.value || ":C#:")(0, new Float32Array(2)) || 440;
         var scale = scales.value.split(",").map(x => parseInt(x));
@@ -130,14 +131,25 @@ addEventListener("init", () => {
         firstNote = firstNote.substring(0, firstNote.length - 1);
         gui.key = firstNote;
         gui.mode = scales.value;
+        let midiNotes = [freq2midi(startingPitch) % 12];
         gui.autocorrect = scaleAutocorrect.value;
         var text = (scales.selectedOptions[0]?.textContent || "(error)").trim() + " scale; Key of " + firstNote + ": \n" + firstNote + ", ";
         const accepted = scale.map(x => {
             offset += x;
-            var note = frequencyToNote(startingPitch * Math.pow(2, offset / 12));
+            const freq = startingPitch * Math.pow(2, offset / 12);
+            midiNotes.push(freq2midi(freq) % 12);
+            var note = frequencyToNote(freq);
             notes.push(note);
             note = note.substring(0, note.length - 1);
             return note;
+        });
+
+        scaleMidiMapping.forEach((x, i) => {
+            const octave = 12 * Math.floor(i / 12);
+            const closest = midiNotes.reduce(function (prev, curr) {
+                return (Math.abs(curr - (i % 12)) < Math.abs(prev - (i % 12)) ? curr : prev);
+            });
+            scaleMidiMapping[i] = octave + closest;
         });
 
         text += accepted.join(", ");
@@ -444,10 +456,12 @@ addEventListener("init", () => {
     function midiDataHandler(event) {
         const [status, note, velocity] = event.data;
 
+        const useableNote = (gui.autocorrect === "SNAP") ? scaleMidiMapping[note] : note;
+
         if (isNoteOn(status) && velocity > 0) {
-            midiNoteOn(note, velocity);
+            midiNoteOn(useableNote, velocity);
         } else if (isNoteOff(status) || (isNoteOn(status) && velocity === 0)) {
-            midiNoteOff(note, velocity);
+            midiNoteOff(useableNote, velocity);
         }
     }
     function loopChangedHandler(ev) {
