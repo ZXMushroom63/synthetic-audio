@@ -3,6 +3,7 @@ function getFftBinIndex(freq, samplerate, fftSize) {
 }
 addEventListener("load", () => {
     const audio = document.querySelector('#renderOut');
+    const sampleAudio = document.querySelector('#loopsample');
     const canvas = document.querySelector('#viz');
     const canvasCtx = canvas.getContext('2d');
 
@@ -25,8 +26,10 @@ addEventListener("load", () => {
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     const analyser = audioCtx.createAnalyser();
     const source = audioCtx.createMediaElementSource(audio);
+    const source2 = audioCtx.createMediaElementSource(sampleAudio);
 
     source.connect(analyser);
+    source2.connect(analyser);
     analyser.connect(audioCtx.destination);
 
     const FFT_SIZE = 2048;
@@ -204,7 +207,7 @@ addEventListener("load", () => {
         }
     }
 
-    audio.addEventListener('play', () => {
+    const playHandler = () => {
         if (!keepDrawing) {
             keepDrawing = true;
             draw();
@@ -214,19 +217,29 @@ addEventListener("load", () => {
                 draw();
             });
         }
-    });
+    };
+
+    sampleAudio.addEventListener("play", playHandler)
+    audio.addEventListener('play', playHandler);
     function stopViz() {
         keepDrawing = false;
     }
     audio.addEventListener('pause', () => {
         stopViz();
     });
+    
     audio.addEventListener('ended', () => {
         stopViz();
         setTimeout(() => {
             canvasCtx.clearRect(0, 0, canvas.width, canvas.height);
             canvasCtx.drawImage(logoImage, 0, 80, 900, 270);
         }, 450);
+    });
+    sampleAudio.addEventListener('ended', () => {
+        if (!(audio.ended || audio.paused)) {
+            return;
+        }
+        stopViz();
     });
 });
 
