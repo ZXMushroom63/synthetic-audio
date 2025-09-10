@@ -80,8 +80,8 @@ addEventListener("load", () => {
     for (let i = 0; i < stereoImg.length; i += 4) {
         const x = ((i / 4) % 450 - 225) / 225;
         const y = (225 - Math.floor((i / 4) / 450)) / 225;
-        const l = (y - x) / 2;
-        const r = (y + x) / 2;
+        const l = (y + x) / 2;
+        const r = (y - x) / 2;
 
         stereoImg[i + 0] = Math.abs(l) * 255;
         stereoImg[i + 1] = Math.abs(r) * 255 + 120;
@@ -113,7 +113,7 @@ addEventListener("load", () => {
             }
 
             let y = 225 + 225 * (l + r);
-            let x = 225 + 225 * (r - l);
+            let x = 225 + 225 * (l - r);
             y = y < 0 ? 0 : y > 449 ? 449 : y | 0;
             x = x < 0 ? 0 : x > 449 ? 449 : x | 0;
 
@@ -127,6 +127,15 @@ addEventListener("load", () => {
         }
 
         canvasCtx.putImageData(stereoImageData, 450 - 225, 0);
+
+        
+        canvasCtx.font = "60px monospace";
+        canvasCtx.fillStyle = 'rgba(255, 0, 93, 1)';
+        canvasCtx.fillText("L", 450-225, 170);
+        canvasCtx.fillStyle = 'rgba(0, 208, 255, 1)';
+        canvasCtx.fillText("R", 900-225-37, 170);
+        canvasCtx.fillStyle = 'rgba(248, 255, 209, 1)';
+        canvasCtx.fillText("M", 450-16, 60);
     }
     function drawWaveform() {
         globalThis.vizDrawnWaveform = previousByteData[0];
