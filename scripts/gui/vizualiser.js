@@ -5,6 +5,8 @@ addEventListener("load", () => {
     const audio = document.querySelector('#renderOut');
     const sampleAudio = document.querySelector('#loopsample');
     const canvas = document.querySelector('#viz');
+
+    /** @type {CanvasRenderingContext2D} */
     const canvasCtx = canvas.getContext('2d');
 
     canvas.addEventListener("click", () => {
@@ -13,7 +15,8 @@ addEventListener("load", () => {
         });
     });
     canvas.addEventListener("contextmenu", (e) => {
-        eqMode = !eqMode;
+        vizMode++;
+        vizMode %= 3;
         if (!keepDrawing) {
             draw();
         }
@@ -25,12 +28,22 @@ addEventListener("load", () => {
 
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     const analyser = audioCtx.createAnalyser();
+    const processor = audioCtx.createScriptProcessor(2048, 2, 2);
     const source = audioCtx.createMediaElementSource(audio);
     const source2 = audioCtx.createMediaElementSource(sampleAudio);
 
     source.connect(analyser);
     source2.connect(analyser);
-    analyser.connect(audioCtx.destination);
+    analyser.connect(processor);
+    processor.connect(audioCtx.destination);
+
+    var lastStereoPcms = [null, null];
+
+    processor.onaudioprocess = function (event) {
+        lastStereoPcms = [event.inputBuffer.getChannelData(0), event.inputBuffer.getChannelData(1)];
+        event.outputBuffer.copyToChannel(lastStereoPcms[0], 0, 0);
+        event.outputBuffer.copyToChannel(lastStereoPcms[1], 1, 0);
+    }
 
     const FFT_SIZE = 2048;
 
@@ -55,9 +68,66 @@ addEventListener("load", () => {
     canvasCtx.drawImage(logoImage, 0, 80, 900, 270);
     var keepDrawing = true;
     var started = false;
-    var eqMode = false;
+    var vizMode = 0;
     const previousByteData = [];
+    const previousStereoData = [];
     const previousFFTData = [];
+    /** @type {ImageData} */
+    const stereoImageData = canvasCtx.createImageData(450, 450, { colorSpace: "srgb" });
+    const pos2idx = (x, y) => (4 * 450 * y) + 4 * x;
+    const penSize = 2;
+    const stereoImg = stereoImageData.data;
+    for (let i = 0; i < stereoImg.length; i += 4) {
+        const x = ((i / 4) % 450 - 225) / 225;
+        const y = (225 - Math.floor((i / 4) / 450)) / 225;
+        const l = (y - x) / 2;
+        const r = (y + x) / 2;
+
+        stereoImg[i + 0] = Math.abs(l) * 255;
+        stereoImg[i + 1] = Math.abs(r) * 255 + 120;
+        stereoImg[i + 2] = (1 + l) * (1 + r) * 255;
+    }
+    function drawStereo() {
+        const stereoData = previousStereoData[0];
+        if (!stereoData) {
+            return;
+        }
+        const leftBuffer = stereoData[0];
+        if (!leftBuffer) {
+            return;
+        }
+        const rightBuffer = stereoData[1];
+
+        for (let i = 3; i < stereoImg.length; i += 4) {
+            stereoImg[i] -= 20;
+        }
+
+        const invNorm = 1 / 2.23606797749979;
+        const po = Math.round(penSize / 2);
+
+        for (let i = 0; i < leftBuffer.length; i++) {
+            const l = leftBuffer[i] * invNorm;
+            const r = rightBuffer[i] * invNorm;
+            if (l === 0 && r === 0) {
+                continue;
+            }
+
+            let y = 225 + 225 * (l + r);
+            let x = 225 + 225 * (r - l);
+            y = y < 0 ? 0 : y > 449 ? 449 : y | 0;
+            x = x < 0 ? 0 : x > 449 ? 449 : x | 0;
+
+            for (let xo = 0; xo < penSize; xo++) {
+                const px = x + xo - po;
+                for (let yo = 0; yo < penSize; yo++) {
+                    const idx = pos2idx(px, y + yo - po);
+                    stereoImg[idx + 3] = 255;
+                }
+            }
+        }
+
+        canvasCtx.putImageData(stereoImageData, 450 - 225, 0);
+    }
     function drawWaveform() {
         globalThis.vizDrawnWaveform = previousByteData[0];
         canvasCtx.lineWidth = 4;
@@ -176,9 +246,11 @@ addEventListener("load", () => {
             analyser.getByteFrequencyData(freqDataArray);
             previousByteData.push(structuredClone(dataArray));
             previousFFTData.push(structuredClone(freqDataArray));
+            previousStereoData.push(lastStereoPcms);
             if (previousByteData.length > dataHistrogramSize) {
                 previousByteData.shift();
                 previousFFTData.shift();
+                previousStereoData.shift();
             }
         }
         const currentVolume = calculateVolume();
@@ -187,7 +259,9 @@ addEventListener("load", () => {
         canvasCtx.drawImage(logoImage, 0, 80, 900, 270);
         canvasCtx.globalAlpha = 1;
 
-        if (eqMode) {
+        if (vizMode === 2) {
+            drawStereo();
+        } else if (vizMode === 1) {
             drawEq();
         } else {
             drawWaveform();
@@ -227,7 +301,7 @@ addEventListener("load", () => {
     audio.addEventListener('pause', () => {
         stopViz();
     });
-    
+
     audio.addEventListener('ended', () => {
         stopViz();
         setTimeout(() => {
