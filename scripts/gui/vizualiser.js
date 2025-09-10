@@ -88,6 +88,7 @@ addEventListener("load", () => {
         stereoImg[i + 2] = (1 + l) * (1 + r) * 255;
     }
     function drawStereo() {
+        const samplerateMult = 24000 / audio.samplerate;
         const stereoData = previousStereoData[0];
         if (!stereoData) {
             return;
@@ -98,8 +99,10 @@ addEventListener("load", () => {
         }
         const rightBuffer = stereoData[1];
 
-        for (let i = 3; i < stereoImg.length; i += 4) {
-            stereoImg[i] -= 20;
+        if (!keymap["Alt"]) {
+            for (let i = 3; i < stereoImg.length; i += 4) {
+                stereoImg[i] -= 20 * samplerateMult;
+            }
         }
 
         const invNorm = 1 / 2.23606797749979;
@@ -121,7 +124,11 @@ addEventListener("load", () => {
                 const px = x + xo - po;
                 for (let yo = 0; yo < penSize; yo++) {
                     const idx = pos2idx(px, y + yo - po);
-                    stereoImg[idx + 3] = 255;
+                    if (keymap["Alt"]) {
+                        stereoImg[idx + 3] += 20;
+                    } else {
+                        stereoImg[idx + 3] = 255;
+                    }
                 }
             }
         }
