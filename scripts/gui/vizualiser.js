@@ -2,7 +2,7 @@ function getFftBinIndex(freq, samplerate, fftSize) {
     return Math.floor((freq / samplerate) * fftSize);
 }
 addEventListener("load", () => {
-    const audio = document.querySelector('#renderOut');
+    const renderAudio = document.querySelector('#renderOut');
     const sampleAudio = document.querySelector('#loopsample');
     const canvas = document.querySelector('#viz');
 
@@ -29,7 +29,7 @@ addEventListener("load", () => {
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     const analyser = audioCtx.createAnalyser();
     const processor = audioCtx.createScriptProcessor(2048, 2, 2);
-    const source = audioCtx.createMediaElementSource(audio);
+    const source = audioCtx.createMediaElementSource(renderAudio);
     const source2 = audioCtx.createMediaElementSource(sampleAudio);
 
     source.connect(analyser);
@@ -310,15 +310,15 @@ addEventListener("load", () => {
     };
 
     sampleAudio.addEventListener("play", playHandler)
-    audio.addEventListener('play', playHandler);
+    renderAudio.addEventListener('play', playHandler);
     function stopViz() {
         keepDrawing = false;
     }
-    audio.addEventListener('pause', () => {
+    renderAudio.addEventListener('pause', () => {
         stopViz();
     });
 
-    audio.addEventListener('ended', () => {
+    renderAudio.addEventListener('ended', () => {
         stopViz();
         setTimeout(() => {
             canvasCtx.clearRect(0, 0, canvas.width, canvas.height);
@@ -326,7 +326,7 @@ addEventListener("load", () => {
         }, 450);
     });
     sampleAudio.addEventListener('ended', () => {
-        if (!(audio.ended || audio.paused)) {
+        if (!(renderAudio.ended || renderAudio.paused)) {
             return;
         }
         stopViz();
