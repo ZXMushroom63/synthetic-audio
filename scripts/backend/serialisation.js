@@ -174,7 +174,7 @@ function deserialise(ser) {
     customEvent("projinit", { data: ser });
 
     ser.nodes.forEach((node) => {
-        deserialiseNode(node);
+        deserialiseNode(node, true);
     });
     proceduralAssets.clear();
     customEvent("deserialise", { data: ser });
