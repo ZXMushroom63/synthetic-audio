@@ -53,11 +53,16 @@ addBlockType("panner", {
     directRefs: ["pan"],
     configs: {
         "Pan": [0, "number", 1],
+        "Binaural": [false, "checkbox"],
+        "BinauralTimeMS": [0.5, "number"],
     },
     functor: async function (inPcm, channel, data) {
+        const maxDelaySamples = this.conf.Binaural ? Math.max(0, Math.round((this.conf.BinauralTimeMS / 1000) * audio.samplerate)) : 0;
         const getPan = _(this.conf.Pan);
-        return inPcm.map((x, i) => {
+        return (new Float32Array(inPcm.length)).map((x, i) => {
             const pan = Math.min(Math.max(getPan(i, inPcm), -1), 1);
+
+            const delay = Math.round(pan * maxDelaySamples) * (channel === 0 ? -1 : 1);
 
             var y = (pan + 1) / 2;
             var gain;
@@ -67,7 +72,7 @@ addBlockType("panner", {
                 gain = Math.sin(y * Math.PI / 2);
             }
 
-            return x * gain;
+            return (inPcm[Math.max(0, i - delay)] * gain) || 0;
         });
     }
 });
