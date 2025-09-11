@@ -572,6 +572,7 @@ async function render() {
     const data = serialise(true);
     const channels = data.stereo ? 2 : 1;
     const output = new Array(channels);
+    output.fill(0).forEach((x, i) => output[i] = []);
 
     const renderProgress = document.querySelector("#renderProgress");
 
@@ -591,38 +592,39 @@ async function render() {
     var calculatedNodeCount = 0;
     var processedNodeCount = 0;
     try {
-        for (let c = 0; c < channels; c++) {
-            const channelPcms = [];
-            for (let q = 0; q < renderDataArray.length; q++) {
-                const abstractLayerMaps = renderDataArray[q];
-                const initialPcm = layerCache[abstractLayerMaps.layerId]?.[c] || new Float32Array(audio.length);
+        for (let q = 0; q < renderDataArray.length; q++) {
+            const abstractLayerMaps = renderDataArray[q];
 
-                if (abstractLayerMaps.needsUpdating) {
-                    for (let l = 0; l < abstractLayerMaps.length; l++) {
-                        const layer = abstractLayerMaps[l];
-                        for (let n = 0; n < layer.length; n++) {
-                            const node = layer[n];
-                            processedNodeCount++;
+            if (abstractLayerMaps.needsUpdating) {
+                for (let l = 0; l < abstractLayerMaps.length; l++) {
+                    const layer = abstractLayerMaps[l];
+                    for (let n = 0; n < layer.length; n++) {
+                        const node = layer[n];
+                        processedNodeCount++;
 
-                            if (node.deleted) {
-                                continue;
-                            }
+                        if (node.deleted) {
+                            continue;
+                        }
 
-                            var newPcm;
+                        if (node.dirty || (!node.ref.cache)) {
+                            undirtyRenderTreeNode(node);
+                            node.ref.cache = [null, null];
+                        }
 
-                            if (node.dirty || (!node.ref.cache)) {
-                                undirtyRenderTreeNode(node);
-                                node.ref.cache = [null, null];
-                            }
+                        const startTime = Math.round(node.start * audio.samplerate);
+                        const endTime = Math.round((node.start + node.duration) * audio.samplerate);
+                        const nodeDef = filters[node.type];
 
-                            const startTime = Math.round(node.start * audio.samplerate);
-                            const endTime = Math.round((node.start + node.duration) * audio.samplerate);
-
+                        let newPcm = [null, null];
+                        let currPcm = [null, null];
+                        for (let c = 0; c < channels; c++) {
+                            let initialPcm = layerCache[abstractLayerMaps.layerId]?.[c] || new Float32Array(audio.length);
+                            currPcm[c] = initialPcm;
                             if (!node.ref.cache[c]) {
                                 currentlyRenderedLoop = node;
-                                newPcm = await filters[node.type].functor.apply(node, [initialPcm.slice(startTime, endTime), c, data]);
+                                newPcm[c] = await nodeDef.functor.apply(node, [initialPcm.slice(startTime, endTime), c, data]);
                                 if (settings.NodeCaching) {
-                                    node.ref.cache[c] = newPcm;
+                                    node.ref.cache[c] = newPcm[c];
                                 }
                                 if (c === 0) {
                                     hydrateLoopBackground(node.ref);
@@ -633,31 +635,42 @@ async function render() {
                                 }
                                 await wait(0);
                             } else {
-                                newPcm = node.ref.cache[c];
+                                newPcm[c] = node.ref.cache[c];
                             }
+                        }
+                        if (nodeDef.postProcessor) {
+                            nodeDef.postProcessor.apply(node, [newPcm, data]);
+                        }
+                        for (let c = 0; c < channels; c++) {
+                            currPcm[c].set(newPcm[c], startTime);
 
-                            initialPcm.set(newPcm, startTime);
-                        }
-                        if (!layerCache[abstractLayerMaps.layerId]) {
-                            layerCache[abstractLayerMaps.layerId] = [null, null];
-                        }
-                        if (settings.NodeCaching) {
-                            layerCache[abstractLayerMaps.layerId][c] = initialPcm;
+                            if (!layerCache[abstractLayerMaps.layerId]) {
+                                layerCache[abstractLayerMaps.layerId] = [null, null];
+                            }
+                            if (settings.NodeCaching) {
+                                layerCache[abstractLayerMaps.layerId][c] = currPcm[c];
+                            }
                         }
                     }
-                } else {
-                    initialPcm = layerCache[abstractLayerMaps.layerId][c];
-                }
-                if (!abstractLayerMaps.editorOnly) {
-                    channelPcms.push(initialPcm);
                 }
             }
-            output[c] = sumFloat32Arrays(channelPcms);
+
+            for (let c = 0; c < channels; c++) {
+                const initialPcm = layerCache[abstractLayerMaps.layerId]?.[c];
+                if (!abstractLayerMaps.editorOnly) {
+                    output[c].push(initialPcm);
+                }
+            }
         }
-        
+
+        for (let c = 0; c < channels; c++) {
+            output[c] = sumFloat32Arrays(output[c]);
+        }
+
         if (audio.normalise) {
             normaliseFloat32Arrays(output);
         }
+
         var renderTime = stopTiming("render");
         renderProgress.innerText = "Encoding...";
         console.log("Encode queued.");
@@ -667,7 +680,7 @@ async function render() {
         console.log(error);
         success = false;
     }
-    
+
     renderProgress.innerText = success
         ? `Render successful! (${renderTime.toFixed(2)}s, ${calculatedNodeCount / (1 + audio.stereo)} calculated, ${processedNodeCount / (1 + audio.stereo)} processed)`
         : "Render failed.";
