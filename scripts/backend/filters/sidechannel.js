@@ -1,6 +1,6 @@
 addBlockType("sidechannel", {
     color: "rgba(0,255,0,0.3)",
-    title: "Sidechannel",
+    title: "Strobe/Pulse",
     configs: {
         "PulsesPerSecond": [2, "number", 1],
         "SecondsOffset": [0, "number", 1],
