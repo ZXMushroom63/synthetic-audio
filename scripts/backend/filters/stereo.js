@@ -89,3 +89,29 @@ addBlockType("gate", {
         return inPcm;
     }
 });
+
+addBlockType("stereo_enhancer", {
+    color: "rgba(0,255,0,0.3)",
+    title: "Stereo Enhancer",
+    configs: {
+        "EnhanceAmount": [0, "number", 1],
+    },
+    functor: function (inPcm, channel, data) {
+        return inPcm;
+    },
+    postProcessor: function (pcms) {
+        if (pcms.length !== 2 || ((!pcms[0]) || (!pcms[1]))) {
+            return;
+        }
+        const left = pcms[0];
+        const right = pcms[1];
+        debugger;
+        const enhanceAmount = _(this.conf.EnhanceAmount);
+        left.forEach((l, i)=>{
+            const r = right[i];
+            const delta = (r - l) * enhanceAmount(i, left) * 2;
+            left[i] -= delta;
+            right[i] += delta;
+        });
+    }
+});
