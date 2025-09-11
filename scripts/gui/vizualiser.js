@@ -52,8 +52,8 @@ addEventListener("load", () => {
 
     processor.onaudioprocess = function (event) {
         lastStereoPcms = [event.inputBuffer.getChannelData(0), event.inputBuffer.getChannelData(1)];
-        event.outputBuffer.copyToChannel(lastStereoPcms[0], 0, 0);
-        event.outputBuffer.copyToChannel(lastStereoPcms[1], 1, 0);
+        event.outputBuffer.getChannelData(0).set(lastStereoPcms[0]);
+        event.outputBuffer.getChannelData(1).set(lastStereoPcms[1]);
     }
 
     const FFT_SIZE = 2048;
