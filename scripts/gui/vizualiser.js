@@ -16,6 +16,18 @@ addEventListener("load", () => {
     });
     canvas.addEventListener("contextmenu", (e) => {
         vizMode++;
+
+        if (vizMode === 2) {
+            analyser.disconnect(audioCtx.destination);
+            analyser.connect(processor);
+            processor.connect(audioCtx.destination);
+            //connect scriptprocessor
+        } else if (vizMode === 3) {
+            //disconnect scriptprocessor
+            processor.disconnect();
+            analyser.connect(audioCtx.destination);
+        }
+
         vizMode %= 3;
         if (!keepDrawing) {
             draw();
@@ -34,8 +46,7 @@ addEventListener("load", () => {
 
     source.connect(analyser);
     source2.connect(analyser);
-    analyser.connect(processor);
-    processor.connect(audioCtx.destination);
+    analyser.connect(audioCtx.destination);
 
     var lastStereoPcms = [null, null];
 
