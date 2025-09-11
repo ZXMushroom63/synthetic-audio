@@ -12,6 +12,7 @@ addBlockType("p_waveform_plus", {
         "Sawtooth": [0, "number", 1],
         "Triangle": [0, "number", 1],
         "Exponent": [1, "number", 1],
+        "StereoWidth": [0, "number", 1],
         "UseCustomWaveform": [false, "checkbox"],
         "WaveformAsset": ["(none)", ["(none)"]],
         "WaveformAsset2": ["(none)", ["(none)"]],
@@ -62,7 +63,7 @@ addBlockType("p_waveform_plus", {
             "Sawtooth",
             "Triangle",
             "Exponent",
-            "PhaseOffset"
+            "StereoWidth"
         ],
         "Custom Waveforms": [
             "UseCustomWaveform",
@@ -267,6 +268,7 @@ addBlockType("p_waveform_plus", {
         const wavetablePos = _(this.conf.WavetablePosition);
 
         const semitones = _(this.conf.HarmonicsSemitoneOffset);
+        const stereoWidth = _(this.conf.StereoWidth);
 
         const uDetuneHz = _(this.conf.uDetuneHz);
         const uPan = _(this.conf.uPan);
@@ -357,6 +359,7 @@ addBlockType("p_waveform_plus", {
             var uPhaseAmount = uPhase(i, inPcm);
             var panAmount = uPan(i, inPcm) / this.conf.uVoices;
             var semiOffset = semitones(i, inPcm);
+            var stereoPhaseOffset = stereoWidth(i, inPcm) * 0.25 * (channel === 0 ? -1 : 1);
             for (let h = 0; h < waveCount; h++) {
                 if (absoluteTime < (h * this.conf.HarmonicsStrum * this.conf.Harmonics)) {
                     continue;
@@ -364,6 +367,7 @@ addBlockType("p_waveform_plus", {
                 var harmonicFrequency = f;
                 var volumeRatio = 1;
                 var wavePhaseOffset = phaseData[h] || 0;
+                wavePhaseOffset += stereoPhaseOffset;
                 if (this.conf.Unison) {
                     var detunePosition = (h + 0.5) - (waveCount / 2);
                     harmonicFrequency += detuneHz * Math.trunc(detunePosition);
