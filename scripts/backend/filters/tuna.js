@@ -157,10 +157,11 @@ addBlockType("tuna_phaser", {
         "FeedbackRatio": [0.2, "number"],
         "StereoPhase": [0.25, "number"],
         "BaseModulationFrequency": [700, "number"],
+        "Normalise": [false, "checkbox"]
     },
     functor: async function (inPcm, channel, data) {
         const ctx = new OfflineAudioContext(1 + channel, inPcm.length, audio.samplerate);
-        return await applyTunaFilter(ctx, inPcm, audio.samplerate, "Phaser", {
+        const pcm = await applyTunaFilter(ctx, inPcm, audio.samplerate, "Phaser", {
             rate: this.conf.Rate,
             depth: this.conf.DepthRatio,
             feedback: this.conf.FeedbackRatio,
@@ -168,6 +169,10 @@ addBlockType("tuna_phaser", {
             baseModulationFrequency: this.conf.BaseModulationFrequency,
             bypass: 0
         });
+        if (this.conf.Normalise) {
+            normaliseFloat32Arrays([pcm]);
+        }
+        return pcm;
     }
 });
 
