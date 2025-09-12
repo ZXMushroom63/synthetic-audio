@@ -135,7 +135,7 @@ addEventListener("load", () => {
                 const px = x + xo - po;
                 for (let yo = 0; yo < penSize; yo++) {
                     const idx = pos2idx(px, y + yo - po);
-                    if (keymap["Alt"]) {
+                    if (keymap["Ctrl"]) {
                         stereoImg[idx + 3] += 2;
                     } else {
                         stereoImg[idx + 3] = 255;
