@@ -3,11 +3,14 @@ addBlockType("peakclip", {
     title: "Distortion / Clipper",
     wet_and_dry_knobs: true,
     configs: {
+        "Drive": [1, "number", 1],
         "Cap": [0.75, "number", 1]
     },
     functor: function (inPcm, channel, data) {
         var cap = _(this.conf.Cap);
+        var drive = _(this.conf.Drive);
         inPcm.forEach((x, i) => {
+            x *= drive(i, inPcm);
             inPcm[i] = Math.min(Math.abs(x), cap(i, inPcm)) * Math.sign(x);
         });
         return inPcm;
