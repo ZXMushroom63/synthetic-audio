@@ -617,10 +617,12 @@ async function render() {
 
                         let newPcm = [null, null];
                         let currPcm = [null, null];
+                        let freshRender = false;
                         for (let c = 0; c < channels; c++) {
                             let initialPcm = layerCache[abstractLayerMaps.layerId]?.[c] || new Float32Array(audio.length);
                             currPcm[c] = initialPcm;
                             if (!node.ref.cache[c]) {
+                                freshRender = true;
                                 currentlyRenderedLoop = node;
                                 newPcm[c] = await nodeDef.functor.apply(node, [initialPcm.slice(startTime, endTime), c, data]);
                                 if (settings.NodeCaching) {
@@ -638,7 +640,7 @@ async function render() {
                                 newPcm[c] = node.ref.cache[c];
                             }
                         }
-                        if (nodeDef.postProcessor) {
+                        if (nodeDef.postProcessor && freshRender) {
                             nodeDef.postProcessor.apply(node, [newPcm, data]);
                         }
                         for (let c = 0; c < channels; c++) {
