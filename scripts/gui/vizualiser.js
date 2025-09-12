@@ -271,8 +271,8 @@ addEventListener("load", () => {
         if (keepDrawing) { //if not true, visualiser if being redrawn while paused.
             analyser.getByteTimeDomainData(dataArray);
             analyser.getByteFrequencyData(freqDataArray);
-            previousByteData.push(structuredClone(dataArray));
-            previousFFTData.push(structuredClone(freqDataArray));
+            previousByteData.push(dataArray.slice());
+            previousFFTData.push(freqDataArray.slice());
             previousStereoData.push(lastStereoPcms);
             if (previousByteData.length > dataHistrogramSize) {
                 previousByteData.shift();
