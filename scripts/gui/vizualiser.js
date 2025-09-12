@@ -110,7 +110,7 @@ addEventListener("load", () => {
         }
         const rightBuffer = stereoData[1];
 
-        if (!keymap["Alt"]) {
+        if (!keymap["Ctrl"]) {
             for (let i = 3; i < stereoImg.length; i += 4) {
                 stereoImg[i] -= 20 * samplerateMult;
             }
