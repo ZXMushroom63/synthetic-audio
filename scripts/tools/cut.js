@@ -16,10 +16,14 @@ addEventListener("init", () => {
                 var a = structuredClone(resultNode);
                 a.duration = cursorPosition - a.start;
                 a.end = cursorPosition;
+                a.duration = timeQuantise(a.duration);
+                a.start = timeQuantise(a.start);
 
                 var b = structuredClone(resultNode);
                 b.duration = b.end - cursorPosition;
                 b.start = cursorPosition;
+                b.duration = timeQuantise(b.duration);
+                b.start = timeQuantise(b.start);
 
                 if (typeof b.conf.StartOffset === "number") {
                     b.conf.StartOffset += b.start - a.start;
@@ -39,7 +43,9 @@ addEventListener("init", () => {
                 for (let n = 0; n < splitCount; n++) {
                     var a = structuredClone(resultNode);
                     a.duration /= splitCount;
+                    a.duration = timeQuantise(a.duration);
                     a.start += n * resultNode.duration / splitCount;
+                    a.start = timeQuantise(a.start);
                     if (typeof a.conf.StartOffset === "number") {
                         a.conf.StartOffset += n / splitCount;
                     }
