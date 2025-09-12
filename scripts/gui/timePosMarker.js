@@ -34,6 +34,12 @@ addEventListener("load", () => {
                 }
             });
         }
+        if (isAnimated) {
+            timePosMarkerAnimator = setTimeout(() => {
+                gui.marker = renderOut.currentTime;
+                hydrateTimePosMarker(null, true);
+            }, 1000 / 30);
+        }
     }
     addEventListener("hydrate", hydrateTimePosMarker);
     addEventListener("deserialise", () => {
@@ -72,7 +78,7 @@ addEventListener("load", () => {
         stopSample();
         clearInterval(timePosMarkerAnimator);
         hydrateTimePosMarker();
-        timePosMarkerAnimator = setInterval(() => {
+        timePosMarkerAnimator = setTimeout(() => {
             gui.marker = renderOut.currentTime;
             hydrateTimePosMarker(null, true);
         }, 1000 / 30);
