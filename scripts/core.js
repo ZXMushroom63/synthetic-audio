@@ -347,14 +347,14 @@ function usesDirtyParams(automationParamMap, serialisedNode) {
     }, false);
 }
 const TIME_EPSILON = 0.001;
-function doNodesIntersect(x, dirtyNode) { // Performance Issue - Add epsilon of 0.001 when checking intersections
+function doNodesIntersect(x, dirtyNode) {
     return ((x.start + TIME_EPSILON) >= dirtyNode.start &&
         (x.start + TIME_EPSILON) < dirtyNode.end) ||
 
         ((x.end - TIME_EPSILON) > dirtyNode.start &&
             (x.end - TIME_EPSILON) <= dirtyNode.end) ||
 
-        ((x.end - TIME_EPSILON) > dirtyNode.start && // is inside
+        ((x.end - TIME_EPSILON) > dirtyNode.start &&
             (x.start + TIME_EPSILON) < dirtyNode.end)
 }
 function forceLoopDirty(loop, wasMoved) {
