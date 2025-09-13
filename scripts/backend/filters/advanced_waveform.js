@@ -317,14 +317,18 @@ addBlockType("p_waveform_plus", {
         const t = new Float32Array(waveCount);
 
         const wcPhases = new Float32Array(waveCount);
-        wcPhases.forEach((x, i) => {
-            wcPhases[i] = (cyrb53a_beta("" + i, 0) / 100) % 1;
-        });
+        if (this.conf.uRandomisePhase) {
+            wcPhases.forEach((x, i) => {
+                wcPhases[i] = (cyrb53a_beta("" + i, 0) / 100) % 1;
+            });
+        }
 
         const wcPanValues = new Float32Array(waveCount);
-        wcPanValues.forEach((x, i) => {
-            wcPanValues[i] = (cyrb53a_beta("pan" + i, 0) / 100) % 2 - 1;
-        });
+        if (this.conf.uRandomisePan) {
+            wcPanValues.forEach((x, i) => {
+                wcPanValues[i] = (cyrb53a_beta("pan" + i, 0) / 100) % 2 - 1;
+            });
+        }
 
         const phaseData = this.conf.SlidePhaseData.split(",").map(x => parseFloat(x));
         const values = Object.fromEntries(keys.map(k => {
@@ -371,10 +375,7 @@ addBlockType("p_waveform_plus", {
                 if (this.conf.Unison) {
                     var detunePosition = (h + 0.5) - (waveCount / 2);
                     harmonicFrequency += detuneHz * Math.trunc(detunePosition);
-                    wavePhaseOffset = uPhaseAmount * h + (phaseData[h] || 0);
-                    if (this.conf.uRandomisePhase) {
-                        wavePhaseOffset += wcPhases[h];
-                    }
+                    wavePhaseOffset = uPhaseAmount * h + (phaseData[h] || 0) + wcPhases[h];
                     if (this.conf.uAmplitudeConstant) {
                         volumeRatio = Math.trunc(detunePosition) === 0 ? 1 : this.conf.uAmplitudeRatio;
                     } else {
