@@ -194,7 +194,7 @@ function hydrateLoopDecoration(loop) {
         transparent ${cumulativeWidth - x}vw,
         transparent ${cumulativeWidth - 0.15}vw,
         white ${cumulativeWidth - 0.15}vw,
-        white ${cumulativeWidth + 0.0}vw${i===trueWidth.length-1?"":","}
+        white ${cumulativeWidth + 0.0}vw${i === trueWidth.length - 1 ? "" : ","}
         `;
     });
     loopInternal.style.backgroundImage = `repeating-linear-gradient(90deg,
@@ -764,6 +764,12 @@ function init() {
         hydrateBeatMarkers();
         hydrateZoom();
         hydrateDecorations();
+        for (let pair of proceduralAssets) {
+            if (pair[0].startsWith("@__params::")) {
+                proceduralAssets.delete(pair[0]);
+            }
+        }
+        findLoops(".loop[data-type=automation_parameter]").forEach(x => forceLoopDirty(x));
     });
     addEventListener("mousemove", (e) => {
         mouse.x = e.x;
