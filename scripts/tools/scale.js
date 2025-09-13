@@ -33,11 +33,11 @@ addEventListener("init", () => {
             const duration = parseFloat(node.getAttribute(`data-duration`));
             if (shiftMode) {
                 const newDuration = Math.min(Math.max((audio.beatSize / gui.substepping), duration + (audio.beatSize / gui.substepping * dir)), audio.duration - start);
-                node.setAttribute(`data-duration`, newDuration);
+                node.setAttribute(`data-duration`, timeQuantise(newDuration));
             } else {
                 const newStart = dir * (start - absoluteStart) + absoluteStart;
-                node.setAttribute(`data-start`, newStart);
-                node.setAttribute(`data-duration`, duration * dir);
+                node.setAttribute(`data-start`, timeQuantise(newStart));
+                node.setAttribute(`data-duration`, timeQuantise(duration * dir));
             }
             markLoopDirty(node, true);
             hydrateLoopPosition(node);

@@ -110,7 +110,7 @@ addEventListener("load", () => {
         }
         const rightBuffer = stereoData[1];
 
-        if (!keymap["Alt"]) {
+        if (!keymap["Ctrl"]) {
             for (let i = 3; i < stereoImg.length; i += 4) {
                 stereoImg[i] -= 20 * samplerateMult;
             }
@@ -135,7 +135,7 @@ addEventListener("load", () => {
                 const px = x + xo - po;
                 for (let yo = 0; yo < penSize; yo++) {
                     const idx = pos2idx(px, y + yo - po);
-                    if (keymap["Alt"]) {
+                    if (keymap["Ctrl"]) {
                         stereoImg[idx + 3] += 2;
                     } else {
                         stereoImg[idx + 3] = 255;
@@ -271,8 +271,8 @@ addEventListener("load", () => {
         if (keepDrawing) { //if not true, visualiser if being redrawn while paused.
             analyser.getByteTimeDomainData(dataArray);
             analyser.getByteFrequencyData(freqDataArray);
-            previousByteData.push(structuredClone(dataArray));
-            previousFFTData.push(structuredClone(freqDataArray));
+            previousByteData.push(dataArray.slice());
+            previousFFTData.push(freqDataArray.slice());
             previousStereoData.push(lastStereoPcms);
             if (previousByteData.length > dataHistrogramSize) {
                 previousByteData.shift();
