@@ -356,7 +356,7 @@ function addBlock(type, start, duration, title, layer = 0, data = {}, editorValu
         ));
         markLoopDirty(loop, true);
 
-        var trackBB = document.querySelector("#trackInternal").getBoundingClientRect();
+        var trackBB = document.querySelector("#trackInternal").getBoundingClientRect(); //Big Performance Issue
         var originalBB = internal.getBoundingClientRect();
         var originalDuration = parseFloat(loop.getAttribute("data-duration"));
         var originalStart = parseFloat(loop.getAttribute("data-start"));
@@ -602,8 +602,8 @@ function addBlock(type, start, duration, title, layer = 0, data = {}, editorValu
 
     if (!noTimeline) {
         (
-            document.querySelector("#trackInternal .loop:last-of-type") ||
-            document.querySelector("#time")
+            document.querySelector("#trackInternal .loop:last-of-type") || //Performance Issue
+            document.querySelector("#time") //Performance Issue
         ).after(loop);
     }
 

@@ -238,7 +238,7 @@ addBlockType("p_waveform_plus", {
                     }
                 }
                 t[h] += harmonicFrequency * dt;
-                t[h] = t[h] - (t[h] | 0);
+                t[h] = t[h] - (t[h] | 0); // Performance Issue: Switch to if statement
                 finalPhases[h] = (t[h] + wavePhaseOffset) % 1;
             }
         });

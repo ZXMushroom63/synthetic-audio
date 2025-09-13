@@ -346,15 +346,16 @@ function usesDirtyParams(automationParamMap, serialisedNode) {
         return ((typeof acc === "string") && acc.startsWith("@") && automationParamMap[acc.replace("@", "").split(":")[0]]) || v
     }, false);
 }
-function doNodesIntersect(x, dirtyNode) {
-    return (x.start >= dirtyNode.start &&
-        x.start < dirtyNode.end) ||
+const TIME_EPSILON = 0.001;
+function doNodesIntersect(x, dirtyNode) { // Performance Issue - Add epsilon of 0.001 when checking intersections
+    return ((x.start + TIME_EPSILON) >= dirtyNode.start &&
+        (x.start + TIME_EPSILON) < dirtyNode.end) ||
 
-        (x.end > dirtyNode.start &&
-            x.end <= dirtyNode.end) ||
+        ((x.end - TIME_EPSILON) > dirtyNode.start &&
+            (x.end - TIME_EPSILON) <= dirtyNode.end) ||
 
-        (x.end > dirtyNode.start &&
-            x.start < dirtyNode.end)
+        ((x.end - TIME_EPSILON) > dirtyNode.start && // is inside
+            (x.start + TIME_EPSILON) < dirtyNode.end)
 }
 function forceLoopDirty(loop, wasMoved) {
     markLoopDirty(loop, wasMoved);
