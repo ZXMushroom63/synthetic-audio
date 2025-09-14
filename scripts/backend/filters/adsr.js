@@ -14,6 +14,7 @@ addBlockType("adsr", {
         "NoTransient": [false, "checkbox"]
     },
     hidden: true,
+    waterfall: 1,
     functor: async function (inPcm, channel, data) {
         var index = 0;
         var len = inPcm.length;

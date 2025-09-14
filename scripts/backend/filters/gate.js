@@ -2,6 +2,7 @@ addBlockType("value_gate", {
     color: "rgba(0,255,0,0.3)",
     title: "Gate",
     wet_and_dry_knobs: true,
+    waterfall: 1,
     configs: {
         "Threshold": [0.1, "number", 1],
         "Volume": [0, "number", 1]

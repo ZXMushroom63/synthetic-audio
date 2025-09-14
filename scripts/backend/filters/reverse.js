@@ -3,6 +3,7 @@ addBlockType("reverse", {
     title: "Reverse",
     directRefs: ["rev", "reverse"],
     wet_and_dry_knobs: true,
+    waterfall: 2,
     configs: {
     },
     functor: function (inPcm, channel, data) {

@@ -109,6 +109,7 @@ addBlockType("keyfinder", {
         "CalculatedScale": ["(uncalculated)", "text", 2],
         "CalculatedScaleIdx": ["(uncalculated)", "text", 2]
     },
+    waterfall: 1,
     noRender: false,
     initMiddleware: (loop) => {
         initGenericDisplay(loop, loop.conf.DisplayText);

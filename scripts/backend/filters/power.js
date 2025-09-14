@@ -2,6 +2,7 @@ addBlockType("power", {
     color: "rgba(0,255,0,0.3)",
     title: "Power",
     wet_and_dry_knobs: true,
+    waterfall: 1,
     configs: {
         "Exponent": [1.5, "number", 1],
         "OffsetNegatives": [false, "checkbox"]

@@ -4,6 +4,7 @@ addBlockType("multiply", {
     configs: {
         "Value": [0, "number", 1],
     },
+    waterfall: 1,
     functor: function (inPcm, channel, data) {
         var val = _(this.conf.Value);
         inPcm.forEach((x, i) => {

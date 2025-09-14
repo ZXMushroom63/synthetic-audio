@@ -5,6 +5,7 @@ addBlockType("center", {
         "MovingAverage": [false, "checkbox"],
         "MovingAverageAmount": [2000, "number", 1]
     },
+    waterfall: 2,
     functor: function (inPcm, channel, data) {
         const inverseSamplerate = (1 / audio.samplerate);
         const getMvgAvg = _(this.conf.MovingAverageAmount);

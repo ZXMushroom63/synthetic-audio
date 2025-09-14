@@ -6,6 +6,7 @@ addBlockType("clamp", {
         "Min": [-1, "number", 1],
         "Max": [1, "number", 1],
     },
+    waterfall: 1,
     functor: function (inPcm, channel, data) {
         var min = _(this.conf.Min);
         var max = _(this.conf.Max);

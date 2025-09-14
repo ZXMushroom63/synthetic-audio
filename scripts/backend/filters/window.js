@@ -16,6 +16,7 @@ function windowEffect(array, windowSizeSeconds) {
 
 addBlockType("window", {
     color: "rgba(0,255,0,0.3)",
+    waterfall: 2,
     title: "Window",
     configs: {
         "WindowSize": [0.02, "number", 1],

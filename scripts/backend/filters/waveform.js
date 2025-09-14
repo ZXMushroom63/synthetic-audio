@@ -1,6 +1,7 @@
 addBlockType("p_waveform", {
     color: "rgba(255,0,0,0.3)",
     title: "Basic Synth",
+    waterfall: 1,
     configs: {
         "StartFrequency": [100, "number"],
         "EndFrequency": [100, "number"],

@@ -5,6 +5,7 @@ addBlockType("modulo", {
     configs: {
         B: [0.3, "number", 1]
     },
+    waterfall: 1,
     functor: function (inPcm, channel, data) {
         var Bvalue = _(this.conf.B);
         var out = new Float32Array(inPcm);

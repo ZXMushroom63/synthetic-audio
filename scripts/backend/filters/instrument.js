@@ -15,6 +15,7 @@ addBlockType("instrument", {
         "SidechainRMSFreq": [31, "number"],
         "Instrument": ["(none)", ["(none)"]]
     },
+    waterfall: 1,
     selectMiddleware: (key) => {
         if (key === "Instrument") {
             return ["(none)", ...Object.keys(SFREGISTRY)];

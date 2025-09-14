@@ -51,6 +51,7 @@ addBlockType("panner", {
     wet_and_dry_knobs: true,
     title: "Panner (simple)",
     directRefs: ["pan"],
+    waterfall: 2,
     configs: {
         "Pan": [0, "number", 1],
         "Binaural": [false, "checkbox"],
@@ -82,6 +83,7 @@ addBlockType("3dpanner", {
     wet_and_dry_knobs: true,
     amplitude_smoothing_knob: true,
     title: "3D Panner",
+    waterfall: 2,
     directRefs: ["3dpos", "3d"],
     configs: {
         "X": [0, "number", 1],

@@ -36,6 +36,7 @@ addBlockType("eq", {
         "Brilliance": [1, "number", 1],
         "ShelfFalloff": [2, "number", 1]
     },
+    waterfall: 2,
     functor: async function (inPcm, channel, data) {
         return await applyEQFilter(inPcm, audio.samplerate, [
             [20, 60, _(this.conf.SubBass)],   // sub

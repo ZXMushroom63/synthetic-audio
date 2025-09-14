@@ -17,6 +17,7 @@ addBlockType("automation_parameter", {
     color: "rgba(255, 0, 119, 0.42)",
     title: "Automation Parameter",
     directRefs: ["param"],
+    waterfall: 1,
     configs: {
         "Identifier": ["Param", "text"],
         "Value": ["#0~1", "number", 1],

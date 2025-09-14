@@ -2,6 +2,7 @@ addBlockType("smooth", {
     color: "rgba(0,255,0,0.3)",
     title: "Smooth",
     wet_and_dry_knobs: true,
+    waterfall: 2,
     configs: {
         "Iterations": [1, "number"],
         "Circular": [false, "checkbox"],

@@ -18,6 +18,7 @@ addBlockType("mixer_channel", {
         "Volume": [1, "number", 2],
         "Pan": [0, "number", 2],
     },
+    waterfall: 1,
     initMiddleware: (loop) => {
         initGenericDisplay(loop, "MIXER");
         mixerChannelHandler(loop);

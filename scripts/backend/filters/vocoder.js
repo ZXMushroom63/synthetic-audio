@@ -4,6 +4,7 @@ addBlockType("vocoder", {
     amplitude_smoothing_knob: true,
     title: "Vocoder",
     directRefs: ["voc", "voca"],
+    waterfall: 2,
     configs: {
         "UseCarrier": [true, "checkbox"],
         "Carrier": ["(none)", ["(none)"]],

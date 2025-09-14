@@ -107,6 +107,7 @@
             "Overdrive": [0.57, "number"],
             "AmplitudeSmoothing": [0.006, "number"]
         },
+        waterfall: 1,
         dropdowns: {
             "Oscillator": ["Waveform", "Tune"],
             "Filter": ["Cutoff", "Resonance", "EnvMod", "EnvDecay"],

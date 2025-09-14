@@ -2,6 +2,7 @@ addBlockType("fuzz", {
     color: "rgba(0,255,0,0.3)",
     title: "Fuzz",
     wet_and_dry_knobs: true,
+    waterfall: 1,
     configs: {
         "Gain": [1, "number", 1],
     },

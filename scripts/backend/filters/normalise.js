@@ -5,6 +5,7 @@ addBlockType("normalise", {
         "MovingPeak": [false, "checkbox"],
         "MovingPeakAmount": [24, "number", 1]
     },
+    waterfall: 2,
     functor: function (inPcm, channel, data) {
         const inverseSamplerate = (1 / audio.samplerate);
         const getMvgAvg = _(this.conf.MovingPeakAmount);

@@ -1,6 +1,7 @@
 addBlockType("repeat", {
     color: "rgba(0,255,0,0.3)",
     title: "Repeat",
+    waterfall: 2,
     amplitude_smoothing_knob: true,
     wet_and_dry_knobs: true,
     directRefs: ["r", "rep", "repeat"],

@@ -34,6 +34,7 @@ async function applyReverbOffline(pcmData, sampleRate, reverbTime = 2.0, decayRa
 addBlockType("reverb", {
     color: "rgba(0,255,0,0.3)",
     title: "Reverb",
+    waterfall: 2,
     directRefs: ["verb", "reverb"],
     configs: {
         "ReverbTime": [2, "number"],

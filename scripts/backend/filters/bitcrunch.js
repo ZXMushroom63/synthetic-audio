@@ -3,6 +3,7 @@ addBlockType("bitcrunch", {
     title: "Bitcrunch",
     wet_and_dry_knobs: true,
     directRefs: ["bcr", "bitcrunch"],
+    waterfall: 2,
     configs: {
         "Level": [1, "number", 1],
         "SmoothDownsample": [false, "checkbox"],

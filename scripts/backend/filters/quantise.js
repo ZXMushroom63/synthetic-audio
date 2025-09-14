@@ -1,6 +1,7 @@
 addBlockType("quantise", {
     color: "rgba(0,255,0,0.3)",
     title: "Quantise",
+    waterfall: 1,
     wet_and_dry_knobs: true,
     configs: {
         "Snapping": [0.25, "number", 1],

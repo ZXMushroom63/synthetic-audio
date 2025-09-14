@@ -7,6 +7,7 @@ addBlockType("comb", {
         "Delay": [0.01, "number", 1],
         "VolumeRatio": [1, "number", 1]
     },
+    waterfall: 2,
     functor: function (inPcm, channel, data) {
         var volRatio = _(this.conf.VolumeRatio);
         var delay = _(this.conf.Delay);

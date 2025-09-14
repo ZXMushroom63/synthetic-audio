@@ -47,6 +47,7 @@ addBlockType("bandpass", {
     color: "rgba(0,255,0,0.3)",
     title: "Bandpass Filter",
     directRefs: ["bp2"],
+    waterfall: 2,
     wet_and_dry_knobs: true,
     amplitude_smoothing_knob: true,
     configs: {

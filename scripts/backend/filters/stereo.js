@@ -29,6 +29,7 @@ function getAudioParamsForChannel(x, y, earDistance, angle, behindFactor, channe
 addBlockType("stereopositioner", {
     color: "rgba(0,255,0,0.3)",
     title: "Stereo XY Pos",
+    waterfall: 2,
     configs: {
         "X": [10, "number", 1],
         "Y": [0, "number", 1],

@@ -13,6 +13,7 @@ const gz_synth_voicecount = 4;
             "Decay": [0, "number", 1],
             "AmplitudeSmoothing": [0.006, "number"],
         },
+        waterfall: 1,
         forcePrimitive: true,
         dropdowns: {},
         functor: async function (inPcm, channel, data) {

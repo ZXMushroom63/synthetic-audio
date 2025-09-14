@@ -7,6 +7,7 @@ addBlockType("noise", {
         "SeedLeft": [1, "number", 1],
         "SeedRight": [1, "number", 1]
     },
+    waterfall: 1,
     functor: function (inPcm, channel, data) {
         if (channel === 0) {
             Math.newRandom(this.conf.SeedLeft);

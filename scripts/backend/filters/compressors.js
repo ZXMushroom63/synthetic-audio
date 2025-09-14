@@ -19,6 +19,7 @@ addBlockType("peakclip", {
 addBlockType("compressor", {
     color: "rgba(0,255,0,0.3)",
     title: "Compressor",
+    waterfall: 2,
     configs: {
         "Threshold": [0.5, "number", 1],
         "Ratio": [0.5, "number", 1],

@@ -18,6 +18,7 @@ addBlockType("audio", {
     },
     dropdowns: { "Sampler": ["SamplerEnabled", "ReferenceNote"] },
     amplitude_smoothing_knob: true,
+    waterfall: 1,
     functor: function (inPcm, channel, data) {
         var obj = decodedPcmCache[this.file];
         var currentData = obj ? obj.getChannelData(Math.min(channel, obj.numberOfChannels - 1)).slice() : null;

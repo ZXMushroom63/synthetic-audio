@@ -1,6 +1,7 @@
 addBlockType("warp", {
     color: "rgba(0,255,0,0.3)",
     title: "Warp",
+    waterfall: 2,
     wet_and_dry_knobs: true,
     configs: {
         "ChunkSize": [0, "number"],

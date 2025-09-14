@@ -9,6 +9,7 @@ addBlockType("mirror", {
         "MirrorFadeTime": [0.0, "number"],
         "MirrorFadeExp": [1.5, "number"]
     },
+    waterfall: 2,
     functor: function (inPcm, channel, data) {
         var outPcm = inPcm.slice();
         var mid = Math.round(inPcm.length / 2);

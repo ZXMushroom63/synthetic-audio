@@ -2,6 +2,7 @@ addBlockType("unison", {
     color: "rgba(0,255,0,0.3)",
     title: "Unison",
     wet_and_dry_knobs: true,
+    waterfall: 2,
     configs: {
         "uVoices": [4, "number"],
         "uAmplitudeRatio": [0.5, "number"],

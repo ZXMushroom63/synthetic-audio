@@ -3,6 +3,7 @@ addBlockType("p_readasset", {
     color: "rgba(255,0,255,0.3)",
     title: "Play Asset",
     directRefs: ["read"],
+    waterfall: 1,
     configs: {
         "Note": [":A4:", "number", 1],
         "Asset": ["(none)", ["(none)"]],
@@ -107,6 +108,7 @@ addBlockType("p_readasset", {
 addBlockType("p_writeasset", {
     color: "rgba(255,0,255,0.3)",
     title: "Save Asset",
+    waterfall: 1,
     directRefs: ["write"],
     configs: {
         "Asset": ["My Asset", "text"],

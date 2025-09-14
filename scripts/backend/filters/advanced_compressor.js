@@ -28,6 +28,7 @@ addBlockType("compressor_advanced", {
     color: "rgba(0,255,0,0.3)",
     title: "Complex Compressor",
     wet_and_dry_knobs: true,
+    waterfall: 2,
     configs: {
         "Threshold_dB": [-24, "number"],
         "Knee_dB": [30, "number"],

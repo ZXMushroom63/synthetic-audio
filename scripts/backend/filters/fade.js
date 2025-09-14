@@ -5,6 +5,7 @@ addBlockType("fadein", {
     configs: {
         "Exponent": [1, "number", 1],
     },
+    waterfall: 1,
     functor: function (inPcm, channel, data) {
         var exp = _(this.conf.Exponent);
         for (let i = 0; i < inPcm.length; i++) {
@@ -20,6 +21,7 @@ addBlockType("fadeout", {
     configs: {
         "Exponent": [1, "number", 1],
     },
+    waterfall: 1,
     functor: function (inPcm, channel, data) {
         var exp = _(this.conf.Exponent);
         for (let i = 0; i < inPcm.length; i++) {

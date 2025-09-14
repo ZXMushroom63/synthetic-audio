@@ -3,6 +3,7 @@ addBlockType("autotune", {
     amplitude_smoothing_knob: true,
     title: "Autotune (beta)",
     directRefs: ["tune", "at"],
+    waterfall: 2,
     configs: {
         "Note": [":A4:", "number", 1],
         "FFTSize": [2048, "number"],

@@ -12,6 +12,7 @@ addBlockType("vinyl", {
         "ForceUniformSpacing": [false, "checkbox"],
         "OverwriteMode": [false, "checkbox"]
     },
+    waterfall: 1,
     functor: function (inPcm, channel, data) {
         const distribSampleRate = Math.floor(24000 * this.conf.Pitch);
         var distribution = new Float32Array(Math.floor(inPcm.length / audio.samplerate * distribSampleRate));

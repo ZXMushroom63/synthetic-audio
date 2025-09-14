@@ -1,6 +1,7 @@
 addBlockType("splice", {
     color: "rgba(0,255,0,0.3)",
     title: "Splice",
+    waterfall: 2,
     configs: {
         "Size": [0.5, "number"],
         "GrainSize": [0.125, "number"],

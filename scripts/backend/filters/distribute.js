@@ -13,6 +13,7 @@ addBlockType("distribute", {
         "SidechainRMSFreq": [31, "number"],
         "Silent": [false, "checkbox"],
     },
+    waterfall: 1,
     selectMiddleware: (key) => {
         if (key === "Asset") {
             var assetNames = [...new Set(Array.prototype.flatMap.apply(

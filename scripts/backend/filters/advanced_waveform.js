@@ -129,6 +129,7 @@ addBlockType("p_waveform_plus", {
     getColorDynamic: (loop) => {
         return loop.conf.IsSlide ? "rgba(255, 143, 31, 0.4)" : "rgba(255,0,0,0.3)";
     },
+    waterfall: 1,
     pitchZscroller: true,
     midiMappings: {
         note: "Frequency",

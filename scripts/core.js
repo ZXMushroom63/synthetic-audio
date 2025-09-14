@@ -209,6 +209,7 @@ function addBlockType(id, data) {
             data.assetUserKeys.push("Asset");
         }
     }
+    data.waterfall ||= 2;
     data.async = data.functor.constructor.name === "AsyncFunction";
     if (data.amplitude_smoothing_knob) {
         addAmpSmoothKnob(data);

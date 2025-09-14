@@ -5,6 +5,7 @@ addBlockType("exciter", {
     configs: {
         "Mix": [0.5, "number", 1],
     },
+    waterfall: 1,
     functor: function (inPcm, channel, data) {
         var mix = _(this.conf.Mix);
         inPcm.forEach((x, i) => {

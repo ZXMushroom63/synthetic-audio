@@ -1,6 +1,7 @@
 addBlockType("randomwalk", {
     color: "rgba(0,255,0,0.3)",
     title: "Random Walk",
+    waterfall: 1,
     amplitude_smoothing_knob: true,
     configs: {
         "Volume": [0.5, "number", 1],

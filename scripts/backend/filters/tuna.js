@@ -32,6 +32,7 @@ fetch("public/impulse_responses/index.txt?plugin=true").then(async x => {
 addBlockType("tuna_chorus", {
     color: "rgba(0,255,0,0.3)",
     title: "Tuna/Chorus",
+    waterfall: 2,
     wet_and_dry_knobs: true,
     amplitude_smoothing_knob: true,
     configs: {
@@ -53,6 +54,7 @@ addBlockType("tuna_chorus", {
 addBlockType("tuna_convolver", {
     color: "rgba(0,255,0,0.3)",
     title: "Tuna/Convolver",
+    waterfall: 2,
     wet_and_dry_knobs: true,
     amplitude_smoothing_knob: true,
     configs: {
@@ -91,6 +93,7 @@ addBlockType("tuna_convolver", {
 addBlockType("tuna_cabinet", {
     color: "rgba(0,255,0,0.3)",
     title: "Tuna/Cabinet",
+    waterfall: 2,
     wet_and_dry_knobs: true,
     amplitude_smoothing_knob: true,
     configs: {
@@ -123,6 +126,7 @@ addBlockType("tuna_wahwah", {
     color: "rgba(0,255,0,0.3)",
     title: "Tuna/WahWah",
     wet_and_dry_knobs: true,
+    waterfall: 2,
     amplitude_smoothing_knob: true,
     configs: {
         "AutoMode": [true, "checkbox"],
@@ -149,6 +153,7 @@ addBlockType("tuna_wahwah", {
 addBlockType("tuna_phaser", {
     color: "rgba(0,255,0,0.3)",
     title: "Tuna/Phaser",
+    waterfall: 2,
     wet_and_dry_knobs: true,
     amplitude_smoothing_knob: true,
     configs: {
@@ -189,6 +194,7 @@ addBlockType("tuna_overdrive", {
     title: "Tuna/Overdrive",
     wet_and_dry_knobs: true,
     amplitude_smoothing_knob: true,
+    waterfall: 2,
     configs: {
         "OutputGain": [0.5, "number"],
         "Drive": [0.7, "number"],

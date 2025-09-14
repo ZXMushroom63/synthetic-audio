@@ -1,6 +1,7 @@
 addBlockType("p_sinewave", {
     color: "rgba(255,0,0,0.3)",
     title: "Soundwave",
+    waterfall: 1,
     configs: {
         "Amplitude": [1, "number"],
         "Frequency": [100, "number"],

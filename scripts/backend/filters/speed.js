@@ -1,6 +1,7 @@
 addBlockType("speed", {
     color: "rgba(0,255,0,0.3)",
     title: "Speed Change",
+    waterfall: 2,
     configs: {
         "Speed": [1, "number", 1],
         "FromEnd": [false, "checkbox"],

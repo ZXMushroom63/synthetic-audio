@@ -45,6 +45,7 @@ addBlockType("lowpass", {
     color: "rgba(0,255,0,0.3)",
     title: "Lowpass Filter",
     wet_and_dry_knobs: true,
+    waterfall: 2,
     amplitude_smoothing_knob: true,
     directRefs: ["lp", "lop"],
     configs: {

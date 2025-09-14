@@ -6,6 +6,7 @@ addBlockType("fluidknot", {
     //rgba(255, 0, 140, 0.5)
     title: "SoundFont2",
     directRefs: ["fk", "sf2"],
+    waterfall: 1,
     configs: {
         "Note": [":A4:", "number", 1],
         "Velocity": [1, "number", 1],

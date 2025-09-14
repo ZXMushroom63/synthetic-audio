@@ -9,6 +9,7 @@ addBlockType("delay", {
         "VolumeRatio": ["0.5", "text", 1],
         "PingPong": ["NONE", ["NONE", "LEFT-FIRST", "RIGHT-FIRST"]]
     },
+    waterfall: 2,
     functor: function (inPcm, channel, data) {
         var volRatios = this.conf.VolumeRatio.split(",").map(x=>_(x));
         var delayTimes = this.conf.DelayTimes.split(",").map(x => Math.floor((parseFloat(x.trim()) || 0) * audio.samplerate));
