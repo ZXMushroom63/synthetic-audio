@@ -962,7 +962,6 @@ addEventListener("keydown", (e) => {
 var concurrentChordProcessors = 0;
 
 function chordComponentEdited(loop) {
-    // Performance Issue when loading from files
     if (!settings.ChordDisplays) {
         return;
     }

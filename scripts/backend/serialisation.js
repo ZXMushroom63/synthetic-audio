@@ -121,6 +121,7 @@ function deserialise(ser) {
     if (!ser) {
         return hydrate();
     }
+    optimisedBB = document.querySelector("#trackInternal").getBoundingClientRect();
     offload("#trackInternal");
     layerCache = {};
     findLoops(".loop").forEach(x => { x.remove() });
@@ -181,6 +182,7 @@ function deserialise(ser) {
     customEvent("deserialise", { data: ser });
     hydrate();
     reflow("#trackInternal");
+    optimisedBB = null;
 }
 globalThis.lastEditedFile = "mysong.sm";
 const loadTabs = new ModMenuTabList();
