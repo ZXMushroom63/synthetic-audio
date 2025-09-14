@@ -88,6 +88,7 @@ function serialiseNode(node, forRender, forMultiplayer, allNodes) {
     out.editorLayer = Math.min(parseInt(node.getAttribute("data-editlayer")), 9);
     if (forRender) {
         out.dirty = node.hasAttribute("data-dirty");
+        out.dirtyLevel = out.dirty ? 2 : 0;
         out.deleted = node.hasAttribute("data-deleted");
         out.wasMovedSinceRender = node.hasAttribute("data-wasMovedSinceRender");
         out.definition = filters[out.type];

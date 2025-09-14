@@ -380,6 +380,7 @@ function constructRenderDataArray(data) {
         }
         if (!settings.NodeCaching) {
             node.dirty = true;
+            node.dirtyLevel = 2;
         }
     });
 
@@ -405,7 +406,7 @@ function constructRenderDataArray(data) {
     if (settings.NodeCaching) {
         renderDataArray.forEach(editorLayer => {
             //dirtying and caching shenanigans
-            var dirtyNodes = editorLayer.flat().filter(x => x.dirty)
+            const dirtyNodes = editorLayer.flat().filter(x => x.dirty)
             dirtyNodes.forEach(x => {
                 if (x.type === "p_writeasset") {
                     assetMap[x.conf.Asset] = true;
@@ -443,14 +444,15 @@ function constructRenderDataArray(data) {
                     }
                     for (let i = 0; i < dirtyNodes.length; i++) {
                         const dirtyNode = dirtyNodes[i];
+
                         if (
                             (!dirtyNodes.includes(x)) &&
-                            (((
-                                doNodesIntersect(x, dirtyNode)
-                            ) && (x.layer > dirtyNode.layer)) || (assetUserTypes.includes(x.type) && usesDirtyAssets(assetMap, x)) || usesDirtyParams(paramMap, x))
+                            ((doNodesIntersect(x, dirtyNode) && (x.layer > dirtyNode.layer) && (dirtyNode.dirtyLevel > 1)) || (assetUserTypes.includes(x.type) && usesDirtyAssets(assetMap, x)) || usesDirtyParams(paramMap, x))
                         ) {
+                            // Potentially directly changed node
                             x.dirty = true;
                             x.ref.setAttribute("data-dirty", "yes");
+                            x.dirtyLevel = x.definition.waterfall;
                             dirtyNodes.push(x);
                             if (x.type === "p_writeasset") {
                                 assetMap[x.conf.Asset] = true;
@@ -479,8 +481,9 @@ function constructRenderDataArray(data) {
                 layerCache[editorLayer.layerId] = [null, null];
             }
 
+            const hitNodes = [...dirtyNodes];
             var cleanNodes = editorLayer.flat().filter(x => !dirtyNodes.includes(x));
-            var hitNodes = [...dirtyNodes];
+
             let hitCount = 1;
             while (hitCount !== 0) {
                 hitCount = 0;
@@ -708,6 +711,7 @@ async function render() {
 
 function undirtyRenderTreeNode(node) {
     node.dirty = false;
+    node.dirtyLevel = 0;
     node.ref.removeAttribute("data-dirty");
     node.ref.removeAttribute("data-wasMovedSinceRender");
     node.ref.startOld = node.start;
