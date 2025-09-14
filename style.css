@@ -12,6 +12,7 @@ body {
   border-radius: 0.5rem;
   overflow-x: scroll;
   overflow-y: auto;
+  contain: strict;
 }
 
 #tabContent>div,
@@ -22,7 +23,7 @@ body {
   border-collapse: collapse;
 }
 
-#track #time {
+#time {
   height: 2rem;
   background-color: rgb(20, 20, 20);
   border-bottom: 2px solid white;
@@ -69,6 +70,12 @@ h4 {
   overflow-x: hidden;
   overflow-y: auto;
   white-space: normal;
+  contain: strict;
+}
+
+#tabContent {
+  contain: strict;
+  padding: 0;
 }
 
 table.main {
@@ -132,6 +139,7 @@ h4 {
   height: calc(600vh - 2rem - 4px);
   text-align: center;
   width: 0px;
+  contain: layout size;
 }
 
 .beatMarker::after {
@@ -154,6 +162,7 @@ h4 {
   padding: 0;
   height: 0;
   left: 0%;
+  contain: size style layout;
 }
 
 .loop.deactivated .loopInternal {
@@ -169,8 +178,6 @@ html[data-libsettings-OpaqueLayers] .loop.deactivated {
 html[data-libsettings-LDMLoopInteraction] .loop.active .loopInternal>* {
   display: none;
 }
-
-
 
 .toast {
   position: fixed;
@@ -222,12 +229,18 @@ html[data-libsettings-LDMLoopInteraction] .loop.active .loopInternal>* {
   border-radius: 0.5rem;
   transition: border 0.3s;
   background-blend-mode: color;
+  contain: size paint style;
 }
 
 
 
 .loopInternal.selected {
   outline: 2px solid rgba(0, 255, 255, 0.75);
+  contain: none;
+}
+
+.loopInternal.selected .handle {
+  display: none;
 }
 
 .loop.active .loopInternal {
@@ -242,7 +255,7 @@ html[data-libsettings-LDMLoopInteraction] .loop.active .loopInternal>* {
   border: 1px solid rgb(199, 199, 255);
 }
 
-.loopInternal .name {
+.name {
   display: block;
   transition: text-decoration 0.5s;
   text-decoration: underline;
@@ -256,11 +269,12 @@ html[data-libsettings-LDMLoopInteraction] .loop.active .loopInternal>* {
   font-size: 0.5rem;
 }
 
-.loopInternal .handle {
+.handle {
   position: absolute;
   display: block;
   top: 0;
-  height: 3rem;
+  height: calc(3rem + 6px);
+  transform: translateY(-0.5px);
   width: 0.5rem;
   color: transparent;
   transition: border 0.3s;
@@ -268,18 +282,20 @@ html[data-libsettings-LDMLoopInteraction] .loop.active .loopInternal>* {
   border: 1px solid rgba(255, 255, 255, 0.5);
 }
 
-.loopInternal span.handleLeft {
+.handleLeft {
   left: 0;
   z-index: 2;
+  transform: translateY(-0.5px) translateX(-1px);
   border-radius: 0.5rem 0px 0px 0.5rem;
 }
 
-.loopInternal span.handleRight {
+.handleRight {
   z-index: 3;
+  right: -1.5px;
   border-radius: 0rem 0.5rem 0.5rem 0rem;
 }
 
-.loopInternal .handle:hover {
+.handle:hover {
   border: 1px solid white;
 }
 
@@ -297,6 +313,7 @@ html[data-libsettings-LDMLoopInteraction] .loop.active .loopInternal>* {
   z-index: 444444;
   background-color: rgba(0, 0, 0, 0.8);
   border-radius: 0.5rem;
+  contain: paint style;
 }
 
 .loopInternal.selected .loopOptionsMenu {
@@ -424,7 +441,7 @@ audio {
 
 .timePosMarker {
   position: relative;
-  display: inline-block;
+  display: block;
   margin: 0;
   user-select: none;
   padding: 0;
@@ -433,15 +450,17 @@ audio {
   text-align: center;
   width: 0px;
   z-index: 4;
+  contain: style size layout;
+  transform: translateY(-9px);
 }
 
 .timePosMarker::after {
-  display: inline-block;
+  display: block;
   margin: 0;
   padding: 0;
   content: "|";
   user-select: none;
-  pointer-events: none;
+  pointer-events: none;  
   color: transparent;
   height: calc(600vh - 2rem - 4px);
   width: 3px;
@@ -452,7 +471,7 @@ audio {
 
 .timePosMarker::before {
   pointer-events: all;
-  display: inline-block;
+  display: block;
   -webkit-user-drag: none;
   position: absolute;
   user-select: none;
@@ -569,6 +588,12 @@ button,
 #trackInternal {
   user-select: none;
   transform-origin: left;
+  contain: size;
+  height: calc(600vh - 2rem - 4px);
+  image-rendering: pixelated;
+  background-attachment: local;
+  background-size: cover;
+  background-position-x: 0.1875vw;
 }
 
 button:disabled {

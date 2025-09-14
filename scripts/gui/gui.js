@@ -114,27 +114,24 @@ function markLoopDirty(loop, wasMoved) {
     }
     customEvent("loopchangedcli", { loop: loop });
 }
-function hydrateBeatMarkers() {
+function hydrateBeatMarkers(lean) {
     updateLOD();
     var track = document.querySelector("#trackInternal");
-    document.querySelectorAll(".beatMarker").forEach(x => { x.remove() });
     audio.bpm = parseInt(document.querySelector("#bpm").value);
     audio.beatSize = 1 / audio.bpm * 60;
-    loopi = parseFloat(document.querySelector("#loopi").value);
 
-    var trueBPM = audio.bpm;
-    trueBPM = trueBPM / gui.LOD;
-    var beatCount = Math.round(audio.duration / 60 * trueBPM);
-    for (let i = 0; i < beatCount; i++) {
-        const marker = document.createElement("span");
-        marker.classList.add("beatMarker");
-        marker.style.left = `calc(${((i * (60 / trueBPM)) / audio.duration * 100)}% - 4px)`;
-        track.appendChild(marker);
-    }
+    const amount = gui.intervals * gui.LOD * audio.beatSize;
+    const cmWidth = ((amount) / audio.duration * 100);
+    track.style.backgroundImage = `repeating-linear-gradient(90deg,
+        transparent 0%,
+        transparent calc(${cmWidth}% - 0.25vw),
+        rgba(255,255,255,0.3) calc(${cmWidth}% - 0.25vw),
+        rgba(255,255,255,0.3) ${cmWidth}%
+        )`;
 
     var timeRibbon = document.querySelector("#time");
     timeRibbon.innerHTML = "";
-    for (let time = 0; time <= (audio.beatSize * (Math.round(audio.duration / audio.beatSize))); time += (gui.intervals * gui.LOD * audio.beatSize)) {
+    for (let time = 0; time <= (audio.beatSize * (Math.round(audio.duration / audio.beatSize))); time += amount) {
         const marker = document.createElement("span");
         marker.classList.add("timeMarker");
         marker.innerText = Math.round(time / audio.beatSize) + "";
@@ -213,7 +210,7 @@ function hydrateLoopPosition(elem, lean) {
 
     var duration = parseFloat(elem.getAttribute("data-duration"));
     var start = parseFloat(elem.getAttribute("data-start"));
-    elem.style.left = (start / audio.duration * 100) + "%";
+    elem.style.left = `${(start / audio.duration * 100)}%`;
     elem.style.top = (parseFloat(elem.getAttribute("data-layer")) * 3) + "rem";
     var nInternalWidth = (duration * gui.zoomConstant);
     elem._nInternalWidth = nInternalWidth;
@@ -235,8 +232,6 @@ function hydrateLoopPosition(elem, lean) {
     if (elem.querySelector(".chordDisplay")) {
         elem.querySelector(".chordDisplay").style.width = "calc(" + internalWidth + " + 6px)";
     }
-
-    loopInternal.querySelector(".handleRight").style.right = "calc(-" + internalWidth + " - 1.5px)";
 }
 function hydrateZoom(lean) {
     offload("#trackInternal");
@@ -297,6 +292,8 @@ function hydrateEditorLayer() {
     });
 }
 function hydrate() {
+    loopi = parseFloat(document.querySelector("#loopi").value);
+
     offload("#trackInternal");
     updateLOD();
 
@@ -378,7 +375,6 @@ function addBlock(type, start, duration, title, layer = 0, data = {}, editorValu
                 var internalWidth = newDuration * gui.zoomConstant;
                 internal.style.width = internalWidth + "vw";
                 backgroundSvg.style.width = internalWidth + "vw";
-                handleRight.style.right = `calc(-${internalWidth}vw - 1.5px)`;
                 loop.setAttribute("data-duration", timeQuantise(newDuration));
                 multiplayer.patchLoop(loop);
             }
@@ -408,7 +404,6 @@ function addBlock(type, start, duration, title, layer = 0, data = {}, editorValu
                 var internalWidth = newDuration * gui.zoomConstant;
                 internal.style.width = internalWidth + "vw";
                 backgroundSvg.style.width = internalWidth + "vw";
-                handleRight.style.right = `calc(-${internalWidth}vw - 1.5px)`;
                 loop.setAttribute("data-duration", timeQuantise(newDuration));
                 multiplayer.patchLoop(loop);
             }
@@ -835,7 +830,7 @@ function init() {
     function actuateZoom() {
         prezoomLeftVal = null;
         zoomActuatorDebouncer = null;
-        document.querySelector("#trackInternal").style.willChange = "";
+        document.querySelector("#track").style.willChange = "";
         hydrateZoom(true);
         hydrateDecorations();
     }

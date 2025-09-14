@@ -473,8 +473,10 @@ addEventListener("init", () => {
     addModifierBtn.classList.add("smallBtn");
     addModifierBtn.innerText = "Modifiers";
     addModifierBtn.style.position = "absolute";
-    addModifierBtn.style.top = "-1.5rem";
-    addModifierBtn.style.left = "0";
+    addModifierBtn.style.top = "0";
+    addModifierBtn.style.left = "-3.4rem";
+    addModifierBtn.style.width = "3rem";
+    addModifierBtn.style.textAlign = "center";
     const addModifierDiv = document.createElement("div");
     addModifierDiv.classList.add("addModifierDiv");
     addModifierBtn.style.zIndex = 700;
