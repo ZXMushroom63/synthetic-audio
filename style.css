@@ -236,11 +236,11 @@ html[data-libsettings-LDMLoopInteraction] .loop.active .loopInternal>* {
 
 .loop.selected .loopInternal {
   outline: 2px solid rgba(0, 255, 255, 0.75);
-  contain: none;
+  contain: style;
 }
 
 .loop.selected {
-  contain: none;
+  contain: style;
 }
 
 .loop.selected .handle {
