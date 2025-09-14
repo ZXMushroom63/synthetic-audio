@@ -489,14 +489,14 @@ function addBlock(type, start, duration, title, layer = 0, data = {}, editorValu
         e.preventDefault();
         e.stopImmediatePropagation();
         e.stopPropagation();
-        document.querySelectorAll(".loopInternal.selected").forEach(a => { a.classList.remove("selected") });
+        document.querySelectorAll(".loop.selected").forEach(a => { a.classList.remove("selected") });
 
         optionsMenu.loadValues();
 
-        internal.classList.add("selected");
+        loop.classList.add("selected");
 
         document.onmousedown = (e) => {
-            document.querySelectorAll(".loopInternal.selected").forEach(a => { a.classList.remove("selected") });
+            document.querySelectorAll(".loop.selected").forEach(a => { a.classList.remove("selected") });
         }
     });
     internal.addEventListener("contextmenu", (e) => { e.preventDefault() });
@@ -809,7 +809,7 @@ function init() {
     addEventListener("keydown", (e) => {
         if (e.key === "Escape") {
             resetDrophandlers(true);
-            document.querySelectorAll(".loopInternal.selected").forEach(a => { a.classList.remove("selected") });
+            document.querySelectorAll(".loop.selected").forEach(a => { a.classList.remove("selected") });
         }
     });
     addEventListener("keyup", (e) => {

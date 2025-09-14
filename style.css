@@ -234,12 +234,16 @@ html[data-libsettings-LDMLoopInteraction] .loop.active .loopInternal>* {
 
 
 
-.loopInternal.selected {
+.loop.selected .loopInternal {
   outline: 2px solid rgba(0, 255, 255, 0.75);
   contain: none;
 }
 
-.loopInternal.selected .handle {
+.loop.selected {
+  contain: none;
+}
+
+.loop.selected .handle {
   display: none;
 }
 
@@ -316,7 +320,7 @@ html[data-libsettings-LDMLoopInteraction] .loop.active .loopInternal>* {
   contain: paint style;
 }
 
-.loopInternal.selected .loopOptionsMenu {
+.loop.selected .loopOptionsMenu {
   display: block;
 }
 
@@ -803,6 +807,7 @@ select optgroup {
   top: 0;
   left: 0;
   height: 3rem;
+  contain: strict;
 }
 
 .loop.deactivated .backgroundSvg {
