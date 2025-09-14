@@ -68,14 +68,18 @@ function activateTool(namespacedId) {
     document.querySelector(`.tool[data-tool="${namespacedId}"]`).click();
 }
 addEventListener("keydown", (e) => {
-    const activeLoops = [...findLoops(".loop.active")];
+    if (e.repeat) {
+        return;
+    }
     if ((e.target.tagName !== "INPUT") && (e.target.contentEditable !== "true") && (CURRENT_TAB === "TIMELINE")) {
         for (const key in TOOL_KEYBIND_DATABASE) {
             const tool = TOOL_DATABASE[key];
             const checkKb = TOOL_KEYBIND_DATABASE[key];
             if (checkKb(e)) {
                 e.preventDefault();
+                const activeLoops = [...findLoops(".loop.active")];
                 tool(activeLoops.length > 0 ? activeLoops : null, e);
+                break;
             }
         }
     }
