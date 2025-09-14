@@ -258,7 +258,7 @@ const chordMacros = {
         applies: ["V"],
         returns: ["II+min"]
     },
-    
+
     ResolveIrregular: {
         applies: ["V+7", "V+dim7"],
         returns: ["II", "III", "IV", "VI", "VII"]
@@ -636,16 +636,23 @@ function chordProcess(loop, chordArray) {
         loop.relatedChord = chordArray;
     }
 
-    if (!loop.querySelector(".chordDisplay")) {
+    const chordDisp = loop.querySelector(".chordDisplay");
+
+    if (!chordDisp) {
         return;
     }
 
+    const oldVal = chordDisp.value;
+
     if (loop.relatedChord[loop.relatedChord.length - 1] === loop) {
-        loop.querySelector(".chordDisplay").style.display = "";
-        loop.querySelector(".chordDisplay").value = getChordTypeFromStack(loop.relatedChord)?.display || "";
+        chordDisp.style.display = "";
+        chordDisp.value = getChordTypeFromStack(loop.relatedChord)?.display || "";
+        return oldVal !== chordDisp.value;
     } else {
         loop.lastChordType = "";
-        loop.querySelector(".chordDisplay").style.display = "none";
+        chordDisp.value = "";
+        chordDisp.style.display = "none";
+        return oldVal !== "";
     }
 }
 registerSetting("ChordMacros", true);
@@ -952,6 +959,7 @@ addEventListener("keydown", (e) => {
     }
 });
 
+var concurrentChordProcessors = 0;
 
 function chordComponentEdited(loop) {
     // Performance Issue when loading from files
@@ -961,19 +969,49 @@ function chordComponentEdited(loop) {
     if (loop.chordHandler || !loop.querySelector(".chordDisplay")) {
         return;
     };
-    if (!loop.relatedChord) {
-        chordProcess(loop);
+
+
+    if (loop.relatedChord) {
+        loop.relatedChord.forEach(l => {
+            l.chordHandler = true;
+        });
     }
 
-    loop.relatedChord.forEach(l => {
-        l.chordHandler = true;
-    });
-
+    concurrentChordProcessors++;
     loop.chordHandler = new Promise(async (res, rej) => {
         await wait(1 / 30);
+
+        var nothingChanged = false;
+
+        if (loop.relatedChord) {
+            const reversed = loop.relatedChord.toReversed();
+            for (const l of reversed) {
+                if (l === loop) {
+                    continue;
+                }
+                const change = chordProcess(l);
+                if (!change) {
+                    nothingChanged = true;
+                    break;
+                }
+            }
+        }
+
+        const change = chordProcess(loop);
+        if (change) {
+            nothingChanged = false;
+        }
+
+        if (nothingChanged) {
+            loop.chordHandler = null;
+            concurrentChordProcessors--;
+            return res();
+        }
+
         loop.relatedChord.forEach(l => {
             l.chordHandler = null;
         });
+
         loop.relatedChord.forEach(l => {
             if (l === loop) {
                 return;
@@ -981,18 +1019,9 @@ function chordComponentEdited(loop) {
             chordProcess(l);
         });
 
-        chordProcess(loop);
-
-        loop.relatedChord.forEach(l => {
-            if (l === loop) {
-                return;
-            }
-            chordProcess(l, loop.relatedChord);
-        });
-
         loop.chordHandler = null;
-
-        res();
+        concurrentChordProcessors--;
+        return res();
     });
 }
 
