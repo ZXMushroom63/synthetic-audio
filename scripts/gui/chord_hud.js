@@ -996,20 +996,27 @@ function chordComponentEdited(loop) {
             }
         }
 
+        if (loop.relatedChord) {
+            loop.relatedChord.forEach(l => {
+                l.chordHandler = null;
+            });
+        }
+
         const change = chordProcess(loop);
         if (change) {
             nothingChanged = false;
         }
+
+        loop.relatedChord.forEach(l => {
+            l.chordHandler = null;
+        });
+
 
         if (nothingChanged) {
             loop.chordHandler = null;
             concurrentChordProcessors--;
             return res();
         }
-
-        loop.relatedChord.forEach(l => {
-            l.chordHandler = null;
-        });
 
         loop.relatedChord.forEach(l => {
             if (l === loop) {
