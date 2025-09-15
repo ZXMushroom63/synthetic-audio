@@ -4,8 +4,8 @@ const waveforms = {
     sin: (t) => {
         return Math.sin(t * TAU);
     },
-    square: (t) => {
-        return ((t % 1) < 0.5) ? 1 : -1;
+    square: (t, g=0.5) => {
+        return ((t % 1) < g) ? 1 : -1;
     },
     sawtooth: (t) => {
         return 2 * (((t + 0.5) % 1) - 0.5);
