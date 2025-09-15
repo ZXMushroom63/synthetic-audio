@@ -1,8 +1,3 @@
-body {
-  font-family: sans-serif;
-  color: white;
-}
-
 :root {
   touch-action: manipulation;
 }
@@ -21,6 +16,7 @@ body {
   width: 100vw;
   height: calc(100vh - 15rem);
   border-collapse: collapse;
+  contain: strict;
 }
 
 #time {
@@ -31,6 +27,7 @@ body {
   width: 100%;
   overflow-x: hidden;
   overflow-y: hidden;
+  contain: strict;
 }
 
 html,
@@ -40,6 +37,11 @@ body {
   background-color: rgb(0, 0, 0);
   overflow-x: hidden;
   overflow-y: hidden;
+  font-family: sans-serif;
+  color: white;
+  width: 100vw;
+  height: 100vh;
+  contain: strict;
 }
 
 h4 {
@@ -59,6 +61,7 @@ h4 {
   text-align: right;
   cursor: pointer;
   user-select: none;
+  contain: strict;
 }
 
 #tray {
@@ -275,6 +278,7 @@ html[data-libsettings-LDMLoopInteraction] .loop.active .loopInternal>* {
 
 .handle {
   position: absolute;
+  contain: strict;
   display: block;
   top: 0;
   height: calc(3rem + 6px);
@@ -317,7 +321,7 @@ html[data-libsettings-LDMLoopInteraction] .loop.active .loopInternal>* {
   z-index: 444444;
   background-color: rgba(0, 0, 0, 0.8);
   border-radius: 0.5rem;
-  contain: paint style;
+  contain: paint style inline-size layout;
 }
 
 .loop.selected .loopOptionsMenu {
