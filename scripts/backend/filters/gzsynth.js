@@ -17,6 +17,7 @@ const gz_synth_voicecount = 4;
         forcePrimitive: true,
         dropdowns: {},
         functor: async function (inPcm, channel, data) {
+            const stereoMult = (channel === 0) ? -1 : 1;
             const adsrMap = Object.fromEntries(adsr_dynamic_keys.map(x => [x, _(this.conf[x])]))
             const pconfs = Object.fromEntries(Object.entries(gzsynth.configs).map(ent => {
                 if (ent[1][2] === 1) {
@@ -74,16 +75,22 @@ const gz_synth_voicecount = 4;
                     }
                     const semiLFO = pconfs[`Voice${vDisplay}SemiOffset`];
                     const panLFO = pconfs[`Voice${vDisplay}Pan`];
+                    const widthLFO = pconfs[`Voice${vDisplay}StereoWidth`];
                     const phaseLFO = pconfs[`Voice${vDisplay}Phase`];
+                    const modLFO = pconfs[`Voice${vDisplay}Mod`];
+                    const modVal = modLFO(i, inPcm);
+                    const wavetype = this.conf[`Voice${vDisplay}WaveType`];
+                    const modVal2 = wavetype === "square" ? 1 : modVal + 0.5;
                     const panVal = panLFO(i, inPcm);
+                    const stereoPhaseMod = widthLFO(i, inPcm) * stereoMult * 0.25;
                     const phaseVal = phaseLFO(i, inPcm);
                     const panVolMult = (channel === 0) ? (1 - Math.max(0, panVal)) : (1 + Math.min(0, panVal));
                     time[v] += dt * freq * Math.pow(2, semiLFO(i, inPcm) / 12);
                     time[v] = time[v] - (time[v] | 0);
                     if (this.conf[`Voice${vDisplay}UseCustomWaveform`]) {
-                        out[i] += -1 * custom_waveforms[this.conf[`Voice${vDisplay}WaveformAsset`]].calculated[Math.floor((time[v] + phaseVal) * WAVEFORM_RES) % WAVEFORM_RES] * drive * adsr * decay * panVolMult;
+                        out[i] += -1 * custom_waveforms[this.conf[`Voice${vDisplay}WaveformAsset`]].calculated[Math.floor((time[v] + phaseVal + stereoPhaseMod) * WAVEFORM_RES) % WAVEFORM_RES] * drive * adsr * decay * panVolMult;
                     } else {
-                        out[i] += waveforms[this.conf[`Voice${vDisplay}WaveType`]](time[v] + phaseVal) * drive * adsr * decay * panVolMult;
+                        out[i] += (waveforms[wavetype](time[v] + phaseVal + stereoPhaseMod, modVal) ** modVal2) * drive * adsr * decay * panVolMult;
                     }
                 }
             });
@@ -214,11 +221,13 @@ const gz_synth_voicecount = 4;
         gzsynth.configs[`Voice${i + 1}Drive`] = [i === 0 ? 1 : 0, "number", 1];
         gzsynth.configs[`Voice${i + 1}WaveType`] = ["sin", ["sin", "triangle", "sawtooth", "square", "random0"]];
         gzsynth.configs[`Voice${i + 1}SemiOffset`] = [0, "number", 1];
+        gzsynth.configs[`Voice${i + 1}Mod`] = [0.5, "number", 1];
+        gzsynth.configs[`Voice${i + 1}StereoWidth`] = [0.0, "number", 1];
         gzsynth.configs[`Voice${i + 1}Phase`] = [0, "number", 1];
         gzsynth.configs[`Voice${i + 1}Pan`] = [0, "number", 1];
         gzsynth.configs[`Voice${i + 1}UseCustomWaveform`] = [false, "checkbox"];
         gzsynth.configs[`Voice${i + 1}WaveformAsset`] = ["(none)", ["(none)"]];
-        gzsynth.dropdowns[`Voice${i + 1}`] = ["Drive", "WaveType", "SemiOffset", "Phase", "Pan", "UseCustomWaveform", "WaveformAsset"].map(x => `Voice${i + 1}` + x);
+        gzsynth.dropdowns[`Voice${i + 1}`] = ["Drive", "WaveType", "SemiOffset", "StereoWidth", "Phase", "Pan", "Mod", "UseCustomWaveform", "WaveformAsset"].map(x => `Voice${i + 1}` + x);
     }
     gzsynth.configs.Filter = [false, "checkbox"];
     gzsynth.configs.FilterType = ["lowpass", ["lowpass", "highpass", "lowshelf", "bandpass", "highshelf", "peaking", "notch", "allpass"]];

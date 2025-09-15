@@ -93,7 +93,7 @@ function applySoundbiteToPcmSidechain(reverse, looping, currentData, inPcm, dura
     } else {
         for (let i = 0; i < inPcm.length; i++) {
             var sideChain = sideChainRaw;
-            var sidechainCoefficient = Math.pow(1 - Math.max(Math.min(1, LOOKUPTABLE_PERSAMPLE[Math.floor(idx)]), 0), Math.abs(sideChain)) || 0;
+            var sidechainCoefficient = Math.pow(1 - Math.max(Math.min(1, LOOKUPTABLE_PERSAMPLE[Math.floor(idx)] || 0), 0), Math.abs(sideChain)) || 0;
             if (i < AmpSmoothingStart) {
                 sidechainCoefficient = lerp(1, sidechainCoefficient, i / AmpSmoothingStart);
             }

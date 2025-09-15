@@ -418,6 +418,7 @@ function constructRenderDataArray(data) {
                         end: x.ref.endOld,
                         duration: x.ref.durationOld,
                         layer: x.ref.layerOld,
+                        dirtyLevel: 2
                     });
                 }
             });
@@ -429,22 +430,22 @@ function constructRenderDataArray(data) {
 
             for (let layer = 0; layer < editorLayer.length; layer++) {
                 const nodes = editorLayer[layer];
+                for (let i = 0; i < dirtyNodes.length; i++) {
+                    const dirtyNode = dirtyNodes[i];
 
-                nodes.forEach(x => {
-                    if (x.dirty) {
-                        if (x.type === "p_writeasset") {
-                            //console.log("Dirty asset found: ", x.conf.Asset);
-                            assetMap[x.conf.Asset] = true;
+                    nodes.forEach(x => {
+                        if (x.dirty) {
+                            if (x.type === "p_writeasset") {
+                                //console.log("Dirty asset found: ", x.conf.Asset);
+                                assetMap[x.conf.Asset] = true;
+                            }
+                            if (x.type === "automation_parameter") {
+                                //console.log("Dirty asset found: ", x.conf.Asset);
+                                paramMap[x.conf.Identifier] = true;
+                            }
+                            // investigate cache issue with save_asset and Transparent
+                            return;
                         }
-                        if (x.type === "automation_parameter") {
-                            //console.log("Dirty asset found: ", x.conf.Asset);
-                            paramMap[x.conf.Identifier] = true;
-                        }
-                        return;
-                    }
-                    for (let i = 0; i < dirtyNodes.length; i++) {
-                        const dirtyNode = dirtyNodes[i];
-
                         if (
                             (!dirtyNodes.includes(x)) &&
                             ((doNodesIntersect(x, dirtyNode) && (x.layer > dirtyNode.layer) && (dirtyNode.dirtyLevel > 1)) || (assetUserTypes.includes(x.type) && usesDirtyAssets(assetMap, x)) || usesDirtyParams(paramMap, x))
@@ -452,7 +453,7 @@ function constructRenderDataArray(data) {
                             // Potentially directly changed node
                             x.dirty = true;
                             x.ref.setAttribute("data-dirty", "yes");
-                            x.dirtyLevel = x.definition.waterfall;
+                            x.dirtyLevel = x.definition.waterfall; //does this change only the overlapped part (1) or the whole block (2)
                             dirtyNodes.push(x);
                             if (x.type === "p_writeasset") {
                                 assetMap[x.conf.Asset] = true;
@@ -463,10 +464,10 @@ function constructRenderDataArray(data) {
                             if (assetUserTypes.includes(x.type)) {
                                 console.log("Asset user marked as dirty: ", x);
                             }
-                            break;
+                            return;
                         }
-                    }
-                });
+                    });
+                }
             }
 
             const rebuildCacheMap = !settings.NodeCaching || !layerCache[editorLayer.layerId] || !layerCache[editorLayer.layerId].slice(0, 1 + audio.stereo).reduce((acc, v) => !!v && !!acc) || !layerCache[editorLayer.layerId].slice(0, 1 + audio.stereo).reduce((acc, v) => (!!v) && acc && (v.length === audio.length), true);

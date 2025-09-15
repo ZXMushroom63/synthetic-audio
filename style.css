@@ -773,6 +773,7 @@ select optgroup {
   width: 150px;
   height: 75px;
   background: black;
+  contain: strict;
 }
 
 #waveformsDropdown {
