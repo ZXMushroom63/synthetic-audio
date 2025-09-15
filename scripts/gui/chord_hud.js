@@ -990,8 +990,7 @@ function chordComponentEdited(loop) {
                 }
                 const change = chordProcess(l);
                 if (!change) {
-                    nothingChanged = true;
-                    break;
+                    nothingChanged ||= true;
                 }
             }
         }
