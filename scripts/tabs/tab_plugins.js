@@ -76,6 +76,9 @@ addEventListener("init", async () => {
         if (zip.file("Cover.png")) {
             const blob = new Blob([await zip.file("Cover.png").async("uint8array")], { type: "image/png" });
             SAMPLEPACK_LOGOMAP[name] = URL.createObjectURL(blob);
+        } else if (zip.file("Cover.jpg")) {
+            const blob = new Blob([await zip.file("Cover.jpg").async("uint8array")], { type: "image/jpeg" });
+            SAMPLEPACK_LOGOMAP[name] = URL.createObjectURL(blob);
         } else {
             SAMPLEPACK_LOGOMAP[name] = "public/covers/cover" + (Math.hash(name, 19) + 1) + ".png";
         }
