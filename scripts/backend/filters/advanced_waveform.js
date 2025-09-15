@@ -56,6 +56,7 @@ addBlockType("p_waveform_plus", {
         "Sidechain": [false, "checkbox"],
         "SidechainPower": [2, "number"],
     },
+    usesWt: (loop)=>loop.conf.WavetableMode,
     dropdowns: {
         "Waveform": [
             "Sine",

@@ -718,7 +718,11 @@ addEventListener("init", async () => {
         if (item.type === "wavetablepack") {
             await loadWavetablePack(item.data, item.name);
             logToLoader(`Loaded wavetable pack: ${item.name}`);
-            findLoops(".loop[data-wt-user]").forEach(forceLoopDirty);
+            findLoops(".loop[data-wt-user]").forEach((loop) => {
+                if (loop.usesWt()) {
+                    forceLoopDirty(loop)
+                }
+            });
         }
         if (item.type === "sample") {
             if (!item.data) {
@@ -746,7 +750,11 @@ addEventListener("init", async () => {
 
             WAVETABLES[key] = buffer;
             logToLoader(`Loaded wavetable: ${item.name}`);
-            findLoops(".loop[data-wt-user]").forEach(forceLoopDirty);
+            findLoops(".loop[data-wt-user]").forEach((loop) => {
+                if (loop.usesWt()) {
+                    forceLoopDirty(loop)
+                }
+            });
         }
     }
     if (performance.measureUserAgentSpecificMemory) {

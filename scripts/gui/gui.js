@@ -426,6 +426,7 @@ function addBlock(type, start, duration, title, layer = 0, data = {}, editorValu
     loop.setAttribute("data-type", type);
     if (definition.wavtableUser) {
         loop.setAttribute("data-wt-user", "yes");
+        loop.usesWt = definition.usesWt ? ()=>definition.usesWt(loop) : ()=>true;
     }
 
     if (data.uuid) {
