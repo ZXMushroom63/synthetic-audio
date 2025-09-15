@@ -453,7 +453,6 @@ function constructRenderDataArray(data) {
                             // Potentially directly changed node
                             x.dirty = true;
                             x.ref.setAttribute("data-dirty", "yes");
-                            x.ref.setAttribute("data-getout", globalThis.testvar || "_");
                             x.dirtyLevel = x.definition.waterfall; //does this change only the overlapped part (1) or the whole block (2)
                             dirtyNodes.push(x);
                             if (x.type === "p_writeasset") {
