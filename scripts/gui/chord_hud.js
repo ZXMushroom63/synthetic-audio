@@ -629,6 +629,7 @@ function getChordStack(loop, allowAtonal) {
 
 function chordProcess(loop, chordArray) {
     [...loop.querySelectorAll("ins.chordMacro")].forEach(e => e.remove());
+    loop.classList.remove("chordengine");
     if (!chordArray) {
         var loops = getChordStack(loop);
         loop.relatedChord = loops;
@@ -679,9 +680,11 @@ function drawChordMacros(loop, inversionsOnly) {
         }
         [...loop.querySelectorAll("ins.chordMacro")].forEach(e => e.remove());
         removeEventListener("mousedown", unfocusHandler)
+        loop.classList.remove("chordengine");
     }
     addEventListener("mousedown", unfocusHandler);
     [...document.querySelectorAll("ins.chordMacro")].forEach(e => e.remove());
+    loop.classList.add("chordengine");
     const chordData = getChordTypeFromStack(loop.relatedChord);
     if (!chordData) {
         return;

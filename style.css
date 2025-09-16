@@ -235,17 +235,24 @@ html[data-libsettings-LDMLoopInteraction] .loop.active .loopInternal>* {
 
 
 
-.loop.selected .loopInternal {
+.loop.selected .loopInternal, .loop.chordengine .loopInternal {
   outline: 2px solid rgba(0, 255, 255, 0.75);
   contain: style;
+  overflow: visible;
 }
 
-.loop.selected {
+.loop.selected, .loop.chordengine {
   contain: style;
 }
 
-.loop.selected .handle {
-  display: none;
+.loop.chordengine .handle {
+  contain: style;
+}
+
+.loop.selected .handleRight, .loop.chordengine .handleRight {
+  position: relative;
+  float: right;
+  transform: translateY(-8px);
 }
 
 .loop.active .loopInternal {
@@ -279,7 +286,7 @@ html[data-libsettings-LDMLoopInteraction] .loop.active .loopInternal>* {
   contain: strict;
   display: block;
   top: 0;
-  height: calc(3rem + 6px);
+  height: calc(3rem + 0px);
   transform: translateY(-0.5px);
   width: 0.5rem;
   color: transparent;
