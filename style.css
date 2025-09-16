@@ -231,8 +231,11 @@ html[data-libsettings-LDMLoopInteraction] .loop.active .loopInternal>* {
   transition: border 0.3s;
   background-blend-mode: color;
   contain: size paint style;
+  cursor: grab;
 }
-
+.loopInternal:active {
+  cursor: grabbing;
+}
 
 
 .loop.selected .loopInternal, .loop.chordengine .loopInternal {
@@ -261,10 +264,6 @@ html[data-libsettings-LDMLoopInteraction] .loop.active .loopInternal>* {
 
 .loop[data-bad-note] .loopInternal {
   outline: 1.5px solid rgba(255, 153, 0, 0.75);
-}
-
-.loopInternal:hover {
-  border: 1px solid rgb(199, 199, 255);
 }
 
 .name {
@@ -327,6 +326,7 @@ html[data-libsettings-LDMLoopInteraction] .loop.active .loopInternal>* {
   background-color: rgba(0, 0, 0, 0.8);
   border-radius: 0.5rem;
   contain: paint style inline-size layout;
+  cursor: default;
 }
 
 .loop.selected .loopOptionsMenu {
@@ -671,10 +671,7 @@ button:hover {
   overflow-y: visible;
 }
 
-::-webkit-scrollbar {
-  display: none;
-  visibility: hidden;
-}
+
 
 #miscTools {
   white-space: normal;
@@ -682,6 +679,7 @@ button:hover {
 
 * {
   white-space: nowrap;
+  scrollbar-width: none;
 }
 
 a, button, input, [onclick], [role="button"] {
@@ -1152,12 +1150,6 @@ code:hover {
 #samplepacks_container {
   white-space: normal;
 }
-
-div:has(#samplepacks_tree) {
-  padding: 0 !important;
-}
-
-
 
 div:has(#samplepacks_tree) code {
   display: inline-block;

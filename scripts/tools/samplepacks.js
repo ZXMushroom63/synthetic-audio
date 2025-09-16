@@ -38,6 +38,7 @@ addEventListener("init", () => {
         pathDisplay.innerText = path;
 
         const tree = document.querySelector("#samplepacks_tree");
+        tree.parentElement.style.padding = "0";
         tree.innerHTML = "";
 
         const parentDir = document.createElement("a");
