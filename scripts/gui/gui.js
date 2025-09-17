@@ -359,6 +359,7 @@ function addBlock(type, start, duration, title, layer = 0, data = {}, editorValu
         var originalDuration = parseFloat(loop.getAttribute("data-duration"));
         var originalStart = parseFloat(loop.getAttribute("data-start"));
         loop.classList.add("active");
+        loop.classList.add("resizing");
         if (isRight) {
             function rightHandler(j) {
                 j.preventDefault();
@@ -413,11 +414,15 @@ function addBlock(type, start, duration, title, layer = 0, data = {}, editorValu
         function mouseUpHandler(e) {
             markLoopDirty(loop, true);
             loop.classList.remove("active");
+            loop.classList.remove("resizing");
             document.removeEventListener("mousemove", isRight ? rightHandler : leftHandler);;
             document.removeEventListener("mouseup", mouseUpHandler);
             hydrateLoopPosition(loop);
+            document.body.style.cursor = "";
+            internal.cursor = "";
         }
         document.addEventListener("mouseup", mouseUpHandler);
+        document.body.style.cursor = "ew-resize";
     }
     const loop = document.createElement("div");
     if (!noTimeline && !noDirty) {
@@ -832,6 +837,7 @@ function init() {
     function actuateZoom() {
         prezoomLeftVal = null;
         zoomActuatorDebouncer = null;
+        document.body.style.cursor = "";
         document.querySelector("#track").style.willChange = "";
         hydrateZoom(true);
         hydrateDecorations();
@@ -845,7 +851,10 @@ function init() {
                 zoomCentre = mouse.x;
                 prezoomLeftVal = document.querySelector("#track").scrollLeft + zoomCentre;
             }
-            gui.zoom += e.deltaY * (keymap["Shift"] ? settings.ZoomScale * 0.05 : settings.ZoomScale);
+            const amount = e.deltaY * (keymap["Shift"] ? settings.ZoomScale * 0.05 : settings.ZoomScale);
+            gui.zoom += amount;
+            
+            document.body.style.cursor = (amount > 0) ? "zoom-in" : "zoom-out";
             gui.zoom = Math.max(100, gui.zoom);
             document.querySelector("#track").style.willChange = "scroll-position, transform";
             const factor = gui.zoom / gui.lastHydratedZoom;

@@ -237,6 +237,10 @@ html[data-libsettings-LDMLoopInteraction] .loop.active .loopInternal>* {
   cursor: grabbing;
 }
 
+.loop.resizing .loopInternal{
+  cursor: ew-resize;
+}
+
 
 .loop.selected .loopInternal, .loop.chordengine .loopInternal {
   outline: 2px solid rgba(0, 255, 255, 0.75);
@@ -292,6 +296,7 @@ html[data-libsettings-LDMLoopInteraction] .loop.active .loopInternal>* {
   transition: border 0.3s;
   background-color: rgba(0, 0, 0, 0.5);
   border: 1px solid rgba(255, 255, 255, 0.5);
+  cursor: ew-resize;
 }
 
 .handleLeft {
@@ -410,11 +415,6 @@ select:focus {
 
 #addstuff h4 {
   text-decoration: underline;
-}
-
-#addstuff * {
-  font-family: sans-serif;
-  color: white;
 }
 
 #addstuff>details>div span {
@@ -686,6 +686,10 @@ a, button, input, [onclick], [role="button"] {
   -webkit-tap-highlight-color: transparent;
 }
 
+select {
+  cursor: pointer;
+}
+
 select option {
   color: white !important;
   background: black;
@@ -704,7 +708,6 @@ select optgroup {
   height: 100%;
   z-index: 988;
   width: calc(4rem + 4px);
-  pointer-events: none;
   align-content: center;
   background-color: rgba(0, 0, 0, 0.7);
   transform: translateX(calc(-4rem - 4px));
@@ -733,10 +736,6 @@ select optgroup {
 
 #toolboxExpander.closed {
   transform: translateX(calc(0rem + 4px));
-}
-
-.toolbox * {
-  pointer-events: all;
 }
 
 .toolbox div.tool {
@@ -885,6 +884,10 @@ canvas {
 }
 
 input[type="number"]::-webkit-inner-spin-button {
+  cursor: pointer;
+}
+
+input[type="checkbox"] {
   cursor: pointer;
 }
 
