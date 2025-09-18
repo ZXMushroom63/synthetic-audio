@@ -405,7 +405,7 @@ function addBlock(type, start, duration, title, layer = 0, data = {}, editorValu
                 var internalWidth = newDuration * gui.zoomConstant;
                 internal.style.width = internalWidth + "vw";
                 backgroundSvg.style.width = internalWidth + "vw";
-                loop.setAttribute("data-duration", timeQuantise(timeQuantise(newDuration + pos, bpmInterval) - pos));
+                loop.setAttribute("data-duration", timeQuantise(timeQuantise(newDuration + pos, bpmInterval) - pos, bpmInterval));
                 multiplayer.patchLoop(loop);
             }
             document.addEventListener("mousemove", leftHandler);

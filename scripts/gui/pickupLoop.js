@@ -9,6 +9,8 @@ function pickupLoop(loop, natural = false, useCache = false) {
     loop.classList.add("active");
     loop.setAttribute("data-new-layer", loop.getAttribute("data-layer"));
     loop.setAttribute("data-new-start", loop.getAttribute("data-start"));
+    loop.setAttribute("data-new-duration", loop.getAttribute("data-duration"));
+    const startDuration = parseFloat(loop.getAttribute("data-duration"));
     var px = mouse.x;
     var py = mouse.y;
     function mouseMove(j) {
@@ -36,6 +38,7 @@ function pickupLoop(loop, natural = false, useCache = false) {
         layer = Math.round(layer - 0.5);
         loop.style.top = layer * 3 + "rem";
         loop.setAttribute("data-new-layer", layer);
+        loop.setAttribute("data-new-duration", timeQuantise(timeQuantise(startDuration + pos, bpmInterval) - pos));
     }
     function mouseUp(unused, cancel) {
         dropHandlers.splice(dropHandlers.indexOf(mouseUp), 1);
@@ -53,9 +56,11 @@ function pickupLoop(loop, natural = false, useCache = false) {
             ));
             loop.setAttribute("data-layer", loop.getAttribute("data-new-layer"));
             loop.setAttribute("data-start", loop.getAttribute("data-new-start"));
+            loop.setAttribute("data-duration", loop.getAttribute("data-new-duration"));
         }
         loop.removeAttribute("data-new-layer");
         loop.removeAttribute("data-new-start");
+        loop.removeAttribute("data-new-duration");
         loop.classList.remove("active");
         hydrateLoopPosition(loop);
         document.removeEventListener("mouseup", mouseUp);
