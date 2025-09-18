@@ -225,7 +225,7 @@ function hydrateLoopPosition(elem, lean) {
             + elem.getAttribute("data-layer")
             + ", Z: "
             + elem.getAttribute("data-editlayer")
-            }\nUUID: ${elem.getAttribute("data-uuid") || "(offline)"}`);
+            }\nUUID: ${elem.getAttribute("data-uuid") || "(offline)"}\nChordInfo: ${elem.romanNumeral || "ERR"}`);
     }
     loopInternal.style.width = internalWidth;
 

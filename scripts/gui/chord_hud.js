@@ -296,6 +296,23 @@ const chordMacros = {
     Flatten: {
         applies: ["I"],
         returns: ["VII^b5"]
+    },
+    // other
+    NotQuiteResolve7: {
+        applies: ["VI+maj7"],
+        returns: ["I^inv)"]
+    },
+    Unresolve: {
+        applies: ["I^inv)"],
+        returns: ["IV+qi"]
+    },
+    QuintalToMajor: {
+        applies: ["IV+qi"],
+        returns: ["VI+maj"]
+    },
+    QuintalToMinor: {
+        applies: ["IV+qi"],
+        returns: ["VI+min"]
     }
 };
 
@@ -689,12 +706,14 @@ function drawChordMacros(loop, inversionsOnly) {
     if (!chordData) {
         return;
     }
+    
     const chordIndexMap = Object.fromEntries([...gui.acceptedNotes].map((x, i) => {
         return [romanize(((i + 1) % gui.acceptedNotes.size) + 1), x];
     }));
     const reverseChordIndexMap = Object.fromEntries([...gui.acceptedNotes].map((x, i) => {
         return [x, romanize(((i + 1) % gui.acceptedNotes.size) + 1)];
     }));
+    const romanNumeral = reverseChordIndexMap[chordData.root];
 
     const rightHandle = loop.querySelector(".loopInternal span.handleRight");
     const leftHandle = loop.querySelector(".loopInternal span.handleLeft");
@@ -709,11 +728,11 @@ function drawChordMacros(loop, inversionsOnly) {
             }
             const searchFn = v.includes("+") ? String.prototype.startsWith : String.prototype.includes;
             const parts = v.includes("+") ? v.split("+") : v.split("^");
-            const match = loop.romanNumeral.toUpperCase() === parts[0].toUpperCase();
+            const match = romanNumeral.toUpperCase() === parts[0].toUpperCase();
             if (parts.length === 1) {
                 return match;
             }
-            return match && searchFn.apply(chordData.type, [parts[1]]);
+            return match && searchFn.apply(chordData.display.replace(chordData.root, ""), [parts[1]]);
         }, false)
     });
 
@@ -726,13 +745,14 @@ function drawChordMacros(loop, inversionsOnly) {
                 unusedChords.splice(unusedChords.indexOf(n), 1);
             }
         });
-        entries.push(...unusedChords.map(x => [`<span style='color:#fe1f6f'>${x.toUpperCase() === loop.romanNumeral.toUpperCase() ? "InvertX" : "UnstableX"}</span> from <code>` + loop.romanNumeral.toUpperCase() + "</code>", { applies: [], returns: [x] }]));
+        entries.push(...unusedChords.map(x => [`<span style='color:#fe1f6f'>${x.toUpperCase() === romanNumeral.toUpperCase() ? "InvertX" : "UnstableX"}</span> from <code>` + romanNumeral.toUpperCase() + "</code>", { applies: [], returns: [x] }]));
     }
 
 
     const octaveOffset = 12 * (Math.min(...loop.relatedChord.map(x => getChromaticOctave(x.theoryNote))));
 
     const rendereableMacros = [];
+    const chordTypeInfo = [];
     /*
     {
         side: "left"|"right",
@@ -760,7 +780,7 @@ function drawChordMacros(loop, inversionsOnly) {
                         if (parts.length === 1) {
                             return match;
                         }
-                        return match && searchFn.apply(x.type, [parts[1]]);
+                        return match && searchFn.apply(x.display.replace(x.root, ""), [parts[1]]);
                     }, false)
                     && x.values.length >= sizeCutoffMin && x.values.length <= sizeCutoffMax
             ).reverse();
@@ -770,12 +790,13 @@ function drawChordMacros(loop, inversionsOnly) {
             }
             const template = serialiseNode(loop.relatedChord[0]);
             template.start += template.duration;
-
+            chordTypeInfo.push(chord.display);
             rendereableMacros.push({
                 side: "right",
                 chord: chord,
                 text: `<code>${chord.type}</code>${chord.inversion !== 0 ? ` <code>i${chord.inversion}</code>` : ""} <code>${reverseChordIndexMap[chord.root]}</code> <code>${chord.values.length}</code> ` + ent[0],
                 template: template,
+                display: chord.display,
                 octaveOffset: octaveOffset
             });
         });
@@ -788,17 +809,29 @@ function drawChordMacros(loop, inversionsOnly) {
         const template = serialiseNode(loop.relatedChord[0]);
 
         const chord = ent[1];
+        chordTypeInfo.push(chord.display);
         rendereableMacros.push({
             side: inversionsOnly ? "right" : "left",
             chord: chord,
+            display: chord.display,
             text: `${(!reverseChordIndexMap[chord.root]) ? "" : `<code>${reverseChordIndexMap[chord.root]}</code>`} <code>${chord.range}</code> ${chord.inversion === 0 ? "<span style='color:skyblue'>OriginalX</span>" : "InversionX " + chord.inversion} ${i === 0 ? " (Smallest)" : ""}`,
             template: template,
             octaveOffset: octaveOffset
         });
     });
 
+    if (!inversionsOnly) {
+        rendereableMacros.forEach((renderData, i) => {
+            if (renderData.side === "right" && (chordTypeInfo.indexOf(renderData.display) !== i)) {
+                rendereableMacros[i] = null;
+            }
+        });
+    }
 
     rendereableMacros.forEach(renderData => {
+        if (!renderData) {
+            return;
+        }
         const { text, template, octaveOffset, chord, side } = renderData;
         const unrealisedChords = chord.values.map((v, i) => {
             const dt = structuredClone(template);
