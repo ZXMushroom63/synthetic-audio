@@ -718,7 +718,7 @@ function init() {
             const dur = parseFloat(x.getAttribute("data-duration"));
 
             const newStart = timeQuantise(start * ratio);
-            const newDur = timeQuantise(dur * ratio);
+            const newDur = timeQuantise(timeQuantise(timeQuantise(dur * ratio) + newStart) - newStart);
 
             x.setAttribute("data-start", newStart);
             x.setAttribute("data-duration", newDur);
