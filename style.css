@@ -233,22 +233,25 @@ html[data-libsettings-LDMLoopInteraction] .loop.active .loopInternal>* {
   contain: size paint style;
   cursor: grab;
 }
+
 .loopInternal:active {
   cursor: grabbing;
 }
 
-.loop.resizing .loopInternal{
+.loop.resizing .loopInternal {
   cursor: ew-resize;
 }
 
 
-.loop.selected .loopInternal, .loop.chordengine .loopInternal {
+.loop.selected .loopInternal,
+.loop.chordengine .loopInternal {
   outline: 2px solid rgba(0, 255, 255, 0.75);
   contain: style;
   overflow: visible;
 }
 
-.loop.selected, .loop.chordengine {
+.loop.selected,
+.loop.chordengine {
   contain: style;
 }
 
@@ -256,7 +259,8 @@ html[data-libsettings-LDMLoopInteraction] .loop.active .loopInternal>* {
   contain: style;
 }
 
-.loop.selected .handleRight, .loop.chordengine .handleRight {
+.loop.selected .handleRight,
+.loop.chordengine .handleRight {
   position: relative;
   float: right;
   transform: translateY(-8px);
@@ -473,7 +477,7 @@ audio {
   padding: 0;
   content: "";
   user-select: none;
-  pointer-events: none;  
+  pointer-events: none;
   color: transparent;
   height: calc(600vh - 2rem - 4px);
   width: 3px;
@@ -682,7 +686,11 @@ button:hover {
   scrollbar-width: none;
 }
 
-a, button, input, [onclick], [role="button"] {
+a,
+button,
+input,
+[onclick],
+[role="button"] {
   -webkit-tap-highlight-color: transparent;
 }
 
@@ -1198,14 +1206,16 @@ li {
   position: relative;
   z-index: 444443;
   user-select: none;
-  margin-left: 6px;
-  opacity: 0.5;
+  margin-left: 4px;
+  padding-left: 2px;
+  opacity: 1;
+  transition: opacity 0.1s;
   border-radius: 4px;
   pointer-events: none;
   outline: 0;
   border: 0;
   background: transparent;
-  color: white;
+  color: rgba(255,255,255,0.55);
   overflow: hidden;
 }
 
@@ -1227,6 +1237,7 @@ a[href]:hover {
   opacity: 1;
   pointer-events: all;
   user-select: contain;
+  color: rgba(255,255,255,1);
 
   -webkit-appearance: none;
   -moz-appearance: none;
@@ -1252,15 +1263,24 @@ a[href]:hover {
   body *:not(.printable, .printable *) {
     display: none;
   }
+  
+  * {
+    contain: style !important;
+  }
+
+  #toolboxExpander {
+    display: none;
+  }
 
   .printable {
     display: block !important;
     position: fixed !important;
-    z-index: 999;
+    z-index: 99999;
     width: 100% !important;
     height: 100% !important;
     top: 0 !important;
     left: 0 !important;
+    box-shadow: none;
     background-color: white;
   }
 }

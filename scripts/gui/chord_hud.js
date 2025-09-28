@@ -348,7 +348,10 @@ const chromaticScaleShifted = [
 ];
 
 function chromaticToIndex(note) { // A4, C#5 (no flats allowed here tho)
-    const octave = parseInt(note[note.length - 1]) || 0;
+    const octave = parseInt(note[note.length - 1]);
+    if (!isFinite(octave)) {
+        return chromaticScale.indexOf(note.toUpperCase());
+    }
     const offset = chromaticScale.indexOf(note.substring(0, note.length - 1).toUpperCase());
     return octave * 12 + offset;
 }
@@ -644,6 +647,21 @@ function getChordStack(loop, allowAtonal) {
     return loops;
 }
 
+const INTERVAL_SCORES = {
+    0: 0, // Unison
+    1: 5, // Minor 2nd
+    2: 4, // Major 2nd
+    3: 1, // Minor 3rd
+    4: 1, // Major 3rd
+    5: 0, // Perfect 4th
+    6: 5, // Tritone
+    7: 0, // Perfect 5th
+    8: 1, // Minor 6th
+    9: 1, // Major 6th
+    10: 4, // Minor 7th
+    11: 5  // Major 7th
+};
+
 function chordProcess(loop, chordArray) {
     [...loop.querySelectorAll("ins.chordMacro")].forEach(e => e.remove());
     loop.classList.remove("chordengine");
@@ -664,14 +682,80 @@ function chordProcess(loop, chordArray) {
 
     if (loop.relatedChord[loop.relatedChord.length - 1] === loop) {
         chordDisp.style.display = "";
-        chordDisp.value = getChordTypeFromStack(loop.relatedChord)?.display || "";
+        chordDisp.lastChordInfo = getChordTypeFromStack(loop.relatedChord) || null;
+        chordDisp.value = chordDisp.lastChordInfo?.display || "";
+        calculateChordStackColors(loop.relatedChord, chordDisp);
         return oldVal !== chordDisp.value;
     } else {
         loop.lastChordType = "";
         chordDisp.value = "";
+        chordDisp.lastChordInfo = null;
+        chordDisp.style.color = "";
         chordDisp.style.display = "none";
         return oldVal !== "";
     }
+}
+function getVADataFromIntervals(chord, root) {
+    root ||= chord[0];
+    const relativeChord = chord.map(note => (note - root + 12) % 12);
+    relativeChord.sort((a, b) => a - b);
+
+    let valence = 0;
+    let arousal = 0;
+    const uniqueRelativeChord = [...new Set(relativeChord)];
+
+    const hasMajorThird = uniqueRelativeChord.includes(4);
+    const hasMinorThird = uniqueRelativeChord.includes(3);
+
+    if (hasMajorThird && !hasMinorThird) {
+        valence = 1;
+    } else if (hasMinorThird && !hasMajorThird) {
+        valence = -1;
+    } else {
+        valence = 0;
+    }
+
+    for (let i = 0; i < uniqueRelativeChord.length; i++) {
+        for (let j = i + 1; j < uniqueRelativeChord.length; j++) {
+            const interval = (uniqueRelativeChord[j] - uniqueRelativeChord[i] + 12) % 12;
+            arousal += INTERVAL_SCORES[interval] || 0
+        }
+    }
+
+    const maxPossibleArousal = (uniqueRelativeChord.length * (uniqueRelativeChord.length - 1) / 2) * Math.max(...Object.values(INTERVAL_SCORES));
+    arousal = maxPossibleArousal > 0 ? (arousal / maxPossibleArousal) : 0;
+
+    const levels = [" ", "░", "▒", "▓", "█"];
+    let moodToken = "";
+    if (valence === 1) {
+        moodToken = "🟨";
+    } else if (valence === 0) {
+        moodToken = "🟩";
+    } else if (valence === -1) {
+        moodToken = "🟦";
+    }
+    const emoji = "⟨" + levels[Math.floor(levels.length*(arousal ** 0.5))] + moodToken + "⟩";
+
+    return { valence, arousal, emoji };
+}
+function calculateChordStackColors(chordCtx, chordDisp) {
+    //  return; //disabled
+    chordDisp ||= chordCtx[chordCtx.length - 1].querySelector(".chordDisplay");
+    if (!chordDisp.lastChordInfo) {
+        chordDisp.style.borderLeft = "0";
+        return;
+    }
+    debugger;
+
+    const chord = [...chordDisp.lastChordInfo.values];
+    if (chord.length === 1) {
+        chordDisp.style.borderLeft = "0";
+        return;
+    }
+    const { valence, arousal } = getVADataFromIntervals(chord, chromaticToIndex(chordDisp.lastChordInfo.root));
+
+    chordDisp.style.borderLeft = `5px solid hsla(${lerp(182, 44, (valence + 1) / 2)
+        }, 50%, ${Math.max(50, 100 - ((arousal ** 0.5) * 50))}%, 100%)`;
 }
 registerSetting("ChordMacros", true);
 registerSetting("ChordMacrosStability", 100);
@@ -706,7 +790,7 @@ function drawChordMacros(loop, inversionsOnly) {
     if (!chordData) {
         return;
     }
-    
+
     const chordIndexMap = Object.fromEntries([...gui.acceptedNotes].map((x, i) => {
         return [romanize(((i + 1) % gui.acceptedNotes.size) + 1), x];
     }));
@@ -765,7 +849,7 @@ function drawChordMacros(loop, inversionsOnly) {
     if (!inversionsOnly) {
         entries.forEach((ent) => {
             const size = chordData.values.length;
-            const sizeCutoffMin = size >= 3 ? 3 : size;
+            const sizeCutoffMin = size >= 3 ? Math.max(3, size - 1) : size;
             const sizeCutoffMax = size >= 3 ? Infinity : size;
             const chordOptions = Object.values(reverseChordLookup).filter(
                 x => x.notes.isSubsetOf(gui.acceptedNotes)
@@ -791,10 +875,11 @@ function drawChordMacros(loop, inversionsOnly) {
             const template = serialiseNode(loop.relatedChord[0]);
             template.start += template.duration;
             chordTypeInfo.push(chord.display);
+            const emotionData = getVADataFromIntervals(chord.values, chromaticToIndex(chord.root));
             rendereableMacros.push({
                 side: "right",
                 chord: chord,
-                text: `<code>${chord.type}</code>${chord.inversion !== 0 ? ` <code>i${chord.inversion}</code>` : ""} <code>${reverseChordIndexMap[chord.root]}</code> <code>${chord.values.length}</code> ` + ent[0],
+                text: `${emotionData.emoji} <code>${chord.type}</code>${chord.inversion !== 0 ? ` <code>i${chord.inversion}</code>` : ""} <code>${reverseChordIndexMap[chord.root]}</code> <code>${chord.values.length}</code> ` + ent[0],
                 template: template,
                 display: chord.display,
                 octaveOffset: octaveOffset

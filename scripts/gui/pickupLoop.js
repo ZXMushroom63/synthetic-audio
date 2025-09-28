@@ -69,6 +69,7 @@ function pickupLoop(loop, natural = false, useCache = false) {
             multiplayer.patchLoop(loop);
         }
     }
+    mouseUp.relevantLoop = loop;
     dropHandlers.push(mouseUp);
     loopMoveHandlers.push(mouseMove);
     var trackBB = (useCache && cachedTrackBB) ? cachedTrackBB : document.querySelector("#trackInternal").getBoundingClientRect();

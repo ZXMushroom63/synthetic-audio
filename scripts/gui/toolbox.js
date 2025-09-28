@@ -54,8 +54,11 @@ function registerTool(name, fn, selected = false, bindChecker) {
         ACTIVE_TOOL = namespacedId;
         ACTIVE_TOOL_FN = TOOL_DATABASE[namespacedId];
     });
-    document.querySelector(".toolbox").appendChild(tool);
-    if (selected) {
+    if (!name.startsWith("internal/")) {
+        document.querySelector(".toolbox").appendChild(tool);
+    }
+    
+    if (selected && !name.startsWith("internal/")) {
         tool.click();
     }
 }
