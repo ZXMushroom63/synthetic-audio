@@ -81,6 +81,10 @@ helpContent.addTab("Keybinds", `
 - <code>&#126;</code> = while hovering over a node = See potential chord progression options + inversions
 - <code>&#96;</code> = while hovering over a node = See potential chord inversions, on right side
 - ~TAB~ = on bottom note of chord, open chord editor
+- ~1~ = Checker deselect selected nodes
+- ~2~ = Turn a chord into an arpeggio
+- ~3~ = Turn an arpeggio into a chord
+- ~4~ = Reverse the order of selected nodes
 `);
 
 helpContent.addTab("Programmable Fields", `
