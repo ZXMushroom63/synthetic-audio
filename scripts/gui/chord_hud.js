@@ -745,7 +745,6 @@ function calculateChordStackColors(chordCtx, chordDisp) {
         chordDisp.style.borderLeft = "0";
         return;
     }
-    debugger;
 
     const chord = [...chordDisp.lastChordInfo.values];
     if (chord.length === 1) {
@@ -755,7 +754,7 @@ function calculateChordStackColors(chordCtx, chordDisp) {
     const { valence, arousal } = getVADataFromIntervals(chord, chromaticToIndex(chordDisp.lastChordInfo.root));
 
     chordDisp.style.borderLeft = `5px solid hsla(${lerp(182, 44, (valence + 1) / 2)
-        }, 50%, ${Math.max(50, 100 - ((arousal ** 0.5) * 50))}%, 100%)`;
+        }, 100%, ${Math.max(50, 100 - ((arousal ** 0.5) * 50))}%, 50%)`;
 }
 registerSetting("ChordMacros", true);
 registerSetting("ChordMacrosStability", 100);
