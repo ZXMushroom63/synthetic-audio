@@ -815,7 +815,7 @@ select optgroup {
   background-color: rgba(0, 125, 255, 0.3);
 }
 
-[data-dirty]:not([data-nodirty]) span.name {
+.loop[data-dirty]:not([data-nodirty])>span.name {
   transition: text-decoration-color 0.1s;
   text-decoration-color: orange;
 }
@@ -1150,7 +1150,7 @@ code:hover {
   background: rgba(255, 255, 255, 0.2);
 }
 
-::-webkit-resizer {
+textarea::-webkit-resizer {
   background-image: url("public/resize.svg");
 }
 
