@@ -304,6 +304,7 @@ function hydrate() {
     hydrateEditorLayer();
     reflow("#trackInternal");
 }
+var trackChildren = [];
 let optimisedBB = null;
 function addBlock(type, start, duration, title, layer = 0, data = {}, editorValue = Math.min(gui.layer, MAX_LAYER - 1), noTimeline, noDirty) {
     if (!multiplayer.isHooked && gui.layer === MAX_LAYER) {
@@ -603,10 +604,7 @@ function addBlock(type, start, duration, title, layer = 0, data = {}, editorValu
     }
 
     if (!noTimeline) {
-        (
-            document.querySelector("#trackInternal .loop:last-of-type") ||
-            document.querySelector("#time")
-        ).after(loop);
+        trackChildren[trackChildren.length - 2].after(loop);
     }
 
     if (multiplayer.use(loop)) {
@@ -653,6 +651,7 @@ function loadAutosave() {
     }
 }
 function init() {
+    trackChildren = document.querySelector("#trackInternal").children;
     customEvent("init");
     document.querySelector('#renderOut').preservesPitch = false;
     document.querySelector("#editorlayer").addEventListener("input", () => {
