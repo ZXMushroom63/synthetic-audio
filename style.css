@@ -815,7 +815,7 @@ select optgroup {
   background-color: rgba(0, 125, 255, 0.3);
 }
 
-.loop[data-dirty]:not([data-nodirty])>span.name {
+.loop[data-dirty]:not([data-nodirty]) span.name {
   transition: text-decoration-color 0.1s;
   text-decoration-color: orange;
 }
