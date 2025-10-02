@@ -47,7 +47,7 @@ addEventListener("init", () => {
                     a.start += n * resultNode.duration / splitCount;
                     a.start = timeQuantise(a.start);
                     if (typeof a.conf.StartOffset === "number") {
-                        a.conf.StartOffset += n / splitCount;
+                        a.conf.StartOffset += n * resultNode.duration / splitCount;
                     }
                     const resultA = deserialiseNode(a);
                     commit(new UndoStackAdd(resultA));

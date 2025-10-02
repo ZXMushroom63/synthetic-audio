@@ -25,8 +25,9 @@ addBlockType("audio", {
         if (!currentData) {
             return inPcm;
         }
-        const FADETIME = Math.min(this.conf.FadeTime * audio.samplerate, Math.min(inPcm.length, currentData.length));
-        const FADESTART = Math.min(inPcm.length, currentData.length) - FADETIME;
+        const offset = this.conf.StartOffset * audio.samplerate;
+        const FADETIME = Math.min(this.conf.FadeTime * audio.samplerate, Math.min(inPcm.length + offset, currentData.length));
+        const FADESTART = Math.min(inPcm.length + offset, currentData.length) - FADETIME;
         const tail = currentData.subarray(FADESTART);
         tail.forEach((x, i) => {
             tail[i] = x * (1 - i / FADETIME);
