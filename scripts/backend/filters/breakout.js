@@ -1,5 +1,5 @@
 addBlockType("breakr", {
-    color: "rgba(0,255,255,0.3)",
+    color: "rgba(0,255,0,0.3)",
     title: "Breakr",
     configs: {
         "RandomSeed": [0, "number"],
