@@ -365,7 +365,7 @@ addBlockType("p_waveform_plus", {
             var uPhaseAmount = uPhase(i, inPcm);
             var panAmount = uPan(i, inPcm) / this.conf.uVoices;
             var semiOffset = semitones(i, inPcm);
-            var stereoPhaseOffset = stereoWidth(i, inPcm) * 0.25 * (channel === 0 ? -1 : 1);
+            var stereoPhaseOffset = 1 + stereoWidth(i, inPcm) * 0.25 * (channel === 0 ? -1 : 1);
             for (let h = 0; h < waveCount; h++) {
                 if (absoluteTime < (h * this.conf.HarmonicsStrum * this.conf.Harmonics)) {
                     continue;
