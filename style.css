@@ -908,14 +908,14 @@ input[type="checkbox"] {
 }
 
 .addModifierDiv {
-  width: 20vw;
+  width: 19vw;
   position: absolute;
   background-color: rgba(0, 0, 0, 0.5);
   white-space: break-spaces !important;
   border: 1px solid white;
   z-index: 700;
   top: 0;
-  left: -1rem;
+  right: 0;
   display: none;
 }
 
