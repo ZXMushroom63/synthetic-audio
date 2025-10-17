@@ -1,5 +1,8 @@
 registerSetting("ZScrollSensitivity", 4);
 async function execZScroll(loop, value) {
+    if (settings.MicrotonalEngine) {
+        value *= Math.min(1, Math.max(settings.MicrotonalZScrollSize, 0.1)) || 0.1;
+    }
     var def = filters[loop.getAttribute("data-type")];
     if (def.zscroll) {
         if (def.pitchZscroller && gui.autocorrect === "SNAP" && value) {

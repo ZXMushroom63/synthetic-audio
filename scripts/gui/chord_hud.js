@@ -348,6 +348,7 @@ const chromaticScaleShifted = [
 ];
 
 function chromaticToIndex(note) { // A4, C#5 (no flats allowed here tho)
+    note = note.split("⁺")[0].split("⁻")[0];
     const octave = parseInt(note[note.length - 1]);
     if (!isFinite(octave)) {
         return chromaticScale.indexOf(note.toUpperCase());
@@ -363,6 +364,7 @@ function indexToChromatic(idx) {
 }
 
 function getChromaticOctave(note) {
+    note = note.split("⁺")[0].split("⁻")[0];
     return parseInt(note.replace("#", "").replace("b", "").substring(1));
 }
 
