@@ -88,7 +88,7 @@ const gz_synth_voicecount = 4;
                     time[v] += dt * freq * Math.pow(2, semiLFO(i, inPcm) / 12);
                     time[v] = time[v] - (time[v] | 0);
                     if (this.conf[`Voice${vDisplay}UseCustomWaveform`]) {
-                        out[i] += -1 * custom_waveforms[this.conf[`Voice${vDisplay}WaveformAsset`]].calculated[Math.floor((time[v] + phaseVal + stereoPhaseMod) * WAVEFORM_RES) % WAVEFORM_RES] * drive * adsr * decay * panVolMult;
+                        out[i] += -1 * custom_waveforms[this.conf[`Voice${vDisplay}WaveformAsset`]].calculated[Math.floor((time[v] + 1 + phaseVal + stereoPhaseMod) * WAVEFORM_RES) % WAVEFORM_RES] * drive * adsr * decay * panVolMult;
                     } else {
                         out[i] += (waveforms[wavetype](time[v] + phaseVal + stereoPhaseMod, modVal) ** modVal2) * drive * adsr * decay * panVolMult;
                     }
