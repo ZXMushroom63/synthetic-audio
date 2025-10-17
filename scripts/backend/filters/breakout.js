@@ -9,6 +9,7 @@ addBlockType("breakr", {
         "Offset": [0.0, "number"],
         "CurvePwr": [1, "number"],
         "Threshold": [0.2, "number", 1],
+        "CloneVolume": [1, "number"],
         "AmplitudeSmoothing": [0.0, "number"],
     },
     hidden: false,
@@ -41,7 +42,7 @@ addBlockType("breakr", {
                     }
                 }
 
-                lastLoudBlock = inPcm.slice(i, Math.min(i + blockSizeSamples, inPcm.length));
+                lastLoudBlock = inPcm.slice(i, Math.min(i + blockSizeSamples, inPcm.length)).map(x => x * this.conf.CloneVolume);
                 if (AmpSmoothingStart > 0) {
                     lastLoudBlock.forEach((x, i) => {
                         var ampSmoothingFactor = 1;
