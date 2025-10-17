@@ -9,6 +9,7 @@ addBlockType("breakr", {
         "Offset": [0.0, "number"],
         "CurvePwr": [1, "number"],
         "Threshold": [0.2, "number", 1],
+        "AmplitudeSmoothing": [0.0, "number"],
     },
     hidden: false,
     waterfall: 2,
@@ -24,12 +25,47 @@ addBlockType("breakr", {
         const LOOKUPTABLE_PERSAMPLE = extractVolumeCurveFromPcm(inPcm, 32); //32hz lowest before ringmod artefacts
         const threshold = _(this.conf.Threshold);
 
+        const AmpSmoothingStart = Math.floor(audio.samplerate * this.conf.AmplitudeSmoothing);
+        const AmpSmoothingEnd = blockSizeSamples - AmpSmoothingStart;
+
         let lastLoudBlock = inPcm.slice(0, blockSizeSamples);
-        for (let i = Math.floor(this.conf.Offset * audio.samplerate); i < out.length; i+=blockSizeSamples) {
-            if ((LOOKUPTABLE_PERSAMPLE[i] ** this.conf.CurvePwr) > (threshold(i, out) + (Math.random() - 0.5)*2*this.conf.RandomWeight )) {
+        let prevInfo = -1; // 0 = passthrough; 1 = overwritten
+
+        for (let i = Math.floor(this.conf.Offset * audio.samplerate); i < out.length; i += blockSizeSamples) {
+            if ((LOOKUPTABLE_PERSAMPLE[i] ** this.conf.CurvePwr) > (threshold(i, out) + (Math.random() - 0.5) * 2 * this.conf.RandomWeight)) {
+                if (prevInfo === 1) {
+                    const startPos = i;
+                    const endPos = i + AmpSmoothingStart;
+                    for (let j = startPos; j < endPos; j++) {
+                        out[j] *= (j - startPos) / AmpSmoothingStart;
+                    }
+                }
+
                 lastLoudBlock = inPcm.slice(i, Math.min(i + blockSizeSamples, inPcm.length));
+                if (AmpSmoothingStart > 0) {
+                    lastLoudBlock.forEach((x, i) => {
+                        var ampSmoothingFactor = 1;
+                        if (i < AmpSmoothingStart) {
+                            ampSmoothingFactor *= i / AmpSmoothingStart;
+                        }
+
+                        if (i > AmpSmoothingEnd) {
+                            ampSmoothingFactor *= 1 - ((i - AmpSmoothingEnd) / AmpSmoothingStart);
+                        }
+                        lastLoudBlock[i] *= ampSmoothingFactor;
+                    });
+                }
+                prevInfo = 0;
             } else if (lastLoudBlock && ((lastLoudBlock.length + i) < inPcm.length)) {
+                if (prevInfo === 0) {
+                    const startPos = i - AmpSmoothingStart;
+                    const endPos = i;
+                    for (let j = startPos; j < endPos; j++) {
+                        out[j] *= 1 - (j - startPos) / AmpSmoothingStart;
+                    }
+                }
                 out.set(lastLoudBlock, i);
+                prevInfo = 1;
             }
         }
 
