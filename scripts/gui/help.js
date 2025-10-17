@@ -55,6 +55,7 @@ helpContent.addTab("Keybinds", `
 - ~RMB on the visualiser~ = switch between waveform <-> EQ
 - ~SHIFT + A~ = add a new loop via search (hint: in search bar, try using shortcuts like ~;lop~ for a lowpass filter)
 - ~ALT + SCROLL~ = modify target value on respective loop (usually the note), and play preview if applicable
+- ~ALT + M~ = if microtonality is enabled, toggle ~ALT + SCROLL~ between note and microtone modes
 - ~ALT + CLICK~ = play loop preview if applicable
 - ~CTRL + S ~= write to autosave slot
 - ~CTRL + SHIFT + S~ = save as file

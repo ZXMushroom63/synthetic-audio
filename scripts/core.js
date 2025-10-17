@@ -39,6 +39,7 @@ function noteToFrequency(note, octave, accidental = '', micro) {
 }
 registerSetting("MicrotonalEngine", false);
 registerSetting("MicrotonalZScrollSize", 0.1);
+registerSetting("MicrotonalZScrollSpeedMult", 2);
 function frequencyToNote(frequency, useFlats) {
     const notes = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
     const notesFlat = ['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B'];

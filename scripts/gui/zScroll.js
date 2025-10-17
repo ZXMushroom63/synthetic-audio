@@ -1,6 +1,7 @@
+let pauseMicrotonality = false;
 registerSetting("ZScrollSensitivity", 4);
 async function execZScroll(loop, value) {
-    if (settings.MicrotonalEngine) {
+    if (settings.MicrotonalEngine && !pauseMicrotonality) {
         value *= Math.min(1, Math.max(settings.MicrotonalZScrollSize, 0.1)) || 0.1;
     }
     var def = filters[loop.getAttribute("data-type")];
@@ -42,6 +43,10 @@ function zscroll(e) {
         e.stopPropagation();
         var delta = Math.min(1, Math.max(-1, Math.round(e.deltaY)));
         zScrollProgress += delta;
+        let quota = settings.ZScrollSensitivity;
+        if (settings.MicrotonalEngine && !pauseMicrotonality) {
+            quota /= settings.MicrotonalZScrollSpeedMult;
+        }
         if (Math.abs(zScrollProgress) >= settings.ZScrollSensitivity) {
             zScrollProgress = 0;
             var currentlyActiveLoops = findLoops(".loop.active")
@@ -91,3 +96,12 @@ addEventListener("keyup", (e) => {
         zScrollProgress = 0;
     }
 });
+addEventListener("keydown", (e)=>{
+    if (e.key.toUpperCase() === "M" && e.altKey && !e.shiftKey && !e.ctrlKey && !((e.target.tagName === "INPUT") || (e.target.contentEditable === "true") || (e.target.tagName === "TEXTAREA"))) {
+        e.preventDefault();
+        if (settings.MicrotonalEngine) {
+            pauseMicrotonality = (!pauseMicrotonality);
+            toast(`Microtonal ZScroll ${pauseMicrotonality ? "Off" : "On"} (Alt + M)`, 1.5);
+        }
+    }
+})
