@@ -16,6 +16,7 @@ function findLoops(selector) {
     return Array.prototype.filter.apply(track.querySelectorAll(selector), [(x) => !x._ignore]);
 }
 function noteToFrequency(note, octave, accidental = '', micro) {
+    micro ||= 0;
     const notes = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
     const flats = {
         'Db': 'C#',
@@ -34,7 +35,7 @@ function noteToFrequency(note, octave, accidental = '', micro) {
         return 0;
     }
     const halfSteps = (octave - 4) * 12 + index - notes.indexOf('A');
-    const frequency = A4 * Math.pow(2, halfSteps / 12);
+    const frequency = A4 * Math.pow(2, (halfSteps + micro) / 12);
     return frequency;
 }
 registerSetting("MicrotonalEngine", false);
