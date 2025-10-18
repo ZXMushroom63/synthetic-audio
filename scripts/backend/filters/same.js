@@ -3362,7 +3362,7 @@ addBlockType("same", {
         "Division": ['0/Entire region', ['0/Entire region', '1/Northwest', '2/North', '3/Northeast', '4/West', '5/Center', '6/East', '7/Southwest', '8/South', '9/Southeast']],
         "County": ["000/Entire state", ["000/Entire state"]],
         "PurgeTimeHH_MM": ['0600', ['0100', '0130', '0200', '0230', '0300', '0330', '0400', '0430', '0500', '0530', '0600', '0700', '0800', '0900', '1000', '1100', '1200', '1300', '1400', '1500', '1600', '1700', '1800', '1900', '2000', '2100', '2200', '2300', '2400', '4800', '9600']],
-        "StartTime": ["", "datetime-local"],
+        "StartTime": ["2021-06-09T03:00", "datetime-local"],
     },
     selectMiddleware: function (key) {
         if (key === "County") {
