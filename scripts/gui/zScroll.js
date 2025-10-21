@@ -1,4 +1,4 @@
-let pauseMicrotonality = false;
+let pauseMicrotonality = true;
 registerSetting("ZScrollSensitivity", 4);
 async function execZScroll(loop, value) {
     if (settings.MicrotonalEngine && !pauseMicrotonality) {
