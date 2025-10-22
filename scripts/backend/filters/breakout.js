@@ -11,6 +11,7 @@ addBlockType("breakr", {
         "Threshold": [0.2, "number", 1],
         "CloneVolume": [1, "number"],
         "AmplitudeSmoothing": [0.0, "number"],
+        "AmpSmthExp": [1, "number"]
     },
     hidden: false,
     waterfall: 2,
@@ -31,6 +32,7 @@ addBlockType("breakr", {
 
         let lastLoudBlock = inPcm.slice(0, blockSizeSamples);
         let prevInfo = -1; // 0 = passthrough; 1 = overwritten
+        const ampSmthExp = this.conf.AmpSmthExp;
 
         for (let i = Math.floor(this.conf.Offset * audio.samplerate); i < out.length; i += blockSizeSamples) {
             if ((LOOKUPTABLE_PERSAMPLE[i] ** this.conf.CurvePwr) > (threshold(i, out) + (Math.random() - 0.5) * 2 * this.conf.RandomWeight)) {
@@ -38,7 +40,7 @@ addBlockType("breakr", {
                     const startPos = i;
                     const endPos = i + AmpSmoothingStart;
                     for (let j = startPos; j < endPos; j++) {
-                        out[j] *= (j - startPos) / AmpSmoothingStart;
+                        out[j] *= Math.pow((j - startPos) / AmpSmoothingStart, ampSmthExp);
                     }
                 }
 
@@ -47,11 +49,11 @@ addBlockType("breakr", {
                     lastLoudBlock.forEach((x, i) => {
                         var ampSmoothingFactor = 1;
                         if (i < AmpSmoothingStart) {
-                            ampSmoothingFactor *= i / AmpSmoothingStart;
+                            ampSmoothingFactor *= Math.pow(i / AmpSmoothingStart, ampSmthExp);
                         }
 
                         if (i > AmpSmoothingEnd) {
-                            ampSmoothingFactor *= 1 - ((i - AmpSmoothingEnd) / AmpSmoothingStart);
+                            ampSmoothingFactor *= (1 - ((i - AmpSmoothingEnd) / AmpSmoothingStart), ampSmthExp);
                         }
                         lastLoudBlock[i] *= ampSmoothingFactor;
                     });
