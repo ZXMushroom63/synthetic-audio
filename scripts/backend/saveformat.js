@@ -14,6 +14,9 @@ const SAVE_PATCHES = [];
 SAVE_PATCHES.sort((a, b) => a.version - b.version);
 
 function patchSave(saveData) {
+    if (!saveData) {
+        return;
+    }
     const format = saveData.saveFormat || 0;
     saveData.saveFormat = format;
 
