@@ -2,16 +2,14 @@ addBlockType("slicr", {
     color: "rgba(0,255,0,0.3)",
     title: "Slicr",
     wet_and_dry_knobs: true,
-    amplitude_smoothing_knob: true,
     configs: {
         "Pattern": ["AABA AB", "textarea"],
         "UseAsset": [false, "checkbox"],
         "Asset": ["(none)", ["(none)"]],
         "RMSFreq": [32, "number"],
-        "Logs": ["# SLICR #", "textarea", 2],
         "TransientThreshold": [0.8, ""],
         "TransientStartThreshold": [0.4, ""], //add force beat clipping (round down to 1, 0.5, 0.25, or 0.125 beats)
-        "AmpSmoothing": [0.0, "number"]
+        "4/4BeatSnapping": [false, "checkbox"],
     },
     assetUser: true,
     selectMiddleware: (key) => {
@@ -40,8 +38,6 @@ addBlockType("slicr", {
         const curve = extractVolumeCurveFromPcm(targetPcm, this.conf.RMSFreq);
         const pattern = this.conf.Pattern.toUpperCase().split("");
 
-        let logs = "# SLICR #";
-
         const thresh = this.conf.TransientThreshold;
         const startThresh = Math.min(this.conf.TransientStartThreshold, thresh);
         const slices = [];
@@ -62,7 +58,6 @@ addBlockType("slicr", {
                         break;
                     }
                 }
-                logs += "\nFound slice at " + sampStart;
                 if (foundSample) {
                     slices.push({ start: oldStart, end: sampStart, ref: targetPcm.subarray(oldStart, sampStart) });
                 }
@@ -120,7 +115,10 @@ addBlockType("slicr", {
                     return;
                 }
                 if (sampLen === null) {
-                    let len = Math.min(out.length - k, slice.ref.length - 1);
+                    let len = Math.min(out.length - k - 1, slice.ref.length - 1);
+                    if (this.conf["4/4BeatFlooring"]) {
+                        len = Math.floor((2**(Math.round(Math.log2(len / audio.samplerate / audio.beatSize)))) * audio.beatSize * audio.samplerate);
+                    }
                     out.set(slice.ref.subarray(0, len), k);
                     k += len;
                 } else {
@@ -131,8 +129,6 @@ addBlockType("slicr", {
                 }
             }
         });
-
-        this.conf.Logs = logs;
 
         return out;
     },

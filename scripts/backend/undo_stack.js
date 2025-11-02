@@ -21,7 +21,7 @@ class UndoStackEdit extends UndoStack {
     }
     undo() {
         this.loop.conf[this.key] = this.oldValue;
-        this.loop.querySelector(`[data-key=${this.key}]`).value = this.oldValue;
+        this.loop.querySelector(`[data-key="${this.key}"]`).value = this.oldValue;
         toast("Undo: Edit Loop");
         markLoopDirty(this.loop);
         if (filters[this.loop.getAttribute("data-type")]?.updateMiddleware) {
