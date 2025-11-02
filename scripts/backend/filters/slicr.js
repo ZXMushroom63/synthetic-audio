@@ -31,7 +31,7 @@ addBlockType("slicr", {
     initMiddleware: function (loop) {
         filters["slicr"].updateMiddleware(loop);
     },
-    waterfall: 1,
+    waterfall: 2,
     functor: function name(inPcm, channel, info) {
         if (this.conf.UseAsset && !proceduralAssets.has(this.conf.Asset)) {
             return inPcm;
