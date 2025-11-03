@@ -1,4 +1,4 @@
-async function applyReverbOffline(pcmData, sampleRate, reverbTime = 2.0, decayRate = 8.0) {
+async function applyReverbOffline(pcmData, sampleRate, reverbTime = 2.0, decayRate = 8.0, seed) {
     const offlineContext = new OfflineAudioContext(1, pcmData.length, sampleRate);
 
     const audioBuffer = offlineContext.createBuffer(1, pcmData.length, sampleRate);
@@ -15,7 +15,7 @@ async function applyReverbOffline(pcmData, sampleRate, reverbTime = 2.0, decayRa
     const impulseData = impulseBuffer.getChannelData(0);
 
     
-    Math.newRandom(0);
+    Math.newRandom(seed);
     for (let i = 0; i < impulseData.length; i++) {
         impulseData[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / impulseData.length, decayRate);
     }
@@ -41,12 +41,14 @@ addBlockType("reverb", {
         "DecayRate": [8, "number"],
         "Volume": [0.5, "number", 1],
         "Offset": [0, "number", 1],
+        "SeedLeft": [0, "number"],
+        "SeedRight": [0, "number"],
         "Method": ["Overwrite", ["Additive", "Overwrite"]]
     },
     functor: async function (inPcm, channel, data) {
         var volume = _(this.conf.Volume);
         var offset = _(this.conf.Offset);
-        const reverb = await applyReverbOffline(inPcm, audio.samplerate, this.conf.ReverbTime, this.conf.DecayRate);
+        const reverb = await applyReverbOffline(inPcm, audio.samplerate, this.conf.ReverbTime, this.conf.DecayRate, channel === 0 ? this.conf.SeedLeft : this.conf.SeedRight);
 
         reverb.forEach((x, i)=>{
             reverb[i] ||= 0;

@@ -134,7 +134,7 @@ function createOptionsMenu(loop, definition) {
 
     optionsMenu.loadValues = () => {
         optionKeys.forEach(key => {
-            var input = optionsMenu.querySelector(`[data-key=${key}]`);
+            var input = optionsMenu.querySelector(`[data-key="${key}"]`);
             if (definition.configs[key][1] === "checkbox") {
                 input.checked = loop["conf"][key];
             } else {
