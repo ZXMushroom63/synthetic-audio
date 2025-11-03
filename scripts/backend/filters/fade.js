@@ -1,6 +1,7 @@
 addBlockType("fadein", {
     color: "rgba(0,255,0,0.3)",
     title: "Fade In",
+    amplitude_smoothing_knob: true,
     directRefs: ["fdin"],
     configs: {
         "Exponent": [1, "number", 1],
@@ -17,6 +18,7 @@ addBlockType("fadein", {
 addBlockType("fadeout", {
     color: "rgba(0,255,0,0.3)",
     title: "Fade Out",
+    amplitude_smoothing_knob: true,
     directRefs: ["fdout"],
     configs: {
         "Exponent": [1, "number", 1],
