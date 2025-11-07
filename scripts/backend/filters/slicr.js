@@ -115,9 +115,9 @@ addBlockType("slicr", {
                     return;
                 }
                 if (sampLen === null) {
-                    let len = Math.min(out.length - k - 1, slice.ref.length - 1);
+                    let len = Math.max(0, Math.min(out.length - k - 1, slice.ref.length - 1));
                     if (this.conf["4/4BeatFlooring"]) {
-                        len = Math.floor((2**(Math.round(Math.log2(len / audio.samplerate / audio.beatSize)))) * audio.beatSize * audio.samplerate);
+                        len = Math.max(0, Math.floor((2**(Math.round(Math.log2(len / audio.samplerate / audio.beatSize)))) * audio.beatSize * audio.samplerate));
                     }
                     out.set(slice.ref.subarray(0, len), k);
                     k += len;
