@@ -1,5 +1,6 @@
 registerSetting("WakatimeEnabled", false);
 registerSetting("WakatimeToken", "(token here)");
+registerSetting("WakatimeInterval", 120);
 registerSetting("WakatimeEndpoint", "https://wakahost.example.com/api/waka/v1");
 (function waka() {
 
@@ -71,7 +72,7 @@ registerSetting("WakatimeEndpoint", "https://wakahost.example.com/api/waka/v1");
             });
             accEdits === 0;
         }
-        activityTimer = setTimeout(wakatime_start, 2 * 60 * 1000);
+        activityTimer = setTimeout(wakatime_start, Math.max(10, settings.WakatimeInterval) * 1000);
     }
     wakatime_start();
     globalThis.wakatimeInteraction = function wakatimeInteraction() {
