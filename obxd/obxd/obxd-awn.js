@@ -127,18 +127,13 @@ class OBXD extends AudioWorkletNode {
 
 OBXD.banklist = [
   "ABS-OBXD-Custom Shop v1.fxb",
-  "Breeze_Meat-n-Potatoes.fxb",
   "Breeze_Meat-n-Potatoes_rev1.fxb",
-  "Breeze_Meat-n-Potatoes_rev3b-ALPHA.fxb",
-  "Breeze_Meat-n-Potatoes_rev3b.fxb",
   "factory.fxb",
   "FMR - OB-Xa Patch Book.fxb",
   "IW_OBXD Bank 1_Rev 1.11.fxb",
   "Joel.fxb",
   "Kujashi-OBXD-Bank.fxb",
   "OBXD Init Bank.fxb",
-  "OBXD - KVR Community Bank - Part 1.fxb",
-  "OBXD - KVR Community Bank - Part 2.fxb",
   "OBXd Bank by Rin_Elyran.fxb",
   "OBXD_AZurStudio.fxb",
   "Xenos Soundworks.fxb"
