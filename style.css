@@ -1215,7 +1215,7 @@ li {
   outline: 0;
   border: 0;
   background: transparent;
-  color: rgba(255,255,255,0.55);
+  color: rgba(255, 255, 255, 0.55);
   overflow: hidden;
 }
 
@@ -1237,7 +1237,7 @@ a[href]:hover {
   opacity: 1;
   pointer-events: all;
   user-select: contain;
-  color: rgba(255,255,255,1);
+  color: rgba(255, 255, 255, 1);
 
   -webkit-appearance: none;
   -moz-appearance: none;
@@ -1259,11 +1259,27 @@ a[href]:hover {
   white-space: normal;
 }
 
+.obxdcontainer {
+  width: 550px;
+}
+
+.obxdwindow {
+  background-color: black;
+  border: 1px solid white;
+  border-radius: 5px;
+  width: 805px;
+  height: 442px;
+  transform: scale(0.65) translate(-209px, -115px);
+  overflow: hidden;
+  margin-bottom: -8rem;
+  display: block;
+}
+
 @media print {
   body *:not(.printable, .printable *) {
     display: none;
   }
-  
+
   * {
     contain: style !important;
   }

@@ -141,6 +141,10 @@ function createOptionsMenu(loop, definition) {
                 input.value = loop["conf"][key];
             }
         });
+
+        if (definition.drawOptionsMiddleware) {
+            definition.drawOptionsMiddleware(loop);
+        }
     };
     optionsMenu.addEventListener("mousedown", (e) => { e.stopPropagation(); document.querySelector(".multiEditMenu")?.saveAndClose(); });
 

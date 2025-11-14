@@ -1,0 +1,169 @@
+<html>
+
+<head>
+  <title>WAM OBXD</title>
+  <script src="obxd/gui/lib/platform.js"></script>
+  <script src="audioworklet.js"></script>
+  <script src="obxd/obxd-awn.js"></script>
+  <script src="obxd/midi.js"></script>
+  <script src="obxd/gui/lib/keys.js"></script>
+  <link rel="import" href="obxd/gui/lib/polymer.html">
+  <link rel="import" href="obxd/gui/lib/daw-knob.html">
+  <link rel="import" href="obxd/gui/lib/daw-toggle.html">
+  <link rel="import" href="obxd/gui/frontpanel.html">
+  <link rel="stylesheet" href="obxd/gui/obxd.css">
+  <script>
+    var obxd, actx;
+    var inited = false;
+
+    function main() {
+      document.onclick = null;
+      actx = detectFeatures();
+      if (actx) {
+        // -- midi keyboard
+        var velo = 100;
+
+        var midikeys = new QwertyHancock({
+          container: document.getElementById("keyboard"), width: 805, height: 60, margin: 0,
+          octaves: 7, startNote: 'C2', oct: 4,
+          whiteNotesColour: 'white', blackNotesColour: 'black', activeColour: 'lightblue'
+        });
+        midikeys.keyDown = (note, name) => onMIDI({ data: [0x90, note, velo] });
+        midikeys.keyUp = (note, name) => onMIDI({ data: [0x80, note, velo] });
+
+        // -- synth
+        OBXD.importScripts(actx).then(() => {
+          obxd = new OBXD(actx);
+          obxd.connect(actx.destination);
+          console.log("init");
+          initPresets();
+          if (ischrome) initMidi();
+          window.parent.obxdInstance = obxd;
+          console.log("OBXD Bridge initiated");
+        });
+      }
+
+      //const knobs = document.getElementsByTagName("daw-knob");
+      //knobs[knobs.length - 1].appendChild(document.querySelector("#keys"));
+    }
+
+    function detectFeatures() {
+      var actx = null;
+      if (typeof WebAssembly !== "object") {
+        document.querySelector("main").style.display = "none";
+        document.querySelector("#no-wasm").style.display = "block";
+      }
+      else {
+        ischrome = navigator.userAgent.indexOf('Chrome') > -1;
+        if (ischrome)
+          Object.values(document.querySelectorAll("select")).forEach(function (s) { s.className = "chrome"; });
+        else document.querySelector("#midiIn").disabled = true;
+
+        if (AWPF.isAudioWorkletPolyfilled) {
+          document.querySelector("#spn-fallback").style.display = "block";
+          actx = AWPF.context;
+        }
+        else actx = new AudioContext();
+      }
+      return actx;
+    }
+
+    function initPresets() {
+      // -- populate comboboxes
+      var banks = document.getElementById("banks");
+      var patches = document.getElementById("patches");
+      OBXD.banklist.forEach(name => { banks.appendChild(new Option(name)); });
+
+      // -- change bank
+      banks.onchange = function (e) { setBank(e.target.value); }
+      banks.onchange({ target: banks });
+
+      // -- change patch
+      patches.onchange = function (e) { setPatch(e.target.selectedIndex); }
+      document.getElementById("patches").selectedIndex = 1;
+    }
+
+    function setBank(name) {
+      var patches = document.getElementById("patches");
+      obxd.load(name).then(bank => {
+        patches.innerHTML = "";
+        bank.forEach(name => { patches.appendChild(new Option(name)); });
+        if (!inited) { inited = true; patches.selectedIndex = 2; }
+        patches.onchange({ target: patches });
+      })
+    }
+
+    function setPatch(index) {
+      var patch = obxd.bank[index];
+      obxd.port.postMessage({ type: "patch", data: Float32Array.from(patch).buffer });
+      document.querySelector("juce-obxd").setPatch(patch);
+    }
+
+    function onbuffersize(numSamples) {
+      obxd.disconnect();
+      console.log("deinit");
+      obxd = new OBXD(actx, { samplesPerBuffer: numSamples | 0 });
+      obxd.connect(actx.destination);
+      console.log("init");
+      inited = false;
+      var banks = document.getElementById("banks");
+      banks.onchange({ target: banks });
+    }
+    async function offlineTest() {
+      oobxd.port.postMessage({ type: "midi", data: [0x90, 128, 100] }); //C5
+      const out = await oactx.startRendering();
+      console.log(out);
+    }
+    function waitTillReady() {
+      return new Promise((res, rej) => {
+        function inner() {
+          if (document.getElementById("VOLUME") && globalThis.onMIDI) {
+            setTimeout(() => res(), 250);
+          } else {
+            setTimeout(inner, 250);
+          }
+        }
+        inner();
+      });
+    }
+
+    addEventListener("contextmenu", (e) => {
+      e.preventDefault();
+    });
+
+    waitTillReady().then(() => {
+      main();
+      window.parent.OBXD = OBXD;
+    })
+  </script>
+</head>
+
+<body>
+  <main>
+    <div id="topbar">
+      <div>webOBXD //</div>
+      <div class="right">
+        <div class="control">
+          <label>bank</label>
+          <select id="banks"></select>
+        </div>
+        <div class="control">
+          <label>patch</label>
+          <select id="patches"></select>
+        </div>
+        <div class="control">
+          <label>midi in</label>
+          <select id="midiIn"></select>
+        </div>
+      </div>
+    </div>
+    <juce-obxd>
+
+    </juce-obxd>
+    <div id="keys">
+      <div id="keyboard"></div>
+    </div>
+  </main>
+</body>
+
+</html>
