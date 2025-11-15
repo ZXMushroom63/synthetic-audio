@@ -346,10 +346,12 @@ addEventListener("init", () => {
             return;
         }
 
-        var activeNode = document.querySelector(".loop.active");
+        var activeNode = document.querySelector(".loop.active:not(.selected)");
         if (activeNode) {
             const def = filters[activeNode.getAttribute("data-type")];
-            def.applyMidi(activeNode, note, quantise(velocity / 127, 0.01));
+            if (def.applyMidi) {
+                def.applyMidi(activeNode, note, quantise(velocity / 127, 0.01));
+            }
             if (def.updateMiddleware) {
                 def.updateMiddleware(activeNode);
             }
@@ -357,14 +359,16 @@ addEventListener("init", () => {
             multiplayer.patchLoop(activeNode);
             return;
         }
-        var caretNode = document.querySelector(".loop.caret:not([data-deleted])");
+        var caretNode = document.querySelector(".loop.caret:not([data-deleted]):not(.selected)");
         if (!caretNode) {
             return;
         }
         const ser = structuredClone(serialiseNode(caretNode));
 
         const def = filters[caretNode.getAttribute("data-type")];
-        def.applyMidi(ser, note, quantise(velocity / 127, 0.01));
+        if (def.applyMidi) {
+            def.applyMidi(ser, note, quantise(velocity / 127, 0.01));
+        }
         
         if ((Date.now() * midiTimescale - lastInsertionTime) > (settings.MIDIInsertionMaximumGap * 1000) * midiTimescale) {
             insertionBaseTime = Date.now() * midiTimescale;
