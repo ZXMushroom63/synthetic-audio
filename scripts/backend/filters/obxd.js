@@ -23,16 +23,25 @@ addBlockType("fakemidi", {
         const startOffset = Math.ceil(((currentlyRenderedLoop?.start || 0) * audio.samplerate) / FAKEMIDI_DISCRETE_INTERVAL) * FAKEMIDI_DISCRETE_INTERVAL - start;
         const endOffset = Math.floor(((currentlyRenderedLoop?.end || 0) * audio.samplerate) / FAKEMIDI_DISCRETE_INTERVAL) * FAKEMIDI_DISCRETE_INTERVAL - start - FAKEMIDI_DISCRETE_INTERVAL;
 
+        if ((startOffset + FAKEMIDI_DISCRETE_INTERVAL) > inPcm.length) {
+            console.warn("FakeMIDI Skipped.", this);
+            return inPcm;
+        }
+        if ((endOffset + FAKEMIDI_DISCRETE_INTERVAL) > inPcm.length) {
+            console.warn("FakeMIDI Skipped.", this);
+            return inPcm;
+        }
+
         inPcm.set(FAKEMIDI_MAGIC, startOffset);
         inPcm.set(FAKEMIDI_MAGIC, endOffset);
         const mid = Math.min(127, Math.max(0, Math.floor(freq2midi(_(this.conf.Note)(0, new Float32Array(2))))));
-        const vel = Math.min(0.999, Math.max(0, _(this.conf.Velocitz)(0, new Float32Array(2))));
+        const vel = Math.min(0.999, Math.max(0, _(this.conf.Velocity)(0, new Float32Array(2))));
 
-        inPcm[startOffset + 8 + 3 * mid + 0] = 1;
-        inPcm[startOffset + 8 + 3 * mid + 2] = this.conf.Velocity;
+        inPcm[startOffset + 8 + 3 * mid + 0] = 2;
+        inPcm[startOffset + 8 + 3 * mid + 2] = vel;
 
-        inPcm[endOffset + 8 + 3 * mid + 1] = -1;
-        inPcm[endOffset + 8 + 3 * mid + 2] = this.conf.Velocity;
+        inPcm[endOffset + 8 + 3 * mid + 1] = -2;
+        inPcm[endOffset + 8 + 3 * mid + 2] = vel;
         return inPcm;
     },
     initMiddleware: (loop) => {
@@ -98,10 +107,10 @@ addBlockType("fakemidi_debugger", {
                     const velocity = chunk[8 + j + 2];
                     const event = noteOn || noteOff;
                     if (event) {
-                        if (noteOff) {
+                        if (noteOff === -2) {
                             console.log(time, "Midi Note ", indexToChromatic(Math.floor(j / 3) - 12), " Off Event");
                         }
-                        if (noteOn) {
+                        if (noteOn === 2) {
                             console.log(time, "Midi Note ", indexToChromatic(Math.floor(j / 3) - 12), " On Event, vel: ", velocity);
                         }
                     }
@@ -166,7 +175,11 @@ addBlockType("obxd_port", {
         const button = optsMenu.querySelector("button");
 
         if ('moveBefore' in HTMLElement.prototype) {
-            optsMenu.moveBefore(OBXDFrame, button);
+            try {
+                optsMenu.moveBefore(OBXDFrame, button);
+            } catch (error) {
+
+            }
         } else {
             button.insertAdjacentElement("beforebegin", OBXDFrame);
             obxdInstance = null;
@@ -196,32 +209,46 @@ addBlockType("obxd_port", {
         const start = Math.floor((currentlyRenderedLoop?.start || 0) * audio.samplerate);
         const startOffset = Math.ceil(((currentlyRenderedLoop?.start || 0) * audio.samplerate) / FAKEMIDI_DISCRETE_INTERVAL) * FAKEMIDI_DISCRETE_INTERVAL - start;
         const midiBundle = [];
-        for (let i = startOffset; i < inPcm.length; i += FAKEMIDI_DISCRETE_INTERVAL) {
-            const chunk = inPcm.subarray(i, i + FAKEMIDI_DISCRETE_INTERVAL);
-            if (verifyFakeMidiBlock(chunk)) {
+        let headerCheckIndex = 0;
+        for (let i = startOffset; i < inPcm.length; i += 1) {
+            if (headerCheckIndex >= FAKEMIDI_MAGIC.length) {
+                
+                const chunk = inPcm.subarray(i - 8, i + FAKEMIDI_DISCRETE_INTERVAL - 8);
+                i += 381 - 1; // actual discrete interval size
+                headerCheckIndex = 0;
+                const time = "[" + (i / audio.samplerate).toFixed(2) + "s]"
                 for (let j = 0; j < FAKEMIDI_DISCRETE_INTERVAL - 8; j += 3) {
                     const noteOn = chunk[8 + j];
                     const noteOff = chunk[8 + j + 1];
                     const velocity = chunk[8 + j + 2];
                     const event = noteOn || noteOff;
-                    const discrete = {time: (i / audio.samplerate), midiPackets: []};
+                    const discrete = { time: (i / audio.samplerate), midiPackets: [] };
                     if (event) {
                         const k = Math.min(127, Math.floor(j / 3));
                         const vel = Math.floor(Math.min(0.999, Math.max(0, velocity)) * 128);
-                        if (noteOff) {
+                        if (noteOff === -2) {
                             discrete.midiPackets.push([0x80, k, vel]);
+                            console.log(time, "Midi Note ", indexToChromatic(Math.floor(j / 3) - 12), " Off Event");
                         }
-                        if (noteOn) {
+                        if (noteOn === 2) {
                             discrete.midiPackets.push([0x90, k, vel]);
+                            console.log(time, "Midi Note ", indexToChromatic(Math.floor(j / 3) - 12), " On Event, vel: ", vel);
                         }
                     }
                     if (discrete.midiPackets.length > 0) {
                         midiBundle.push(discrete);
                     }
                 }
+                continue;
+            } else if (FAKEMIDI_MAGIC[headerCheckIndex] === inPcm[i]) {
+                headerCheckIndex++;
+                continue;
+            } else {
+                headerCheckIndex = 0;
+                continue;
             }
         }
-        localOBXD.port.postMessage({type: "midibundle", data: midiBundle});
+        localOBXD.port.postMessage({ type: "midibundle", data: midiBundle });
         await wait(1 / 30);
         const result = await actx.startRendering();
         return result.getChannelData(0);

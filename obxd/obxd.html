@@ -54,7 +54,7 @@
         document.querySelector("#no-wasm").style.display = "block";
       }
       else {
-        ischrome = navigator.userAgent.indexOf('Chrome') > -1;
+        ischrome = true;
         if (ischrome)
           Object.values(document.querySelectorAll("select")).forEach(function (s) { s.className = "chrome"; });
         else document.querySelector("#midiIn").disabled = true;

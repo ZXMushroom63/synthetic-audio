@@ -531,7 +531,7 @@ function constructRenderDataArray(data) {
 
                 const durationSamples = Math.round(x.duration * audio.samplerate); //'+1' = TypedArray.set being a pain
                 const endIndex = durationSamples + startIndex;
-                const clippedDuration = Math.min(endIndex, audio.length) - startIndex;
+                const clippedDuration = Math.max(0, Math.min(endIndex, audio.length) - startIndex);
 
                 if (x?.definition?.clearCache) {
                     x.definition.clearCache(
@@ -661,6 +661,9 @@ async function render() {
                             nodeDef.postProcessor.apply(node, [newPcm, data]);
                         }
                         for (let c = 0; c < channels; c++) {
+                            if ((startTime + newPcm[c].length) > currPcm[c].length) {
+                                continue;
+                            }
                             currPcm[c].set(newPcm[c], startTime);
 
                             if (!layerCache[abstractLayerMaps.layerId]) {

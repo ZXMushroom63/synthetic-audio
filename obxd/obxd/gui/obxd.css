@@ -11,10 +11,10 @@ p { line-height:18px; }
 #no-wasm { display:none; }
 
 #topbar { display:flex; background:#222; color:#eee; width:805px; height:40px; line-height:40px; padding-left:10px; }
-.right { display:flex; margin-left:auto; }
+.right { display:flex; margin-left:auto; margin-right: 10px; }
 .control { margin:0 10px; }
 label  { color:#bbb; font-size:12px; }
-select.chrome { background:#222; color:#eee; height:20px; margin-top:10px; cursor:pointer; }
+select.chrome { max-width: 10rem; background:#222; color:#eee; height:20px; margin-top:10px; cursor:pointer; }
 li { cursor:pointer; }
 body, html {
   margin: 0;

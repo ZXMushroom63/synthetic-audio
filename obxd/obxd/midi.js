@@ -1,12 +1,11 @@
 const midiMap = {};
 var midiPort;
 
-function initMidi () {
-  let combo = document.querySelector("#midiIn");
+function initMidi() {
+  let combo = document.getElementById("midiIn");
   navigator.requestMIDIAccess().then((midiIF) => {
     for (let input of midiIF.inputs.values()) {
       let option = new Option(input.name);
-      option.port = input;
       midiMap[input.name] = input;
       combo.appendChild(option);
     }
