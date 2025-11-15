@@ -78,7 +78,7 @@ function verifyFakeMidiBlock(pcm) {
 }
 addBlockType("fakemidi_debugger", {
     color: "rgba(0,255,0,0.3)",
-    title: "FakeMIDI Export",
+    title: "FakeMIDI Debugger",
     configs: {
         "Info": ["Logs printed in developer console", "textarea", 2]
     },
