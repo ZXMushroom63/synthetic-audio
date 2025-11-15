@@ -16,6 +16,9 @@ addBlockType("fakemidi", {
     },
     forcePrimitive: true,
     functor: function (inPcm, channel, data) {
+        if (inPcm.length < FAKEMIDI_DISCRETE_INTERVAL * 2) {
+            return inPcm;
+        }
         const start = Math.floor((currentlyRenderedLoop?.start || 0) * audio.samplerate);
         const startOffset = Math.ceil(((currentlyRenderedLoop?.start || 0) * audio.samplerate) / FAKEMIDI_DISCRETE_INTERVAL) * FAKEMIDI_DISCRETE_INTERVAL - start;
         const endOffset = Math.floor(((currentlyRenderedLoop?.end || 0) * audio.samplerate) / FAKEMIDI_DISCRETE_INTERVAL) * FAKEMIDI_DISCRETE_INTERVAL - start - FAKEMIDI_DISCRETE_INTERVAL;
