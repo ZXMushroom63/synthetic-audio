@@ -235,11 +235,11 @@ addBlockType("obxd_port", {
                         const vel = Math.floor(Math.min(0.999, Math.max(0, velocity)) * 128);
                         if (noteOff === -2) {
                             discrete.midiPackets.push([0x80, k, vel]);
-                            console.log(time, "Midi Note ", indexToChromatic(Math.floor(j / 3) - 12), " Off Event");
+                            //console.log(time, "Midi Note ", indexToChromatic(Math.floor(j / 3) - 12), " Off Event");
                         }
                         if (noteOn === 2) {
                             discrete.midiPackets.push([0x90, k, vel]);
-                            console.log(time, "Midi Note ", indexToChromatic(Math.floor(j / 3) - 12), " On Event, vel: ", vel);
+                            //console.log(time, "Midi Note ", indexToChromatic(Math.floor(j / 3) - 12), " On Event, vel: ", vel);
                         }
                     }
                     if (discrete.midiPackets.length > 0) {
