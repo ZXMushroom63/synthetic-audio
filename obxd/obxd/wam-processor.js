@@ -10,7 +10,9 @@ class WAMProcessor extends AudioWorkletProcessor
   
   constructor(options) {
     super(options);
-    options = options || {}
+    options = options || {};
+    Math.newRandom(options.processorOptions.seed || 0);
+    Date.now = ()=>options.processorOptions.seed*4;
     this.bufsize = options.samplesPerBuffer || 128;
     this.sr = AudioWorkletGlobalScope.sampleRate || sampleRate;
     this.audiobufs = [[],[]];

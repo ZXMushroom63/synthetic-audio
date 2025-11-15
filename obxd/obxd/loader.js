@@ -1,3 +1,17 @@
+Math.newRandom = function seedRandom(seed) {
+    seed++;
+    let m = 0x80000000; // 2^31
+    let a = 1103515245;
+    let state = seed ? seed : Math.floor(Math.random() * (m - 1));
+
+    Math.random = function () {
+        state = (a * state) % m;
+        return state / (m - 1);
+    };
+
+    return Math.random;
+}
+
 var Module;
 if (!Module) Module = (typeof AudioWorkletGlobalScope.WAM !== "undefined" ? AudioWorkletGlobalScope.WAM : null) || {};
 var moduleOverrides = {};
@@ -4303,15 +4317,13 @@ var FS = {
         FS.mkdev("/dev/tty1", FS.makedev(6, 0));
         var random_device;
         if (typeof crypto !== "undefined") {
-            var randomBuffer = new Uint8Array(1);
             random_device = (function() {
-                crypto.getRandomValues(randomBuffer);
-                return randomBuffer[0]
+                return Math.random() * 256 | 0
             })
         } else if (ENVIRONMENT_IS_NODE) {
             random_device = (function() {
-                return require("crypto").randomBytes(1)[0]
-            })
+                return Math.random() * 256 | 0
+            });
         } else {
             random_device = (function() {
                 return Math.random() * 256 | 0

@@ -8,6 +8,8 @@ class OBXD extends AudioWorkletNode {
     options.numberOfInputs = 0;
     options.numberOfOutputs = 1;
     options.ioConfiguration = { outputs: [1] };
+    options.processorOptions ||= {};
+    options.processorOptions.seed ||= 0;
 
     super(actx, "OBXD", options);
 

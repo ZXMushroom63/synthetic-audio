@@ -144,6 +144,8 @@ addBlockType("obxd_port", {
     hidden: location.protocol === "file:",
     configs: {
         Patch: ['63|!!!!!!!!ĊAQ`!!Å`²Ĭŀ_Úd,_!!!!!!!!!!!!½ă@_´3$`ĕCĠ_!!!!ëàĉ_!!Å`w/N`V¡ÿ_!!!!!!!!!!!!!!!!w/N`µ^+`!!!!!!!!!!Å`!!Å`!!Å`!!Å`ā¹Ø_!!!!ırý_!!!!!!Å`!!!!!!Å`!!!!N÷>`Ĺłę_Ä¯]`!!Å`Zùi`R)ñ_!!Å`0NS`ïĶė_ûĸÂ_!!!!!!!!!!Å`mXÎ_Łî¶_éµ^`±Ĭŀ_}Ôc`V¡ÿ_V¡[`ãĴH`2yZ`Ēđm_įGR`!!!`ãĴH_ĮGR`R)ñ_íċl`À5O`V¡ÿ_yZU`Ĩêà_!!!!', "text", 2],
+        LSeed: [0, "number"],
+        RSeed: [0, "number"],
     },
     waterfall: 2,
     initMiddleware: (loop) => {
@@ -193,16 +195,20 @@ addBlockType("obxd_port", {
             obxdInstance.onChange = null;
             obxdInstance.loadPatchData(buf);
             obxdInstance.onChange = () => { saveBtn.innerText = "Save*" };
+            findLoops(".loop[data-type=obxd_port]").forEach((l)=>markLoopDirty(l, true));
         });
     },
     functor: async function (inPcm, channel, data) {
+        if (!globalThis.OBXD) {
+            return inPcm;
+        }
         const actx = new OfflineAudioContext({
             length: inPcm.length,
             sampleRate: audio.samplerate,
             numberOfChannels: 1 //OBXD no stereo support :(
         })
         await OBXD.importScripts(actx, "obxd/");
-        const localOBXD = new OBXD(actx);
+        const localOBXD = new OBXD(actx, {processorOptions: {seed: channel === 0 ? this.conf.LSeed : this.conf.RSeed}});
         localOBXD.connect(actx.destination);
         const base = this.conf.Patch.substring(3);
         const buf = stringToUint8(base).buffer;
