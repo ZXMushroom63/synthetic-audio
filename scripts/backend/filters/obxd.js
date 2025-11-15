@@ -140,6 +140,7 @@ function waitForOBXDInstance() {
 addBlockType("obxd_port", {
     color: "rgba(149, 0, 255, 0.3)",
     title: "SnOBXD Synth - FakeMIDI",
+    amplitude_smoothing_knob: true,
     hidden: location.protocol === "file:",
     configs: {
         Patch: ['63|!!!!!!!!ĊAQ`!!Å`²Ĭŀ_Úd,_!!!!!!!!!!!!½ă@_´3$`ĕCĠ_!!!!ëàĉ_!!Å`w/N`V¡ÿ_!!!!!!!!!!!!!!!!w/N`µ^+`!!!!!!!!!!Å`!!Å`!!Å`!!Å`ā¹Ø_!!!!ırý_!!!!!!Å`!!!!!!Å`!!!!N÷>`Ĺłę_Ä¯]`!!Å`Zùi`R)ñ_!!Å`0NS`ïĶė_ûĸÂ_!!!!!!!!!!Å`mXÎ_Łî¶_éµ^`±Ĭŀ_}Ôc`V¡ÿ_V¡[`ãĴH`2yZ`Ēđm_įGR`!!!`ãĴH_ĮGR`R)ñ_íċl`À5O`V¡ÿ_yZU`Ĩêà_!!!!', "text", 2],
