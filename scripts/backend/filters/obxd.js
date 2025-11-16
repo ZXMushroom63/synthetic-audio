@@ -265,6 +265,11 @@ addBlockType("obxd_port", {
             const base = uint8ToString(new Uint8Array(obxdInstance.serialiseToPatchData())).join("");
             const hash = ("0" + (cyrb53(base) % (16 ** 2)).toString(16));
             const val = hash.substring(hash.length - 2, hash.length) + "|" + base;
+            commit(new UndoStackEdit(
+                this,
+                "Patch",
+                this["conf"]["Patch"]
+            ));
             this.querySelector("[data-key=Patch]").value = val;
             this.conf.Patch = val;
             markLoopDirty(this);
