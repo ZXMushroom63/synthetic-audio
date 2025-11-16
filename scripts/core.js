@@ -178,7 +178,8 @@ function addWetDryKnobs(data) {
     }
 }
 function addAmpSmoothKnob(data) {
-    data.configs["AmplitudeSmoothing"] = [0.0, "number"];
+    data.configs["AmplitudeSmoothing"] ||= [0.0, "number"];
+    data.configs["AmplitudeSmoothing"][1] = "number";
     var oldFunctor = data.functor;
     data.functor = function (inPcm, channel, data) {
         const out = oldFunctor.apply(this, [inPcm, channel, data]);
