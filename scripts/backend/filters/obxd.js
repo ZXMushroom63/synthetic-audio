@@ -276,6 +276,12 @@ addBlockType("obxd_port", {
             markLoopDirty(this);
             multiplayer.patchLoop(this);
             this.querySelector(".loopOptionsMenu button:last-child").innerText = "Save";
+        },
+        "How": function () {
+            alert("How to use SnOBXd", `<span style="white-space: break-spaces">Use the FakeMIDI node to create a MIDI signal, and then use this node to convert that into an instrument.</span>`);
+        },
+        "Manual":  function () {
+            window.open("https://linuxsynths.com/ObxdPatchesDemos/unofficial-obxd-manual.pdf");
         }
     }
 });
