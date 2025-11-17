@@ -86,6 +86,7 @@
     function setBank(name) {
       var patches = document.getElementById("patches");
       obxd.load(name).then(bank => {
+        console.log(bank);
         patches.innerHTML = "";
         bank.forEach(name => { patches.appendChild(new Option(name)); });
         if (!inited) { inited = true; patches.selectedIndex = 2; }

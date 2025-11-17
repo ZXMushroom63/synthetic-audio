@@ -1,3 +1,4 @@
+const IDB_SAMPLES = [...window.parent.OBXD_PATCHNAMES];
 // OBXD WAM Controller
 // Jari Kleimola 2017 (jari@webaudiomodules.org)
 
@@ -86,50 +87,60 @@ class OBXD extends AudioWorkletNode {
     })
   }
 
-  load(filename) {
+  loadBankBytes(data) {
+    this.patches = [];
+    this.bank = [];
+    var arr = new Uint8Array(data);
+
+    // -- oh dear, cannot use DOMParser since fxb attribute names start with a number
+    var s = String.fromCharCode.apply(null, arr.subarray(168, arr.length - 1));
+    var i1 = s.indexOf("<programs>");
+    var i2 = s.indexOf("</programs>");
+    if (i1 > 0 && i2 > 0) {
+      s = s.slice(i1 + 10, i2);
+      i2 = 0;
+      i1 = s.indexOf("programName");
+      var patchCount = 0;
+      while (i1 > 0 && patchCount++ < 128) {
+        var n1 = s.indexOf('\"', i1);
+        var n2 = s.indexOf('\"', n1 + 1);
+        if (n1 < 0 || n2 < 0) break;
+        this.patches.push(s.slice(n1 + 1, n2));
+        i2 = s.indexOf("/>", n2);
+        if (i2 > 0) {
+          var s2 = s.slice(n2 + 2, i2);
+          var tokens = s2.split(' ');
+          if (tokens.length == 71) {
+            var patch = [];
+            for (var i = 0; i < tokens.length; i++) {
+              var pair = tokens[i].split('"');
+              patch.push(parseFloat(pair[1]));
+            }
+            this.bank.push(patch);
+          }
+        }
+        i1 = s.indexOf("programName", i2);
+      }
+    }
+  }
+
+  async load(filename) {
+    const IS_IDB = IDB_SAMPLES.includes(filename);
     var self = this;
     var url = "obxd/presets/" + filename;
+    if (IS_IDB) {
+      url = URL.createObjectURL(await window.parent.getSample(filename));
+    }
     return new Promise((resolve, reject) => {
       fetch(url).then(resp => {
         resp.arrayBuffer().then(data => {
-
-          self.patches = [];
-          self.bank = [];
-          var arr = new Uint8Array(data);
-
-          // -- oh dear, cannot use DOMParser since fxb attribute names start with a number
-          var s = String.fromCharCode.apply(null, arr.subarray(168, arr.length - 1));
-          var i1 = s.indexOf("<programs>");
-          var i2 = s.indexOf("</programs>");
-          if (i1 > 0 && i2 > 0) {
-            s = s.slice(i1 + 10, i2);
-            i2 = 0;
-            i1 = s.indexOf("programName");
-            var patchCount = 0;
-            while (i1 > 0 && patchCount++ < 128) {
-              var n1 = s.indexOf('\"', i1);
-              var n2 = s.indexOf('\"', n1 + 1);
-              if (n1 < 0 || n2 < 0) break;
-              self.patches.push(s.slice(n1 + 1, n2));
-              i2 = s.indexOf("/>", n2);
-              if (i2 > 0) {
-                var s2 = s.slice(n2 + 2, i2);
-                var tokens = s2.split(' ');
-                if (tokens.length == 71) {
-                  var patch = [];
-                  for (var i = 0; i < tokens.length; i++) {
-                    var pair = tokens[i].split('"');
-                    patch.push(parseFloat(pair[1]));
-                  }
-                  self.bank.push(patch);
-                }
-              }
-              i1 = s.indexOf("programName", i2);
-            }
+          self.loadBankBytes(data);
+          if (IS_IDB) {
+            URL.revokeObjectURL(url)
           }
           resolve(self.patches);
-        })
-      })
+        });
+      });
     });
   }
 }
@@ -145,6 +156,6 @@ OBXD.banklist = [
   "OBXD Init Bank.fxb",
   "OBXd Bank by Rin_Elyran.fxb",
   "OBXD_AZurStudio.fxb",
-  "Xenos Soundworks.fxb"
+  "Xenos Soundworks.fxb",
+  ...IDB_SAMPLES
 ];
-

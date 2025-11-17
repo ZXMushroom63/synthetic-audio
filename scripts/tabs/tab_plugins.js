@@ -381,6 +381,20 @@ addEventListener("init", async () => {
         });
         f.click();
     }, "usamples");
+    mkBtn("Upload OB-Xd Bank (.fxb)", () => {
+        var f = document.createElement("input");
+        f.type = "file";
+        f.multiple = true;
+        f.accept = ".fxb";
+        f.addEventListener("input", async () => {
+            var files = [...f.files].filter(x => x.name.endsWith(".fxb"));
+            for (x of files) {
+                await addSample(x.name, x);
+                await drawModArray();
+            }
+        });
+        f.click();
+    }, "ufxb");
     if (!IS_DISCORD) {
         mkBtn("Download SYNTHETIC Extras", async () => {
             var modList = (await (await fetch("https://zxmushroom63.github.io/synthetic-audio/extras/list.txt?plugin=true")).text()).split("\n").filter(x => !!x);
@@ -513,6 +527,7 @@ addEventListener("init", async () => {
     loadingScreenModMenu.init();
     logDiagnostics();
     var modList = await getMods();
+    OBXD_PATCHNAMES.push(...modList.filter(x => x.endsWith(".fxb")));
     for (let i = 0; i < modList.length; i++) {
         if (keymap["Shift"]) {
             break;
