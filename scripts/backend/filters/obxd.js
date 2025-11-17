@@ -268,6 +268,9 @@ addBlockType("obxd_port", {
         "Manual":  function () {
             window.open("https://linuxsynths.com/ObxdPatchesDemos/unofficial-obxd-manual.pdf");
         },
+        "Dbg": function () {
+            obxdInstance.debugReload();
+        },
         "Save": function () {
             const base = uint8ToString(new Uint8Array(obxdInstance.serialiseToPatchData())).join("");
             const hash = ("0" + (cyrb53(base) % (16 ** 2)).toString(16));

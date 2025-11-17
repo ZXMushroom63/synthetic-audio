@@ -15,6 +15,11 @@
 			if (0 < value && value < 1)
 				value = Math.round(this.value * this.states) % this.states;
 			var dy = value * -this.H; // -parseInt(this.$.elem.style.height);
+			if (dy === -256) {
+				debugger;
+			} else {
+				console.log(dy);
+			}
 			this.$.image.style.transform = "translateY(" + dy + "px)";
 			if (this.interacting)
 			{

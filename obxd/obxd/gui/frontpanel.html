@@ -146,15 +146,15 @@
 			{
 				var id = this.map[i];
 				var widget = this.$[id];
-				if (id == "VOICE_COUNT") widget.value = Math.round(patch[i] * 8 - 1);
-				else if (id == "LEGATOMODE") widget.value = Math.round(patch[i] * 4 - 1);
+				if (id == "VOICE_COUNT") widget.value = Math.floor(patch[i] * 7);
+				else if (id == "LEGATOMODE") {widget.value = Math.floor(patch[i] * 3);}
 				else widget.value = patch[i];
 			}
 		},
 		handleEvent: function(e)
 		{
       if (e.detail.key == "VOICE_COUNT") e.detail.value /= 7;
-      else if (e.detail.key == "LEGATOMODE") e.detail.value /= 3;
+      else if (e.detail.key == "LEGATOMODE") {e.detail.value /= 3;}
 			var ikey = this.map.indexOf(e.detail.key);
       if (obxd) obxd.port.postMessage({ type:"param", key:ikey, value:e.detail.value });
 		},

@@ -20,9 +20,10 @@ class OBXD extends AudioWorkletNode {
     this.onChange = null;
     const oldPostMessage = this.port.postMessage;
     this.port.postMessage = function (...args) {
-      //console.log("from processor: ", args);
+      console.log("from processor: ", args);
       if (args[0].type === "param") {
         self.cfgMap.set(args[0].key, args[0].value);
+        console.log(args[0].key, args[0].value);
         if (self.onChange) {
           self.onChange();
         }
@@ -62,6 +63,12 @@ class OBXD extends AudioWorkletNode {
     this.port.postMessage({ type: "patch", data: arrBuf });
     if (headless) { return; }
     document.querySelector("juce-obxd").setPatch(val);
+  }
+
+  debugReload() {
+    const data = this.serialiseToPatchData();
+    console.log(data);
+    this.loadPatchData(data);
   }
 
   static importScripts(actx, prefix) {
