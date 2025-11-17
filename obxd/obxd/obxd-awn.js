@@ -18,6 +18,7 @@ class OBXD extends AudioWorkletNode {
     const self = this;
     this.patches = [];
     this.bank = [];
+    this.textDecoder = new TextDecoder("utf-8");
     this.onChange = null;
     const oldPostMessage = this.port.postMessage;
     this.port.postMessage = function (...args) {
@@ -93,7 +94,8 @@ class OBXD extends AudioWorkletNode {
     var arr = new Uint8Array(data);
 
     // -- oh dear, cannot use DOMParser since fxb attribute names start with a number
-    var s = String.fromCharCode.apply(null, arr.subarray(168, arr.length - 1));
+    var s = this.textDecoder.decode(arr.subarray(168, arr.length - 1));
+
     var i1 = s.indexOf("<programs>");
     var i2 = s.indexOf("</programs>");
     if (i1 > 0 && i2 > 0) {
@@ -117,6 +119,9 @@ class OBXD extends AudioWorkletNode {
               patch.push(parseFloat(pair[1]));
             }
             this.bank.push(patch);
+          } else {
+            window.parent.alert("OB-Xd Parse Error", "<span style='white-space:break-spaces'>Incompatible patch found. Perhaps wrong version? Look for banks targetting the Datsounds model.</span>");
+            break;
           }
         }
         i1 = s.indexOf("programName", i2);
