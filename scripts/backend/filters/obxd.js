@@ -139,7 +139,7 @@ function waitForOBXDInstance() {
 
 addBlockType("obxd_port", {
     color: "rgba(149, 0, 255, 0.3)",
-    title: "SnOBXD Synth - FakeMIDI",
+    title: "Sn OBXd Synth - FakeMIDI",
     amplitude_smoothing_knob: true,
     hidden: location.protocol === "file:",
     configs: {

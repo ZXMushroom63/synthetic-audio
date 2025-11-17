@@ -120,7 +120,7 @@ class OBXD extends AudioWorkletNode {
             }
             this.bank.push(patch);
           } else {
-            window.parent.alert("OB-Xd Parse Error", "<span style='white-space:break-spaces'>Incompatible patch found. Perhaps wrong version? Look for banks targetting the Datsounds model.</span>");
+            window.parent.alert("OBXd Parse Error", "<span style='white-space:break-spaces'>Incompatible patch found. Perhaps wrong version? Look for banks targetting the Datsounds model.</span>");
             break;
           }
         }

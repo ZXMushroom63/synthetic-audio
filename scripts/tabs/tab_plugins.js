@@ -381,7 +381,7 @@ addEventListener("init", async () => {
         });
         f.click();
     }, "usamples");
-    mkBtn("Upload OB-Xd Bank (.fxb)", () => {
+    mkBtn("Upload OBXd Bank (.fxb)", () => {
         var f = document.createElement("input");
         f.type = "file";
         f.multiple = true;
