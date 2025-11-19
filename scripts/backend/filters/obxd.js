@@ -27,7 +27,7 @@ addBlockType("fakemidi", {
             console.warn("FakeMIDI Skipped.", this);
             return inPcm;
         }
-        if ((endOffset + FAKEMIDI_DISCRETE_INTERVAL) > inPcm.length) {
+        if ((endOffset + FAKEMIDI_DISCRETE_INTERVAL - 1) > inPcm.length) {
             console.warn("FakeMIDI Skipped.", this);
             return inPcm;
         }
