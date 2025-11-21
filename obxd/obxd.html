@@ -175,15 +175,21 @@
         });
       });
       const track = window.parent.trackChildren[0].parentElement.parentElement;
-      addEventListener(
-        "wheel",
-        (e) => {
-          //make scroll permeate through
-          track.scrollTop += e.deltaY;
-          track.scrollLeft += e.deltaX;
-        },
-        true
-      );
+      addEventListener("load", ()=>{
+        const main = document.querySelector("main");
+        addEventListener(
+          "wheel",
+          (e) => {
+            if (main.classList.has("fullscreen")) {
+              return;
+            }
+            //make scroll permeate through
+            track.scrollTop += e.deltaY;
+            track.scrollLeft += e.deltaX;
+          },
+          true
+        );
+      });
     </script>
   </head>
 
