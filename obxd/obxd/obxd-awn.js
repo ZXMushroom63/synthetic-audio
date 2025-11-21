@@ -22,7 +22,7 @@ class OBXD extends AudioWorkletNode {
     this.onChange = null;
     const oldPostMessage = this.port.postMessage;
     this.port.postMessage = function (...args) {
-      console.log("from processor: ", args);
+      //console.log("from processor: ", args);
       if (args[0].type === "param") {
         self.cfgMap.set(args[0].key, args[0].value);
         console.log(args[0].key, args[0].value);
