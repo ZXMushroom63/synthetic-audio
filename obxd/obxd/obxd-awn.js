@@ -25,7 +25,12 @@ class OBXD extends AudioWorkletNode {
       //console.log("from processor: ", args);
       if (args[0].type === "param") {
         self.cfgMap.set(args[0].key, args[0].value);
-        //console.log(args[0].key, args[0].value);
+        if (window.parent.OBXDFrame) {
+          const optionsMenu = window.parent.OBXDFrame.parentElement;
+          //const loop = optionsMenu.parentElement.parentElement;
+          optionsMenu.querySelector("[data-key=LastEditedParamID]").value = args[0].key;
+          optionsMenu.querySelector("[data-key=LastEditedParamValue]").value = args[0].value;
+        }
         if (self.onChange) {
           self.onChange();
         }

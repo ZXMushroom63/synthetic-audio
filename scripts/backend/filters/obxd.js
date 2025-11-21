@@ -125,6 +125,7 @@ const OBXDFrame = document.createElement("iframe");
 OBXDFrame.src = "about:blank";
 OBXDFrame.classList.add("obxdwindow");
 OBXDFrame._initState = false;
+window.OBXDFrame = OBXDFrame;
 
 function OBXDIsInDom() {
     return !!OBXDFrame.parentElement.parentElement.parentElement.parentElement;
@@ -153,6 +154,32 @@ addBlockType("obxd_port", {
         LSeed: [0, "number"],
         RSeed: [0, "number"],
         AmplitudeSmoothing: [0.006, "number"],
+        LastEditedParamID: [0, "number", "readonly"],
+        LastEditedParamValue: [0, "number", "readonly"],
+        Param1Enabled: [false, "checkbox"],
+        Param1ID: [-1, "number"],
+        Param1Value: [0.5, "number", 1],
+        Param2Enabled: [false, "checkbox"],
+        Param2ID: [-1, "number"],
+        Param2Value: [0.5, "number", 1],
+        Param3Enabled: [false, "checkbox"],
+        Param3ID: [-1, "number"],
+        Param3Value: [0.5, "number", 1],
+    },
+    dropdowns: {
+        "Automation Hooks": [
+            "LastEditedParamID",
+            "LastEditedParamValue",
+            "Param1Enabled",
+            "Param1ID",
+            "Param1Value",
+            "Param2Enabled",
+            "Param2ID",
+            "Param2Value",
+            "Param3Enabled",
+            "Param3ID",
+            "Param3Value",
+        ]
     },
     waterfall: 2,
     initMiddleware: (loop) => {
@@ -222,6 +249,7 @@ addBlockType("obxd_port", {
             numberOfChannels: 1 //OBXD no stereo support :(
         })
         await OBXD.importScripts(actx, "obxd/");
+        const self = this;
         const localOBXD = new OBXD(actx, {processorOptions: {seed: channel === 0 ? this.conf.LSeed : this.conf.RSeed}});
         localOBXD.connect(actx.destination);
         const base = this.conf.Patch.substring(3);
@@ -269,6 +297,31 @@ addBlockType("obxd_port", {
                 continue;
             }
         }
+
+        const totalDuration = inPcm.length / audio.samplerate;
+        function bakeParameterData(fn) { // 120 samples per second
+            const paramData = new Float32Array(Math.ceil(totalDuration * 120));
+            const sampleDuration = 1 / 120;
+            for (let i = 0; i <= totalDuration; i += sampleDuration) {
+                paramData[Math.round(i * 120)] = fn(Math.round(i * audio.samplerate), inPcm);
+            }
+            return paramData;
+        }
+        function sendParameter(id) {
+            if (self.conf[`Param${id}Enabled`]) {
+                const key = self.conf[`Param${id}ID`];
+                const fn = _(self.conf[`Param${id}Value`]);
+                const buffer = bakeParameterData(fn);
+                localOBXD.port.postMessage({ type:"automation_param", key: key, buffer: buffer });
+            }
+        }
+
+        sendParameter(1);
+        sendParameter(2);
+        sendParameter(3);
+
+        // bake everything into a float32array, with a sensible samplerate
+        
         localOBXD.port.postMessage({ type: "midibundle", data: midiBundle });
         await wait(1 / 30);
         const result = await actx.startRendering();

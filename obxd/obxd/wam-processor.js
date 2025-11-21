@@ -17,6 +17,7 @@ class WAMProcessor extends AudioWorkletProcessor
     this.sr = AudioWorkletGlobalScope.sampleRate || sampleRate;
     this.audiobufs = [[],[]];
     this.hasStaticMidi = false;
+    this.automationParams = [];
     this.midiBundle = [];
 
     var WAM = AudioWorkletGlobalScope.WAM;
@@ -70,6 +71,7 @@ class WAMProcessor extends AudioWorkletProcessor
       case "patch": this.onpatch(data); break;
       case "param": this.onparam(msg.key, msg.value); break;
       case "midibundle": this.onmidibundle(data); break;
+      case "automation_param": this.onautomationparam(msg.key, msg.buffer); break;
     }
   }
   
@@ -80,6 +82,17 @@ class WAMProcessor extends AudioWorkletProcessor
   onmidibundle (midiBundle) {
     this.hasStaticMidi = true;
     this.midiBundle = midiBundle;
+  }
+
+  onautomationparam (key, buffer) { // 120 samples per second automation parameter
+    const keyId = parseInt(key);
+    if (!keyId || keyId < 0) {
+      return;
+    }
+    this.automationParams.push({
+      key: keyId,
+      buffer
+    });
   }
   
   onparam (key, value) {
@@ -114,6 +127,11 @@ class WAMProcessor extends AudioWorkletProcessor
         }
       }
     }
+
+    this.automationParams.forEach((param)=>{
+      const value = param.buffer[Math.round(currentTime * 120)] || 0;
+      this.wam_onparam(this.inst, param.key, value);
+    });
     
     this.wam_onprocess(this.inst, this.audiobus, 0);
     
