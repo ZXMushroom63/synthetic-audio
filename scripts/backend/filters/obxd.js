@@ -120,10 +120,15 @@ addBlockType("fakemidi_debugger", {
         return inPcm;
     }
 });
+
 const OBXDFrame = document.createElement("iframe");
 OBXDFrame.src = "about:blank";
 OBXDFrame.classList.add("obxdwindow");
 OBXDFrame._initState = false;
+
+function OBXDIsInDom() {
+    return !!OBXDFrame.parentElement.parentElement.parentElement.parentElement;
+}
 
 function waitForOBXDInstance() {
     return new Promise((res, rej) => {
@@ -154,11 +159,11 @@ addBlockType("obxd_port", {
         const optsMenu = loop.querySelector(".loopOptionsMenu");
         optsMenu.classList.add("obxdcontainer");
         const button = optsMenu.querySelector("button");
-        if (OBXDFrame.src !== "obxd/obxd.html" && !OBXDFrame._initState) {
+        if (!OBXDFrame.contentWindow) {
+            OBXDFrame.src = "about:blank";
             OBXDFrame.src = "obxd/obxd.html";
-            OBXDFrame._initState = true;
         }
-        if ('moveBefore' in Node.prototype) {
+        if ('moveBefore' in Node.prototype && OBXDIsInDom()) {
             optsMenu.moveBefore(OBXDFrame, button);
         } else {
             button.insertAdjacentElement("beforebegin", OBXDFrame);
@@ -181,7 +186,12 @@ addBlockType("obxd_port", {
         const optsMenu = loop.querySelector(".loopOptionsMenu");
         const button = optsMenu.querySelector("button");
 
-        if ('moveBefore' in HTMLElement.prototype) {
+        if (!OBXDFrame.contentWindow) {
+            OBXDFrame.src = "about:blank";
+            OBXDFrame.src = "obxd/obxd.html";
+        }
+
+        if ('moveBefore' in HTMLElement.prototype && OBXDIsInDom()) {
             try {
                 optsMenu.moveBefore(OBXDFrame, button);
             } catch (error) {
