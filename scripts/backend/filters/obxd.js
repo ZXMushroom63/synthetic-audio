@@ -123,6 +123,7 @@ addBlockType("fakemidi_debugger", {
 const OBXDFrame = document.createElement("iframe");
 OBXDFrame.src = "about:blank";
 OBXDFrame.classList.add("obxdwindow");
+OBXDFrame._initState = false;
 
 function waitForOBXDInstance() {
     return new Promise((res, rej) => {
@@ -153,8 +154,9 @@ addBlockType("obxd_port", {
         const optsMenu = loop.querySelector(".loopOptionsMenu");
         optsMenu.classList.add("obxdcontainer");
         const button = optsMenu.querySelector("button");
-        if (OBXDFrame.src !== "obxd/obxd.html") {
+        if (OBXDFrame.src !== "obxd/obxd.html" && !OBXDFrame._initState) {
             OBXDFrame.src = "obxd/obxd.html";
+            OBXDFrame._initState = true;
         }
         if ('moveBefore' in Node.prototype) {
             optsMenu.moveBefore(OBXDFrame, button);
