@@ -177,6 +177,7 @@ addBlockType("obxd_port", {
         button.insertAdjacentElement("beforebegin", p);
     },
     drawOptionsMiddleware: (loop) => {
+        globalThis.obxdCanRender = true;
         const optsMenu = loop.querySelector(".loopOptionsMenu");
         const button = optsMenu.querySelector("button");
 
@@ -272,6 +273,17 @@ addBlockType("obxd_port", {
         },
         "Dbg": function () {
             obxdInstance.debugReload();
+        },
+        "⛶": function () {
+            OBXDFrame.contentDocument.querySelector("main").classList.add("fullscreen");
+            OBXDFrame.requestFullscreen();
+            const removeFullscreenClass = ()=>{
+                if (document.fullscreenElement !== OBXDFrame) {
+                    OBXDFrame.contentDocument.querySelector("main").classList.remove("fullscreen");
+                }
+            }
+            document.onfullscreenerror = removeFullscreenClass;
+            document.onfullscreenchange = removeFullscreenClass;
         },
         "Save": function () {
             const base = uint8ToString(new Uint8Array(obxdInstance.serialiseToPatchData())).join("");
