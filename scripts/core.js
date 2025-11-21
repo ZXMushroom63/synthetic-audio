@@ -303,6 +303,7 @@ async function decodeSoundFonts(ax) {
 }
 function sumFloat32Arrays(arrays) {
     if (arrays.length === 0) return new Float32Array(0);
+    arrays = arrays.filter(x => !!x);
     const length = arrays[0].length;
     const result = arrays[0].slice();
 
