@@ -180,7 +180,7 @@
         addEventListener(
           "wheel",
           (e) => {
-            if (main.classList.has("fullscreen")) {
+            if (main.classList.contains("fullscreen")) {
               return;
             }
             //make scroll permeate through
@@ -217,5 +217,6 @@
         <div id="keyboard"></div>
       </div>
     </main>
+    <span id="midiInfo"></span>
   </body>
 </html>
