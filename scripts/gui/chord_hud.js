@@ -354,6 +354,9 @@ function chromaticToIndex(note) { // A4, C#5 (no flats allowed here tho)
         return chromaticScale.indexOf(note.toUpperCase());
     }
     const offset = chromaticScale.indexOf(note.substring(0, note.length - 1).toUpperCase());
+    if (offset === -1) {
+        return -1;
+    }
     return octave * 12 + offset;
 }
 
@@ -736,7 +739,7 @@ function getVADataFromIntervals(chord, root) {
     } else if (valence === -1) {
         moodToken = "🟦";
     }
-    const emoji = "⟨" + levels[Math.floor(levels.length*(arousal ** 0.5))] + moodToken + "⟩";
+    const emoji = "⟨" + levels[Math.floor(levels.length * (arousal ** 0.5))] + moodToken + "⟩";
 
     return { valence, arousal, emoji };
 }
@@ -972,43 +975,51 @@ function chordDisplayEdit(display, e, loop) {
     e.stopPropagation();
     if (!e.key) {
         return;
-    } else
-        if (e.ctrlKey || e.metaKey || e.altKey || e.repeat) {
-            if (e.ctrlKey && e.key === "a") {
-                return; //Ctrl + A is a G
-            }
-            return e.preventDefault();
-        } else
-            if (e.key === "Enter") {
-                e.preventDefault();
-            } else
-                if (e.key === "Escape") {
-                    e.preventDefault();
-                    deselectText();
-                    display.blur();
-                } else {
-                    return;
-                }
-    var lookupValue = display.value.replace(/[\r\n\t]/gm, "")
+    } else if (e.ctrlKey || e.metaKey || e.altKey || e.repeat) {
+        if (e.ctrlKey && e.key === "a") {
+            return; //Ctrl + A is a G
+        }
+        return e.preventDefault();
+    } else if (e.key === "Enter") {
+        e.preventDefault();
+    } else if (e.key === "Escape") {
+        e.preventDefault();
+        deselectText();
+        display.blur();
+    } else {
+        return;
+    }
+    const rawText = display.value.replace(/[\r\n\t]/gm, "").trim();
+    var lookupValue = rawText
         .replaceAll("major", "maj")
         .replaceAll("minor", "min")
         .replaceAll("power", "5")
         .replaceAll("pwr", "5")
         .replaceAll("aug7", "augMaj7")
-        .replaceAll("(root)", "")
-        .trim();
+        .replaceAll("(root)", "");
     lookupValue = lookupValue[0].toUpperCase() + lookupValue.substring(1);
     var bassNote = lookupValue.includes("/") ? lookupValue.split("/")[1] : "";
     if (bassNote) {
         lookupValue = lookupValue.split("/")[0];
         lookupValue = lookupValue[0].toUpperCase() + lookupValue.substring(1);
     }
-    if (!lookupValue) {
-        return;
+    let chord = null;
+    let octaveOffset = 0;
+    if (reverseChordLookup[lookupValue] && loop.relatedChord) {
+        chord = reverseChordLookup[lookupValue];
+        octaveOffset = octaveOffset = 12 * (Math.min(...loop.relatedChord.map(x => getChromaticOctave(x.theoryNote))));
     }
-    if ((e.key === "Enter") && loop.relatedChord && reverseChordLookup[lookupValue]) {
-        const chord = reverseChordLookup[lookupValue];
-        const octaveOffset = 12 * (Math.min(...loop.relatedChord.map(x => getChromaticOctave(x.theoryNote))));
+    if (lookupValue.includes(",")) {
+        let customIntervals = lookupValue.split(",").map(x => chromaticToIndex(x.trim())).filter(x => isFinite(x) && (x >= 0)).sort((a,b)=>a-b);
+        if (customIntervals.length === 0) {
+            return;
+        }
+        octaveOffset = 0;
+        chord = {
+            values: customIntervals
+        };
+    }
+    if ((e.key === "Enter") && loop.relatedChord && chord) {
         e.preventDefault();
         display.blur();
         deselectText();
