@@ -5,6 +5,11 @@ function customEvent(ev, data = {}) {
 }
 var dropHandlers = [];
 var loopMoveHandlers = [];
+
+const TIMELINE_LOOPS_ALL = new Set();
+const TIMELINE_LOOPS_ALIVE = new Set();
+const TIMELINE_LOOPS_DEAD = new Set();
+
 function resetDrophandlers(cancel) {
     while (dropHandlers.length > 0) {
         dropHandlers[0](null, cancel);
@@ -51,7 +56,10 @@ function deleteLoop(loop) {
     }
     if (loop.forceDelete) {
         loop.remove();
+    } else {
+        TIMELINE_LOOPS_DEAD.add(loop);
     }
+    TIMELINE_LOOPS_ALIVE.delete(loop);
     loop.setAttribute("data-deleted", "yes");
     loop.classList.remove("active");
     markLoopDirty(loop, true);
@@ -100,7 +108,7 @@ function markLoopDirty(loop, wasMoved) {
     if (multiplayer.use(loop) && (
         (!loop.hasAttribute("data-dirty"))
         || (wasMoved && (!loop.hasAttribute("data-wasMovedSinceRender")))
-        || (parseInt(loop.getAttribute("data-lastsynchash")) !== hashNode(loop))
+        || (loop.getAttribute("data-lastsynchash") !== hashNode(loop))
     )) {
         customEvent("loopchangedcli", { loop: loop });
         return multiplayer.markLoopDirty(JSON.stringify({
@@ -110,7 +118,7 @@ function markLoopDirty(loop, wasMoved) {
     }
     loop.setAttribute("data-dirty", "yes");
     if (wasMoved) {
-        loop.setAttribute("data-wasMovedSinceRender", "yes");
+        loop.setAttribute("data-wasMovedSinceRender", true);
     }
     customEvent("loopchangedcli", { loop: loop });
 }
@@ -208,10 +216,10 @@ function hydrateLoopPosition(elem, lean) {
     }
     hydrateLoopSpecificLayer(elem);
 
-    var duration = parseFloat(elem.getAttribute("data-duration"));
-    var start = parseFloat(elem.getAttribute("data-start"));
+    var duration = elem.getAttribute("data-duration");
+    var start = elem.getAttribute("data-start");
     elem.style.left = `${(start / audio.duration * 100)}%`;
-    elem.style.top = (parseFloat(elem.getAttribute("data-layer")) * 3) + "rem";
+    elem.style.top = (elem.getAttribute("data-layer") * 3) + "rem";
     var nInternalWidth = (duration * gui.zoomConstant);
     elem._nInternalWidth = nInternalWidth;
     var internalWidth = nInternalWidth + "vw";
@@ -229,8 +237,8 @@ function hydrateLoopPosition(elem, lean) {
     }
     loopInternal.style.width = internalWidth;
 
-    if (elem.querySelector(".chordDisplay")) {
-        elem.querySelector(".chordDisplay").style.width = "calc(" + internalWidth + " + 6px)";
+    if (elem.chordDisplay) {
+        elem.chordDisplay.style.width = "calc(" + internalWidth + " + 6px)";
     }
 }
 function hydrateZoom(lean) {
@@ -280,7 +288,7 @@ function hydrateLoopBackground(elem) {
 registerSetting("OpaqueLayers", false);
 registerSetting("LDMLoopInteraction", false);
 function hydrateLoopSpecificLayer(elem) {
-    if (elem.noEditorLayer || (parseInt(elem.getAttribute("data-editlayer")) === gui.layer) || (gui.layer === MAX_LAYER)) {
+    if (elem.noEditorLayer || (elem.getAttribute("data-editlayer") === gui.layer) || (gui.layer === MAX_LAYER)) {
         elem.classList.remove("deactivated");
     } else {
         elem.classList.add("deactivated");
@@ -318,7 +326,7 @@ function addBlock(type, start, duration, title, layer = 0, data = {}, editorValu
         }
         var isRight = e.target.classList.contains("handleRight");
         if (
-            (!loop.noEditorLayer && (parseInt(loop.getAttribute("data-editlayer")) !== gui.layer))
+            (!loop.noEditorLayer && (loop.getAttribute("data-editlayer") !== gui.layer))
             || loop.classList.contains("active")
         ) {
             return;
@@ -357,8 +365,8 @@ function addBlock(type, start, duration, title, layer = 0, data = {}, editorValu
 
         var trackBB = optimisedBB || document.querySelector("#trackInternal").getBoundingClientRect();
         var originalBB = internal.getBoundingClientRect();
-        var originalDuration = parseFloat(loop.getAttribute("data-duration"));
-        var originalStart = parseFloat(loop.getAttribute("data-start"));
+        var originalDuration = loop.getAttribute("data-duration");
+        var originalStart = loop.getAttribute("data-start");
         loop.classList.add("active");
         loop.classList.add("resizing");
         if (isRight) {
@@ -432,7 +440,7 @@ function addBlock(type, start, duration, title, layer = 0, data = {}, editorValu
     loop.setAttribute("data-type", type);
     if (definition.wavtableUser) {
         loop.setAttribute("data-wt-user", "yes");
-        loop.usesWt = definition.usesWt ? ()=>definition.usesWt(loop) : ()=>true;
+        loop.usesWt = definition.usesWt ? () => definition.usesWt(loop) : () => true;
     }
 
     if (data.uuid) {
@@ -488,7 +496,7 @@ function addBlock(type, start, duration, title, layer = 0, data = {}, editorValu
 
 
     internal.addEventListener("mousedown", (e) => {
-        if (!loop.noEditorLayer && (parseInt(loop.getAttribute("data-editlayer")) !== gui.layer)) {
+        if (!loop.noEditorLayer && (loop.getAttribute("data-editlayer") !== gui.layer)) {
             return;
         }
         if (e.button !== 2) {
@@ -509,7 +517,7 @@ function addBlock(type, start, duration, title, layer = 0, data = {}, editorValu
     });
     internal.addEventListener("contextmenu", (e) => { e.preventDefault() });
     internal.addEventListener("mousedown", function (e) {
-        if (!loop.noEditorLayer && (parseInt(loop.getAttribute("data-editlayer")) !== gui.layer)) {
+        if (!loop.noEditorLayer && (loop.getAttribute("data-editlayer") !== gui.layer)) {
             return;
         }
         if (loop.classList.contains("active")) {
@@ -605,6 +613,8 @@ function addBlock(type, start, duration, title, layer = 0, data = {}, editorValu
 
     if (!noTimeline) {
         trackChildren[trackChildren.length - 2].after(loop);
+        TIMELINE_LOOPS_ALL.add(loop);
+        TIMELINE_LOOPS_ALIVE.add(loop);
     }
 
     if (multiplayer.use(loop)) {
@@ -718,8 +728,8 @@ function init() {
         let newSongDur = 10;
 
         findLoops(".loop:not([data-deleted])").forEach(x => {
-            const start = parseFloat(x.getAttribute("data-start"));
-            const dur = parseFloat(x.getAttribute("data-duration"));
+            const start = x.getAttribute("data-start");
+            const dur = x.getAttribute("data-duration");
 
             const newStart = timeQuantise(start * ratio);
             const newDur = timeQuantise(timeQuantise(timeQuantise(dur * ratio) + newStart) - newStart);
@@ -852,7 +862,7 @@ function init() {
             }
             const amount = e.deltaY * (keymap["Shift"] ? settings.ZoomScale * 0.05 : settings.ZoomScale);
             gui.zoom += amount;
-            
+
             document.body.style.cursor = (amount > 0) ? "zoom-in" : "zoom-out";
             gui.zoom = Math.max(100, gui.zoom);
             document.querySelector("#track").style.willChange = "scroll-position, transform";

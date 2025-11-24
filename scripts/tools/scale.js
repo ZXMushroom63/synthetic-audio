@@ -25,12 +25,12 @@ addEventListener("init", () => {
         globalThis.zscrollisInternal = false;
         let absoluteStart = Infinity;
         [...nodes].forEach(n => {
-            const start = parseFloat(n.getAttribute(`data-start`));
+            const start = n.getAttribute(`data-start`);
             absoluteStart = Math.min(start, absoluteStart);
         });
         [...nodes].forEach((node, i) => {
-            const start = parseFloat(node.getAttribute(`data-start`));
-            const duration = parseFloat(node.getAttribute(`data-duration`));
+            const start = node.getAttribute(`data-start`);
+            const duration = node.getAttribute(`data-duration`);
             if (shiftMode) {
                 const newDuration = Math.min(Math.max((audio.beatSize / gui.substepping), duration + (audio.beatSize / gui.substepping * dir)), audio.duration - start);
                 node.setAttribute(`data-duration`, timeQuantise(newDuration));

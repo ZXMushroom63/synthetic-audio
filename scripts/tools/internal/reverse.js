@@ -7,7 +7,7 @@ addEventListener("init", () => {
         nodes = Array.prototype.sort.apply(nodes,
             [
                 (a, b) => {
-                    return parseInt(a.getAttribute("data-layer")) - parseInt(b.getAttribute("data-layer"));
+                    return a.getAttribute("data-layer") - b.getAttribute("data-layer");
                 }
             ]
         );
@@ -15,7 +15,7 @@ addEventListener("init", () => {
         nodes = Array.prototype.sort.apply(nodes,
             [
                 (a, b) => {
-                    return parseFloat(a.getAttribute("data-start")) - parseFloat(b.getAttribute("data-start"));
+                    return a.getAttribute("data-start") - b.getAttribute("data-start");
                 }
             ]
         );

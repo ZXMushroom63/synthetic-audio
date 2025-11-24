@@ -12,6 +12,15 @@ function stopTiming(name) {
     return dt / 1000;
 }
 function findLoops(selector) {
+    if (selector === ".loop") {
+        return [...TIMELINE_LOOPS_ALL];
+    }
+    if (selector === ".loop[data-deleted]") {
+        return [...TIMELINE_LOOPS_DEAD];
+    }
+    if (selector === ".loop:not([data-deleted])") {
+        return [...TIMELINE_LOOPS_ALIVE];
+    }
     const track = document.querySelector("#trackInternal");
     return Array.prototype.filter.apply(track.querySelectorAll(selector), [(x) => !x._ignore]);
 }

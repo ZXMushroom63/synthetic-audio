@@ -172,7 +172,7 @@ addBlockType("p_waveform_plus", {
             playSample(blob);
         },
         "Dbg": function () {
-            alert("Phase Data", filters["p_waveform_plus"].guessEndPhase.apply(this, [parseFloat(this.getAttribute("data-duration"))]).join(";\n"));
+            alert("Phase Data", filters["p_waveform_plus"].guessEndPhase.apply(this, [this.getAttribute("data-duration")]).join(";\n"));
         }
     },
     wavtableUser: true,
@@ -492,10 +492,10 @@ function slideNoteHandler(l, allNodes) {
         return;
     }
     const slideTarget = [...allNodes].find(n => {
-        return n.querySelector(".noteDisplay")
+        return n.querySelector(".noteDisplay") //TODO: optimise this and other .noteDisplay query selectors
             && (n.getAttribute("data-editlayer") === l.getAttribute("data-editlayer"))
             && (n.getAttribute("data-layer") === l.getAttribute("data-layer"))
-            && (n.getAttribute("data-start") === "" + timeQuantise(parseFloat(l.getAttribute("data-start")) + parseFloat(l.getAttribute("data-duration"))))
+            && (n.getAttribute("data-start") === timeQuantise(l.getAttribute("data-start") + l.getAttribute("data-duration")))
     });
     if (!slideTarget || !slideTarget.theoryNote) {
         const oldFreq = l.conf.Frequency;
@@ -519,7 +519,7 @@ function slideNoteHandler(l, allNodes) {
     l.conf.Frequency = `#:${l.theoryNote}:~:${slideTarget.theoryNote}:@${mapper}`;
     if (oldFreq !== l.conf.Frequency || l.hasAttribute("data-dirty")) {
         markLoopDirty(l);
-        slideTarget.conf.SlidePhaseData = filters["p_waveform_plus"].guessEndPhase.apply(l, [parseFloat(l.getAttribute("data-duration"))]).join(",\n");
+        slideTarget.conf.SlidePhaseData = filters["p_waveform_plus"].guessEndPhase.apply(l, [l.getAttribute("data-duration")]).join(",\n");
         markLoopDirty(slideTarget);
     }
 }

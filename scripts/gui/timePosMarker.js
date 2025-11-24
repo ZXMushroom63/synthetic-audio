@@ -25,11 +25,11 @@ addEventListener("load", () => {
                 if (
                     loop.theoryNote &&
                     !timePosMarkerLoopPlayback[loop.getAttribute("data-uuid")] &&
-                    gui.marker > parseFloat(loop.getAttribute("data-start"))
+                    gui.marker > loop.getAttribute("data-start")
                 ) {
                     const midiId = chromaticToIndex(loop.theoryNote) + 12;
                     timePosMarkerLoopPlayback[loop.getAttribute("data-uuid")] = true;
-                    timePosMarkerMidiActuator[midiId] = [parseFloat(loop.getAttribute("data-start")) + parseFloat(loop.getAttribute("data-duration"))];
+                    timePosMarkerMidiActuator[midiId] = [loop.getAttribute("data-start") + loop.getAttribute("data-duration")];
                     sendMidiMessage(MIDI_NOTE_ON, midiId, Math.floor(127 * (loop.conf.Amplitude || loop.conf.Volume)));
                 }
             });

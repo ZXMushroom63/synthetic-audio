@@ -66,7 +66,7 @@ addBlockType("repeat", {
     findLoopMarkerOffset: function (loop) {
         if (loop.conf.FromEnd && parseFloat(loop.conf.RepeatDuration)) {
             const repeatDuration = parseFloat(loop.conf.RepeatDuration);
-            return repeatDuration - (parseFloat(loop.getAttribute("data-duration")) % repeatDuration);
+            return repeatDuration - (loop.getAttribute("data-duration") % repeatDuration);
         }
     },
 });

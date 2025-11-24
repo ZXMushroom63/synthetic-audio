@@ -51,10 +51,10 @@ function zscroll(e) {
             zScrollProgress = 0;
             var currentlyActiveLoops = findLoops(".loop.active")
                 .sort((a, b) => {
-                    return parseFloat(a.getAttribute("data-layer")) - parseFloat(b.getAttribute("data-layer"))
+                    return a.getAttribute("data-layer") - b.getAttribute("data-layer")
                 })
                 .sort((a, b) => {
-                    return parseFloat(a.getAttribute("data-start")) - parseFloat(b.getAttribute("data-start"))
+                    return a.getAttribute("data-start") - b.getAttribute("data-start")
                 });
             if (currentlyActiveLoops[0]) {
                 currentlyActiveLoops.forEach((x, i) => {

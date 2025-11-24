@@ -35,21 +35,21 @@ function serialise(forRender, forMultiplayer) {
     hNodes = Array.prototype.sort.apply(hNodes,
         [
             (a, b) => {
-                return parseFloat(a.getAttribute("data-start")) - parseFloat(b.getAttribute("data-start"));
+                return a.getAttribute("data-start") - b.getAttribute("data-start");
             }
         ]
     );
     hNodes = Array.prototype.sort.apply(hNodes,
         [
             (a, b) => {
-                return parseInt(a.getAttribute("data-layer")) - parseInt(b.getAttribute("data-layer"));
+                return a.getAttribute("data-layer") - b.getAttribute("data-layer");
             }
         ]
     );
     hNodes = Array.prototype.sort.apply(hNodes,
         [
             (a, b) => {
-                return parseInt(a.getAttribute("data-editlayer")) - parseInt(b.getAttribute("data-editlayer"));
+                return a.getAttribute("data-editlayer") - b.getAttribute("data-editlayer");
             }
         ]
     );
@@ -79,13 +79,13 @@ function serialiseNode(node, forRender, forMultiplayer, allNodes) {
     } else {
         delete out.conf.uuid;
     }
-    out.start = timeQuantise(parseFloat(node.getAttribute("data-start"))) || 0;
-    out.duration = timeQuantise(parseFloat(node.getAttribute("data-duration"))) || 0;
+    out.start = timeQuantise(node.getAttribute("data-start")) || 0;
+    out.duration = timeQuantise(node.getAttribute("data-duration")) || 0;
     out.end = timeQuantise(out.start + out.duration);
-    out.layer = parseFloat(node.getAttribute("data-layer")) || 0;
+    out.layer = node.getAttribute("data-layer") || 0;
     out.file = node.getAttribute("data-file") || "";
     out.type = node.getAttribute("data-type");
-    out.editorLayer = Math.min(parseInt(node.getAttribute("data-editlayer")), 9);
+    out.editorLayer = Math.min(node.getAttribute("data-editlayer"), 9);
     if (forRender) {
         out.dirty = node.hasAttribute("data-dirty");
         out.dirtyLevel = out.dirty ? 2 : 0;

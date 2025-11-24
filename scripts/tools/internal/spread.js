@@ -5,7 +5,7 @@ addEventListener("init", () => {
         nodes = Array.prototype.sort.apply(nodes,
             [
                 (a, b) => {
-                    return parseInt(a.getAttribute("data-layer")) - parseInt(b.getAttribute("data-layer"));
+                    return a.getAttribute("data-layer") - b.getAttribute("data-layer");
                 }
             ]
         );
@@ -13,7 +13,7 @@ addEventListener("init", () => {
         nodes = Array.prototype.sort.apply(nodes,
             [
                 (a, b) => {
-                    return parseFloat(a.getAttribute("data-start")) - parseFloat(b.getAttribute("data-start"));
+                    return a.getAttribute("data-start") - b.getAttribute("data-start");
                 }
             ]
         );
@@ -22,8 +22,8 @@ addEventListener("init", () => {
         var minLayer = Infinity;
         var minStart = Infinity;
         nodes.forEach((node, i) => {
-            minLayer = Math.min(minLayer, parseInt(node.getAttribute("data-layer")));
-            minStart = Math.min(minStart, parseInt(node.getAttribute("data-start")));
+            minLayer = Math.min(minLayer, node.getAttribute("data-layer"));
+            minStart = Math.min(minStart, node.getAttribute("data-start"));
         });
 
         resetDrophandlers(false);
@@ -33,7 +33,7 @@ addEventListener("init", () => {
             node.setAttribute("data-start", timeQuantise(minStart + offset));
             console.log(timeQuantise(minStart + offset));
             node.setAttribute("data-layer", minLayer);
-            offset += parseFloat(node.getAttribute("data-duration"));
+            offset += ode.getAttribute("data-duration");
 
             markLoopDirty(node, true);
             hydrateLoopPosition(node);

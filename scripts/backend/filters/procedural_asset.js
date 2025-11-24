@@ -45,7 +45,7 @@ addBlockType("p_readasset", {
         } else {
             if (loop.querySelector(".noteDisplay")) {
                 loop.querySelector(".noteDisplay").remove();
-                loop.querySelector(".chordDisplay").remove();
+                loop.chordDisplay.remove();
             }
         }
     },

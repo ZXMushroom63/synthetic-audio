@@ -10,7 +10,7 @@ function pickupLoop(loop, natural = false, useCache = false) {
     loop.setAttribute("data-new-layer", loop.getAttribute("data-layer"));
     loop.setAttribute("data-new-start", loop.getAttribute("data-start"));
     loop.setAttribute("data-new-duration", loop.getAttribute("data-duration"));
-    const startDuration = parseFloat(loop.getAttribute("data-duration"));
+    const startDuration = loop.getAttribute("data-duration");
     var px = mouse.x;
     var py = mouse.y;
     function mouseMove(j) {

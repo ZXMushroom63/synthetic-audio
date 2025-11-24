@@ -107,8 +107,8 @@ addEventListener("init", () => {
             };
             const notes = await fileToNotes(picker.files[0]);
             deleteLoop(templateNode);
-            var startOffset = parseFloat(templateNode.getAttribute("data-start"));
-            var layerOffset = parseInt(templateNode.getAttribute("data-layer"));
+            var startOffset = templateNode.getAttribute("data-start");
+            var layerOffset = templateNode.getAttribute("data-layer");
             notes.forEach((x, i)=>{
                 var conf = structuredClone(templateNode.conf);
                 conf.Frequency = ":" + x.note + ":";

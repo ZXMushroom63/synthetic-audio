@@ -40,12 +40,12 @@ addEventListener("init", () => {
             );
 
             const newNode = addBlock(targetType,
-                parseFloat(node.getAttribute("data-start")),
-                parseFloat(node.getAttribute("data-duration")),
+                node.getAttribute("data-start"),
+                node.getAttribute("data-duration"),
                 node.getAttribute("data-file"),
-                parseInt(node.getAttribute("data-layer")),
+                node.getAttribute("data-layer"),
                 cout,
-                parseInt(node.getAttribute("data-editlayer")),
+                node.getAttribute("data-editlayer"),
             );
             commit(new UndoStackAdd(newNode));
             return newNode;

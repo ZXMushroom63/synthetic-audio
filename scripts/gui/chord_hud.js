@@ -621,33 +621,33 @@ function getChordStack(loop, allowAtonal) {
     if (!loop || loop.hasAttribute("data-deleted")) {
         return [];
     }
-    var combiner = allowAtonal ? "" : ":has(.chordDisplay)";
-    var startingRange = parseInt(loop.getAttribute("data-layer"));
+    var startingRange = loop.getAttribute("data-layer");
     var endingRange = startingRange;
-    var loops = [...findLoops(`.loop${combiner}:not([data-deleted])[data-start="${loop.getAttribute("data-start")
-        }"][data-duration="${loop.getAttribute("data-duration")
-        }"][data-editlayer="${loop.getAttribute("data-editlayer")
-        }"]`)]
-        .sort((a, b) => parseInt(a.getAttribute("data-layer")) - parseInt(b.getAttribute("data-layer")));
+    var loops = [...findLoops(`.loop:not([data-deleted])`)].filter(x => 
+        (allowAtonal ? true : !!x.chordDisplay)
+         && (x.getAttribute("data-start") === loop.getAttribute("data-start"))
+         && (x.getAttribute("data-duration") === loop.getAttribute("data-duration"))
+         && (x.getAttribute("data-editlayer") === loop.getAttribute("data-editlayer"))
+    ).sort((a, b) => a.getAttribute("data-layer") - b.getAttribute("data-layer"));
     loops.forEach(x => {
-        if (endingRange === parseInt(x.getAttribute("data-layer")) - 1) {
+        if (endingRange === x.getAttribute("data-layer") - 1) {
             endingRange++;
         }
     })
     loops.reverse()
     loops.forEach(x => {
-        if (startingRange === parseInt(x.getAttribute("data-layer")) + 1) {
+        if (startingRange === x.getAttribute("data-layer") + 1) {
             startingRange--;
         }
     })
     loops.reverse()
     loops = loops.filter(x => {
-        const pos = parseInt(x.getAttribute("data-layer"));
+        const pos = x.getAttribute("data-layer");
         return pos >= startingRange && pos <= endingRange;
     });
     loops.sort((a, b) => {
-        return parseInt(a.getAttribute("data-layer"))
-            - parseInt(b.getAttribute("data-layer"));;
+        return a.getAttribute("data-layer")
+            - b.getAttribute("data-layer");
     });
     return loops;
 }
@@ -677,7 +677,7 @@ function chordProcess(loop, chordArray) {
         loop.relatedChord = chordArray;
     }
 
-    const chordDisp = loop.querySelector(".chordDisplay");
+    const chordDisp = loop.chordDisplay;
 
     if (!chordDisp) {
         return;
@@ -1046,10 +1046,9 @@ function addChordDisplay(loop) {
     if (!settings.ChordDisplays) {
         return;
     }
-    if (loop._hasChordDisplay) {
+    if (loop.chordDisplay) {
         return;
     }
-    loop._hasChordDisplay = true;
     const chordDisplay = document.createElement("input");
     chordDisplay.type = "text";
     chordDisplay.tabIndex = -1;
@@ -1071,6 +1070,7 @@ function addChordDisplay(loop) {
     });
 
     loop.appendChild(chordDisplay);
+    loop.chordDisplay = chordDisplay;
 
     setTimeout(() => {
         if (loop.suppressChordDisplay) {
@@ -1085,10 +1085,10 @@ addEventListener("keydown", (e) => {
         return;
     }
     const loop = document.elementFromPoint(mouse.x, mouse.y)?.closest(".loopInternal:not(.selected):not(.active)")?.parentElement;
-    if (loop && loop._hasChordDisplay) {
+    if (loop && loop.chordDisplay) {
         e.preventDefault();
-        loop.querySelector(".chordDisplay").focus();
-        loop.querySelector(".chordDisplay").select();
+        loop.chordDisplay.focus();
+        loop.chordDisplay.select();
     }
 });
 
@@ -1098,7 +1098,7 @@ function chordComponentEdited(loop) {
     if (!settings.ChordDisplays) {
         return;
     }
-    if (loop.chordHandler || !loop.querySelector(".chordDisplay")) {
+    if (loop.chordHandler || !loop.chordDisplay) {
         return;
     };
 

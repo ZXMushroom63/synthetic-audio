@@ -18,10 +18,10 @@ addEventListener("init", () => {
         globalThis.zscrollisInternal = false;
         [...nodes]
             .sort((a, b) => {
-                return parseFloat(a.getAttribute("data-layer")) - parseFloat(b.getAttribute("data-layer"))
+                return a.getAttribute("data-layer") - b.getAttribute("data-layer")
             })
             .sort((a, b) => {
-                return parseFloat(a.getAttribute("data-start")) - parseFloat(b.getAttribute("data-start"))
+                return a.getAttribute("data-start") - b.getAttribute("data-start")
             }).forEach((node, i) => {
                 const def = filters[node.getAttribute("data-type")];
                 if ((!def.pitchZscroller && (Math.abs(dir) !== 1)) || !def.zscroll) { //only zscroll if possible, and allow single number zscrolling for non pitch zscollers

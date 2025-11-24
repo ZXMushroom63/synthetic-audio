@@ -17,8 +17,8 @@ registerTool("[Dev] 2score", (nodes) => {
     nodes.forEach(node => {
         score.notes.push({
             semis: Math.round(Math.log2((node.hitFrequency / C5) ** 12)),
-            beatsStart: parseFloat(node.getAttribute("data-start")) / audio.beatSize,
-            beatsDuration: parseFloat(node.getAttribute("data-duration")) / audio.beatSize
+            beatsStart: node.getAttribute("data-start") / audio.beatSize,
+            beatsDuration: node.getAttribute("data-duration") / audio.beatSize
         });
     });
     const scoreName = prompt("name: ", dev2score_lastName, "Dev2Score");
