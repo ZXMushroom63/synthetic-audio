@@ -23,7 +23,7 @@ addEventListener("init", async () => {
     loadingScreenTabs.addTab("Loader", `<pre style="width:100%;height:35vh;margin-top:0;margin:0;overflow-x:hidden;overflow-y:scroll;" id="loader_logs"></pre>`);
     const logs = [];
     const loadingScreenModMenu = new ModMenu("SYNTHETIC Bootloader", loadingScreenTabs, "bootloader", syntheticMenuStyles);
-    function logToLoader(txt) {
+    globalThis.logToLoader = function logToLoader(txt) {
         if (txt !== undefined) {
             logs.push(txt.replaceAll(" ", "&nbsp").replaceAll("<", "").replaceAll(">", "").replaceAll("\n", "<br>"));
         }
