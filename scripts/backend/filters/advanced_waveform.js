@@ -495,7 +495,7 @@ function slideNoteHandler(l, allNodes) {
         return n.querySelector(".noteDisplay") //TODO: optimise this and other .noteDisplay query selectors
             && (n.getAttribute("data-editlayer") === l.getAttribute("data-editlayer"))
             && (n.getAttribute("data-layer") === l.getAttribute("data-layer"))
-            && (n.getAttribute("data-start") === timeQuantise(l.getAttribute("data-start") + l.getAttribute("data-duration")))
+            && timeCompare(n.getAttribute("data-start"), l.getAttribute("data-start") + l.getAttribute("data-duration"))
     });
     if (!slideTarget || !slideTarget.theoryNote) {
         const oldFreq = l.conf.Frequency;
