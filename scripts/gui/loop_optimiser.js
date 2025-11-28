@@ -23,5 +23,6 @@ if (globalThis.IntersectionObserver) {
         });
     }, options);
 } else {
-    logToLoader("This browser does not support IntersectionObserver, performance will suffer.")
+    logToLoader("This browser does not support IntersectionObserver, performance will suffer.");
+    console.warn("This browser does not support IntersectionObserver, performance will suffer.");
 }
