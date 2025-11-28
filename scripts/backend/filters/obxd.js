@@ -1,6 +1,6 @@
 const FAKEMIDI_DISCRETE_INTERVAL = 400;
 const FAKEMIDI_MAGIC = new Float32Array([0.25, 1, -0.5, -2, 0, 0.125, 0, 1]);
-
+const FAKEMIDI_PREVIEW_FLUSH_QUEUE = [];
 addBlockType("fakemidi", {
     color: "rgba(62, 242, 62, 0.3)",
     title: "FakeMIDI",
@@ -56,6 +56,29 @@ addBlockType("fakemidi", {
         velocity: "Velocity",
         zero: []
     },
+    customGuiButtons: {
+        "Preview": async function () {
+            const mid = Math.min(127, Math.max(0, Math.floor(freq2midi(_(this.conf.Note)(0, new Float32Array(2))))));
+            const vel = Math.floor(Math.min(127, Math.max(0, 127 *  _(this.conf.Velocity)(0, new Float32Array(2)))));
+            const duration = Math.min(this.getAttribute("data-duration"), 2);
+            try {
+                FAKEMIDI_PREVIEW_FLUSH_QUEUE.filter(x => true ? true : x.data[1] === mid).forEach(x => { // (duration > 1)
+                    obxdInstance.port.postMessage(x);
+                    FAKEMIDI_PREVIEW_FLUSH_QUEUE.splice(FAKEMIDI_PREVIEW_FLUSH_QUEUE.indexOf(x), 1);
+                });
+                obxdInstance.port.postMessage({ type: "midi", data: [0x90, mid, vel] });
+                const ExitMsg = { type: "midi", data: [0x80, mid, vel] };
+                FAKEMIDI_PREVIEW_FLUSH_QUEUE.push(ExitMsg);
+                await wait(duration);
+                if (FAKEMIDI_PREVIEW_FLUSH_QUEUE.includes(ExitMsg)) {
+                    obxdInstance.port.postMessage(ExitMsg);
+                    FAKEMIDI_PREVIEW_FLUSH_QUEUE.splice(FAKEMIDI_PREVIEW_FLUSH_QUEUE.indexOf(ExitMsg), 1);
+                }
+            } catch (error) {
+
+            }
+        },
+    },
     pitchZscroller: true,
     zscroll: (loop, value) => {
         if (keymap["q"] || keymap["w"]) {
@@ -74,6 +97,10 @@ addBlockType("fakemidi", {
             ));
             loop.conf.Note = ":" + frequencyToNote(_(loop.conf.Note)(0, new Float32Array(1)) * Math.pow(2, value / 12)) + ":";
             updateNoteDisplay(loop);
+        }
+
+        if (!globalThis.zscrollIsInternal) {
+            filters["fakemidi"].customGuiButtons.Preview.apply(loop, []);
         }
     },
 });
@@ -236,7 +263,7 @@ addBlockType("obxd_port", {
             obxdInstance.onChange = null;
             obxdInstance.loadPatchData(buf);
             obxdInstance.onChange = () => { saveBtn.innerText = "Save*" };
-            findLoops(".loop[data-type=obxd_port]").forEach((l)=>markLoopDirty(l, true));
+            findLoops(".loop[data-type=obxd_port]").forEach((l) => markLoopDirty(l, true));
         });
     },
     functor: async function (inPcm, channel, data) {
@@ -250,7 +277,7 @@ addBlockType("obxd_port", {
         })
         await OBXD.importScripts(actx, "obxd/");
         const self = this;
-        const localOBXD = new OBXD(actx, {processorOptions: {seed: channel === 0 ? this.conf.LSeed : this.conf.RSeed}});
+        const localOBXD = new OBXD(actx, { processorOptions: { seed: channel === 0 ? this.conf.LSeed : this.conf.RSeed } });
         localOBXD.connect(actx.destination);
         const base = this.conf.Patch.substring(3);
         const buf = stringToUint8(base).buffer;
@@ -261,7 +288,7 @@ addBlockType("obxd_port", {
         let headerCheckIndex = 0;
         for (let i = startOffset; i < inPcm.length; i += 1) {
             if (headerCheckIndex >= FAKEMIDI_MAGIC.length) {
-                
+
                 const chunk = inPcm.subarray(i - 8, i + FAKEMIDI_DISCRETE_INTERVAL - 8);
                 i += 381 - 1; // actual discrete interval size
                 headerCheckIndex = 0;
@@ -312,7 +339,7 @@ addBlockType("obxd_port", {
                 const key = self.conf[`Param${id}ID`];
                 const fn = _(self.conf[`Param${id}Value`]);
                 const buffer = bakeParameterData(fn);
-                localOBXD.port.postMessage({ type:"automation_param", key: key, buffer: buffer });
+                localOBXD.port.postMessage({ type: "automation_param", key: key, buffer: buffer });
             }
         }
 
@@ -321,7 +348,7 @@ addBlockType("obxd_port", {
         sendParameter(3);
 
         // bake everything into a float32array, with a sensible samplerate
-        
+
         localOBXD.port.postMessage({ type: "midibundle", data: midiBundle });
         await wait(1 / 30);
         const result = await actx.startRendering();
@@ -331,7 +358,7 @@ addBlockType("obxd_port", {
         "How": function () {
             alert("How to use SnOBXd", `<span style="white-space: break-spaces">Use the FakeMIDI node to create a MIDI signal, and then use this node to convert that into an instrument.</span>`);
         },
-        "Manual":  function () {
+        "Manual": function () {
             window.open("https://linuxsynths.com/ObxdPatchesDemos/unofficial-obxd-manual.pdf");
         },
         "Dbg": function () {
@@ -340,7 +367,7 @@ addBlockType("obxd_port", {
         "⛶": function () {
             OBXDFrame.contentDocument.querySelector("main").classList.add("fullscreen");
             OBXDFrame.requestFullscreen();
-            const removeFullscreenClass = ()=>{
+            const removeFullscreenClass = () => {
                 if (document.fullscreenElement !== OBXDFrame) {
                     OBXDFrame.contentDocument.querySelector("main").classList.remove("fullscreen");
                 }
