@@ -8,6 +8,9 @@ const options = {
 if (globalThis.IntersectionObserver) {
     globalThis.LoopOptimiser = new IntersectionObserver((entries, observer) => {
         entries.forEach(entry => {
+            if (!entry.parentElement) {
+                return;
+            }
             if (entry.parentElement.classList.contains("selected")) {
                 return entry.target.style.contentVisibility = "visible";
             }
