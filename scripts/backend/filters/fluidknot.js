@@ -80,7 +80,7 @@ addBlockType("fluidknot", {
         const finalPcm = out.getChannelData(0);
 
         const AmpSmoothingStart = Math.floor(audio.samplerate * this.conf.AmplitudeSmoothing);
-        const AmpSmoothingEnd = inPcm.length - AmpSmoothingStart;
+        const AmpSmoothingEnd = inPcm.length - AmpSmoothingStart - 1;
 
         const FADETIME = Math.min(this.conf.Tail * audio.samplerate, inPcm.length);
         const FADESTART = inPcm.length - FADETIME;

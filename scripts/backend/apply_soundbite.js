@@ -67,7 +67,7 @@ function applySoundbiteToPcmSidechain(reverse, looping, currentData, inPcm, dura
     const LOOKUPTABLE_PERSAMPLE = extractVolumeCurveFromPcm(currentData, sidechainFreq);
     
     const AmpSmoothingStart = Math.floor(audio.samplerate * 0.01);
-    const AmpSmoothingEnd = inPcm.length - AmpSmoothingStart;
+    const AmpSmoothingEnd = inPcm.length - AmpSmoothingStart - 1;
     if (looping) {
         for (let i = 0; i < inPcm.length; i++) {
             var sideChain = sideChainRaw;

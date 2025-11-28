@@ -193,7 +193,7 @@ function addAmpSmoothKnob(data) {
     data.functor = function (inPcm, channel, data) {
         const out = oldFunctor.apply(this, [inPcm, channel, data]);
         const AmpSmoothingStart = Math.floor(audio.samplerate * this.conf.AmplitudeSmoothing);
-        const AmpSmoothingEnd = inPcm.length - AmpSmoothingStart;
+        const AmpSmoothingEnd = inPcm.length - AmpSmoothingStart - 1;
         function applyFn(data) {
             data.forEach((x, i) => {
                 var ampSmoothingFactor = 1;

@@ -298,7 +298,7 @@ addBlockType("p_waveform_plus", {
         }
 
         const AmpSmoothingStart = (this.conf.IsSlide && this.conf.SlideOverrideSmoothing) ? 0 : Math.floor(audio.samplerate * this.conf.AmplitudeSmoothTime);
-        const AmpSmoothingEnd = inPcm.length - AmpSmoothingStart;
+        const AmpSmoothingEnd = inPcm.length - AmpSmoothingStart - 1;
         var dt = Math.pow(audio.samplerate, -1);
 
         if (this.conf.BadSine) {

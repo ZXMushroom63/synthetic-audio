@@ -3,6 +3,7 @@ addBlockType("p_value", {
     title: "Value",
     directRefs: ["val", "value"],
     waterfall: 1,
+    amplitude_smoothing_knob: true,
     configs: {
         "Value": [0, "number", 1],
         "Volume": [1, "number", 1],
