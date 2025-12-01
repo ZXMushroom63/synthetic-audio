@@ -582,6 +582,7 @@ var currentlyRenderedLoop = null;
 let renderFileName = "";
 let renderBlob = null;
 let renderCodec = null;
+let InsecurityEnabledForProject = false;
 async function render() {
     if (processRendering) {
         return;
@@ -598,6 +599,16 @@ async function render() {
 
     startTiming("render");
     const data = serialise(true);
+    if (!InsecurityEnabledForProject && data.nodes.find(x => x.ref.hasAttribute("data-insecure"))) {
+        InsecurityEnabledForProject = await confirm("Project contains insecure scripts. Render anyway?", "Insecure Render Warning");
+        if (!InsecurityEnabledForProject) {
+            renderBtn.removeAttribute("disabled");
+            processRendering = false;
+            renderBtn.disabled = false;
+            currentlyRenderedLoop = null;
+            return;
+        }
+    }
     const channels = data.stereo ? 2 : 1;
     const output = new Array(channels);
     output.fill(0).forEach((x, i) => output[i] = []);
@@ -728,9 +739,9 @@ async function render() {
 
     processRendering = false;
     renderBtn.disabled = false;
+    currentlyRenderedLoop = null;
 
     findLoops(".loop").forEach(hydrateLoopDecoration);
-    currentlyRenderedLoop = null;
 
     customEvent("render");
 }

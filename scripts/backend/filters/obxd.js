@@ -1,6 +1,7 @@
 const FAKEMIDI_DISCRETE_INTERVAL = 400;
 const FAKEMIDI_MAGIC = new Float32Array([0.25, 1, -0.5, -2, 0, 0.125, 0, 1]);
 const FAKEMIDI_PREVIEW_FLUSH_QUEUE = [];
+
 addBlockType("fakemidi", {
     color: "rgba(62, 242, 62, 0.3)",
     title: "FakeMIDI",
@@ -59,7 +60,7 @@ addBlockType("fakemidi", {
     customGuiButtons: {
         "Preview": async function () {
             const mid = Math.min(127, Math.max(0, Math.floor(freq2midi(_(this.conf.Note)(0, new Float32Array(2))))));
-            const vel = Math.floor(Math.min(127, Math.max(0, 127 *  _(this.conf.Velocity)(0, new Float32Array(2)))));
+            const vel = Math.floor(Math.min(127, Math.max(0, 127 * _(this.conf.Velocity)(0, new Float32Array(2)))));
             const duration = Math.min(this.getAttribute("data-duration"), 2);
             try {
                 FAKEMIDI_PREVIEW_FLUSH_QUEUE.filter(x => true ? true : x.data[1] === mid).forEach(x => { // (duration > 1)
@@ -391,4 +392,106 @@ addBlockType("obxd_port", {
             this.querySelector(".loopOptionsMenu button:last-child").innerText = "Save";
         },
     }
+});
+const MIDIScriptTemplates = {
+    "SimplePolyrythm": `const SCALE = ["C", "D", "D#", "F", "G", "G#", "A#"];
+const BEAT_GAP = 16;
+const OFFSET_SIZE_PER_NOTE = 1 / 24;
+const DENOMINATOR_BASE = 5;
+const PULSE_DURATION = 0.125;
+const STARTING_OCTAVE = 5;
+const NOTE_COUNT = 12;
+
+const chords = [];
+for (let i=0; i<NOTE_COUNT; i++) {
+    const octaveOffset = Math.floor(i / 7) + STARTING_OCTAVE;
+    chords.push(new Chord(SCALE[i % 7] + octaveOffset));
+}
+const gaps = chords.map((x,i) => BEAT_GAP / ((i*OFFSET_SIZE_PER_NOTE)+DENOMINATOR_BASE));
+
+chords.forEach((chord, j) => {
+    for (let t = 0; t < lengthBeats; t += gaps[j]) {
+        timeline.append(t, chord, "down", 1);
+        timeline.append(t + PULSE_DURATION, chord, "up", 1);
+    }
+});
+
+const maxLoopTime = BEAT_GAP * (1 / OFFSET_SIZE_PER_NOTE);
+//console.log("Appx. Max Loop Time: ", maxLoopTime, " beats");`
+}
+addBlockType("fakemidiscript", {
+    color: "rgba(0, 255, 183, 0.6)",
+    title: "FakeMIDI Script",
+    directRefs: ["midscript", "midiscript"],
+    insecure: true,
+    configs: {
+        "Timescale": [1, "number"],
+        "Preset": ["Click to load...", ["Click to load..."]],
+        "Textarea": [`const chord = (new Chord("A4")).applyChord("maj7").addInterval("octave");
+for (let t = 0; t < lengthBeats; t += 1) {
+   timeline.append(t, chord, "down", 1);
+   timeline.append(t + 0.5, chord, "up", 1);
+}`, "textarea", 1],
+        //todo: use monaco or smth
+        //todo: add fix bpm
+    },
+    waterfall: 1,
+    forcePrimitive: true,
+    selectMiddleware: (key)=>{
+        if (key === "Preset") {
+            return ["Click to load...", ...Object.keys(MIDIScriptTemplates)];
+        }
+    },
+    updateMiddleware: (loop)=>{
+        const preset = loop.conf.Preset;
+        if (preset !== "Click to load...") {
+            loop.conf.Textarea = MIDIScriptTemplates[preset];
+            loop.querySelector("[data-key=Textarea]").value = loop.conf.Textarea;
+            const presetField = loop.querySelector("[data-key=Preset]");
+            presetField.triggerUpdate();
+            loop.conf.Preset = "Click to load...";
+            presetField.selectedIndex = [...presetField.options].findIndex(x => x.value === "Click to load...");
+            markLoopDirty(loop);
+        }
+    },
+    functor: function (inPcm, channel, data) {
+        if (inPcm.length < FAKEMIDI_DISCRETE_INTERVAL * 2) {
+            return inPcm;
+        }
+
+        const start = Math.floor((currentlyRenderedLoop?.start || 0) * audio.samplerate);
+
+        // if ((startOffset + FAKEMIDI_DISCRETE_INTERVAL) > inPcm.length) {
+        //     console.warn("FakeMIDI Skipped.", this);
+        //     return inPcm;
+        // }
+
+        const timeline = new MIDITimeline(this.conf.Timescale);
+        const beatLength = Math.floor(inPcm.length / audio.samplerate / audio.beatSize);
+        const script = new Function("timeline", "lengthBeats", this.conf.Textarea);
+        
+        try {
+            script(timeline, beatLength / this.conf.Timescale);
+        } catch (error) {
+            console.error(error);
+            return inPcm;
+        }
+
+        timeline.signals.forEach(signal => {
+            const time = signal.beatsOffset * audio.beatSize;
+            const startOffset = Math.ceil((((currentlyRenderedLoop?.start + time) || 0) * audio.samplerate) / FAKEMIDI_DISCRETE_INTERVAL) * FAKEMIDI_DISCRETE_INTERVAL - start;
+            inPcm.set(FAKEMIDI_MAGIC, startOffset);
+            const mid = Math.min(127, Math.max(0, signal.note));
+            const vel = Math.min(127, Math.max(0, signal.velocity));
+            inPcm[startOffset + 8 + 3 * mid + 0] = signal.keyState ? 2 : -2;
+            inPcm[startOffset + 8 + 3 * mid + 2] = vel;
+        });
+
+        return inPcm;
+    },
+    initMiddleware: (loop) => {
+        loop.querySelector("[data-key=Textarea]").setAttribute("spellcheck", "false");
+    },
+    customGuiButtons: {
+    },
 });

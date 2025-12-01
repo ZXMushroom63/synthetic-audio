@@ -145,7 +145,7 @@ addBlockType("fluidknot", {
         loop.conf.Program = newProgram.name;
         soundFont.program = newProgram.id;
 
-        const bankField = loop.querySelector("[data-key=Bank]")
+        const bankField = loop.querySelector("[data-key=Bank]");
         bankField.triggerUpdate();
         bankField.selectedIndex = [...bankField.options].findIndex(x => x.value === newBank.name);
 

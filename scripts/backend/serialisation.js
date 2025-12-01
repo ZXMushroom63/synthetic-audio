@@ -112,6 +112,7 @@ function deserialiseNode(serNode, markDirty) {
 }
 const BPM_VALUES = [120, 70, 80, 100, 128, 116, 156];
 function deserialise(ser) {
+    InsecurityEnabledForProject = false;
     if (!multiplayer.isHooked) {
         patchSave(ser);
     }

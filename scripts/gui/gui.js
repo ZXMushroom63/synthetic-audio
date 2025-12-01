@@ -438,6 +438,9 @@ function addBlock(type, start, duration, title, layer = 0, data = {}, editorValu
         markLoopDirty(loop);
     }
     loop.setAttribute("data-type", type);
+    if (definition.insecure) {
+        loop.setAttribute("data-insecure", "yes");
+    }
     if (definition.wavtableUser) {
         loop.setAttribute("data-wt-user", "yes");
         loop.usesWt = definition.usesWt ? () => definition.usesWt(loop) : () => true;
