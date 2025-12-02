@@ -33,7 +33,7 @@ addEventListener("init", () => {
             node.setAttribute("data-start", timeQuantise(minStart + offset));
             console.log(timeQuantise(minStart + offset));
             node.setAttribute("data-layer", minLayer);
-            offset += ode.getAttribute("data-duration");
+            offset += node.getAttribute("data-duration");
 
             markLoopDirty(node, true);
             hydrateLoopPosition(node);
