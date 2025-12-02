@@ -7,15 +7,27 @@ const app = express();
 const server = createServer(app);
 
 // CONFIGS
-const multiplayerEnabled = 1;
+const multiplayerEnabledDefault = 0;
 // 0: multiplayer disabled
-// 1: multiplayer enabled, client frontent that autoconnects to server. not recommended if the server isn't static, as service workers will cache new clients repeatedly.
+// 1: multiplayer enabled, client frontent that autoconnects to server. not recommended if the server is temporary, as service workers will cache new clients repeatedly.
 // 2: multiplayer enabled, and client frontent is disabled.
+let multiplayerEnabled = multiplayerEnabledDefault;
+
+if (process.argv.includes("headless")) {
+    multiplayerEnabled = 2;
+}
+
+if (process.argv.includes("full_multi")) {
+    multiplayerEnabled = 1;
+}
+
+if (process.argv.includes("no_multi")) {
+    multiplayerEnabled = 0;
+}
 
 const port = 4152;
 const logging = false;
 const statKeeper = {}; // or null to disable
-
 
 if (multiplayerEnabled !== 2) {
     app.use(express.static('.'));

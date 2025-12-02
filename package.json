@@ -7,7 +7,9 @@
     "lib": "lib"
   },
   "scripts": {
-    "host": "node server/index.js",
+    "host": "node server/index.js headless",
+    "full": "node server/index.js full_multi",
+    "static": "node server/index.js no_multi",
     "getlib": "node server/dl_libs.mjs"
   },
   "repository": {
