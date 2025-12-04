@@ -27,10 +27,10 @@ addBlockType("vinyl", {
             var val = distribution[Math.floor(i * (distribSampleRate / audio.samplerate))];
             if (this.conf.OverwriteMode) {
                 if (val !== 0) {
-                    inPcm[i] = val;
+                    inPcm[i] = val || 0;
                 }
             } else {
-                inPcm[i] += val;
+                inPcm[i] += val || 0;
             }
         });
         return inPcm;
