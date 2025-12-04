@@ -9,6 +9,7 @@ addBlockType("bitcrunch", {
         "SmoothDownsample": [false, "checkbox"],
     },
     functor: function (inPcm, channel, data) {
+        inPcm = inPcm.slice();
         var sampleRateAnchor = audio.samplerate / 24000;
         var level = _(this.conf.Level);
         var x = Math.max(0, Math.roundsampleRateAnchor * (level(0, 0, 0)));
