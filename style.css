@@ -1330,7 +1330,7 @@ input[type=range]:active {
   height: 10px;
   background-color: rgba(255, 255, 255, 1);
   border: 1px solid rgba(0, 0, 0, 0.25);
-  border-radius: 5px;
+  border-radius: 4px;
   cursor: crosshair;
   transform: translate(-50%, -50%);
   /* margin-bottom: -13.5px; */
