@@ -26,12 +26,21 @@ function drawAutomationGraphKeyframes(loop) {
             const xOffset = - (e.x - keyAabb.left - 8);
             const yOffset = - (e.y - keyAabb.top - 8);
             function mouseHandler(ev) {
-                let newX = Math.max(0, Math.min(1, (ev.x - aabb.left + xOffset) / aabb.width));
-                let newY = Math.max(0, Math.min(1, (ev.y - aabb.top + yOffset) / aabb.height));
+                let newX = (ev.x - aabb.left + xOffset) / aabb.width;
+                let newY = (ev.y - aabb.top + yOffset) / aabb.height;
 
                 const substeps = keymap["Shift"] ? 36 * 35 : (4 * gui.substepping);
                 newY = Math.round(newY * substeps) / substeps;
 
+                if (!keymap["Shift"]) {
+                    const tempOffset = (loop.getAttribute("data-start") / audio.beatSize * gui.substepping % 1) * audio.beatSize;
+                    console.log(tempOffset);
+                    newX = (Math.round((newX * loop.getAttribute("data-duration") + tempOffset) / audio.beatSize * gui.substepping)
+                        / loop.getAttribute("data-duration") - tempOffset) * audio.beatSize / gui.substepping;
+                }
+
+                newX = Math.max(0, Math.min(1, newX));
+                newY = Math.max(0, Math.min(1, newY));
                 //console.log(newX, newY);
                 keyf.style.left = `${newX * 100}%`;
                 keyf.style.top = `${newY * 100}%`;
@@ -166,12 +175,12 @@ addBlockType("automation_parameter", {
             })).map(pair => ({
                 x: pair[0],
                 y: pair[1]
-            })).sort((a, b)=>a.x - b.x);
+            })).sort((a, b) => a.x - b.x);
             if (keyframes[0].x !== 0) {
-                keyframes.unshift({x: 0, y: 0});
+                keyframes.unshift({ x: 0, y: 0 });
             }
             if (keyframes[keyframes.length - 1].x !== 1) {
-                keyframes.push({x: 1, y: 0});
+                keyframes.push({ x: 1, y: 0 });
             }
             return keyframes;
         }
@@ -233,5 +242,5 @@ addEventListener("serialisenode", (e) => {
 // Y coord: round(pos*1295).toString(36)
 // Note 2 Self: Use editor substepping to snap across the X axis, on Y axis use 4 levels and substep further
 // + extra snapping on X axis for start and end
-
+// to insert keyframe, find largest gap kframes, and insert halfway between
 // Demo Data: 0,0;zzzz,zz;
