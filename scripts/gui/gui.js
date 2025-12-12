@@ -802,7 +802,6 @@ function init() {
             }
             return;
         }
-
     });
 
     addEventListener("keydown", (e) => {

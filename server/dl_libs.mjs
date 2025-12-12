@@ -15,6 +15,12 @@ import fs from "fs/promises";
             libContent = libContent.replaceAll("as default }", "as default}");
             libContent = `(function ${libName}() { globalThis.${libName} = {}; ${libContent.replaceAll("export{", "globalThis."+libName+"= ").replaceAll(" as default}", ";")} })();`
         }
+        if (library[2] && library[2].trim() === 'UMDPATCH2') {
+            const libName = library[3].trim();
+            libContent = libContent.replaceAll("export {", "export{");
+            libContent = libContent.replaceAll("as default }", "as default}");
+            libContent = `globalThis.${libName} = {}; ${libContent.replaceAll("export{", "globalThis."+libName+"= ").replaceAll(" as default}", ";").replaceAll("export function", "function")}`
+        }
         await fs.writeFile("./lib/" + library[0], `//Automatically pulled from ${library[1]}\n` + libContent);
         console.log("Fetched: " + library[0]);
     }
