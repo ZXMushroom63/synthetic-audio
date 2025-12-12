@@ -90,3 +90,11 @@ addBlockType("automation_parameter", {
 });
 //@Param means bind to param
 //@Param!5~12 means bind to param, mapping from 0-1 to x-y
+addEventListener("serialisenode", (e)=>{
+    if (e.detail.forRender && e.detail.data.type === "automation_parameter") {
+        if (!e.detail.data.conf.ReaderMode) {
+            e.detail.data.layer -= 1000;
+            console.log("Shifted ", e.detail.data);
+        }
+    }
+});
