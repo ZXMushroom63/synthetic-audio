@@ -1,16 +1,52 @@
 function getAutomationParamIds() {
     return [...new Set([...document.querySelectorAll("[data-paramid]")].map(x => x.getAttribute("data-paramid")))];
 }
+function createAutomationAutograph(loop) {
+    const minVal = document.createElement("span");
+    minVal.classList.add("graphMinVal");
+    minVal.classList.add("graph");
+    minVal.innerText = "$MINVAL";
+    loop.internalContainer.appendChild(minVal);
+}
+function updateAutomationAutograph(loop) {
+    loop.querySelector(".graphMinVal").innerText = loop.conf.GraphExtentMin.toFixed(1);
+}
 function automationParamHandler(loop) {
-    loop.setAttribute("data-paramid", loop.conf.Identifier);
-    var newTitle = "@" + loop.conf.Identifier + " - Automation Parameter";
-    loop.setAttribute("data-file", newTitle);
-    loop.querySelector(".loopInternal .name").innerText = newTitle;
+    if (loop.conf.ReaderMode) {
+        loop.conf.GraphMode = false;
+        loop.querySelector("[data-key=GraphMode]").checked = false;
+    }
+
+    if (!loop.conf.GraphMode) {
+        loop.setAttribute("data-paramid", loop.conf.Identifier);
+        let newTitle = "@" + loop.conf.Identifier + " - Automation Parameter";
+        loop.setAttribute("data-file", newTitle);
+        loop.querySelector(".loopInternal .name").innerText = newTitle;
+    }
 
     if (loop.conf.ReaderMode) {
-        loop.querySelector(".genericDisplay").innerText = "Signal Reader";
+        loop.querySelector(".genericDisplay").innerText = "→stdin";
+    } else if (!loop.conf.GraphMode) {
+        loop.querySelector(".genericDisplay").innerText = ("" + loop.conf.Value).startsWith("#") ? loop.conf.Value.replace("#", "") : loop.conf.Value; ("" + loop.conf.Value).startsWith("#") ? loop.conf.Value.replace("#", "") : loop.conf.Value;
     } else {
-        loop.querySelector(".genericDisplay").innerText = ("" + loop.conf.Value).startsWith("#") ? loop.conf.Value.replace("#", "") : loop.conf.Value;
+        loop.querySelector(".genericDisplay").innerText = "";
+    }
+
+    if (loop.conf.GraphMode) {
+        loop.setAttribute("data-paramid", loop.conf.Identifier);
+        let newTitle = loop.conf.GraphExtentMax.toFixed(1) + " | @" + loop.conf.Identifier;
+        loop.setAttribute("data-file", newTitle);
+        loop.querySelector(".loopInternal .name").innerText = newTitle;
+        if (!loop.querySelector(".graph")) {
+            createAutomationAutograph(loop);
+        }
+        updateAutomationAutograph(loop);
+        loop.querySelector(".backgroundSvg").style.display = "none";
+    } else if (loop.querySelector(".graph")) {
+        loop.querySelectorAll(".graph").forEach(x => x.remove());
+        loop.querySelector(".backgroundSvg").style.display = "";
+    } else {
+        loop.querySelector(".backgroundSvg").style.display = "";
     }
 }
 addBlockType("automation_parameter", {
@@ -21,16 +57,27 @@ addBlockType("automation_parameter", {
     configs: {
         "Identifier": ["Param", "text"],
         "Value": ["#0~1", "number", 1],
-        "Transparent": [true, "checkbox"],
+        "GraphMode": [false, "checkbox"],
+        "GraphExtentMin": [0, "number"],
+        "GraphExtentMax": [1, "number"],
+        "GraphData": ["", "textarea", 2],
         "ReaderMode": [false, "checkbox"],
         "ReaderRMSFreq": [31, "number"],
         "ReaderMapping": ["#0~1", "number", 1],
+        "ReaderTransparent": [true, "checkbox"],
     },
     dropdowns: {
+        "Graph": [
+            "GraphMode",
+            "GraphExtentMin",
+            "GraphExtentMax",
+            "GraphData",
+        ],
         "Reader": [
             "ReaderMode",
             "ReaderRMSFreq",
-            "ReaderMapping"
+            "ReaderMapping",
+            "ReaderTransparent"
         ]
     },
     clearCache: (self, info, layer) => {
@@ -57,7 +104,7 @@ addBlockType("automation_parameter", {
         const blankPcm = new Float32Array(2048);
 
         this.ref.setAttribute("data-lastrenparam", this.conf.Identifier);
-        var val = _(this.conf.Value, {disallowAutomationParams: true});
+        var val = _(this.conf.Value, { disallowAutomationParams: true });
         const internalId = "@__params::" + this.conf.Identifier.toUpperCase();
         const alreadyExists = proceduralAssets.has(internalId);
         var paramPcm;
@@ -82,18 +129,27 @@ addBlockType("automation_parameter", {
             }
         });
 
-        if (!this.conf.Transparent) {
-            return new Float32Array(inPcm.length);
+        if (this.conf.ReaderTransparent && this.conf.ReaderMode) {
+            return inPcm;
         }
-        return inPcm;
+        return new Float32Array(inPcm.length);
     }
 });
 //@Param means bind to param
 //@Param!5~12 means bind to param, mapping from 0-1 to x-y
-addEventListener("serialisenode", (e)=>{
+addEventListener("serialisenode", (e) => {
     if (e.detail.forRender && e.detail.data.type === "automation_parameter") {
         if (!e.detail.data.conf.ReaderMode) {
             e.detail.data.layer -= 1000;
         }
     }
 });
+
+// GraphMode Internal Syntax (base 36)
+// X,Y;X,Y;X,Y;X,Y; and repeat
+// X coord: round(pos*1679615).toString(36)
+// Y coord: round(pos*1295).toString(36)
+// Note 2 Self: Use editor substepping to snap across the X axis, on Y axis use 4 levels and substep further
+// + extra snapping on X axis for start and end
+
+// Demo Data: 0,i0;3lll,zz;
