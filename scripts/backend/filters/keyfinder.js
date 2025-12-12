@@ -40,6 +40,9 @@ function findBestScales(midiNotes, scalePatterns) {
 
 const KEYFINDER_DEBOUNCE_PERIOD = 3000;
 function updateKeyfinders() {
+    if (findLoops(".loop[data-type=keyfinder]").length < 1) {
+        return;
+    }
     const scales = [...document.querySelector("#scaleModeInput").options].map(scale => scale.value.split(",").map(interval => parseInt(interval)));
     const scalesDisplay = [...document.querySelector("#scaleModeInput").options].map(scale => scale.innerText);
     const serialised = serialise(true, false);
