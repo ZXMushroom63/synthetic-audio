@@ -1316,3 +1316,26 @@ input[type=range]:active {
   line-height: 0.5rem;
   margin-bottom: 4px;
 }
+
+.graphKeyframe {
+  position: absolute;
+  font-size: 0.5rem;
+  line-height: 0.5rem;
+  margin-bottom: 4px;
+  left: 50%;
+  top: 50%;
+  display: block;
+  width: 16px;
+  height: 16px;
+  background-color: rgba(200, 200, 200, 0.5);
+  border: 1px solid white;
+  overflow: hidden;
+  border-radius: 2px;
+  cursor: crosshair;
+  transform: translate(-50%, -50%);
+  /* margin-bottom: -13.5px; */
+  z-index: 999;
+  color: white;
+  text-align: center;
+  align-content: center;
+}

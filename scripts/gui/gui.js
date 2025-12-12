@@ -255,30 +255,44 @@ function hydrateZoom(lean) {
 
 registerSetting("LoopWaveformDisplayDownsampling", 256);
 function hydrateLoopBackground(elem) {
-    if (!settings.LoopWaveformDisplays || !elem.cache[0]) {
+    const def = filters[elem.getAttribute("data-type")];
+    const keyframes = def.backgroundHandler ? def.backgroundHandler(elem) : null;
+    if ((!settings.LoopWaveformDisplays || !elem?.cache?.[0]) && !keyframes) {
         return;
     }
     var line = elem.querySelector(".backgroundSvg path");
     if (!line) {
         return;
     }
+
+    let targetArray = elem?.cache?.[0];
+
     var d = "M0 50";
     var downsample = Math.min(Math.max(64, settings.LoopWaveformDisplayDownsampling || 256), 8192);
     prevY = 0;
-    elem.cache[0].forEach((v, i) => {
-        var isFinalSample = i === (elem.cache[0].length - 1);
-        if (i % downsample === 0 || isFinalSample) {
-            var x = Math.round(i / elem.cache[0].length * 100 * 100) / 100;
-            var y = (v + 1) / 2 * 100;
-            y ||= 50;
-            y = Math.min(100, Math.max(0, y));
-            if (x === NaN || ((Math.abs(y - prevY) < 5) && !isFinalSample && (Math.abs(elem.cache[0][i + 1] - v) > 0.05))) {
-                return;
-            }
-            prevY = y;
-            d += "L" + x.toFixed(2) + " " + Math.round(y) + "";
+    if (keyframes) {
+        keyframes.forEach(keyframe => {
+            d += "L" + (keyframe.x * 100).toFixed(3) + " " + Math.round(100 - keyframe.y * 100) + "";
+        });
+    } else {
+        if (!settings.LoopWaveformDisplays || !elem?.cache?.[0]) {
+            return;
         }
-    });
+        targetArray.forEach((v, i) => {
+            var isFinalSample = i === (targetArray.length - 1);
+            if (i % downsample === 0 || isFinalSample) {
+                var x = Math.round(i / targetArray.length * 100 * 100) / 100;
+                var y = (v + 1) / 2 * 100;
+                y ||= 50;
+                y = Math.min(100, Math.max(0, y));
+                if (x === NaN || ((Math.abs(y - prevY) < 5) && !isFinalSample && (Math.abs(targetArray[i + 1] - v) > 0.05))) {
+                    return;
+                }
+                prevY = y;
+                d += "L" + x.toFixed(2) + " " + Math.round(y) + "";
+            }
+        });
+    }
     d = d.replaceAll("NaN", "50");
     d = d.replaceAll(".00 ", " ");
     d = d.replaceAll(".0 ", " ");
