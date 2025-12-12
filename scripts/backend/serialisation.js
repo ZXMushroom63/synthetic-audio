@@ -58,7 +58,7 @@ function serialise(forRender, forMultiplayer) {
     })]);
     var out = getProjectMeta();
     out.nodes = x;
-    customEvent("serialise", { data: out });
+    customEvent("serialise", { data: out, forRender, forMultiplayer, allNodes: hNodes });
     return out;
 }
 function hashSerialisedNode(node) {
@@ -69,7 +69,7 @@ function hashNode(node) {
 }
 function serialiseNode(node, forRender, forMultiplayer, allNodes) {
     if (allNodes) {
-        customEvent("preserialisenode", { node: node, allNodes: allNodes });
+        customEvent("preserialisenode", { node, allNodes, forMultiplayer, forRender });
     }
 
     var out = {};
@@ -95,7 +95,7 @@ function serialiseNode(node, forRender, forMultiplayer, allNodes) {
         out.ref = node;
         out.hash = hashNode(node);
     }
-    customEvent("serialisenode", { node: node, data: out });
+    customEvent("serialisenode", { node: node, data: out, forRender, forMultiplayer, allNodes });
     return out;
 }
 function deserialiseNode(serNode, markDirty) {
