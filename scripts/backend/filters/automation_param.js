@@ -1,10 +1,45 @@
+function findNewAutomationKeyframeCoords(aabb, ev, loop, xOffset, yOffset) {
+    let newX = (ev.x - aabb.left + xOffset) / aabb.width;
+    let newY = (ev.y - aabb.top + yOffset) / aabb.height;
+
+    const substeps = keymap["Shift"] ? 36 * 35 : (4 * gui.substepping);
+    newY = Math.round(newY * substeps) / substeps;
+
+    if (!keymap["Shift"]) {
+        const tempOffset = (loop.getAttribute("data-start") / audio.beatSize * gui.substepping % 1) * audio.beatSize;
+        newX = (Math.round((newX * loop.getAttribute("data-duration") + tempOffset) / audio.beatSize * gui.substepping)
+            / loop.getAttribute("data-duration") - tempOffset) * audio.beatSize / gui.substepping;
+    }
+
+    newX = Math.max(0, Math.min(1, newX));
+    newY = Math.max(0, Math.min(1, newY));
+
+    return { newX, newY };
+}
+function automation_getNewGraphData(keyframes) {
+    return keyframes.map(keyframe => {
+        return keyframe[0].toString(36) + "," + keyframe[1].toString(36);
+    }).join(";");
+}
+function automation_writeGraphData(gdata, loop) {
+    loop.conf.GraphData = gdata;
+    hydrateLoopBackground(loop);
+    loop.querySelector("[data-key=GraphData]").value = gdata;
+    markLoopDirty(loop);
+    multiplayer.patchLoop(loop);
+    drawAutomationGraphKeyframes(loop);
+}
+function automation_extractKeyframeData(loop) {
+    return loop.conf.GraphData.split(";").filter(x => !!x).map(y => y.split(",").map(x => parseInt(x, 36)));
+}
 function getAutomationParamIds() {
     return [...new Set([...document.querySelectorAll("[data-paramid]")].map(x => x.getAttribute("data-paramid")))];
 }
 function drawAutomationGraphKeyframes(loop) {
     loop.internalContainer.querySelectorAll(".graphKeyframe").forEach(x => x.remove());
-    const keyframes = loop.conf.GraphData.split(";").filter(x => !!x).map(y => y.split(",").map(x => parseInt(x, 36)));
-    keyframes.forEach(keyframe => {
+    const keyframes = automation_extractKeyframeData(loop);
+
+    keyframes.forEach((keyframe, i) => {
         const x = keyframe[0] / 1679615;
         const y = keyframe[1] / 1295;
 
@@ -13,10 +48,15 @@ function drawAutomationGraphKeyframes(loop) {
         keyf.classList.add("graphKeyframe");
         keyf.style.left = `${x * 100}%`;
         keyf.style.top = `${100 - y * 100}%`;
+        keyf.triggerRemove = function () {
+            keyframes.splice(i, 1);
+            automation_writeGraphData(automation_getNewGraphData(keyframes), loop);
+        };
         keyf.innerText = Math.round(lerp(loop.conf.GraphExtentMin, loop.conf.GraphExtentMax, y) * 100) / 100;
         keyf.addEventListener("mousedown", (e) => {
             e.stopPropagation();
             e.preventDefault();
+
             /**
              * @type {DOMRectReadOnly} aabb
              */
@@ -26,21 +66,8 @@ function drawAutomationGraphKeyframes(loop) {
             const xOffset = - (e.x - keyAabb.left - 8);
             const yOffset = - (e.y - keyAabb.top - 8);
             function mouseHandler(ev) {
-                let newX = (ev.x - aabb.left + xOffset) / aabb.width;
-                let newY = (ev.y - aabb.top + yOffset) / aabb.height;
+                const { newX, newY } = findNewAutomationKeyframeCoords(aabb, ev, loop, xOffset, yOffset);
 
-                const substeps = keymap["Shift"] ? 36 * 35 : (4 * gui.substepping);
-                newY = Math.round(newY * substeps) / substeps;
-
-                if (!keymap["Shift"]) {
-                    const tempOffset = (loop.getAttribute("data-start") / audio.beatSize * gui.substepping % 1) * audio.beatSize;
-                    console.log(tempOffset);
-                    newX = (Math.round((newX * loop.getAttribute("data-duration") + tempOffset) / audio.beatSize * gui.substepping)
-                        / loop.getAttribute("data-duration") - tempOffset) * audio.beatSize / gui.substepping;
-                }
-
-                newX = Math.max(0, Math.min(1, newX));
-                newY = Math.max(0, Math.min(1, newY));
                 //console.log(newX, newY);
                 keyf.style.left = `${newX * 100}%`;
                 keyf.style.top = `${newY * 100}%`;
@@ -48,18 +75,18 @@ function drawAutomationGraphKeyframes(loop) {
 
                 keyframe[0] = Math.round(newX * 1679615);
                 keyframe[1] = Math.round(1295 - newY * 1295);
-                const newGraphData = keyframes.map(keyframe => {
-                    return keyframe[0].toString(36) + "," + keyframe[1].toString(36);
-                }).join(";");
+                const newGraphData = automation_getNewGraphData(keyframes);
                 loop.conf.GraphData = newGraphData;
                 hydrateLoopBackground(loop);
                 return newGraphData;
             }
+
             function mouseUp(ev) {
                 const newGraphData = mouseHandler(ev);
 
                 //update GraphData & multiplayer push
                 loop.querySelector("[data-key=GraphData]").value = newGraphData;
+                markLoopDirty(loop);
                 multiplayer.patchLoop(loop);
 
                 removeEventListener("mousemove", mouseHandler);
@@ -119,11 +146,15 @@ function automationParamHandler(loop) {
     } else {
     }
 }
+
 addBlockType("automation_parameter", {
     color: "rgba(255, 0, 119, 0.42)",
     title: "Automation Parameter",
     directRefs: ["param"],
-    bgStrokeMult: 10,
+    bgStrokeMult: (loop) => {
+        return loop.conf.GraphMode ? 12 : 1;
+    },
+    noWvLOD: true,
     waterfall: 1,
     configs: {
         "Identifier": ["Param", "text"],
@@ -177,11 +208,15 @@ addBlockType("automation_parameter", {
                 x: pair[0],
                 y: pair[1]
             })).sort((a, b) => a.x - b.x);
-            if (keyframes[0].x !== 0) {
+            if (keyframes[0].x > 0.01) {
                 keyframes.unshift({ x: 0, y: 0 });
+            } else {
+                keyframes[0].x = 0;
             }
-            if (keyframes[keyframes.length - 1].x !== 1) {
+            if (keyframes[keyframes.length - 1].x < 0.99) {
                 keyframes.push({ x: 1, y: 0 });
+            } else {
+                keyframes[keyframes.length - 1].x = 1;
             }
             return keyframes;
         }
@@ -189,6 +224,34 @@ addBlockType("automation_parameter", {
     initMiddleware: (loop) => {
         initGenericDisplay(loop, "");
         automationParamHandler(loop);
+        loop.internalContainer.addEventListener("mousedown", (ev) => {
+            if (ev.ctrlKey && !ev.metaKey && !ev.altKey) {
+                ev.stopPropagation();
+                ev.stopImmediatePropagation();
+
+                if (ev.target.classList.contains("graphKeyframe")) {
+                    if (loop.internalContainer.querySelectorAll(".graphKeyframe").length < 2) {
+                        return;
+                    }
+                    ev.target.triggerRemove();
+                    toast("Removed Keyframe");
+                    return;
+                }
+
+                toast("Created Keyframe");
+                const aabb = loop.internalContainer.getBoundingClientRect();
+                const offset = 0;
+                const { newX, newY } = findNewAutomationKeyframeCoords(aabb, ev, loop, offset, offset);
+                const keyframes = automation_extractKeyframeData(loop);
+                keyframes.push([Math.round(newX * 1679615), Math.round(1295 - 1295*newY)]);
+                automation_writeGraphData(automation_getNewGraphData(keyframes), loop);
+            }
+        }, true);
+    },
+    customGuiButtons: {
+        "Graph Mode Help": function () {
+            alert("Graph Mode Help", `<span style="white-space: initial;">Use CTRL+Click to add keyframes or remove keyframes!</span>`);
+        }
     },
     updateMiddleware: automationParamHandler,
     functor: function (inPcm, channel, data) {
@@ -213,9 +276,33 @@ addBlockType("automation_parameter", {
             volumeCurve = extractVolumeCurveFromPcm(inPcm, this.conf.ReaderRMSFreq);
         }
 
+        let graphCurve = null;
+        if (this.conf.GraphMode) {
+            graphCurve = new Float32Array(inPcm.length);
+            const keyframes = filters["automation_parameter"].backgroundHandler(this);
+            keyframes.forEach((keyframe, i) => {
+                if (i === 0) {
+                    return;
+                }
+                const prev = keyframes[i - 1];
+                const prevPos = Math.round(prev.x * inPcm.length);
+                const currPos = Math.round(keyframe.x * inPcm.length);
+                const span = currPos - prevPos;
+                for (let i = prevPos; i <= currPos; i++) {
+                    graphCurve[i] = lerp(
+                        this.conf.GraphExtentMin,
+                        this.conf.GraphExtentMax,
+                        lerp(prev.y, keyframe.y, (i - prevPos) / span)
+                    );
+                }
+            });
+        }
+
         inPcm.forEach((x, i) => {
             if (this.conf.ReaderMode) {
                 paramPcm[offset + i] = renderMapping(Math.round(volumeCurve[i] * 2048), blankPcm);
+            } else if (this.conf.GraphMode) {
+                paramPcm[offset + i] = graphCurve[i];
             } else {
                 paramPcm[offset + i] = val(i, inPcm);
             }

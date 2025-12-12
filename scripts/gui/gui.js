@@ -161,9 +161,9 @@ function hydrateLoopDecoration(loop) {
     }
     const def = filters[loop.getAttribute("data-type")];
     var bg = loop.querySelector(".backgroundSvg");
-    if (settings.LoopWaveformDisplays && bg && ((loop._nInternalWidth || 0) > (9.9 * (!gui.noWvLOD)))) {
+    if (settings.LoopWaveformDisplays && bg && ((loop._nInternalWidth || 0) > (9.9 * (!(gui.noWvLOD || def.noWvLOD))))) {
         bg.style.width = loop._nInternalWidth + "vw";
-        bg.querySelector("path").style.strokeWidth = innerWidth / (loop._nInternalWidth || 0) * 0.0025 * (def.bgStrokeMult || 1) + "px";
+        bg.querySelector("path").style.strokeWidth = innerWidth / (loop._nInternalWidth || 0) * 0.0025 * (def.bgStrokeMult ? def.bgStrokeMult(loop) : 1) + "px";
         bg.style.display = "block";
     } else if (bg) {
         bg.style.display = "none";
@@ -272,8 +272,9 @@ function hydrateLoopBackground(elem) {
     var downsample = Math.min(Math.max(64, settings.LoopWaveformDisplayDownsampling || 256), 8192);
     prevY = 0;
     if (keyframes) {
-        keyframes.forEach(keyframe => {
-            d += "L" + (keyframe.x * 100).toFixed(3) + " " + Math.round(100 - keyframe.y * 100) + "";
+        d = "";
+        keyframes.forEach((keyframe, i) => {
+            d += (i === 0 ? "M" : "L") + (keyframe.x * 100).toFixed(3) + " " + Math.round(100 - keyframe.y * 100) + "";
         });
     } else {
         if (!settings.LoopWaveformDisplays || !elem?.cache?.[0]) {
@@ -613,6 +614,8 @@ function addBlock(type, start, duration, title, layer = 0, data = {}, editorValu
     backgroundLine.setAttributeNS(null, "d", "");
     backgroundLine.setAttributeNS(null, "stroke", "rgba(255,255,255,0.75)");
     backgroundLine.setAttributeNS(null, "fill", "none");
+    backgroundLine.setAttributeNS(null, "stroke-linecap", "round");
+    backgroundLine.setAttributeNS(null, "stroke-linejoin", "round");
     backgroundLine.style.strokeWidth = "0.1px";
     backgroundSvg.appendChild(backgroundLine);
     internal.appendChild(backgroundSvg);
