@@ -1319,25 +1319,32 @@ input[type=range]:active {
 
 .graphKeyframe {
   position: absolute;
-  font-size: 0.5rem;
-  line-height: 0.5rem;
+  font-size: 0rem;
+  line-height: 0rem;
   margin-bottom: 4px;
-  left: 50%;
-  top: 50%;
+  --dodge-amount: 3px;
+  left: max(min(var(--left), 100% - var(--dodge-amount)), var(--dodge-amount));
+  top: max(min(var(--top), 100% - var(--dodge-amount)), var(--dodge-amount));
   display: block;
-  width: 16px;
-  height: 16px;
-  background-color: rgba(200, 200, 200, 0.5);
-  border: 1px solid white;
-  overflow: hidden;
-  border-radius: 2px;
+  width: 10px;
+  height: 10px;
+  background-color: rgba(255, 255, 255, 1);
+  border: 1px solid rgba(0, 0, 0, 0.25);
+  border-radius: 5px;
   cursor: crosshair;
   transform: translate(-50%, -50%);
   /* margin-bottom: -13.5px; */
   z-index: 999;
-  color: white;
+  color: rgb(255, 255, 255);
+  text-shadow: 0px 0px 2.5px rgba(0, 0, 0, 1);
+  overflow: visible;
   text-align: center;
   align-content: center;
+}
+
+.graphKeyframe:hover {
+  font-size: 0.75rem;
+  line-height: 2rem;
 }
 
 .loop.selected .graph {

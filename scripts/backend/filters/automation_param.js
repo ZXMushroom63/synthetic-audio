@@ -46,8 +46,8 @@ function drawAutomationGraphKeyframes(loop) {
         const keyf = document.createElement("span");
         keyf.classList.add("graph");
         keyf.classList.add("graphKeyframe");
-        keyf.style.left = `${x * 100}%`;
-        keyf.style.top = `${100 - y * 100}%`;
+        keyf.style.setProperty("--left", `${x * 100}%`);
+        keyf.style.setProperty("--top", `${100 - y * 100}%`);
         keyf.triggerRemove = function () {
             keyframes.splice(i, 1);
             automation_writeGraphData(automation_getNewGraphData(keyframes), loop);
@@ -63,14 +63,14 @@ function drawAutomationGraphKeyframes(loop) {
             const aabb = loop.internalContainer.getBoundingClientRect();
             const keyAabb = keyf.getBoundingClientRect();
 
-            const xOffset = - (e.x - keyAabb.left - 8);
-            const yOffset = - (e.y - keyAabb.top - 8);
+            const xOffset = - (e.x - keyAabb.left - 6);
+            const yOffset = - (e.y - keyAabb.top - 6);
             function mouseHandler(ev) {
                 const { newX, newY } = findNewAutomationKeyframeCoords(aabb, ev, loop, xOffset, yOffset);
 
                 //console.log(newX, newY);
-                keyf.style.left = `${newX * 100}%`;
-                keyf.style.top = `${newY * 100}%`;
+                keyf.style.setProperty("--left", `${newX * 100}%`);
+                keyf.style.setProperty("--top", `${newY * 100}%`);
                 keyf.innerText = Math.round(lerp(loop.conf.GraphExtentMin, loop.conf.GraphExtentMax, 1 - newY) * 100) / 100;
 
                 keyframe[0] = Math.round(newX * 1679615);
@@ -243,7 +243,7 @@ addBlockType("automation_parameter", {
                 const offset = 0;
                 const { newX, newY } = findNewAutomationKeyframeCoords(aabb, ev, loop, offset, offset);
                 const keyframes = automation_extractKeyframeData(loop);
-                keyframes.push([Math.round(newX * 1679615), Math.round(1295 - 1295*newY)]);
+                keyframes.push([Math.round(newX * 1679615), Math.round(1295 - 1295 * newY)]);
                 automation_writeGraphData(automation_getNewGraphData(keyframes), loop);
             }
         }, true);
