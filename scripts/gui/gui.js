@@ -159,10 +159,11 @@ function hydrateLoopDecoration(loop) {
     if (loop.updateSuppression) {
         return;
     }
+    const def = filters[loop.getAttribute("data-type")];
     var bg = loop.querySelector(".backgroundSvg");
     if (settings.LoopWaveformDisplays && bg && ((loop._nInternalWidth || 0) > (9.9 * (!gui.noWvLOD)))) {
         bg.style.width = loop._nInternalWidth + "vw";
-        bg.querySelector("path").style.strokeWidth = innerWidth / (loop._nInternalWidth || 0) * 0.0025 + "px";
+        bg.querySelector("path").style.strokeWidth = innerWidth / (loop._nInternalWidth || 0) * 0.0025 * (def.bgStrokeMult || 1) + "px";
         bg.style.display = "block";
     } else if (bg) {
         bg.style.display = "none";
@@ -171,7 +172,7 @@ function hydrateLoopDecoration(loop) {
     var trueDuration = (parseFloat(loopDurationMap[loop.getAttribute("data-file")]) + 0.0) || ((elemType !== "distribute") * (proceduralAssets.get(loop.conf.Asset)?.[0]?.length / audio.samplerate)) || 0;
     trueDuration = (Math.round(trueDuration / loopi) * loopi) / (loop.conf.Speed || 1);
     trueDuration = [trueDuration];
-    var def = filters[loop.getAttribute("data-type")];
+    
     if (def.findLoopMarker) {
         const loopProvided = def.findLoopMarker(loop);
         if (loopProvided) {

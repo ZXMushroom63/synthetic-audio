@@ -1339,3 +1339,7 @@ input[type=range]:active {
   text-align: center;
   align-content: center;
 }
+
+.loop.selected .graph {
+  display: none;
+}
