@@ -101,9 +101,9 @@ addBlockType("3dpanner", {
                 distanceModel: this.conf.DistanceModel,
             },
             {
-                positionX: _(this.conf.X, inPcm.length),
-                positionY: _(this.conf.Y, inPcm.length),
-                positionZ: _(this.conf.Z, inPcm.length),
+                positionX: _(this.conf.X, {upscaleSize: inPcm.length}),
+                positionY: _(this.conf.Y, {upscaleSize: inPcm.length}),
+                positionZ: _(this.conf.Z, {upscaleSize: inPcm.length}),
                 rolloffFactor: _(this.conf.RolloffFactor),
                 refDistance: _(this.conf.RefDistance),
             }

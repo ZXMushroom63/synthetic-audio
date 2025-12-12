@@ -57,7 +57,7 @@ addBlockType("automation_parameter", {
         const blankPcm = new Float32Array(2048);
 
         this.ref.setAttribute("data-lastrenparam", this.conf.Identifier);
-        var val = _(this.conf.Value);
+        var val = _(this.conf.Value, {disallowAutomationParams: true});
         const internalId = "@__params::" + this.conf.Identifier.toUpperCase();
         const alreadyExists = proceduralAssets.has(internalId);
         var paramPcm;

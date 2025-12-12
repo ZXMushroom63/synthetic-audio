@@ -9,7 +9,7 @@ addBlockType("warp", {
         "AntiAlias": [false, "checkbox"],
     },
     functor: function (inPcm, channel, data) {
-        var pos = _(this.conf.Position, inPcm.length);
+        var pos = _(this.conf.Position, {upscaleSize: inPcm.length});
         var len = inPcm.length;
         var chunk = (this.conf.ChunkSize * audio.samplerate) || len;
         var out = new Float32Array(len);
