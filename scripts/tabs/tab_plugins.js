@@ -697,9 +697,11 @@ addEventListener("init", async () => {
             logToLoader(`(that was a joke btw)`);
             logToLoader(`Integrating with Discord...`);
             document.querySelector("#renderProgress").innerText = `Integrating with Discord...`;
+            alert("Server Dead", `Our servers have been killed temporarily. If you want to use SYNTHETIC for multiplayer, please follow the self-hosting tutorial at https://github.com/ZXMushroom63/synthetic-audio/`);
             while (!location.search.includes("instance_id")) {
                 await wait(0.5);
             }
+            throw Error("brokey!");
         }
         logToLoader(`Multiplayer supported! Loading multiplayer system...`);
         document.querySelector("#renderProgress").innerText = `Initialising multiplayer system...`;
