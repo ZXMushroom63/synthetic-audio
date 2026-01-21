@@ -1,3 +1,8 @@
+.hidden {
+  display: none;
+  visibility: hidden;
+}
+
 :root {
   touch-action: manipulation;
 }
@@ -1349,4 +1354,28 @@ input[type=range]:active {
 
 .loop.selected .graph {
   display: none;
+}
+
+.tranceUI {
+  border: 1px solid white;
+  font-family: monospace;
+  color: white;
+  background-color: black;
+  text-shadow: 0px 0px 4px;
+  height: 3rem;
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+  text-align: center;
+  align-content: center;
+  font-size: 1.5rem;
+  width: calc(100% - 2px - 1rem);
+}
+.tranceUI>span {
+  cursor: pointer;
+  transition: color 0.02s;
+  color: white;
+}
+.tranceUI>span:active {
+  cursor: pointer;
+  color: lime;
 }

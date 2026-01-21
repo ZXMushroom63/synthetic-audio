@@ -87,6 +87,11 @@ function createOptionsMenu(loop, definition) {
             if (value[2] === 2) {
                 input.readOnly = true;
             }
+            if (value[2] === 3) {
+                input.readOnly = true;
+                label.classList.add("hidden");
+                input.classList.add("hidden");
+            }
             input.value = value[0];
             input.setAttribute("data-key", key);
             input.checked = value[0];
