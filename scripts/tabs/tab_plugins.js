@@ -680,7 +680,18 @@ addEventListener("init", async () => {
     globalThis.multiplayer_support = false;
     logToLoader(`Checking multiplayer support...`);
     try {
-        globalThis.multiplayer_support = (!(location.protocol === "file:") && ((await fetch("/multiplayer_check")).status === 200)) || params.has("multiplayer") || (IS_DISCORD && !IS_EMULATING_DISCORD);
+        function getMultiplayerSupport() {
+            return new Promise((resolve, reject) => {
+                fetch("/multiplayer_check").then(net => {
+                    resolve((!(location.protocol === "file:") && ((net.status === 200)) || params.has("multiplayer") || (IS_DISCORD && !IS_EMULATING_DISCORD)));
+                });
+                setTimeout(()=>{
+                    resolve(false);
+                }, 3500);
+            });
+        }
+        
+        globalThis.multiplayer_support = await getMultiplayerSupport();
     } catch (error) {
         console.log("Multiplayer not supported on instance.")
     }
