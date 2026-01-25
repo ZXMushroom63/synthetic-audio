@@ -76,7 +76,7 @@ addBlockType("trance", {
         for (let i = 0; i < sliceCount; i++) {
             const s = document.createElement("span");
             s.innerText = loop.conf._data[i] || "0";
-            s.onclick = ()=>{
+            s.onmousedown = ()=>{
                 s.innerText = s.innerText === "0" ? "1" : "0";
                 loop.conf._data = tui.innerText.trim().substring(1, sliceCount + 1);
                 dataRef.value = loop.conf._data;
