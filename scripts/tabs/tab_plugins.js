@@ -738,6 +738,13 @@ addEventListener("init", async () => {
                 console.error(err);
             });
         });
+        socketio.addEventListener("error", ()=>{
+            logToLoader(`Multiplayer library failed to load?`);
+            setTimeout(() => {
+                loadAutosave();
+                document.body.style.pointerEvents = "all";
+            }, 250);
+        });
         document.body.appendChild(socketio);
     }
     const ax = new OfflineAudioContext({ sampleRate: 44100, numberOfChannels: 1, length: 1 });
