@@ -712,7 +712,11 @@ addEventListener("init", async () => {
             while (!location.search.includes("instance_id")) {
                 await wait(0.5);
             }
-            throw Error("brokey!");
+            //throw Error("brokey!");
+            if (!(await fetch("https://1403677664514146325.discordsays.com/discord-multiplayer-host")).ok) {
+                throw new Error("its borked.");
+                return;
+            }
         }
         logToLoader(`Multiplayer supported! Loading multiplayer system...`);
         document.querySelector("#renderProgress").innerText = `Initialising multiplayer system...`;
