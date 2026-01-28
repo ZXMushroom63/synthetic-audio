@@ -25,7 +25,7 @@ if (process.argv.includes("no_multi")) {
     multiplayerEnabled = 0;
 }
 
-const port = 4152;
+const port = parseInt(process.env.SYN_PORT) || 4152;
 const logging = false;
 const statKeeper = {}; // or null to disable
 
