@@ -106,7 +106,6 @@ addBlockType("stereo_enhancer", {
         }
         const left = pcms[0];
         const right = pcms[1];
-        debugger;
         const enhanceAmount = _(this.conf.EnhanceAmount);
         left.forEach((l, i)=>{
             const r = right[i];

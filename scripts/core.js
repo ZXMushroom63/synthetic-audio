@@ -667,9 +667,6 @@ async function render() {
                                 if (settings.NodeCaching) {
                                     node.ref.cache[c] = newPcm[c];
                                 }
-                                if (c === 0) {
-                                    hydrateLoopBackground(node.ref);
-                                }
                                 calculatedNodeCount++;
                                 if (calculatedNodeCount % 5 === 0) {
                                     renderProgress.innerText = `Processing layers... (${Math.floor(calculatedNodeCount / (1 + audio.stereo))}/${dirtyNodeTotal})`;
@@ -680,7 +677,10 @@ async function render() {
                             }
                         }
                         if (nodeDef.postProcessor && freshRender) {
-                            nodeDef.postProcessor.apply(node, [newPcm, data]);
+                            await nodeDef.postProcessor.apply(node, [newPcm, data]);
+                        }
+                        if (freshRender) {
+                            hydrateLoopBackground(node.ref);
                         }
                         for (let c = 0; c < channels; c++) {
                             if ((startTime + newPcm[c].length) > currPcm[c].length) {
