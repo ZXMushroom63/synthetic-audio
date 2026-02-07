@@ -205,7 +205,7 @@ addBlockType("webvial", {
             for (let i = 0; i < ubuf.length; i++) {
                 str += String.fromCharCode(ubuf[i]);
             }
-            console.log(str);
+            //console.log(str);
             commit(new UndoStackEdit(
                 this,
                 "Patch",
