@@ -85,9 +85,9 @@ addBlockType("fakemidi", {
 
         inPcm.set(FAKEMIDI_MAGIC, startOffset);
         inPcm.set(FAKEMIDI_MAGIC, endOffset);
-        console.log("MIDI NOTE: ");
-        console.log((startOffset + currentlyRenderedLoop?.writeOffset || 0) / 400);
-        console.log((endOffset + currentlyRenderedLoop?.writeOffset || 0) / 400);
+        // console.log("MIDI NOTE: ");
+        // console.log((startOffset + currentlyRenderedLoop?.writeOffset || 0) / 400);
+        // console.log((endOffset + currentlyRenderedLoop?.writeOffset || 0) / 400);
         const mid = Math.min(127, Math.max(0, Math.floor(freq2midi(_(this.conf.Note)(0, new Float32Array(2))))));
         const vel = Math.min(0.999, Math.max(0, _(this.conf.Velocity)(0, new Float32Array(2))));
 
