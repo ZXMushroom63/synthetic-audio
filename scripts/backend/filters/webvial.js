@@ -41,7 +41,7 @@ addBlockType("webvial", {
     configs: {
         FFTSize: [512, "number"],
         BPMMultiplier: [1, "number"],
-        Patch: ["", "textarea", 2],
+        Patch: ["", "text", 3],
     },
     updateMiddleware: (loop) => {
         let hash = cyrb53(loop.conf.Patch);
