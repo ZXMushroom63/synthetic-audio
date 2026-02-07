@@ -93,6 +93,7 @@ function serialiseNode(node, forRender, forMultiplayer, allNodes) {
         out.wasMovedSinceRender = node.hasAttribute("data-wasMovedSinceRender");
         out.definition = filters[out.type];
         out.ref = node;
+        out.writeOffset = Math.round(out.start * audio.samplerate);
         out.hash = hashNode(node);
     }
     customEvent("serialisenode", { node: node, data: out, forRender, forMultiplayer, allNodes });

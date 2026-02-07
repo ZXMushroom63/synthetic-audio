@@ -114,6 +114,8 @@ addBlockType("obxd_port", {
             obxdInstance.loadPatchData(buf);
             obxdInstance.onChange = () => { saveBtn.innerText = "Save*" };
             findLoops(".loop[data-type=obxd_port]").forEach((l) => markLoopDirty(l, true));
+            clearFakemidiPreviews();
+            fakemidiPreviewCallback = (midi) => obxdInstance.port.postMessage({ type: "midi", data: midi});
         });
     },
     functor: async function (inPcm, channel, data) {
@@ -134,46 +136,7 @@ addBlockType("obxd_port", {
         localOBXD.loadPatchData(buf, true);
         const start = Math.floor((currentlyRenderedLoop?.start || 0) * audio.samplerate);
         const startOffset = Math.ceil(((currentlyRenderedLoop?.start || 0) * audio.samplerate) / FAKEMIDI_DISCRETE_INTERVAL) * FAKEMIDI_DISCRETE_INTERVAL - start;
-        const midiBundle = [];
-        let headerCheckIndex = 0;
-        for (let i = startOffset; i < inPcm.length; i += 1) {
-            if (headerCheckIndex >= FAKEMIDI_MAGIC.length) {
-
-                const chunk = inPcm.subarray(i - 8, i + FAKEMIDI_DISCRETE_INTERVAL - 8);
-                i += 381 - 1; // actual discrete interval size
-                headerCheckIndex = 0;
-                const time = "[" + (i / audio.samplerate).toFixed(2) + "s]"
-                for (let j = 0; j < FAKEMIDI_DISCRETE_INTERVAL - 8; j += 3) {
-                    const noteOn = chunk[8 + j];
-                    const noteOff = chunk[8 + j + 1];
-                    const velocity = chunk[8 + j + 2];
-                    const event = noteOn || noteOff;
-                    const discrete = { time: (i / audio.samplerate), midiPackets: [] };
-                    if (event) {
-                        const k = Math.min(127, Math.floor(j / 3));
-                        const vel = Math.floor(Math.min(0.999, Math.max(0, velocity)) * 128);
-                        if (noteOff === -2) {
-                            discrete.midiPackets.push([0x80, k, vel]);
-                            //console.log(time, "Midi Note ", indexToChromatic(Math.floor(j / 3) - 12), " Off Event");
-                        }
-                        if (noteOn === 2) {
-                            discrete.midiPackets.push([0x90, k, vel]);
-                            //console.log(time, "Midi Note ", indexToChromatic(Math.floor(j / 3) - 12), " On Event, vel: ", vel);
-                        }
-                    }
-                    if (discrete.midiPackets.length > 0) {
-                        midiBundle.push(discrete);
-                    }
-                }
-                continue;
-            } else if (FAKEMIDI_MAGIC[headerCheckIndex] === inPcm[i]) {
-                headerCheckIndex++;
-                continue;
-            } else {
-                headerCheckIndex = 0;
-                continue;
-            }
-        }
+        const midiBundle = getMidibundleFromPcmWithCtx(inPcm, currentlyRenderedLoop);
 
         const totalDuration = inPcm.length / audio.samplerate;
         function bakeParameterData(fn) { // 120 samples per second

@@ -653,6 +653,7 @@ async function render() {
                         const startTime = Math.round(node.start * audio.samplerate);
                         const endTime = Math.round((node.start + node.duration) * audio.samplerate);
                         const nodeDef = filters[node.type];
+                        node.writeOffset = startTime;
 
                         let newPcm = [null, null];
                         let currPcm = [null, null];

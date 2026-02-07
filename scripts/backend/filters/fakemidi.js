@@ -1,6 +1,56 @@
 const FAKEMIDI_DISCRETE_INTERVAL = 400;
 const FAKEMIDI_MAGIC = new Float32Array([0.25, 1, -0.5, -2, 0, 0.125, 0, 1]);
 const FAKEMIDI_PREVIEW_FLUSH_QUEUE = [];
+let fakemidiPreviewCallback = (midi)=>{};
+
+globalThis.clearFakemidiPreviews = ()=>{
+    FAKEMIDI_PREVIEW_FLUSH_QUEUE.forEach(fakemidiPreviewCallback);
+    FAKEMIDI_PREVIEW_FLUSH_QUEUE.splice(0, FAKEMIDI_PREVIEW_FLUSH_QUEUE.length);
+}
+globalThis.getMidibundleFromPcmWithCtx = function getMidibundleFromPcmWithCtx(pcm, currLoop) {
+    const start = Math.floor((currLoop?.start || 0) * audio.samplerate);
+    const startOffset = Math.ceil(((currLoop?.start || 0) * audio.samplerate) / FAKEMIDI_DISCRETE_INTERVAL) * FAKEMIDI_DISCRETE_INTERVAL - start;
+    const midiBundle = [];
+    let headerCheckIndex = 0;
+    for (let i = startOffset; i < pcm.length; i += 1) {
+        if (headerCheckIndex >= FAKEMIDI_MAGIC.length) {
+            const chunk = pcm.subarray(i - 8, i + FAKEMIDI_DISCRETE_INTERVAL - 8);
+            i += 381 - 1; // actual discrete interval size
+            headerCheckIndex = 0;
+            const time = "[" + (i / audio.samplerate).toFixed(2) + "s]"
+            for (let j = 0; j < FAKEMIDI_DISCRETE_INTERVAL - 8; j += 3) {
+                const noteOn = chunk[8 + j];
+                const noteOff = chunk[8 + j + 1];
+                const velocity = chunk[8 + j + 2];
+                const event = noteOn || noteOff;
+                const discrete = { time: (i / audio.samplerate), midiPackets: [] };
+                if (event) {
+                    const k = Math.min(127, Math.floor(j / 3));
+                    const vel = Math.floor(Math.min(0.999, Math.max(0, velocity)) * 128);
+                    if (noteOff === -2) {
+                        discrete.midiPackets.push([0x80, k, vel]);
+                        //console.log(time, "Midi Note ", indexToChromatic(Math.floor(j / 3) - 12), " Off Event");
+                    }
+                    if (noteOn === 2) {
+                        discrete.midiPackets.push([0x90, k, vel]);
+                        //console.log(time, "Midi Note ", indexToChromatic(Math.floor(j / 3) - 12), " On Event, vel: ", vel);
+                    }
+                }
+                if (discrete.midiPackets.length > 0) {
+                    midiBundle.push(discrete);
+                }
+            }
+            continue;
+        } else if (FAKEMIDI_MAGIC[headerCheckIndex] === pcm[i]) {
+            headerCheckIndex++;
+            continue;
+        } else {
+            headerCheckIndex = 0;
+            continue;
+        }
+    }
+    return midiBundle;
+}
 
 addBlockType("fakemidi", {
     color: "rgba(62, 242, 62, 0.3)",
@@ -20,9 +70,9 @@ addBlockType("fakemidi", {
         if (inPcm.length < FAKEMIDI_DISCRETE_INTERVAL * 2) {
             return inPcm;
         }
-        const start = Math.floor((currentlyRenderedLoop?.start || 0) * audio.samplerate);
-        const startOffset = Math.ceil(((currentlyRenderedLoop?.start || 0) * audio.samplerate) / FAKEMIDI_DISCRETE_INTERVAL) * FAKEMIDI_DISCRETE_INTERVAL - start;
-        const endOffset = Math.floor(((currentlyRenderedLoop?.end || 0) * audio.samplerate) / FAKEMIDI_DISCRETE_INTERVAL) * FAKEMIDI_DISCRETE_INTERVAL - start - FAKEMIDI_DISCRETE_INTERVAL;
+        const start = (currentlyRenderedLoop?.writeOffset || 0);
+        const startOffset = Math.ceil((currentlyRenderedLoop?.writeOffset || 0) / FAKEMIDI_DISCRETE_INTERVAL) * FAKEMIDI_DISCRETE_INTERVAL - start;
+        const endOffset = Math.floor(((currentlyRenderedLoop?.writeOffset + inPcm.length - 1) || 0) / FAKEMIDI_DISCRETE_INTERVAL) * FAKEMIDI_DISCRETE_INTERVAL - start - FAKEMIDI_DISCRETE_INTERVAL;
 
         if ((startOffset + FAKEMIDI_DISCRETE_INTERVAL) > inPcm.length) {
             console.warn("FakeMIDI Skipped.", this);
@@ -35,6 +85,9 @@ addBlockType("fakemidi", {
 
         inPcm.set(FAKEMIDI_MAGIC, startOffset);
         inPcm.set(FAKEMIDI_MAGIC, endOffset);
+        console.log("MIDI NOTE: ");
+        console.log((startOffset + currentlyRenderedLoop?.writeOffset || 0) / 400);
+        console.log((endOffset + currentlyRenderedLoop?.writeOffset || 0) / 400);
         const mid = Math.min(127, Math.max(0, Math.floor(freq2midi(_(this.conf.Note)(0, new Float32Array(2))))));
         const vel = Math.min(0.999, Math.max(0, _(this.conf.Velocity)(0, new Float32Array(2))));
 
@@ -64,20 +117,20 @@ addBlockType("fakemidi", {
             const vel = Math.floor(Math.min(127, Math.max(0, 127 * _(this.conf.Velocity)(0, new Float32Array(2)))));
             const duration = Math.min(this.getAttribute("data-duration"), 2);
             try {
-                FAKEMIDI_PREVIEW_FLUSH_QUEUE.filter(x => true ? true : x.data[1] === mid).forEach(x => { // (duration > 1)
-                    obxdInstance.port.postMessage(x);
+                FAKEMIDI_PREVIEW_FLUSH_QUEUE.filter(x => true ? true : x[1] === mid).forEach(x => { // (duration > 1)
+                    fakemidiPreviewCallback(x);
                     FAKEMIDI_PREVIEW_FLUSH_QUEUE.splice(FAKEMIDI_PREVIEW_FLUSH_QUEUE.indexOf(x), 1);
                 });
-                obxdInstance.port.postMessage({ type: "midi", data: [0x90, mid, vel] });
-                const ExitMsg = { type: "midi", data: [0x80, mid, vel] };
+                fakemidiPreviewCallback([0x90, mid, vel]);
+                const ExitMsg = [0x80, mid, vel];
                 FAKEMIDI_PREVIEW_FLUSH_QUEUE.push(ExitMsg);
                 await wait(duration);
                 if (FAKEMIDI_PREVIEW_FLUSH_QUEUE.includes(ExitMsg)) {
-                    obxdInstance.port.postMessage(ExitMsg);
+                    fakemidiPreviewCallback(ExitMsg);
                     FAKEMIDI_PREVIEW_FLUSH_QUEUE.splice(FAKEMIDI_PREVIEW_FLUSH_QUEUE.indexOf(ExitMsg), 1);
                 }
             } catch (error) {
-                console.error("err");
+                console.error("fakemidi preview error: ", error);
             }
         },
     },
@@ -194,12 +247,12 @@ for (let t = 0; t < lengthBeats; t += 1) {
     },
     waterfall: 1,
     forcePrimitive: true,
-    selectMiddleware: (key)=>{
+    selectMiddleware: (key) => {
         if (key === "Preset") {
             return ["Click to load...", ...Object.keys(MIDIScriptTemplates)];
         }
     },
-    updateMiddleware: (loop)=>{
+    updateMiddleware: (loop) => {
         const preset = loop.conf.Preset;
         if (preset !== "Click to load...") {
             loop.conf.Textarea = MIDIScriptTemplates[preset];
@@ -226,7 +279,7 @@ for (let t = 0; t < lengthBeats; t += 1) {
         const timeline = new MIDITimeline(this.conf.Timescale);
         const beatLength = Math.floor(inPcm.length / audio.samplerate / audio.beatSize);
         const script = new Function("timeline", "lengthBeats", this.conf.Textarea);
-        
+
         try {
             script(timeline, beatLength / this.conf.Timescale);
         } catch (error) {

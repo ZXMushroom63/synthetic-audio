@@ -46,7 +46,7 @@ function pickupLoop(loop, natural = false, useCache = false) {
         if (!cancel) {
             markLoopDirty(loop, true);
             if (!loop.getAttribute("data-new-start")) {
-                debugger;
+                //debugger;
             }
             commit(new UndoStackMove(
                 loop,

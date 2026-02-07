@@ -26,14 +26,22 @@ function waitForVIALInstance() {
     });
 }
 
+function bootVial() {
+    if (!VIALFrame.contentWindow) {
+        VIALFrame.src = "about:blank";
+        VIALFrame.src = "/vital/docs/index.html?screen_percentage=100&target_fps=18&channel_count=2&audio_stack_size_samples=512&clockspeed_multiplier=1&autostart&samplerate=24000&syn";
+    }
+}
+
 addBlockType("webvial", {
     color: "rgba(143, 72, 143, 0.6)",
     title: "▾ Vial Synth - FakeMIDI",
     waterfall: 2,
     hidden: location.protocol === "file:" || !crossOriginIsolated,
     configs: {
+        FFTSize: [512, "number"],
         BPMMultiplier: [1, "number"],
-        Patch: ["WIP!", "textarea", 2],
+        Patch: ["", "textarea", 2],
     },
     updateMiddleware: (loop) => {
         let hash = cyrb53(loop.conf.Patch);
@@ -45,7 +53,7 @@ addBlockType("webvial", {
         const color3 = EMOJI_COLORS[hash % EMOJI_COLORS.length];
         let title = "";
         try {
-            title = JSON.parse(loop.conf.Patch).preset_name || "";
+            //title = JSON.parse(loop.conf.Patch).preset_name || "";
         } catch (error) {
             title = "";
         }
@@ -56,7 +64,7 @@ addBlockType("webvial", {
     drawOptionsMiddleware: (loop) => {
         const optsMenu = loop.querySelector(".loopOptionsMenu");
         optsMenu.classList.add("obxdcontainer");
-        optsMenu.onmousedown = (e)=>{
+        optsMenu.onmousedown = (e) => {
             if (e.target === optsMenu) {
                 VIALFrame.contentWindow.focus();
                 e.preventDefault();
@@ -65,10 +73,7 @@ addBlockType("webvial", {
         }
         const button = optsMenu.querySelector("button");
 
-        if (!VIALFrame.contentWindow) {
-            VIALFrame.src = "about:blank";
-            VIALFrame.src = "/vital/docs/index.html?screen_percentage=100&target_fps=18&channel_count=2&audio_stack_size_samples=512&clockspeed_multiplier=1&autostart&samplerate=24000&syn";
-        }
+        bootVial();
 
         if ('moveBefore' in HTMLElement.prototype && VIALIsInDom()) {
             try {
@@ -86,20 +91,37 @@ addBlockType("webvial", {
         loop.unselected = () => {
             VIALFrame.contentDocument._hiddenFlag = true;
         }
+
+        const saveBtn = optsMenu.querySelector("button:last-child");
+        saveBtn.innerText = "PSave";
+        waitForVIALInstance().then(() => {
+            const ubuf = new Uint8Array(loop.conf.Patch.length);
+            for (let i = 0; i < ubuf.length; i++) {
+                ubuf[i] = loop.conf.Patch.charCodeAt(i) & 255;
+            }
+            vialInstance.FS.writeFile("/slot0.vital", ubuf);
+            if (ubuf.length > 2) {
+                vialInstance._vialLoadSlot0();
+            }
+            findLoops(".loop[data-type=webvial]").forEach((l) => markLoopDirty(l, true));
+            clearFakemidiPreviews();
+            fakemidiPreviewCallback = (midi) => {
+                VIALFrame.contentWindow.sleepTime = 0;
+                VIALFrame.contentWindow.sleeping = false;
+                vialInstance._processMidiEvent(midi[0] === 0x90, midi[1], midi[0] === 0x90 ? midi[2] : 0);
+            }
+        });
     },
     functor: function (inPcm, channel, data) { return inPcm },
     postProcessor: async function (pcms) {
         pcms = pcms.filter(x => !!x);
-        if (!globalThis.vialInstance) {
-            return;
+        bootVial();
+        await waitForVIALInstance();
+        const midiBundle = getMidibundleFromPcmWithCtx(pcms[0], currentlyRenderedLoop);
+
+        if (VIALFrame.contentWindow._v_vialNode) {
+            VIALFrame.contentWindow._v_vialNode.disconnect();
         }
-        const ctx = new OfflineAudioContext({
-            length: pcms[0].length,
-            sampleRate: audio.samplerate,
-            numberOfChannels: 2
-        });
-        await ctx.audioWorklet.addModule("/vital/docs/worklet.js");
-        VIALFrame.contentWindow._v_vialNode.disconnect();
 
         vialInstance._setBPM(Math.round(audio.bpm));
         vialInstance._setSamplerate(Math.round(audio.samplerate));
@@ -112,45 +134,43 @@ addBlockType("webvial", {
         for (let i = 0; i < ubuf.length; i++) {
             ubuf[i] = this.conf.Patch.charCodeAt(i) & 255;
         }
-        vialInstance.FS.writeFile("/slot0.json", ubuf);
-        //vialInstance._vialLoadSlot0();
+        vialInstance.FS.writeFile("/slot0.vital", ubuf);
+        if (ubuf.length > 2) {
+            vialInstance._vialLoadSlot0();
+        }
 
         // process code client side?? scriptprocessor moment 🔥
-        const fftSize = 512;
+        const fftSize = 2**Math.ceil(Math.log2(this.conf.FFTSize || 256));
         const pointerArray = vialInstance._malloc(4 * pcms.length);
-        const pointerArrayView = vialInstance.HEAPU32.subarray(pointerArray / 4, pointerArray / 4 + 1);
+        const pointerArrayView = vialInstance.HEAPU32.subarray(pointerArray / 4, pointerArray / 4 + pcms.length);
         const float32arrayviews = [];
+
         for (let i = 0; i < pcms.length; i++) {
             const ptr = vialInstance._malloc(fftSize * 4);
             float32arrayviews.push(vialInstance.HEAPF32.subarray(ptr / 4, ptr / 4 + fftSize));
             pointerArrayView[i] = ptr;
         }
-        
-        const c = pcms.length;
-        const scriptProcessor = ctx.createScriptProcessor(fftSize, 1, c);
 
-        scriptProcessor.onaudioprocess = function (audioProcessingEvent) {
-            vialInstance._clientAudioCallback(fftSize, c, pointerArray);
-            const outputBuffer = audioProcessingEvent.outputBuffer;
-            for (let i = 0; i < c; i++) {
-                outputBuffer.getChannelData(i).set(float32arrayviews[i]);
-                //console.log(float32arrayviews[i][0]);
+        const c = pcms.length;
+
+        for (let s = 0; s < pcms[0].length + fftSize; s+=fftSize) {
+            const currentTime = s / audio.samplerate;
+            while (currentTime >= midiBundle[0]?.time) {
+                const packet = midiBundle.shift();
+                packet.midiPackets.forEach(x => {
+                    vialInstance._processMidiEvent(x[0] === 0x90, x[1], x[0] === 0x90 ? x[2] : 0);
+                });
             }
-            // const randomWait = Math.classicRandom() * 15;
-            // const b = Date.now();
-            // while ((Date.now() - b) < randomWait) {
-                
-            // }
-        }
-        scriptProcessor.connect(ctx.destination);
-        vialInstance._processMidiEvent(true, 60, 127);
-        const resultAudioBuffer = await ctx.startRendering();
-        for (let i = 0; i < c; i++) {
-            pcms[i].set(resultAudioBuffer.getChannelData(i));
+            vialInstance._clientAudioCallback(fftSize, c, pointerArray);
+            for (let i = 0; i < c; i++) {
+                if ((s - fftSize) < pcms[0].length) {
+                    pcms[i].set(float32arrayviews[i].subarray(0, Math.min(fftSize, pcms[0].length - (s - fftSize))), Math.max(0, s-fftSize));
+                }
+            }
         }
 
         //void clientAudioCallback(int bSize, int c, float** audioBuffer) { //64bits total (32bit address space / 4 bytes)
-        vialInstance.FS.unlink("/slot0.json");
+        vialInstance.FS.unlink("/slot0.vital");
         for (let c = 0; c < pcms.length; c++) {
             vialInstance._free(pointerArrayView[c]);
         }
@@ -159,8 +179,11 @@ addBlockType("webvial", {
         vialInstance._setThreadMode(false);
         vialInstance._release_lock(VIALFrame.contentWindow._V_AUDIO_LOCK_PTR);
         vialInstance._dumpAudioBuffers();
-        VIALFrame.contentWindow._v_vialNode.connect(VIALFrame.contentWindow._v_audioContext.destination);
-        return;
+        if (VIALFrame.contentWindow._v_vialNode) {
+            VIALFrame.contentWindow._v_vialNode.connect(
+                VIALFrame.contentWindow._v_audioContext.destination
+            );
+        }
     },
     customGuiButtons: {
         "⛶": function () {
@@ -174,6 +197,26 @@ addBlockType("webvial", {
             }
             document.onfullscreenerror = removeFullscreenClass;
             document.onfullscreenchange = removeFullscreenClass;
+        },
+        "PSave": function () {
+            vialInstance._vialSaveSlot0();
+            const ubuf = vialInstance.FS.readFile("/slot0.vital");
+            let str = "";
+            for (let i = 0; i < ubuf.length; i++) {
+                str += String.fromCharCode(ubuf[i]);
+            }
+            console.log(str);
+            commit(new UndoStackEdit(
+                this,
+                "Patch",
+                this["conf"]["Patch"]
+            ));
+
+            this.querySelector("[data-key=Patch]").value = str;
+            this.conf.Patch = str;
+            markLoopDirty(this);
+            multiplayer.patchLoop(this);
+            this.querySelector(".loopOptionsMenu button:last-child").innerText = "PSave";
         },
     }
 });
