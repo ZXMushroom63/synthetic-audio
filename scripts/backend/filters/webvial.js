@@ -29,7 +29,9 @@ function waitForVIALInstance() {
 function bootVial() {
     if (!VIALFrame.contentWindow) {
         VIALFrame.src = "about:blank";
-        VIALFrame.src = "/vital/docs/index.html?screen_percentage=100&target_fps=18&channel_count=2&audio_stack_size_samples=512&clockspeed_multiplier=1&autostart&samplerate=24000&syn";
+        let urlParams = new URLSearchParams(location.search);
+        let vialPrefix = urlParams.has("vialprefix") ? urlParams.get("vialprefix") : "/vital/docs/index.html"
+        VIALFrame.src = vialPrefix + "?screen_percentage=85&target_fps=12&channel_count=2&audio_stack_size_samples=512&clockspeed_multiplier=1&autostart&samplerate=24000&syn";
     }
 }
 
@@ -42,6 +44,10 @@ addBlockType("webvial", {
         FFTSize: [512, "number"],
         BPMMultiplier: [1, "number"],
         Patch: ["", "text", 3],
+        Macro1: ["", "number", 1],
+        Macro2: ["", "number", 1],
+        Macro3: ["", "number", 1],
+        Macro4: ["", "number", 1],
     },
     updateMiddleware: (loop) => {
         let hash = cyrb53(loop.conf.Patch);
@@ -114,6 +120,7 @@ addBlockType("webvial", {
     },
     functor: function (inPcm, channel, data) { return inPcm },
     postProcessor: async function (pcms) {
+        const macros = ["Macro1", "Macro2", "Macro3", "Macro4"].map((x, i)=>[i, this.conf[x] ? _(this.conf[x] || 0) : null]).filter(x => !!x[1]);
         pcms = pcms.filter(x => !!x);
         bootVial();
         await waitForVIALInstance();
@@ -161,6 +168,7 @@ addBlockType("webvial", {
                     vialInstance._processMidiEvent(x[0] === 0x90, x[1], x[0] === 0x90 ? x[2] : 0);
                 });
             }
+            macros.forEach(fn => vialInstance._setMacroValue(fn[0], Math.min(1, Math.max(0, fn[1](s, pcms[0].length)))));
             vialInstance._clientAudioCallback(fftSize, c, pointerArray);
             for (let i = 0; i < c; i++) {
                 if ((s - fftSize) < pcms[0].length) {
