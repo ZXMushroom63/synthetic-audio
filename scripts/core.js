@@ -615,7 +615,8 @@ async function render() {
 
     const renderProgress = document.querySelector("#renderProgress");
 
-    const ax = new OfflineAudioContext(channels, audio.length, audio.samplerate);
+    globalThis.sharedAX = new OfflineAudioContext(channels, audio.length, audio.samplerate);
+    const ax = sharedAX;
 
     renderBtn.setAttribute("disabled", "true");
     await decodeAudioFiles(ax);

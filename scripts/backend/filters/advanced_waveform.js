@@ -1,3 +1,31 @@
+async function ensureWtKey(key) {
+    if (!WAVETABLES_AUDIO[key] && WAVETABLES[key]) {
+        var buffer;
+        try {
+            const arrbuf = WAVETABLES[key];
+            buffer = await pluginAX.decodeAudioData(arrbuf);
+        } catch (error) {
+            logToLoader(`${key} buffer is corrupt.`);
+            delete WAVETABLES[key];
+            return;
+        }
+
+        if (buffer.length < 2048) {
+            const newBuffer = pluginAX.createBuffer(buffer.numberOfChannels, 2048, buffer.sampleRate);
+            for (let c = 0; c < buffer.numberOfChannels; c++) {
+                const pcm = buffer.getChannelData(c);
+                newBuffer.getChannelData(c).set(upsampleFloat32Array(pcm, 2048))
+            }
+            buffer = newBuffer;
+        }
+
+        if ((buffer.length % 2048) !== 0 || !buffer) {
+            logToLoader(`${key} buffer is bad size.`);
+        }
+
+        WAVETABLES_AUDIO[key] = buffer;
+    }
+}
 addBlockType("p_waveform_plus", {
     color: "rgba(255,0,0,0.3)",
     title: "Advanced Synth",
@@ -246,7 +274,7 @@ addBlockType("p_waveform_plus", {
         });
         return finalPhases;
     },
-    functor: function (inPcm, channel, data) {
+    functor: async function (inPcm, channel, data) {
         const keys = ["Sine", "Square", "Sawtooth", "Triangle"];
         const underscores = {};
         keys.forEach(k => {
@@ -265,8 +293,10 @@ addBlockType("p_waveform_plus", {
         const customWaveform2 = custom_waveforms[this.conf.WaveformAsset2]?.calculated;
         const waveformAlpha = _(this.conf.WaveformAlpha);
 
-        const wavetable = WAVETABLES[this.conf.Wavetable] ? WAVETABLES[this.conf.Wavetable].getChannelData(Math.min(channel, WAVETABLES[this.conf.Wavetable].numberOfChannels - 1)) : null;
-        const wavetableFrames = Math.floor(WAVETABLES[this.conf.Wavetable]?.length / 2048);
+
+        await ensureWtKey(this.conf.Wavetable);
+        const wavetable = WAVETABLES_AUDIO[this.conf.Wavetable] ? WAVETABLES_AUDIO[this.conf.Wavetable].getChannelData(Math.min(channel, WAVETABLES_AUDIO[this.conf.Wavetable].numberOfChannels - 1)) : null;
+        const wavetableFrames = Math.floor(WAVETABLES_AUDIO[this.conf.Wavetable]?.length / 2048);
         const wavetablePos = _(this.conf.WavetablePosition);
 
         const semitones = _(this.conf.HarmonicsSemitoneOffset);

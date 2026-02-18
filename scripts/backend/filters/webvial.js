@@ -16,6 +16,24 @@ const EMOJI_NUMBERS = "0️⃣ 1️⃣ 2️⃣ 3️⃣ 4️⃣ 5️⃣ 6️⃣ 7
 function waitForVIALInstance() {
     return new Promise((res, rej) => {
         function inner() {
+            if (!globalThis.pluginsCompletedLoading) {
+                setTimeout(inner, 250);
+            }
+            // wait on plugins to complete loading
+            if (VIALFrame?.contentWindow?.waitingOnRemoteAssets) {
+                //todo: populate assets
+                Object.entries(WAVETABLES).forEach(ent => {
+                    VIALFrame.contentWindow.FILE_OVERRIDES["./Wavetables/" + ent[0] + ".wav"] = ent[1];
+                });
+                Object.entries(loopMap).forEach(ent => {
+                    if (!ent[0].endsWith(".wav")) {
+                        return;
+                    }
+                    VIALFrame.contentWindow.FILE_OVERRIDES["./Samples/" + ent[0]] = ent[1];
+                });
+                
+                VIALFrame.contentWindow.waitingOnRemoteAssets = false;
+            }
             if (globalThis.vialInstance) {
                 setTimeout(() => res(), 250);
             } else {
@@ -31,7 +49,7 @@ function bootVial() {
         VIALFrame.src = "about:blank";
         let urlParams = new URLSearchParams(location.search);
         let vialPrefix = urlParams.has("vialprefix") ? urlParams.get("vialprefix") : "/vital/docs/index.html"
-        VIALFrame.src = vialPrefix + "?screen_percentage=85&target_fps=12&channel_count=2&audio_stack_size_samples=512&clockspeed_multiplier=1&autostart&samplerate=24000&syn";
+        VIALFrame.src = vialPrefix + "?screen_percentage=85&target_fps=24&channel_count=2&audio_stack_size_samples=512&clockspeed_multiplier=1&autostart&samplerate=24000&syn&remoteassets=true";
     }
 }
 

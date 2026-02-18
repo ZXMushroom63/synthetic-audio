@@ -1,3 +1,4 @@
+globalThis.pluginsCompletedLoading = false;
 //https://www.webaudiomodules.com/community/plugins/burns-audio/distortion/index.js
 //https://www.webaudiomodules.com/community/plugins.json
 //.sf2 support   https://danigb.github.io/soundfont-player/
@@ -116,36 +117,15 @@ addEventListener("init", async () => {
         const rootFolders = getRootFolders(zip);
         for (const path in zip.files) {
             const file = zip.files[path];
-            if (!file.dir && isAudio(path) && path.endsWith(".wav")) {
+            if (!file.dir && isAudio(path) && path.endsWith(".wav") && !path.startsWith("__MACOSX")) {
                 var filename = path;
                 if (rootFolders.length === 1) {
                     filename = filename.replace(rootFolders[0], "");
                 }
-                var buffer;
-                try {
-                    const arrbuf = await file.async("arraybuffer");
-                    buffer = await ax.decodeAudioData(arrbuf);
-                } catch (error) {
-                    logToLoader(`${filename} buffer is corrupt.`);
-                    continue;
-                }
-
-                if (buffer.length < 2048) {
-                    const newBuffer = ax.createBuffer(buffer.numberOfChannels, 2048, buffer.sampleRate);
-                    for (let c = 0; c < buffer.numberOfChannels; c++) {
-                        const pcm = buffer.getChannelData(c);
-                        newBuffer.getChannelData(c).set(upsampleFloat32Array(pcm, 2048))
-                    }
-                    buffer = newBuffer;
-                }
-
-                if ((buffer.length % 2048) !== 0 || !buffer) {
-                    logToLoader(`${filename} buffer is bad size.`);
-                    continue;
-                }
+                
                 const key = filename.replace("wt/", "").replaceAll(".wav", "");
 
-                WAVETABLES[key] = buffer;
+                WAVETABLES[key] = await file.async("arraybuffer");
 
             }
         }
@@ -752,6 +732,7 @@ addEventListener("init", async () => {
         document.body.appendChild(socketio);
     }
     const ax = new OfflineAudioContext({ sampleRate: 44100, numberOfChannels: 1, length: 1 });
+    globalThis.pluginAX = ax;
     for (item of postInitQueue) {
         if (item.type === "samplepack") {
             await loadSamplePack(item.data, item.name);
@@ -777,20 +758,10 @@ addEventListener("init", async () => {
             if (!item.data) {
                 continue;
             }
-            var buffer;
-            try {
-                buffer = await ax.decodeAudioData(await item.data.arrayBuffer());
-            } catch (error) {
-                logToLoader(`${item.name} buffer is corrupt.`);
-                continue;
-            }
-            if ((buffer.length % 2048) !== 0 || !buffer) {
-                logToLoader(`${item.name} buffer is bad size.`);
-                continue;
-            }
+            
             const key = item.name.replace("wt/", "").replaceAll(".wt.wav", "");
 
-            WAVETABLES[key] = buffer;
+            WAVETABLES[key] = await item.data.arrayBuffer();
             logToLoader(`Loaded wavetable: ${item.name}`);
             findLoops(".loop[data-wt-user]").forEach((loop) => {
                 if (loop.usesWt()) {
@@ -799,6 +770,7 @@ addEventListener("init", async () => {
             });
         }
     }
+    globalThis.pluginsCompletedLoading = true;
     if (performance.measureUserAgentSpecificMemory) {
         console.log("Startup completed, using ", (await performance.measureUserAgentSpecificMemory()).bytes / (1024 ** 2), "MB of memory.");
     }
