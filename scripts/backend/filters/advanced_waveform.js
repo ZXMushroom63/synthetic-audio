@@ -195,7 +195,7 @@ addBlockType("p_waveform_plus", {
     },
     customGuiButtons: {
         "Preview": async function () {
-            var pcmData = filters["p_waveform_plus"].functor.apply(this, [new Float32Array(audio.samplerate), 0, getProjectMeta()]);
+            var pcmData = await filters["p_waveform_plus"].functor.apply(this, [new Float32Array(audio.samplerate), 0, getProjectMeta()]);
             var blob = await convertToFileBlob([sumFloat32Arrays([pcmData])], 1, audio.samplerate, audio.bitrate, true);
             playSample(blob);
         },
