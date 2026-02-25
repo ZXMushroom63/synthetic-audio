@@ -633,7 +633,8 @@ function addBlock(type, start, duration, title, layer = 0, data = {}, editorValu
     }
 
     if (!noTimeline) {
-        trackChildren[trackChildren.length - 2].after(loop);
+        const filtered = [...trackChildren].filter(x => !x.classList.contains("multicursor"));
+        filtered[filtered.length - 2].after(loop);
         TIMELINE_LOOPS_ALL.add(loop);
         TIMELINE_LOOPS_ALIVE.add(loop);
         if (globalThis.LoopOptimiser) {
