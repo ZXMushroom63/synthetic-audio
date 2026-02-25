@@ -1,3 +1,4 @@
+const cursorMap = {};
 function getLoopByUUID(uuid) {
     return document.querySelector(".loop[data-uuid='" + uuid + "']");
 }
@@ -124,6 +125,39 @@ const multiplayer = {
             multiplayer.isHooked = true;
             customEvent("netcode:" + res.mode, res.data);
             multiplayer.isHooked = false;
+        });
+        let cid = crypto.randomUUID();
+        const track = document.querySelector("#trackInternal");
+        track.addEventListener("mousemove", (e) => {
+            const x = (e.layerX + track.parentElement.scrollLeft) / track.clientWidth;
+            const y = (e.layerY + track.parentElement.scrollTop) / track.clientHeight;
+            multiplayer.custom_buffered("cursor", { x: x, y: y, cid: cid }, "cursorsend");
+        });
+        addEventListener("netcode:cursor", (data) => {
+            const now = Date.now();
+            const pkt = data.detail;
+            const cursorId = pkt.cid;
+            const newX = pkt.x;
+            const newY = pkt.y;
+            if (cursorMap[cursorId]) {
+                cursorMap[cursorId].ld = now;
+                cursorMap[cursorId].elem.style.translate = `${newX * track.clientWidth}px ${newY * track.clientHeight}px`;
+            } else {
+                const cursor = document.createElement("img");
+                cursor.src = "public/multi_cursor.png";
+                cursor.classList.add("multicursor");
+                cursor.style.filter = `hue-rotate(${(cyrb53(cursorId) / 10) % 360}deg) saturate(1.35)`;
+                cursor.style.translate = `${newX * track.clientWidth}px ${newY * track.clientHeight}px`;
+                cursorMap[cursorId] = { x: newX, y: newY, id: cursorId, elem: cursor, ld: now };
+                document.querySelector("#trackInternal").appendChild(cursor);
+            }
+
+            Object.entries(cursorMap).forEach((entry) => {
+                if ((now - entry[1].ld) > 10 * 1000) {
+                    entry[1].elem.remove();
+                    delete cursorMap[entry[0]];
+                }
+            });
         });
     },
     addBlock: function (data) {

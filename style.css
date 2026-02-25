@@ -1379,3 +1379,16 @@ input[type=range]:active {
   cursor: pointer;
   color: lime;
 }
+.multicursor {
+  position: absolute;
+  opacity: 1;
+  pointer-events: none;
+  user-select: none;
+  transition: translate 0.4s;
+  width: 32px;
+  height: 32px;
+  top: 0px;
+  left: 0px;
+  translate: 0% 0%;
+  transform-origin: 0% 0%;
+}

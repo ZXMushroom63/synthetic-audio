@@ -92,7 +92,6 @@ function multiplayer_support(server, debugMode, statKeeper) {
         socket.on = function name(ev, handler) {
             handlers.set(ev, handler);
             return oldOn.apply(socket, [ev, function (e) {
-                console.log(ev + " " + socket.id);
                 if ((bucket.length + bucketOverfilling) > BUCKET_KICK_THRESHOLD) {
                     socket.disconnect(true);
                     return;
