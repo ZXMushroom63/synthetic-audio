@@ -8,7 +8,7 @@ addBlockType("modulo", {
     waterfall: 1,
     functor: function (inPcm, channel, data) {
         var Bvalue = _(this.conf.B);
-        var out = new Float32Array(inPcm);
+        var out = new FloatBuffer(inPcm);
         out.forEach((x, i) => {
             out[i] = x % Bvalue(i, inPcm);
         });

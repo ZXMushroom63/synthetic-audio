@@ -40,6 +40,7 @@ var loopi = 0.001;
 var audio = {
     samplerate: 24000,
     bitrate: 320,
+    bitdepth: 32,
     bpm: 120,
     beatSize: 1 / 120 * 60,
     duration: 10,

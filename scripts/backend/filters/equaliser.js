@@ -1,7 +1,7 @@
 async function applyEQFilter(pcmData, sampleRate, shelfValues, falloff) {
     //var volOld = pcmData.reduce((acc, v)=>acc + Math.abs(v)) / pcmData.length;
 
-    var pcmValues = new Float32Array(pcmData.length);
+    var pcmValues = new FloatBuffer(pcmData.length);
     for (let i = 0; i < shelfValues.length; i++) {
         const shelf = shelfValues[i];
         var pcm = await applyBandpassFilter(pcmData, sampleRate, ()=>shelf[0], ()=>shelf[1], falloff);

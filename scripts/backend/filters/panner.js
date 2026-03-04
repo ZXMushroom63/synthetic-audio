@@ -60,7 +60,7 @@ addBlockType("panner", {
     functor: async function (inPcm, channel, data) {
         const maxDelaySamples = this.conf.Binaural ? Math.max(0, Math.round((this.conf.BinauralTimeMS / 1000) * audio.samplerate)) : 0;
         const getPan = _(this.conf.Pan);
-        return (new Float32Array(inPcm.length)).map((x, i) => {
+        return (new FloatBuffer(inPcm.length)).map((x, i) => {
             const pan = Math.min(Math.max(getPan(i, inPcm), -1), 1);
 
             const delay = Math.round(pan * maxDelaySamples) * (channel === 0 ? -1 : 1);

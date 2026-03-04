@@ -15,7 +15,7 @@ addBlockType("delay", {
         var delayTimes = this.conf.DelayTimes.split(",").map(x => Math.floor((parseFloat(x.trim()) || 0) * audio.samplerate));
         var pingPongEnabled = this.conf.PingPong !== "NONE";
         var pingPongChannel = (this.conf.PingPong === "RIGHT-FIRST") ? 0 : 1;
-        var out = (new Float32Array(inPcm.length)).fill(0);
+        var out = (new FloatBuffer(inPcm.length)).fill(0);
         out.forEach((x, i) => {
             var timeOffset = 0;
             var ping = pingPongChannel;

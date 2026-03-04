@@ -29,7 +29,7 @@ addBlockType("vocoder", {
     functor: function (inPcm, channel, data) {
         const modulatorPcm = inPcm;
         const frameSize = this.conf.FFTSize;
-        let carrierPcm = proceduralAssets.has(this.conf.Carrier) ? proceduralAssets.get(this.conf.Carrier)[channel] : new Float32Array(frameSize);
+        let carrierPcm = proceduralAssets.has(this.conf.Carrier) ? proceduralAssets.get(this.conf.Carrier)[channel] : new FloatBuffer(frameSize);
 
         const bandCount = this.conf.BandCount || 28;
         const loopCarrier = this.conf.LoopCarrier || !this.conf.UseCarrier;
@@ -40,9 +40,9 @@ addBlockType("vocoder", {
 
         const fft = new FFTJS(frameSize);
 
-        const out = new Float32Array(modulatorPcm.length);
+        const out = new FloatBuffer(modulatorPcm.length);
 
-        const window = new Float32Array(frameSize);
+        const window = new FloatBuffer(frameSize);
         //hann window
         for (let i = 0; i < frameSize; i++) {
             window[i] = 0.5 * (1 - Math.cos(2 * Math.PI * i / (frameSize - 1)));
@@ -72,7 +72,7 @@ addBlockType("vocoder", {
         };
 
         const getLoopedFrame = (buffer, position) => {
-            const frame = new Float32Array(frameSize);
+            const frame = new FloatBuffer(frameSize);
             const len = buffer.length;
             for (let i = 0; i < frameSize; i++) {
                 frame[i] = buffer[(position + i) % len];
@@ -81,7 +81,7 @@ addBlockType("vocoder", {
         };
 
         const bands = generateLogarithmicBands(bandCount, frameSize, sampleRate);
-        const bandMagnitudes = new Float32Array(bands.length);
+        const bandMagnitudes = new FloatBuffer(bands.length);
 
         const modComplex = fft.createComplexArray();
         const carrierComplex = fft.createComplexArray();

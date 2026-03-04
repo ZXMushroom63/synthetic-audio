@@ -14,7 +14,7 @@ async function ensureWtKey(key) {
             const newBuffer = pluginAX.createBuffer(buffer.numberOfChannels, 2048, buffer.sampleRate);
             for (let c = 0; c < buffer.numberOfChannels; c++) {
                 const pcm = buffer.getChannelData(c);
-                newBuffer.getChannelData(c).set(upsampleFloat32Array(pcm, 2048))
+                newBuffer.getChannelData(c).set(upsampleFloatArray(pcm, 2048))
             }
             buffer = newBuffer;
         }
@@ -184,7 +184,7 @@ addBlockType("p_waveform_plus", {
         //     loop.conf.InternalSemiOffset = 0;
         // }
         // if (loop.conf.InternalSemiOffset === 0 && !(("" + loop.conf.Frequency).startsWith("#")) && (typeof loop.conf.SemitonesOffset === "number")) {
-        //     loop.conf.Frequency = ":" + frequencyToNote(_(loop.conf.Frequency)(0, new Float32Array(1)) * Math.pow(2, loop.conf.SemitonesOffset/12)) + ":";
+        //     loop.conf.Frequency = ":" + frequencyToNote(_(loop.conf.Frequency)(0, new FloatBuffer(1)) * Math.pow(2, loop.conf.SemitonesOffset/12)) + ":";
         //     loop.conf.SemitonesOffset = 0;
         // }
 
@@ -195,8 +195,8 @@ addBlockType("p_waveform_plus", {
     },
     customGuiButtons: {
         "Preview": async function () {
-            var pcmData = filters["p_waveform_plus"].functor.apply(this, [new Float32Array(audio.samplerate), 0, getProjectMeta()]);
-            var blob = await convertToFileBlob([sumFloat32Arrays([pcmData])], 1, audio.samplerate, audio.bitrate, true);
+            var pcmData = filters["p_waveform_plus"].functor.apply(this, [new FloatBuffer(audio.samplerate), 0, getProjectMeta()]);
+            var blob = await convertToFileBlob([sumFloatArrays([pcmData])], 1, audio.samplerate, audio.bitrate, true);
             playSample(blob);
         },
         "Dbg": function () {
@@ -218,7 +218,7 @@ addBlockType("p_waveform_plus", {
     },
     guessEndPhase: function (duration) {
         //maybe: add harmonics sync?
-        const examplePcm = new Float32Array(Math.floor(duration * audio.samplerate));
+        const examplePcm = new FloatBuffer(Math.floor(duration * audio.samplerate));
         const fdecay = _(this.conf.FrequencyDecay);
         const freq = _(this.conf.Frequency);
         const freqsemioffset = _(this.conf.SemitonesOffset);
@@ -234,7 +234,7 @@ addBlockType("p_waveform_plus", {
             waveCount = this.conf.uVoices;
         }
 
-        const t = new Float32Array(waveCount);
+        const t = new FloatBuffer(waveCount);
 
         const uDetuneHz = _(this.conf.uDetuneHz);
         const uPhase = _(this.conf.uPhase);
@@ -346,16 +346,16 @@ addBlockType("p_waveform_plus", {
             waveCount = this.conf.uVoices;
         }
 
-        const t = new Float32Array(waveCount);
+        const t = new FloatBuffer(waveCount);
 
-        const wcPhases = new Float32Array(waveCount);
+        const wcPhases = new FloatBuffer(waveCount);
         if (this.conf.uRandomisePhase) {
             wcPhases.forEach((x, i) => {
                 wcPhases[i] = (cyrb53a_beta("" + i, 0) / 100) % 1;
             });
         }
 
-        const wcPanValues = new Float32Array(waveCount);
+        const wcPanValues = new FloatBuffer(waveCount);
         if (this.conf.uRandomisePan) {
             wcPanValues.forEach((x, i) => {
                 wcPanValues[i] = (cyrb53a_beta("pan" + i, 0) / 100) % 2 - 1;

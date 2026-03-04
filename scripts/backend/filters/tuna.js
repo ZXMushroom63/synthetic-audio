@@ -70,7 +70,7 @@ addBlockType("tuna_convolver", {
     },
     functor: async function (inPcm, channel, data) {
         if (this.conf.ImpulseResponse === "(none)") {
-            return new Float32Array(inPcm.length);
+            return new FloatBuffer(inPcm.length);
         }
         const ctx = new OfflineAudioContext(1, inPcm.length, audio.samplerate);
 
@@ -107,7 +107,7 @@ addBlockType("tuna_cabinet", {
     },
     functor: async function (inPcm, channel, data) {
         if (this.conf.ImpulseResponse === "(none)") {
-            return new Float32Array(inPcm.length);
+            return new FloatBuffer(inPcm.length);
         }
         const ctx = new OfflineAudioContext(1, inPcm.length, audio.samplerate);
         const arrBuf = await (await fetch("public/impulse_responses/" + this.conf.ImpulseResponse)).arrayBuffer();
@@ -175,7 +175,7 @@ addBlockType("tuna_phaser", {
             bypass: 0
         });
         if (this.conf.Normalise) {
-            normaliseFloat32Arrays([pcm]);
+            normaliseFloatArrays([pcm]);
         }
         return pcm;
     }

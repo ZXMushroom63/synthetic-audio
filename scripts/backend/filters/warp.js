@@ -12,12 +12,12 @@ addBlockType("warp", {
         var pos = _(this.conf.Position, {upscaleSize: inPcm.length});
         var len = inPcm.length;
         var chunk = (this.conf.ChunkSize * audio.samplerate) || len;
-        var out = new Float32Array(len);
+        var out = new FloatBuffer(len);
         var chunkPcm;
         if (len === chunk) {
             chunkPcm = out;
         } else {
-            chunkPcm = new Float32Array(chunk);
+            chunkPcm = new FloatBuffer(chunk);
         }
         out.forEach((x, i) => {
             var chunkBase = Math.floor(i / chunk) * chunk;

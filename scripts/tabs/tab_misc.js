@@ -122,7 +122,7 @@ addEventListener("init", () => {
     const scaleAutocorrect = scaleGeneratorModule.querySelector("#scaleAutocorrect");
     let scaleMidiMapping = new Uint8Array(128);
     function updateScales() {
-        var startingPitch = _(note.value || ":C#:")(0, new Float32Array(2)) || 440;
+        var startingPitch = _(note.value || ":C#:")(0, new FloatBuffer(2)) || 440;
         var scale = scales.value.split(",").map(x => parseInt(x));
         var notes = [];
         var offset = 0;

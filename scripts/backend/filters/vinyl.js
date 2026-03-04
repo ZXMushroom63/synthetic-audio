@@ -15,7 +15,7 @@ addBlockType("vinyl", {
     waterfall: 1,
     functor: function (inPcm, channel, data) {
         const distribSampleRate = Math.floor(24000 * this.conf.Pitch);
-        var distribution = new Float32Array(Math.floor(inPcm.length / audio.samplerate * distribSampleRate));
+        var distribution = new FloatBuffer(Math.floor(inPcm.length / audio.samplerate * distribSampleRate));
         Math.newRandom(channel === 0 ? this.conf.SeedLeft : this.conf.SeedRight);
         var strength = _(this.conf.Strength);
         for (let i = 0; i < this.conf.Quantity; i++) {

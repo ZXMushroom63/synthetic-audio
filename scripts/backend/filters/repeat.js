@@ -19,7 +19,7 @@ addBlockType("repeat", {
             inPcm.reverse();
         }
 
-        var out = new Float32Array(inPcm.length);
+        var out = new FloatBuffer(inPcm.length);
 
         var repeatAmount;
 

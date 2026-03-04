@@ -34,7 +34,7 @@ addBlockType("distribute", {
         var pcmDuration = inPcm.length / audio.samplerate;
         var spacing = _(this.conf.Spacing);
         const MAX_ITERS = 100*pcmDuration;
-        var out = new Float32Array(inPcm.length);
+        var out = new FloatBuffer(inPcm.length);
         var iter = 0;
 
         while (currentTime >= 0 && currentTime < pcmDuration && iter < MAX_ITERS) {

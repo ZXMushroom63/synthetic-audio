@@ -34,7 +34,7 @@ function extractVolumeCurveFromPcm(currentData, sidechainFreq) {
     sidechainFreq ||= 32;
 
     const PCMBINSIZE = 1 / sidechainFreq * audio.samplerate;
-    const LOOKUPTABLE = new Float32Array(Math.floor(currentData.length / PCMBINSIZE)).fill(0);
+    const LOOKUPTABLE = new FloatBuffer(Math.floor(currentData.length / PCMBINSIZE)).fill(0);
 
     LOOKUPTABLE.forEach((x, i) => {
         const start = i * PCMBINSIZE;
@@ -45,7 +45,7 @@ function extractVolumeCurveFromPcm(currentData, sidechainFreq) {
         LOOKUPTABLE[i] = isFinite(out) ? out : 0;
     });
 
-    const LOOKUPTABLE_PERSAMPLE = new Float32Array(currentData.length);
+    const LOOKUPTABLE_PERSAMPLE = new FloatBuffer(currentData.length);
     LOOKUPTABLE_PERSAMPLE.forEach((x, i) => {
         LOOKUPTABLE_PERSAMPLE[i] = lerp(LOOKUPTABLE[Math.floor(i / PCMBINSIZE)] || 0, LOOKUPTABLE[Math.ceil(i / PCMBINSIZE)] || 0, (i % PCMBINSIZE) / PCMBINSIZE) || 0;
     });

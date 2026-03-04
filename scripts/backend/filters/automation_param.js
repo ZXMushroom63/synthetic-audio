@@ -190,7 +190,7 @@ addBlockType("automation_parameter", {
         const alreadyExists = proceduralAssets.has(internalId);
         if (alreadyExists) {
             proceduralAssets.get(internalId).set(
-                new Float32Array(info.length),
+                new FloatBuffer(info.length),
                 info.start
             );
         }
@@ -256,7 +256,7 @@ addBlockType("automation_parameter", {
     updateMiddleware: automationParamHandler,
     functor: function (inPcm, channel, data) {
         const renderMapping = _(this.conf.ReaderMapping);
-        const blankPcm = new Float32Array(2048);
+        const blankPcm = new FloatBuffer(2048);
 
         this.ref.setAttribute("data-lastrenparam", this.conf.Identifier);
         var val = _(this.conf.Value, { disallowAutomationParams: true });
@@ -266,7 +266,7 @@ addBlockType("automation_parameter", {
         if (alreadyExists) {
             paramPcm = proceduralAssets.get(internalId);
         } else {
-            paramPcm = new Float32Array(audio.length);
+            paramPcm = new FloatBuffer(audio.length);
             proceduralAssets.set(internalId, paramPcm);
         }
         const offset = Math.floor(this.start * audio.samplerate);
@@ -278,7 +278,7 @@ addBlockType("automation_parameter", {
 
         let graphCurve = null;
         if (this.conf.GraphMode) {
-            graphCurve = new Float32Array(inPcm.length);
+            graphCurve = new FloatBuffer(inPcm.length);
             const keyframes = filters["automation_parameter"].backgroundHandler(this);
             keyframes.forEach((keyframe, i) => {
                 if (i === 0) {
@@ -311,7 +311,7 @@ addBlockType("automation_parameter", {
         if (this.conf.ReaderTransparent && this.conf.ReaderMode) {
             return inPcm;
         }
-        return new Float32Array(inPcm.length);
+        return new FloatBuffer(inPcm.length);
     }
 });
 //@Param means bind to param

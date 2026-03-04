@@ -88,8 +88,8 @@ addBlockType("fakemidi", {
         // console.log("MIDI NOTE: ");
         // console.log((startOffset + currentlyRenderedLoop?.writeOffset || 0) / 400);
         // console.log((endOffset + currentlyRenderedLoop?.writeOffset || 0) / 400);
-        const mid = Math.min(127, Math.max(0, Math.floor(freq2midi(_(this.conf.Note)(0, new Float32Array(2))))));
-        const vel = Math.min(0.999, Math.max(0, _(this.conf.Velocity)(0, new Float32Array(2))));
+        const mid = Math.min(127, Math.max(0, Math.floor(freq2midi(_(this.conf.Note)(0, new FloatBuffer(2))))));
+        const vel = Math.min(0.999, Math.max(0, _(this.conf.Velocity)(0, new FloatBuffer(2))));
 
         inPcm[startOffset + 8 + 3 * mid + 0] = 2;
         inPcm[startOffset + 8 + 3 * mid + 2] = vel;
@@ -113,8 +113,8 @@ addBlockType("fakemidi", {
     customGuiButtons: {
         "Preview": async function () {
             //todo: only preview in last interacted synth (obxd/webvial)
-            const mid = Math.min(127, Math.max(0, Math.floor(freq2midi(_(this.conf.Note)(0, new Float32Array(2))))));
-            const vel = Math.floor(Math.min(127, Math.max(0, 127 * _(this.conf.Velocity)(0, new Float32Array(2)))));
+            const mid = Math.min(127, Math.max(0, Math.floor(freq2midi(_(this.conf.Note)(0, new FloatBuffer(2))))));
+            const vel = Math.floor(Math.min(127, Math.max(0, 127 * _(this.conf.Velocity)(0, new FloatBuffer(2)))));
             const duration = Math.min(this.getAttribute("data-duration"), 2);
             try {
                 FAKEMIDI_PREVIEW_FLUSH_QUEUE.filter(x => true ? true : x[1] === mid).forEach(x => { // (duration > 1)
@@ -150,7 +150,7 @@ addBlockType("fakemidi", {
                 "Note",
                 loop["conf"]["Note"]
             ));
-            loop.conf.Note = ":" + frequencyToNote(_(loop.conf.Note)(0, new Float32Array(1)) * Math.pow(2, value / 12)) + ":";
+            loop.conf.Note = ":" + frequencyToNote(_(loop.conf.Note)(0, new FloatBuffer(1)) * Math.pow(2, value / 12)) + ":";
             updateNoteDisplay(loop);
         }
 

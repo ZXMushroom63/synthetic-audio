@@ -17,7 +17,7 @@ addBlockType("smooth", {
         var len = inPcm.length;
         var lastIdx = len - 1;
         for (let iter = 0; iter < x; iter++) {
-            let tempPcm = new Float32Array(len);
+            let tempPcm = new FloatBuffer(len);
             for (let i = 0; i < len; i++) {
                 var prevSampleIdx = i - 1;
                 var nextSampleIdx = i + 1;

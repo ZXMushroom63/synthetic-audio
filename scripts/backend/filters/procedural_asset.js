@@ -67,7 +67,7 @@ addBlockType("p_readasset", {
             "Note",
             loop["conf"]["Note"]
         ));
-        loop.conf.Note = ":" + frequencyToNote(_(loop.conf.Note)(0, new Float32Array(1)) * Math.pow(2, value / 12)) + ":";
+        loop.conf.Note = ":" + frequencyToNote(_(loop.conf.Note)(0, new FloatBuffer(1)) * Math.pow(2, value / 12)) + ":";
         updateNoteDisplay(loop);
 
         if (!globalThis.zscrollIsInternal && globalThis.zscrollIsFirst) {
@@ -87,7 +87,7 @@ addBlockType("p_readasset", {
             tail[i] = x * (1 - i / FADETIME);
         });
         var duration = Math.floor(Math.round((((currentData.length / audio.samplerate) || 0) + 0.0) / data.loopInterval) * data.loopInterval * audio.samplerate);
-        const empty = new Float32Array(2);
+        const empty = new FloatBuffer(2);
         const speed = this.conf.SamplerEnabled ? (this.conf.Speed * (_(this.conf.Note)(0, empty) / _(this.conf.ReferenceNote)(0, empty))) : this.conf.Speed;
         if (this.conf.Sidechain) {
             applySoundbiteToPcmSidechain(this.conf.Reverse, this.conf.Looping, currentData, inPcm, duration, speed, this.conf.Volume, this.conf.StartOffset, this.conf.SidechainPower, this.conf.Silent, this.conf.SidechainRMSFreq);
@@ -99,8 +99,8 @@ addBlockType("p_readasset", {
     },
     customGuiButtons: {
         "Preview": async function () {
-            var pcmData = filters["p_readasset"].functor.apply(this, [new Float32Array(audio.samplerate), 0, getProjectMeta()]);
-            var blob = await convertToFileBlob([sumFloat32Arrays([pcmData])], 1, audio.samplerate, audio.bitrate, true);
+            var pcmData = filters["p_readasset"].functor.apply(this, [new FloatBuffer(audio.samplerate), 0, getProjectMeta()]);
+            var blob = await convertToFileBlob([sumFloatArrays([pcmData])], 1, audio.samplerate, audio.bitrate, true);
             playSample(blob);
         },
     }
@@ -126,7 +126,7 @@ addBlockType("p_writeasset", {
             proceduralAssets.get(this.conf.Asset)[channel] = inPcm;
         }
 
-        var out = new Float32Array(inPcm.length);
+        var out = new FloatBuffer(inPcm.length);
         if (this.conf.Transparent) {
             out.set(inPcm);
         }

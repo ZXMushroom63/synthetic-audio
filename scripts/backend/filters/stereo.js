@@ -44,7 +44,7 @@ addBlockType("stereopositioner", {
         var p_x = _(this.conf.X);
         var p_y = _(this.conf.Y);
         var p_r = _(this.conf.PostRotation);
-        var outPcm = new Float32Array(inPcm.length).fill(0);
+        var outPcm = new FloatBuffer(inPcm.length).fill(0);
         var prevDelay = null;
         inPcm.forEach((x, i) => {
             var xpos = p_x(i, inPcm);

@@ -42,7 +42,7 @@ addBlockType("instrument", {
             "Note",
             loop["conf"]["Note"]
         ));
-        loop.conf.Note = ":" + frequencyToNote(_(loop.conf.Note)(0, new Float32Array(1)) * Math.pow(2, value / 12)) + ":";
+        loop.conf.Note = ":" + frequencyToNote(_(loop.conf.Note)(0, new FloatBuffer(1)) * Math.pow(2, value / 12)) + ":";
         updateNoteDisplay(loop);
         //usually would check globalThis.zscrollIsFirst, but `instrument` can play multiple notes at once, so might as well.
         if (!globalThis.zscrollIsInternal) {
@@ -55,7 +55,7 @@ addBlockType("instrument", {
                 return;
             }
 
-            var note = _(this.conf.Note)(0, new Float32Array(2));
+            var note = _(this.conf.Note)(0, new FloatBuffer(2));
             note = frequencyToNote(note, true);
             var audio = new Audio(SFREGISTRY[this.conf.Instrument][note]);
             audio.volume = 1;
@@ -75,10 +75,10 @@ addBlockType("instrument", {
             return inPcm;
         }
 
-        var note = _(this.conf.Note)(0, new Float32Array(2));
+        var note = _(this.conf.Note)(0, new FloatBuffer(2));
         note = frequencyToNote(note, true);
 
-        const volume = _(this.conf.Volume)(0, new Float32Array(2));
+        const volume = _(this.conf.Volume)(0, new FloatBuffer(2));
         var currentData = SFCACHE[this.conf.Instrument][note];
         if (!currentData) {
             return inPcm;

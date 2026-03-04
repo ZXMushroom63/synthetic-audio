@@ -11,7 +11,7 @@ addBlockType("comb", {
     functor: function (inPcm, channel, data) {
         var volRatio = _(this.conf.VolumeRatio);
         var delay = _(this.conf.Delay);
-        var out = (new Float32Array(inPcm.length)).fill(0);
+        var out = (new FloatBuffer(inPcm.length)).fill(0);
         out.forEach((x, i) => {
             var delayImpl = delay(i, out) * audio.samplerate;
             for (let j = 1; j < (this.conf.Iterations + 1); j++) {

@@ -9,7 +9,7 @@ addBlockType("splice", {
         "Opacity": [1, "number"],
     },
     functor: async function (inPcm, channel, data) {
-        const output = new Float32Array(inPcm.length);
+        const output = new FloatBuffer(inPcm.length);
 
         Math.newRandom(this.conf.Seed);
 

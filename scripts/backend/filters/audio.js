@@ -79,7 +79,7 @@ addBlockType("audio", {
             "Note",
             loop["conf"]["Note"]
         ));
-        loop.conf.Note = ":" + frequencyToNote(_(loop.conf.Note)(0, new Float32Array(1)) * Math.pow(2, value / 12)) + ":";
+        loop.conf.Note = ":" + frequencyToNote(_(loop.conf.Note)(0, new FloatBuffer(1)) * Math.pow(2, value / 12)) + ":";
         updateNoteDisplay(loop);
 
         if (!globalThis.zscrollIsInternal && globalThis.zscrollIsFirst) {
@@ -96,7 +96,7 @@ addBlockType("audio", {
             const refNote = _(this.conf.ReferenceNote);
             const samplerEnabled = this.conf.SamplerEnabled;
             const speed = (i, inPcm) => samplerEnabled ? (_speed(i, inPcm) * (hitNote(i, inPcm) / refNote(i, inPcm))) : _speed(i, inPcm);
-            playSample(loopMap[this.getAttribute("data-file")], this.conf.Volume, speed(0, new Float32Array(2)), this.conf.StartOffset);
+            playSample(loopMap[this.getAttribute("data-file")], this.conf.Volume, speed(0, new FloatBuffer(2)), this.conf.StartOffset);
         },
     }
 });

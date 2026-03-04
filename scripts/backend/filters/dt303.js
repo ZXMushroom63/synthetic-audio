@@ -72,7 +72,7 @@
     class Convol {
         constructor() {
             this.kernel = [0.013475, 0.097598, 0.235621, 0.306612, 0.235621, 0.097598, 0.013475];
-            this.taps = new Float32Array(this.kernel.length);
+            this.taps = new FloatBuffer(this.kernel.length);
         }
         process(v) {
             var n = this.kernel.length;
@@ -115,7 +115,7 @@
             "FX": ["Overdrive"]
         },
         functor: async function (inPcm, channel, data) {
-            const out = new Float32Array(inPcm.length);
+            const out = new FloatBuffer(inPcm.length);
             const dt = 1 / audio.samplerate;
             const conf = this.conf;
             const state = {
@@ -166,7 +166,7 @@
                 // Overdrive effect
                 const od = conf.Overdrive;
                 if (od > 0) {
-                    let e = new Float32Array(4);
+                    let e = new FloatBuffer(4);
                     e[0] = state.us.process(v * 4);
                     for (let j = 1; j < 4; j++) e[j] = state.us.process(0);
                     for (let j = 0; j < 4; ++j) {
@@ -225,7 +225,7 @@
                 loop["conf"]["Note"]
             ));
             // Use z-scrolling (Ctrl+MouseWheel) to adjust the note pitch
-            loop.conf.Note = ":" + frequencyToNote(_(loop.conf.Note)(0, new Float32Array(1)) * Math.pow(2, value / 12)) + ":";
+            loop.conf.Note = ":" + frequencyToNote(_(loop.conf.Note)(0, new FloatBuffer(1)) * Math.pow(2, value / 12)) + ":";
             updateNoteDisplay(loop);
             if (globalThis.zscrollIsFirst && !globalThis.zscrollIsInternal) {
                 tb303synth.customGuiButtons.Preview.apply(loop, []);
@@ -233,8 +233,8 @@
         },
         customGuiButtons: {
             "Preview": async function () {
-                var pcmData = await tb303synth.functor.apply(this, [new Float32Array(audio.samplerate / 2), 0, getProjectMeta()]);
-                var blob = await convertToFileBlob([sumFloat32Arrays([pcmData])], 1, audio.samplerate, audio.bitrate, true);
+                var pcmData = await tb303synth.functor.apply(this, [new FloatBuffer(audio.samplerate / 2), 0, getProjectMeta()]);
+                var blob = await convertToFileBlob([sumFloatArrays([pcmData])], 1, audio.samplerate, audio.bitrate, true);
                 playSample(blob);
             },
         },

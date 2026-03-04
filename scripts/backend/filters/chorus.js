@@ -9,7 +9,7 @@ addBlockType("chorus", {
     },
     waterfall: 2,
     functor: async function (inPcm, channel, data) {
-        const output = new Float32Array(inPcm.length);
+        const output = new FloatBuffer(inPcm.length);
         const delaySamples = Math.floor((this.conf.DelayMs / 1000) * audio.samplerate);
         const modFrequency = (2 * Math.PI * this.conf.ModulationRateHz) / audio.samplerate;
         const depth = this.conf.DepthMs / 1000 * audio.samplerate;

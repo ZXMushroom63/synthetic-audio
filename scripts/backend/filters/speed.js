@@ -15,7 +15,7 @@ addBlockType("speed", {
         if (this.conf.FromEnd) {
             original.reverse();
         }
-        var out = new Float32Array(original.length).fill(0);
+        var out = new FloatBuffer(original.length).fill(0);
         out.forEach((x, i) => {
             if (this.conf.AntiAlias) {
                 out[i] = lerp(original[Math.floor(samplePosition)] || 0, original[Math.ceil(samplePosition)] || 0, samplePosition % 1) || 0;

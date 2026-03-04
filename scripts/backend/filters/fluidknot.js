@@ -25,8 +25,8 @@ addBlockType("fluidknot", {
     },
     forcePrimitive: true,
     functor: async function (inPcm, channel, data) {
-        const midiNote = freq2midi(_(this.conf.Note)(0, new Float32Array(2)));
-        const velocity = Math.max(1, Math.min(127, Math.floor((_(this.conf.Velocity)(0, new Float32Array(2)) || 0) * 128)));
+        const midiNote = freq2midi(_(this.conf.Note)(0, new FloatBuffer(2)));
+        const velocity = Math.max(1, Math.min(127, Math.floor((_(this.conf.Velocity)(0, new FloatBuffer(2)) || 0) * 128)));
 
         const soundFont = SF2_REGISTRY[this.conf.SoundFont];
         if (!soundFont) {
@@ -183,7 +183,7 @@ addBlockType("fluidknot", {
                 "Note",
                 loop["conf"]["Note"]
             ));
-            loop.conf.Note = ":" + frequencyToNote(_(loop.conf.Note)(0, new Float32Array(1)) * Math.pow(2, value / 12)) + ":";
+            loop.conf.Note = ":" + frequencyToNote(_(loop.conf.Note)(0, new FloatBuffer(1)) * Math.pow(2, value / 12)) + ":";
             updateNoteDisplay(loop);
         }
 
@@ -193,8 +193,8 @@ addBlockType("fluidknot", {
     },
     customGuiButtons: {
         "Preview": async function () {
-            const pcmData = await filters["fluidknot"].functor.apply(this, [new Float32Array(audio.samplerate), 0, getProjectMeta()]);
-            const blob = await convertToFileBlob([sumFloat32Arrays([pcmData])], 1, audio.samplerate, audio.bitrate, true);
+            const pcmData = await filters["fluidknot"].functor.apply(this, [new FloatBuffer(audio.samplerate), 0, getProjectMeta()]);
+            const blob = await convertToFileBlob([sumFloatArrays([pcmData])], 1, audio.samplerate, audio.bitrate, true);
             playSample(blob);
         },
         "Velocity?": ()=>{toast("Use ALT+Q or ALT+W while scrolling to easily modify velocity.")}

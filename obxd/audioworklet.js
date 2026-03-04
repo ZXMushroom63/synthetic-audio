@@ -117,7 +117,7 @@ AudioContext = window.AudioContext || window.webkitAudioContext;
 
     var spn = context.createScriptProcessor(options.samplesPerBuffer, 0,1);
     this.input = spn;
-    var outbuf = new Float32Array(this.outputBus[0][0]);  // spn limitation
+    var outbuf = new FloatBuffer(this.outputBus[0][0]);  // spn limitation
     
     this.connect = function (dst) {
       spn.onaudioprocess = onprocess.bind(this);

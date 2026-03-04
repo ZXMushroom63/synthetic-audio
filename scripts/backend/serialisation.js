@@ -8,6 +8,7 @@ function getProjectMeta() {
         stereo: audio.stereo,
         sampleRate: audio.samplerate,
         bitRate: audio.bitrate,
+        bitDepth: audio.bitdepth,
         normalise: audio.normalise,
         substepping: gui.substepping,
         saveFormat: CURRENT_SAVE_FORMAT
@@ -137,6 +138,7 @@ function deserialise(ser) {
     ser.stereo ||= false;
     ser.sampleRate ||= 24000;
     ser.bitRate ||= 320;
+    ser.bitDepth ||= 32;
     ser.normalise ||= false;
     ser.encformat ||= "wav";
 
@@ -150,6 +152,7 @@ function deserialise(ser) {
     document.querySelector("#normalisebox").checked = ser.normalise;
     document.querySelector("#samplerate").value = ser.sampleRate;
     document.querySelector("#bitrate").value = ser.bitRate;
+    document.querySelector("#bitdepth").value = ser.bitDepth;
     document.querySelector("#encformat").value = ser.encformat;
     document.querySelector("#substepping").value = ser.substepping;
     document.querySelector("#renderOut").currentTime = 0;
@@ -163,6 +166,7 @@ function deserialise(ser) {
     audio.stereo = ser.stereo;
     audio.format = ser.encformat;
     audio.bitrate = ser.bitRate;
+    audio.bitdepth = ser.bitDepth;
 
     if (audio.samplerate !== ser.sampleRate) {
         decodedPcmCache = {};

@@ -16,7 +16,7 @@ addBlockType("breakr", {
     hidden: false,
     waterfall: 2,
     functor: async function (inPcm, channel, data) {
-        const out = new Float32Array(inPcm.length);
+        const out = new FloatBuffer(inPcm.length);
         out.set(inPcm);
         const blockSize = (channel === 0) ? this.conf.BlockSizeLeft : this.conf.BlockSizeRight;
         const blockSizeSamples = Math.floor(audio.samplerate * blockSize);

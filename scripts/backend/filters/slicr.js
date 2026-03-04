@@ -68,7 +68,7 @@ addBlockType("slicr", {
         });
         // slices found, process the user's pattern
         var sampLen = null;
-        const out = new Float32Array(inPcm.length);
+        const out = new FloatBuffer(inPcm.length);
         let k = 0;
         pattern.forEach((x, i) => {
             if (k >= out.length) {

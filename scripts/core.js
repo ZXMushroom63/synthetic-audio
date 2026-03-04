@@ -113,21 +113,22 @@ function findClosestNumber(arr, target) {
 
 const validSampleRates = [8000, 11025, 12000, 16000, 22050, 24000, 32000, 44100, 48000];
 
-function float32ToInt16(float32Array) {
-    let int16Array = new Int16Array(float32Array.length);
-    for (let i = 0; i < float32Array.length; i++) {
-        int16Array[i] = Math.max(-1, Math.min(1, float32Array[i])) * 32767;
+function floatToInt16(floatArray) {
+    let int16Array = new Int16Array(floatArray.length);
+    for (let i = 0; i < floatArray.length; i++) {
+        int16Array[i] = Math.max(-1, Math.min(1, floatArray[i])) * 32767;
     }
     return int16Array;
 }
-function convertToWavData(float32Arrays, channels, sampleRate, bRate) {
+function convertToWavData(floatArrays, channels, sampleRate, bRate) {
     const audioInterface = {
         sampleRate: sampleRate,
-        channelData: float32Arrays
+        channelData: floatArrays,
+        float: true,
     };
     return WavEncoder.encodeSync(audioInterface);
 }
-async function convertToFileBlob(float32Arrays, channels, sampleRate, bRate, forceWav) {
+async function convertToFileBlob(floatArrays, channels, sampleRate, bRate, forceWav) {
     startTiming("encode");
     var blob;
 
@@ -137,7 +138,7 @@ async function convertToFileBlob(float32Arrays, channels, sampleRate, bRate, for
         }
         await ffmpeg.load();
         const codec = codec_registry[audio.format];
-        ffmpeg.FS("writeFile", 'input.wav', new Uint8Array(convertToWavData(float32Arrays, channels, sampleRate, bRate)));
+        ffmpeg.FS("writeFile", 'input.wav', new Uint8Array(convertToWavData(floatArrays, channels, sampleRate, bRate)));
         const fname = codec.codec().pop();
         renderFileName = fname;
         renderCodec = codec;
@@ -149,7 +150,7 @@ async function convertToFileBlob(float32Arrays, channels, sampleRate, bRate, for
         if (processRendering) {
             renderCodec = codec_registry["wav"];
         }
-        blob = new Blob([convertToWavData(float32Arrays, channels, sampleRate, bRate)], { type: "audio/wav" });
+        blob = new Blob([convertToWavData(floatArrays, channels, sampleRate, bRate)], { type: "audio/wav" });
     }
     stopTiming("encode");
     return blob;
@@ -310,8 +311,8 @@ async function decodeSoundFonts(ax) {
         }
     }
 }
-function sumFloat32Arrays(arrays) {
-    if (arrays.length === 0) return new Float32Array(0);
+function sumFloatArrays(arrays) {
+    if (arrays.length === 0) return new FloatBuffer(0);
     arrays = arrays.filter(x => !!x);
     const length = arrays[0].length;
     const result = arrays[0].slice();
@@ -325,7 +326,7 @@ function sumFloat32Arrays(arrays) {
 
     return result;
 }
-function normaliseFloat32Arrays(arrays) {
+function normaliseFloatArrays(arrays) {
     if (arrays.length === 0) return [];
     var largestsample = 0.001;
     const length = arrays[0].length;
@@ -567,7 +568,7 @@ function constructRenderDataArray(data) {
 
 
                         pcm.set(
-                            new Float32Array(clippedDuration),
+                            new FloatBuffer(clippedDuration),
                             startIndex
                         );
                     });
@@ -660,7 +661,7 @@ async function render() {
                         let currPcm = [null, null];
                         let freshRender = false;
                         for (let c = 0; c < channels; c++) {
-                            let initialPcm = layerCache[abstractLayerMaps.layerId]?.[c] || new Float32Array(audio.length);
+                            let initialPcm = layerCache[abstractLayerMaps.layerId]?.[c] || new FloatBuffer(audio.length);
                             currPcm[c] = initialPcm;
                             if (!node.ref.cache[c]) {
                                 freshRender = true;
@@ -709,12 +710,13 @@ async function render() {
             }
         }
 
+        // force convert to f32 at end of pass
         for (let c = 0; c < channels; c++) {
-            output[c] = sumFloat32Arrays(output[c]);
+            output[c] = sumFloatArrays(output[c]);
         }
 
         if (audio.normalise) {
-            normaliseFloat32Arrays(output);
+            normaliseFloatArrays(output);
         }
 
         var renderTime = stopTiming("render");

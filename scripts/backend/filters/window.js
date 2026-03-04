@@ -1,5 +1,5 @@
 function windowEffect(array, windowSizeSeconds) {
-    const newArray = new Float32Array(array.length);
+    const newArray = new FloatBuffer(array.length);
     const sampleRate = audio.samplerate;
     
     for (let i = 0; i < array.length; i++) {

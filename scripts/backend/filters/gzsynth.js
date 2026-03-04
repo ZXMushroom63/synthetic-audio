@@ -25,7 +25,7 @@ const gz_synth_voicecount = 4;
                 }
                 return null;
             }).filter(x => !!x));
-            const out = new Float32Array(inPcm.length);
+            const out = new FloatBuffer(inPcm.length);
             const time = (new Array(4)).fill(0);
             const dt = 1 / audio.samplerate;
             const note = _(this.conf.Note);
@@ -160,7 +160,7 @@ const gz_synth_voicecount = 4;
                 "Note",
                 loop["conf"]["Note"]
             ));
-            loop.conf.Note = ":" + frequencyToNote(_(loop.conf.Note)(0, new Float32Array(1)) * Math.pow(2, value / 12)) + ":";
+            loop.conf.Note = ":" + frequencyToNote(_(loop.conf.Note)(0, new FloatBuffer(1)) * Math.pow(2, value / 12)) + ":";
             updateNoteDisplay(loop);
 
             if (!globalThis.zscrollIsInternal && globalThis.zscrollIsFirst) {
@@ -169,8 +169,8 @@ const gz_synth_voicecount = 4;
         },
         customGuiButtons: {
             "Preview": async function () {
-                var pcmData = await gzsynth.functor.apply(this, [new Float32Array(audio.samplerate), 0, getProjectMeta()]);
-                var blob = await convertToFileBlob([sumFloat32Arrays([pcmData])], 1, audio.samplerate, audio.bitrate, true);
+                var pcmData = await gzsynth.functor.apply(this, [new FloatBuffer(audio.samplerate), 0, getProjectMeta()]);
+                var blob = await convertToFileBlob([sumFloatArrays([pcmData])], 1, audio.samplerate, audio.bitrate, true);
                 playSample(blob);
             },
         },

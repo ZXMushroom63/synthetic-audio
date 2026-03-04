@@ -14,4 +14,11 @@ addEventListener("init", () => {
     document.querySelector("#bitrate").addEventListener("input", (e) => {
         audio.bitrate = parseInt(e.target.value);
     });
+    document.querySelector("#bitdepth").addEventListener("input", (e) => {
+        audio.bitdepth = parseInt(e.target.value);
+        proceduralAssets.clear();
+        findLoops(".loop").forEach(x => x.setAttribute("data-dirty", "yes"));
+        resetRenderHashes();
+        layerCache = {};
+    });
 });

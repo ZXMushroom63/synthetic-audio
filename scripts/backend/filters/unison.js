@@ -29,7 +29,7 @@ addBlockType("unison", {
 
         var pan = _(this.conf.uPan);
 
-        var outPcm = new Float32Array(inPcm.length);
+        var outPcm = new FloatBuffer(inPcm.length);
         var uTimeOffset = this.conf.uTimeOffset;
         outPcm.forEach((x, i) => {
             var panAmount = pan(i, inPcm);

@@ -28,7 +28,7 @@ addBlockType("autotune", {
             "Note",
             loop["conf"]["Note"]
         ));
-        loop.conf.Note = ":" + frequencyToNote(_(loop.conf.Note)(0, new Float32Array(1)) * Math.pow(2, value / 12)) + ":";
+        loop.conf.Note = ":" + frequencyToNote(_(loop.conf.Note)(0, new FloatBuffer(1)) * Math.pow(2, value / 12)) + ":";
         updateNoteDisplay(loop);
     },
     functor: function (inPcm, channel, data) {
@@ -38,8 +38,8 @@ addBlockType("autotune", {
 
 
         const fft = new FFTJS(frameSize);
-        const out = new Float32Array(modulatorPcm.length);
-        const window = new Float32Array(frameSize);
+        const out = new FloatBuffer(modulatorPcm.length);
+        const window = new FloatBuffer(frameSize);
         //hann window
         for (let i = 0; i < frameSize; i++) {
             window[i] = 0.5 * (1 - Math.cos(2 * Math.PI * i / (frameSize - 1)));
@@ -48,7 +48,7 @@ addBlockType("autotune", {
 
         const modComplex = fft.createComplexArray();
         const timeDomain = fft.createComplexArray();
-        const previousPhases = new Float32Array(frameSize / 2);
+        const previousPhases = new FloatBuffer(frameSize / 2);
         const expectedPhaseAdvance = 2 * Math.PI * hopSize / frameSize;
         for (let pos = 0; pos + frameSize <= modulatorPcm.length; pos += hopSize) {
             const noteFreq = _(this.conf.Note)(pos, inPcm);

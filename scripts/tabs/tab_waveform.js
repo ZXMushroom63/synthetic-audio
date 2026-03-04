@@ -768,7 +768,7 @@ addEventListener("init", () => {
     function deserialiseWaveform(wv, uuid) {
         wv.samples = new Float32Array(wv.samples);
         if (wv.samples.length !== WAVEFORM_RES) { //upsample old
-            wv.samples = upsampleFloat32Array(wv.samples, WAVEFORM_RES);
+            wv.samples = upsampleFloatArray(wv.samples, WAVEFORM_RES);
         }
         wv.uuid = uuid;
         calculateWaveform(wv, true);

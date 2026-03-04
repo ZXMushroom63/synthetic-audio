@@ -940,14 +940,14 @@ function drawChordMacros(loop, inversionsOnly) {
                 return playSample(macroBadge.blob);
             }
             macroBadge.processing = true;
-            const pcm = new Float32Array(audio.samplerate / 2);
+            const pcm = new FloatBuffer(audio.samplerate / 2);
             const def = filters[template.type];
             for (let i = 0; i < unrealisedChords.length; i++) {
                 const dt = unrealisedChords[i];
                 pcm.set(await def.functor.apply(dt, [pcm, 0, getProjectMeta()]));
             }
             if (audio.normalise) {
-                normaliseFloat32Arrays([pcm]);
+                normaliseFloatArrays([pcm]);
             }
             const blob = await convertToFileBlob([pcm], 1, audio.samplerate, audio.bitrate, true);
             macroBadge.blob = blob;
