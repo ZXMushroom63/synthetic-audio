@@ -48,7 +48,7 @@ function bootVial() {
     if (!VIALFrame.contentWindow) {
         VIALFrame.src = "about:blank";
         let urlParams = new URLSearchParams(location.search);
-        let vialPrefix = urlParams.has("vialprefix") ? urlParams.get("vialprefix") : "/vital/docs/index.html"
+        let vialPrefix = urlParams.has("vialprefix") ? urlParams.get("vialprefix") : "/vital/index.html"
         VIALFrame.src = vialPrefix + "?screen_percentage=85&target_fps=24&channel_count=2&audio_stack_size_samples=512&clockspeed_multiplier=1&autostart&samplerate=24000&syn&remoteassets=true";
     }
 }
