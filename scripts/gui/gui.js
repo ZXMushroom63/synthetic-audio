@@ -972,6 +972,7 @@ function init() {
     document.querySelector("#loopsample").addEventListener("ended", stopSample);
 }
 let stopPlayingTimer = null;
+registerSetting("SoundPreviewVolMult", 1.0);
 function playSample(file, volume, speed, timeOffset) {
     if (stopPlayingTimer) {
         clearTimeout(stopPlayingTimer);
@@ -986,7 +987,7 @@ function playSample(file, volume, speed, timeOffset) {
     sample.src = URL.createObjectURL(file);
     sample.preservesPitch = false;
     sample.playbackRate = speed;
-    sample.volume = volume;
+    sample.volume = settings.SoundPreviewVolMult ?? 1;
     sample.currentTime = timeOffset ?? 0;
     sample.play();
     stopPlayingTimer = setTimeout(() => {
