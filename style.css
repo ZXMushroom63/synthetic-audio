@@ -180,6 +180,9 @@ h4 {
 html[data-libsettings-OpaqueLayers] .loop.deactivated {
   display: none;
 }
+html[data-libsettings-NoRounding] * {
+  border-radius: 0;
+}
 
 html[data-libsettings-LDMLoopInteraction] .loop.active .loopInternal>* {
   display: none;

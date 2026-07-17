@@ -303,6 +303,7 @@ function hydrateLoopBackground(elem) {
 }
 
 registerSetting("OpaqueLayers", false);
+registerSetting("NoRounding", false);
 registerSetting("LDMLoopInteraction", false);
 function hydrateLoopSpecificLayer(elem) {
     if (elem.noEditorLayer || (elem.getAttribute("data-editlayer") === gui.layer) || (gui.layer === MAX_LAYER)) {

@@ -101,7 +101,7 @@ addEventListener("keydown", (e)=>{
         e.preventDefault();
         if (settings.MicrotonalEngine) {
             pauseMicrotonality = (!pauseMicrotonality);
-            toast(`Microtonal ZScroll ${pauseMicrotonality ? "Off" : "On"} (Alt + M)`, 1.5);
+            toast(`Microtonal ZScroll ${pauseMicrotonality ? "Off" : "On"} (Alt + M), using ${12 / (pauseMicrotonality ? 1 : settings.MicrotonalZScrollSize)} tone scale`, 1.5);
         }
     }
 })
